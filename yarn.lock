@@ -1327,6 +1327,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#5.4.0.3":
+  version: 5.4.0.1
+  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=a5fb384bec065118b8c26a80c6a18e59ff84713a"
+  dependencies:
+    govuk-frontend: "npm:^5.0.0"
+  checksum: 10c0/9a814b8baadd758971a941a65a193ae39230e75ab62cbb8a7c18f058da8650fe5ef5f93e4fa0837756097c8eb2f0063cbd8a5373a5dab6f7911f65f6c78de5fc
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -3750,6 +3759,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"govuk-frontend@npm:^5.0.0":
+  version: 5.6.0
+  resolution: "govuk-frontend@npm:5.6.0"
+  checksum: 10c0/e3bd8e50b6d4e0ef2190f0bc14ecbdd4a126abce52a683c2008e32d16185ec5d7963bbfce53f7ef17026b97ee1dbe340272cc624f883e1e8a054aa90423f2293
+  languageName: node
+  linkType: hard
+
 "graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.2.11, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6, graceful-fs@npm:^4.2.9":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
@@ -5779,6 +5795,7 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.17.0"
     "@babel/preset-env": "npm:^7.16.0"
+    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#5.4.0.3"
     "@symfony/webpack-encore": "npm:^4.0.0"
     core-js: "npm:^3.23.0"
     regenerator-runtime: "npm:^0.13.9"
