@@ -1,1 +1,13 @@
 {% extends '@GhostGovUkFrontend/template.html.twig' %}
+
+{% block head %}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block bodyEnd %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+
+{% block content %}
+    <p class="govuk-body">Hello world</p>
+{% endblock %}
