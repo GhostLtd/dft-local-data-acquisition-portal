@@ -1,9 +1,6 @@
 twig:
     file_name_pattern: '*.twig'
 
-    globals:
-        csp_inline_script_helper: '@App\Utility\CspInlineScriptHelper'
-
 when@test:
     twig:
         strict_variables: true
