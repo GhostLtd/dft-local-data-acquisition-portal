@@ -1,0 +1,90 @@
+enum:
+  active_travel:
+    no_active_travel_elements: No active travel elements
+    area_wide_traffic_management: Area-wide traffic management (including by TROs, whether permanent or experimental)
+    bus_priority_measures: Bus priority measures that also enable Active Travel (e.g. bus gates)
+    route_improvements: Improvements to make an existing walking /cycle route safer
+    new_junction_treatment: New junction treatment
+    new_permanent_footway: New permanent footway
+    new_road_crossings: new road crossings
+    new_segregated_cycling: New segregated cycling facility
+    new_shared_use: New shared use (walking /cycling)
+    provision_of_secure_cycle_parking: Provision of secure cycle parking facilities
+    restriction_or_reduction_of_parking: Restriction or reduction of car parking availability
+    school_streets: School streets
+    other: Other active travel
+  business_case:
+    working_towards_sobc: Working towards SOBC
+    working_towards_obc: Working towards OBC
+    working_towards_fbc: Working towards FBC
+    post_fbc: Post-FBC
+    not_applicable: N/A
+  crsts_phase:
+    crsts1: CRSTS1
+    crsts2: CRSTS2
+  fund:
+    CRSTS: CRSTS
+  milestone_type:
+    start_development: Start development
+    end_development: End development
+    start_delivery: Start construction / delivery
+    end_delivery: End construction / delivery
+    final_delivery: Final delivery
+  on_track_rating:
+    green: Green
+    green_amber: Green / Amber
+    amber: Amber
+    amber_red: Amber / Red
+    red: Red
+    project_completed: Project completed
+    project_on_hold: Project on hold
+    project_completed_late: Project completed late
+    project_cancelled: Project cancelled
+    not_applicable: N/A
+  rating:
+    green: Green
+    green_amber: Green / Amber
+    amber: Amber
+    amber_red: Amber / Red
+    red: Red
+  transport_mode:
+    multi-modal:
+      interchange-with-active-travel: Interchange or travel hub, with Active Travel elements
+      interchange-without-active-travel: Interchange or travel hub, without Active Travel elements
+      bus-and-active-travel-corridor: Bus & Active Travel corridor
+      traffic_reduction: Traffic reduction / modal shift
+      other: Other
+    active-travel:
+      improvements-to-existing-walking-or-cycle-route: Improvements to make an existing walking/cycle route safer
+      new-junction-treatment: New junction treatment
+      new-permanent-footway: New permanent footway
+      new-road-crossings: New road crossings
+      new-segregated-cycling-facility: New segregated cycling facility
+      new-shared-use-walking-or-cycling: New shared use (walking /cycling)
+      provision-of-secure-cycle-parking: Provision of secure cycle parking facilities
+      restriction-or-reduction-of-car-parking: Restriction or reduction of car parking availability
+      school-streets: School streets
+      other: Other
+    bus:
+      bus-priority-measures: Bus priority measures
+      other-bus-and-coach-infrastructure: Other bus & coach infrastructure
+      ticketing-reform: Ticketing Reform
+      fares-support: Fares Support
+      zero-emission-buses: Zero Emission Buses
+      fleet-upgrade: Fleet upgrade
+      other: Other
+    rail:
+      interchange-or-network-upgrade: Interchange or network upgrade
+      other: Other
+    tram:
+      interchange-or-network-upgrade: Interchange or network upgrade
+      fleet-upgrade: Fleet upgrade
+      other: Other
+    road:
+      highways-maintenance: Highways maintenance (including resilience & adaptation measures)
+      ev-charging-infrastructure: EV charging infrastructure
+      local-road-junction-congestion-or-safety-improvements: Local road, junction, congestion, safety improvements
+      other: Other
+    other:
+      staffing-and-resourcing: Staffing & resourcing
+      other: Other
