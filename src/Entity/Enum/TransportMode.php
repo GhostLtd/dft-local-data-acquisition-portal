@@ -50,4 +50,26 @@ enum TransportMode: string
     // Other
     case OTHER_STAFFING_AND_RESOURCING = "road.other-staffing-and-resourcing";
     case OTHER_OTHER = "other.other";
+
+    /**
+     * @return array<TransportMode>
+     */
+    public static function filterByCategory(string $category): array
+    {
+        return array_values(
+            array_filter(self::cases(), fn(\UnitEnum $e) => str_starts_with($e->value, "{$category}."))
+        );
+    }
+
+    /**
+     * @return array<string>
+     */
+    public static function getCategories(): array
+    {
+        return array_values(
+            array_unique(
+                array_map(fn(\UnitEnum $e) => explode('.', $e->value)[0], self::cases())
+            )
+        );
+    }
 }
