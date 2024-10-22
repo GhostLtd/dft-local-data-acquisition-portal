@@ -4,14 +4,35 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        main:
+            entity:
+                class: App\Entity\User
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
         main:
+            host: '^%frontend_hostname%$'
             lazy: true
-            provider: users_in_memory
+            provider: main
+            remember_me:
+                secret:   '%kernel.secret%' # required
+                lifetime: 604800 # 1 week in seconds
+                always_remember_me: true
+            login_link:
+                check_route: app_login_check
+                check_post_only: true
+                lifetime: 604800
+                max_uses: 1
+                signature_properties: ['email']
+
+                failure_handler: App\Security\EmailAuthenticationHandler
+                success_handler: App\Security\EmailAuthenticationHandler
+            entry_point: App\Security\EmailAuthenticationHandler
+            logout:
+                path: app_logout
+                target: app_login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -22,8 +43,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { host: '^%frontend_hostname%$', path: '^/$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%frontend_hostname%$', path: '^/login$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
 
 when@test:
     security:

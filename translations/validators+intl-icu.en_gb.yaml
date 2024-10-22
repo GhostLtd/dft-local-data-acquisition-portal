@@ -1,0 +1,19 @@
+common:
+  cost:
+    invalid: Enter a real cost. For example £3.70
+  date:
+    invalid: Enter a valid date
+  number:
+    invalid: Enter a number
+    not-null: Enter a number
+    positive-or-zero: Enter a positive number or zero
+    positive: Enter a positive number
+    max: "Cannot be more than {limit, number}"
+    too-large:
+      whole: Enter a maximum of {maxWholeDigits} digits and {maxDecimalDigits} decimal places
+      decimal: Enter a maximum of {maxDecimalDigits} decimal places
+
+auth:
+  login:
+    email_blank: Enter an email address
+    invalid_email: Enter a valid email address

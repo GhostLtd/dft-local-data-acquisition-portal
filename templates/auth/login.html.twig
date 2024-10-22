@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block pageTitle %}Sign in - {{ parent() }}{% endblock %}
+{% block metaDescription %}Sign in here. You will need the credentials you were sent.{% endblock %}
+
+{%- block beforeContent -%}
+{%- endblock -%}
+
+{%- block content -%}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import errorSummary, notificationBanner -%}
+
+    {%- if maintenanceWarningBanner ?? false -%}
+        {{- notificationBanner(maintenanceWarningBanner) -}}
+    {%- endif -%}
+
+    {%- if authenticationError -%}
+        {{- errorSummary({
+            titleText: 'error_summary.title' | trans,
+            errorList: [
+                {text: authenticationError.message, href: '#login_username'}
+            ]
+        }) -}}
+    {% endif -%}
+
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-3">Sign in</h1>
+    <p class="govuk-body govuk-!-margin-bottom-8">Use this service to complete your returns.</p>
+
+    {% form_theme form '@GhostGovUkFrontend/theme.html.twig' %}
+    {{ form(form) }}
+
+<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+{#
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+    </div>
+</div>
+#}
+{%- endblock -%}

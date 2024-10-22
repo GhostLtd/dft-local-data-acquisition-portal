@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{%- set disable_breadcrumbs = true -%}
+
+{% block pageTitle %}Portal - {{ parent() }}{% endblock %}
+
+{% block content %}
+    <h1 class="govuk-heading-xl">Portal</h1>
+
+    <p class="govuk-body">Thank you for logging in.</p>
+    <p class="govuk-body">Click through to your dashboard to fill in a new return or review completed returns.</p>
+
+    <form action="{{ path('app_login_check') }}" method="POST">
+        <input type="hidden" name="expires" value="{{ expires }}">
+        <input type="hidden" name="user" value="{{ user }}">
+        <input type="hidden" name="hash" value="{{ hash }}">
+
+        <button id="login" type="submit" class="govuk-button">Access dashboard</button>
+    </form>
+{% endblock %}

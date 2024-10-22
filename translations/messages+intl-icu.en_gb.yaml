@@ -1,3 +1,13 @@
+auth:
+  error: Error
+  login:
+    email.label: Email address
+    sign_in.label: Sign in
+  login_failure_banner:
+    heading: Login error
+    title: Login error
+  rate_limit_error: "Rate limit exceeded; try again later"
+
 enum:
   active_travel:
     no_active_travel_elements: No active travel elements
@@ -48,43 +58,46 @@ enum:
     amber_red: Amber / Red
     red: Red
   transport_mode:
-    multi-modal:
-      interchange-with-active-travel: Interchange or travel hub, with Active Travel elements
-      interchange-without-active-travel: Interchange or travel hub, without Active Travel elements
-      bus-and-active-travel-corridor: Bus & Active Travel corridor
+    multi_modal:
+      interchange_with_active_travel: Interchange or travel hub, with Active Travel elements
+      interchange_without_active_travel: Interchange or travel hub, without Active Travel elements
+      bus_and_active_travel_corridor: Bus & Active Travel corridor
       traffic_reduction: Traffic reduction / modal shift
       other: Other
-    active-travel:
-      improvements-to-existing-walking-or-cycle-route: Improvements to make an existing walking/cycle route safer
-      new-junction-treatment: New junction treatment
-      new-permanent-footway: New permanent footway
-      new-road-crossings: New road crossings
-      new-segregated-cycling-facility: New segregated cycling facility
-      new-shared-use-walking-or-cycling: New shared use (walking /cycling)
-      provision-of-secure-cycle-parking: Provision of secure cycle parking facilities
-      restriction-or-reduction-of-car-parking: Restriction or reduction of car parking availability
-      school-streets: School streets
+    active_travel:
+      improvements_to_existing_walking_or_cycle_route: Improvements to make an existing walking/cycle route safer
+      new_junction_treatment: New junction treatment
+      new_permanent_footway: New permanent footway
+      new_road_crossings: New road crossings
+      new_segregated_cycling_facility: New segregated cycling facility
+      new_shared_use_walking_or_cycling: New shared use (walking /cycling)
+      provision_of_secure_cycle_parking: Provision of secure cycle parking facilities
+      restriction_or_reduction_of_car_parking: Restriction or reduction of car parking availability
+      school_streets: School streets
       other: Other
     bus:
-      bus-priority-measures: Bus priority measures
-      other-bus-and-coach-infrastructure: Other bus & coach infrastructure
-      ticketing-reform: Ticketing Reform
-      fares-support: Fares Support
-      zero-emission-buses: Zero Emission Buses
-      fleet-upgrade: Fleet upgrade
+      bus_priority_measures: Bus priority measures
+      other_bus_and_coach_infrastructure: Other bus & coach infrastructure
+      ticketing_reform: Ticketing Reform
+      fares_support: Fares Support
+      zero_emission_buses: Zero Emission Buses
+      fleet_upgrade: Fleet upgrade
       other: Other
     rail:
-      interchange-or-network-upgrade: Interchange or network upgrade
+      interchange_or_network_upgrade: Interchange or network upgrade
       other: Other
     tram:
-      interchange-or-network-upgrade: Interchange or network upgrade
-      fleet-upgrade: Fleet upgrade
+      interchange_or_network_upgrade: Interchange or network upgrade
+      fleet_upgrade: Fleet upgrade
       other: Other
     road:
-      highways-maintenance: Highways maintenance (including resilience & adaptation measures)
-      ev-charging-infrastructure: EV charging infrastructure
-      local-road-junction-congestion-or-safety-improvements: Local road, junction, congestion, safety improvements
+      highways_maintenance: Highways maintenance (including resilience & adaptation measures)
+      ev_charging_infrastructure: EV charging infrastructure
+      local_road_junction_congestion_or_safety_improvements: Local road, junction, congestion, safety improvements
       other: Other
     other:
-      staffing-and-resourcing: Staffing & resourcing
+      staffing_and_resourcing: Staffing & resourcing
       other: Other
+
+error_summary:
+  title: Error
