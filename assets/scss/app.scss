@@ -1,1 +1,11 @@
-@import "@ghost/govuk-frontend-bundle/assets/css/ghost-frontend";
+@import "@ghost/govuk-frontend-bundle/assets/scss/ghost-frontend";
+
+section.govuk-service-navigation__wrapper-full-width {
+  nav.govuk-service-navigation__wrapper {
+    flex-grow: 1;
+  }
+}
+
+li.govuk-service-navigation__margin-left-auto {
+  margin-left: auto;
+}

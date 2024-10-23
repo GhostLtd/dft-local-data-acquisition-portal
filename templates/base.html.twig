@@ -7,3 +7,41 @@
 {% block javascripts %}
     {{ encore_entry_script_tags('app') }}
 {% endblock %}
+
+{%- block headerBar -%}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import header %}
+    {{- header({
+        classes: 'govuk-header--full-width-border'
+    }) -}}
+{%- endblock -%}
+
+{% block phaseBanner %}
+    {% if is_granted('ROLE_USER') %}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
+
+        {%- set signOutLink -%}
+            <li class="govuk-service-navigation__item govuk-service-navigation__margin-left-auto">
+                <a class="govuk-service-navigation__link" href="{{ path('app_logout') }}">Sign out</a>
+            </li>
+        {%- endset %}
+
+        {{- serviceNavigation({
+            classes: 'govuk-service-navigation__wrapper-full-width',
+            serviceName: "Data acquisition portal",
+            navigation: [
+                {
+                    href: "#",
+                    text: "Item 1"
+                },
+                {
+                    href: "#",
+                    text: "Item 2",
+                    active: true
+                }
+            ],
+            slots: {
+                navigationEnd: signOutLink
+            }
+        }) -}}
+    {% endif %}
+{% endblock %}
