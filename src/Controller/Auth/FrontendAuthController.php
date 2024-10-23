@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Auth;
 
 use App\Entity\User;
 use App\Features;
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AuthController extends AbstractController
+class FrontendAuthController extends AbstractController
 {
     #[Route("/login", name: "app_login")]
     public function login(

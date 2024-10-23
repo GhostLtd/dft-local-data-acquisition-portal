@@ -1,5 +1,27 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+base:
+    resource: '../src/Controller/*'
     type: attribute
+    stateless: false
+
+admin:
+    resource: '../src/Controller/Admin/**/*'
+    type: attribute
+    host: '%admin_hostname%'
+    stateless: false
+
+cron:
+    resource: ../src/Controller/Cron/
+    type: attribute
+    prefix: /cron
+    name_prefix: 'cron_'
+    condition: "(request.headers.get('X-Appengine-Cron') === 'true') or (request.headers.get('X-Cloudscheduler') === 'true')"
+
+frontend:
+    resource: '../src/Controller/Frontend/**/*'
+    type: attribute
+    host: '%frontend_hostname%'
+
+frontend_login:
+    resource: '../src/Controller/Auth/FrontendAuthController.php'
+    type: attribute
+    host: '%frontend_hostname%'

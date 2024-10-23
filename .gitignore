@@ -1,6 +1,7 @@
 
 .idea
 .yarn
+/public/.htaccess
 
 ###> symfony/framework-bundle ###
 /.env.local

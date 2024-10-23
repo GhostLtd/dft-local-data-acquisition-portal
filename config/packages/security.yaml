@@ -34,6 +34,13 @@ security:
                 path: app_logout
                 target: app_login
 
+        admin:
+            host: '^%admin_hostname%$'
+            lazy: true
+            stateless: true
+            custom_authenticators:
+                - Ghost\GovUkCoreBundle\Security\GoogleIap\IapAuthenticator
+
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -44,7 +51,11 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { host: '^%frontend_hostname%$', path: '^/$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%frontend_hostname%$', path: '^/authenticate$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%frontend_hostname%$', path: '^/check-email$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
         - { host: '^%frontend_hostname%$', path: '^/login$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%frontend_hostname%$', roles: ROLE_USER, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%admin_hostname%$', roles: ROLE_ADMIN, requires_channel: '%env(SECURE_SCHEME)%' }
 
 when@test:
     security:

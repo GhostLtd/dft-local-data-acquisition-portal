@@ -33,6 +33,10 @@ services:
         arguments:
             $apiKey: '%alphagov_notify_api_key%'
 
+    Ghost\GovUkCoreBundle\Security\GoogleIap\IapAuthenticator:
+        arguments:
+            $roleResolver: '@App\Security\IapRoleResolver'
+
     Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface $loginLinkHandler:
         '@security.authenticator.login_link_handler.main'
 
