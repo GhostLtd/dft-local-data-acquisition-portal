@@ -11,9 +11,9 @@ framework:
   rate_limiter:
     ip:
       policy: 'sliding_window'
-      limit: 20
+      limit: 5
       interval: '5 minutes'
     ip_and_username:
       policy: 'sliding_window'
-      limit: 20
+      limit: 5
       interval: '15 minutes'

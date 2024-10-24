@@ -90,7 +90,7 @@ class FrontendAuthController extends AbstractController
         ]);
     }
 
-    #[Route("/check-email", name: "app_login_check_email")]
+    #[Route("/login/check-email", name: "app_login_check_email")]
     public function loginCheckEmail(Security $security): Response {
         if ($security->getUser() !== null) {
             return $this->redirectToRoute('app_dashboard');
@@ -99,7 +99,7 @@ class FrontendAuthController extends AbstractController
         return $this->render('auth/login_check_email.html.twig');
     }
 
-    #[Route("/authenticate", name: "app_login_check")]
+    #[Route("/login/authenticate", name: "app_login_check")]
     public function loginCheck(Request $request): Response
     {
         $expires = $request->query->get('expires');
