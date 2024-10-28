@@ -7,6 +7,7 @@ auth:
     heading: Login error
     title: Login error
   rate_limit_error: "Rate limit exceeded; try again later"
+  sign_out: Sign out
 
 enum:
   active_travel:
@@ -101,3 +102,42 @@ enum:
 
 error_summary:
   title: Error
+
+errors:
+  http-not-found:
+    title: Page not found
+    heading: Page not found
+    copy: |-
+      If you typed the web address, check it is correct.
+
+      If you pasted the web address, check you copied the entire address.
+  forbidden:
+    title: Access denied
+    heading: Access denied
+    copy: |-
+      Sorry - you do not have permission to access this page
+  internal-server-error:
+    title: Sorry, there is a problem with the service
+    heading: Sorry, there is a problem with the service
+    copy: |-
+      Try again later.
+  maintenance:
+    title: Scheduled maintenance - Service unavailable
+    heading: |-
+      Scheduled maintenance -
+      Service unavailable
+    copy: |-
+      The service is undergoing scheduled maintenance, and is not available. Check back in 15 minutes.
+  unavailable:
+    title: Sorry, the service is unavailable
+    heading: Sorry, the service is unavailable
+    copy: |-
+      Try again later.
+  unauthorised:
+    title: Unauthorised
+    heading: Unauthorised
+    copy: |-
+      You need to be logged in to access this page
+
+site:
+  title: Data acquisition portal

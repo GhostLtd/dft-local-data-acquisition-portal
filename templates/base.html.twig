@@ -21,13 +21,13 @@
 
         {%- set signOutLink -%}
             <li class="govuk-service-navigation__item govuk-service-navigation__margin-left-auto">
-                <a class="govuk-service-navigation__link" href="{{ path('app_logout') }}">Sign out</a>
+                <a class="govuk-service-navigation__link" href="{{ path('app_logout') }}">{{ 'auth.sign_out' | trans }}</a>
             </li>
         {%- endset %}
 
         {{- serviceNavigation({
             classes: 'govuk-service-navigation__wrapper-full-width',
-            serviceName: "Data acquisition portal",
+            serviceName: 'site.title' | trans,
             navigation: [
                 {
                     href: "#",
@@ -44,4 +44,9 @@
             }
         }) -}}
     {% endif %}
+
+    {% from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner %}
+    {%- if maintenanceWarningBanner is defined -%}
+        {{- notificationBanner(maintenanceWarningBanner) -}}
+    {%- endif -%}
 {% endblock %}
