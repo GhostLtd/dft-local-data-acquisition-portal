@@ -30,6 +30,7 @@
         "symfony/yaml": "6.4.*"
     },
     "require-dev": {
+        "fakerphp/faker": "^1.23",
         "phpunit/phpunit": "^11.3",
         "symfony/debug-bundle": "6.4.*",
         "symfony/maker-bundle": "^1.61",

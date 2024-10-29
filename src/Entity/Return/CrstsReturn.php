@@ -5,6 +5,7 @@ namespace App\Entity\Return;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
+use App\Entity\Expense\ExpenseSeries;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\Traits\IdTrait;
@@ -26,56 +27,56 @@ class CrstsReturn
     #[ORM\Column]
     private ?int $year = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $quarter = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $progressSummary = null;
+    private ?string $progressSummary = null; // 1top_info: Programme level progress summary
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $deliveryConfidence = null;
+    private ?string $deliveryConfidence = null; // 1top_info: Programme delivery confidence comment assessment
 
     #[ORM\Column(nullable: true, enumType: Rating::class)]
-    private ?Rating $overallConfidence = null;
+    private ?Rating $overallConfidence = null; // 1top_info: Overall confidence
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $ragProgressSummary = null;
+    private ?string $ragProgressSummary = null; // 1top_info: RAG progress this quarter - commentary
 
     #[ORM\Column(nullable: true, enumType: Rating::class)]
-    private ?Rating $ragProgressRating = null;
+    private ?Rating $ragProgressRating = null; // 1top_info: RAG progress this quarter
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $localContribution = null;
+    private ?string $localContribution = null; // 2top_exp: Local contribution.  Please provide a current breakdown of local contribution achieved, by source.
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $resourceFunding = null;
+    private ?string $resourceFunding = null; // 2top_exp: Resource (RDEL) funding.  Please see Appendix A.
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $comments = null;
+    private ?string $comments = null; // 2top_exp: Comment box.  Please provide some commentary on the programme expenditure table above.  Any expenditure post 26/27 MUST be explained.
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $totalCost = null;
+    private ?string $totalCost = null; // 2proj_exp: Total cost of project (<this fund> plus other expenditure)
 
     #[ORM\Column(length: 255)]
-    private ?string $agreedFunding = null;
+    private ?string $agreedFunding = null; // 2proj_exp: Agreed funding, <this fund>
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $spendToDate = null;
+    private ?string $spendToDate = null; // 2proj_exp: Spend to date, <this fund>
 
     #[ORM\Column(nullable: true, enumType: OnTrackRating::class)]
-    private ?OnTrackRating $onTrackRating = null;
+    private ?OnTrackRating $onTrackRating = null; // 4proj_exp: On-track rating (delivery confidence assessment)
 
     #[ORM\Column(nullable: true, enumType: BusinessCase::class)]
-    private ?BusinessCase $businessCase = null;
+    private ?BusinessCase $businessCase = null; // 4proj_exp: Current business case
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $expectedBusinessCaseApproval = null;
+    private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_exp: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $progressUpdate = null;
+    private ?string $progressUpdate = null; // 4proj_exp: Progress update (comment)
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $signoffBy = null;
+    private ?string $signoffBy = null; // top_signoff
 
     /**
      * @var Collection<int, Milestone>
@@ -83,9 +84,16 @@ class CrstsReturn
     #[ORM\OneToMany(targetEntity: Milestone::class, mappedBy: 'return', orphanRemoval: true)]
     private Collection $milestones;
 
+    /**
+     * @var Collection<int, ExpenseSeries>
+     */
+    #[ORM\ManyToMany(targetEntity: ExpenseSeries::class)]
+    private Collection $expenses;
+
     public function __construct()
     {
         $this->milestones = new ArrayCollection();
+        $this->expenses = new ArrayCollection();
     }
 
     public function getProjectFund(): ?CrstsProjectFund
@@ -115,7 +123,7 @@ class CrstsReturn
         return $this->quarter;
     }
 
-    public function setQuarter(int $quarter): static
+    public function setQuarter(?int $quarter): static
     {
         $this->quarter = $quarter;
         return $this;
@@ -324,6 +332,29 @@ class CrstsReturn
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ExpenseSeries>
+     */
+    public function getExpenses(): Collection
+    {
+        return $this->expenses;
+    }
+
+    public function addExpense(ExpenseSeries $expense): static
+    {
+        if (!$this->expenses->contains($expense)) {
+            $this->expenses->add($expense);
+        }
+
+        return $this;
+    }
+
+    public function removeExpense(ExpenseSeries $expense): static
+    {
+        $this->expenses->removeElement($expense);
         return $this;
     }
 }

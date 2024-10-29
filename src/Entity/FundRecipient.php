@@ -15,11 +15,11 @@ class FundRecipient
     use IdTrait;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $name = null; // 1top_info: Local Authority name
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Contact $leadContact = null;
+    private ?Contact $leadContact = null; // 1top_info: Lead contact
 
     /**
      * @var Collection<int, Project>

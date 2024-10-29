@@ -6,6 +6,9 @@ use App\Entity\Traits\IdTrait;
 use App\Repository\ContactRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+// These fields are currently used to represent the "Lead contact" fields from 1top_info,
+// but later can be additionally used for storing other contacts
+
 #[ORM\Entity(repositoryClass: ContactRepository::class)]
 class Contact
 {

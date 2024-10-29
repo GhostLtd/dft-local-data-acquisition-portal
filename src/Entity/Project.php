@@ -21,10 +21,10 @@ class Project
     private ?FundRecipient $owner = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $name = null; // 1proj_info: Project name
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $description = null;
+    private ?string $description = null; // 1proj_info: Project description
 
     /**
      * @var Collection<int, ProjectFund>

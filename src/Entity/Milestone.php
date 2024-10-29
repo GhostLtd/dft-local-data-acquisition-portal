@@ -15,10 +15,10 @@ class Milestone
     use IdTrait;
 
     #[ORM\Column(enumType: MilestoneType::class)]
-    private ?MilestoneType $type = null;
+    private ?MilestoneType $type = null; // 4proj_milestones (one of "Start development", "End development" etc - see enum)
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $date = null;
+    private ?\DateTimeInterface $date = null; // 4proj_milestone (the value for the chosen field)
 
     #[ORM\ManyToOne(inversedBy: 'milestones')]
     #[ORM\JoinColumn(nullable: false)]

@@ -26,19 +26,19 @@ class ProjectFund
     private ?Project $project = null;
 
     #[ORM\Column(nullable: true, enumType: TransportMode::class)]
-    private ?TransportMode $transportMode = null;
+    private ?TransportMode $transportMode = null; // 1proj_info: Transport mode
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ActiveTravelElements::class)]
-    private array $activeTravelElements = [];
+    private array $activeTravelElements = []; // 1proj_info: Does this project have active travel elements?
 
     #[ORM\Column(nullable: true)]
-    private ?bool $includesCleanAirElements = null;
+    private ?bool $includesCleanAirElements = null; // 1proj_info: Will this project include clean air elements?
 
     #[ORM\Column(nullable: true)]
-    private ?bool $includesChargingPoints = null;
+    private ?bool $includesChargingPoints = null; // 1proj_info: Will this project include charging points for electric vehicles?
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $projectIdentifier = null;
+    private ?string $projectIdentifier = null; // 1proj_info: Project ID
 
     public function getProject(): ?Project
     {

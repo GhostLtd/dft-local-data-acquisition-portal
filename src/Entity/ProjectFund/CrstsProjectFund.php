@@ -13,10 +13,10 @@ use Doctrine\ORM\Mapping as ORM;
 class CrstsProjectFund extends ProjectFund
 {
     #[ORM\Column]
-    private ?bool $retained = null;
+    private ?bool $retained = null; // 1proj_info: Is this a retained scheme / project?
 
     #[ORM\Column(enumType: CrstsPhase::class)]
-    private ?CrstsPhase $phase = null;
+    private ?CrstsPhase $phase = null; // 1proj_info: Is this project funded by CRSTS1 or CRSTS2?
 
     /**
      * @var Collection<int, CrstsReturn>
