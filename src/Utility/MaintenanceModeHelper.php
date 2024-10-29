@@ -65,7 +65,7 @@ class MaintenanceModeHelper
             return true;
         }
 
-        if (1 === preg_match('/^_profiler/', (string)$routeName)) {
+        if (1 === preg_match('/^_profiler/', $routeName)) {
             return true;
         }
 
@@ -114,8 +114,8 @@ class MaintenanceModeHelper
             $this->cache->delete(self::MAINTENANCE_INFO_CACHE_KEY);
         } catch (InvalidArgumentException) {}
 
-        $this->isActive = null;
-        $this->whitelistedIps = null;
+        $this->isActive = false;
+        $this->whitelistedIps = [];
     }
 
     protected function loadState(): void
