@@ -1,10 +1,18 @@
+parameters:
+    DEFAULT_DRIVER: pdo_pgsql
+    DEFAULT_HOST: "127.0.0.1"
+    DEFAULT_NAME: ldap
+    DEFAULT_USER: ldap
+
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
-
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '16'
+        driver: '%env(string:default:DEFAULT_DRIVER:DATABASE_DRIVER)%'
+        host: '%env(string:default:DEFAULT_HOST:DATABASE_HOST)%'
+        dbname: '%env(string:default:DEFAULT_NAME:DATABASE_NAME)%'
+        user: '%env(string:default:DEFAULT_USER:DATABASE_USER)%'
+        password: '%env(DATABASE_PASSWORD)%'
+        server_version: '%env(DATABASE_SERVER_VERSION)%'
+        charset: utf8
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true

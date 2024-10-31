@@ -18,6 +18,13 @@ class MaintenanceLockSubscriber implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $routeName = $event->getRequest()->attributes->get('_route');
+
+        if (!$routeName) {
+            // This may happen in case of an error, for example:
+            // We'll end up with error_controller, and no route defined
+            return;
+        }
+
         $clientIp = $event->getRequest()->getClientIp();
 
         if (!$this->maintenanceModeHelper->isMaintenanceModeEnabledForRouteAndIp($routeName, $clientIp)) {
