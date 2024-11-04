@@ -3,6 +3,13 @@ csp_report:
     methods: [POST]
     defaults: { _controller: nelmio_security.csp_reporter_controller::indexAction }
 
+cron:
+    resource: ../src/Controller/Cron/
+    type: attribute
+    prefix: /cron
+    name_prefix: 'cron_'
+    condition: "(request.headers.get('X-Appengine-Cron') === 'true') or (request.headers.get('X-Cloudscheduler') === 'true')"
+
 core_controllers:
     resource:
         path: '@GhostGovUkCoreBundle/src/Controller'
@@ -19,13 +26,6 @@ admin:
     type: attribute
     host: '%admin_hostname%'
     stateless: false
-
-cron:
-    resource: ../src/Controller/Cron/
-    type: attribute
-    prefix: /cron
-    name_prefix: 'cron_'
-    condition: "(request.headers.get('X-Appengine-Cron') === 'true') or (request.headers.get('X-Cloudscheduler') === 'true')"
 
 frontend:
     resource: '../src/Controller/Frontend/**/*'

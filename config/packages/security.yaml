@@ -49,6 +49,9 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # N.B. Don't force https for either of these, as it means we'll get a redirect...
+        - { path: ^/_ah }
+        - { host: '^%frontend_hostname%$', path: ^/cron }
         - { host: '^%frontend_hostname%$', path: '^/$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
         - { host: '^%frontend_hostname%$', path: '^/login', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
         - { host: '^%frontend_hostname%$', roles: ROLE_USER, requires_channel: '%env(SECURE_SCHEME)%' }

@@ -1,0 +1,64 @@
+options:
+    env:
+      - 'APP_ENV=prod'
+      - 'APP_DATABASE_HOST=${_APP_DATABASE_HOST}'
+      - 'APP_DATABASE_SERVER_VERSION=${_APP_DATABASE_SERVER_VERSION}'
+      - 'APP_DATABASE_NAME=${_APP_DATABASE_NAME}'
+      - 'APP_DATABASE_USER=${_APP_DATABASE_USER}'
+      - 'APP_DATABASE_PASSWORD=${_APP_DATABASE_PASSWORD}'
+      - 'APP_ADMIN_HOSTNAME=${_APP_ADMIN_HOSTNAME}'
+      - 'APP_FRONTEND_HOSTNAME=${_APP_FRONTEND_HOSTNAME}'
+      - 'APP_SECRET=${_APP_SECRET}'
+
+    defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+
+steps:
+    # Start by running some pre-install actions
+#    - name: node:22
+#      id: 'pre-install-script'
+#      entrypoint: sh
+#      args: ['-c', 'config/gcloud-build/call-remote-action.sh -a pre-install']
+#      waitFor: ['-']
+
+    # Copy deployment config files in to root directory (alpine required for gsutil)
+    - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+      id: 'copy-deploy-files'
+      entrypoint: sh
+      args: ['-c', 'gsutil rsync config/gcloud-build/all/ . && gsutil rsync config/gcloud-build/$PROJECT_ID/ .']
+#      waitFor: ['pre-install-script']
+
+    # build assets, and .env.local file
+    - name: node:22
+      id: 'yarn-build'
+      entrypoint: sh
+      args: ['-c', 'corepack enable && yarn install --immutable --network-timeout 60000 && yarn run deploy-build && yarn run build-env-subs']
+      automapSubstitutions: true
+      waitFor: ['copy-deploy-files']
+
+    ## The app deployment will not run `composer install` if the composer.lock file has not changed
+    ## meaning that post install scripts, or even update scripts to not get run
+
+    # deploy default service
+    - name: "gcr.io/cloud-builders/gcloud"
+      id: 'deploy-default-service'
+      args: ["app", "deploy", "app.default.yaml", "--ignore-file=.gcloudignore", "--no-cache"]
+      waitFor: ['yarn-build']
+
+    - name: "gcr.io/cloud-builders/gcloud"
+      id: 'deploy-admin-service'
+      args: ["app", "deploy", "app.admin.yaml", "--ignore-file=.gcloudignore", "--no-cache"]
+      waitFor: ['deploy-default-service']
+
+    - name: "gcr.io/cloud-builders/gcloud"
+      id: 'deploy-cron'
+      args: ["app", "deploy", "cron.yaml"]
+      waitFor: ['deploy-default-service', 'deploy-admin-service']
+
+    # Finish up by calling the post-install-script
+#    - name: node:22
+#      id: 'post-install-script'
+#      entrypoint: sh
+#      args: ['-c', 'config/gcloud-build/call-remote-action.sh -a post-install']
+#      waitFor: ['deploy-default-service', 'deploy-admin-service', 'deploy-cron']
+
+timeout: "1800s"

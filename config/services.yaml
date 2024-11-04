@@ -1,18 +1,20 @@
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 
-imports:
-    - { resource: 'form_wizards/**/*.php' }
-    - { resource: 'workflows/**/*.php' }
+# Re-enable these when you put files into these directories
+# ---------------------------------------------------------
+# imports:
+#    - { resource: 'form_wizards/**/*.php' }
+#    - { resource: 'workflows/**/*.php' }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    alphagov_notify_api_key: '%env(string:ALPHAGOV_NOTIFY_API_KEY)%'
+    app_notify_api_key: '%env(string:APP_NOTIFY_API_KEY)%'
     app_secret: '%env(APP_SECRET)%'
 
-    admin_hostname: '%env(string:ADMIN_HOSTNAME)%'
-    frontend_hostname: '%env(string:FRONTEND_HOSTNAME)%'
+    admin_hostname: '%env(string:APP_ADMIN_HOSTNAME)%'
+    frontend_hostname: '%env(string:APP_FRONTEND_HOSTNAME)%'
 
 services:
     # default configuration for services in *this* file
@@ -35,7 +37,7 @@ services:
     Alphagov\Notifications\Client:
         factory: '@Ghost\GovUkCoreBundle\Utility\AlphagovNotify\ClientFactory'
         arguments:
-            $apiKey: '%alphagov_notify_api_key%'
+            $apiKey: '%app_notify_api_key%'
 
     Ghost\GovUkCoreBundle\Security\GoogleIap\IapAuthenticator:
         arguments:
