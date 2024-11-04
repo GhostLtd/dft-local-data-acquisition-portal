@@ -2,6 +2,7 @@
 
 namespace App\Entity\Return;
 
+use App\Entity\Contact;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
@@ -78,6 +79,10 @@ class CrstsReturn
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $signoffBy = null; // top_signoff
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?Contact $signoffContact = null; // top_signoff
+
     /**
      * @var Collection<int, Milestone>
      */
@@ -89,6 +94,7 @@ class CrstsReturn
      */
     #[ORM\ManyToMany(targetEntity: ExpenseSeries::class)]
     private Collection $expenses;
+
 
     public function __construct()
     {
@@ -355,6 +361,18 @@ class CrstsReturn
     public function removeExpense(ExpenseSeries $expense): static
     {
         $this->expenses->removeElement($expense);
+        return $this;
+    }
+
+    public function getSignoffContact(): ?Contact
+    {
+        return $this->signoffContact;
+    }
+
+    public function setSignoffContact(?Contact $signoffContact): static
+    {
+        $this->signoffContact = $signoffContact;
+
         return $this;
     }
 }

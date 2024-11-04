@@ -1,5 +1,4 @@
 services:
-
     app.lock_store:
         class: 'Symfony\Component\Lock\Store\DoctrineDbalStore'
         lazy: true

@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\DataFixtures\Definition\ContactDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
 use App\DataFixtures\Definition\FundRecipientDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
@@ -21,7 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class FixtureHelper
 {
     protected ?EntityManagerInterface $entityManager = null;
-    protected ?array $expenseTypes = [];
+    protected ?array $contacts = [];
 
     public function setEntityManager(EntityManagerInterface $entityManager): static
     {
@@ -47,23 +48,50 @@ class FixtureHelper
 
     public function createFundRecipient(FundRecipientDefinition $definition): FundRecipient
     {
-        $leadContact = (new Contact())
-            ->setName($definition->getLeadContactName())
-            ->setPosition($definition->getLeadContactPosition())
-            ->setPhone($definition->getLeadContactPhone())
-            ->setEmail($definition->getLeadContactEmail());
+        $leadContact = $this->createContact($definition->getContact());
 
         $fundRecipient = (new FundRecipient())
             ->setName($definition->getName())
             ->setLeadContact($leadContact);
 
-        $this->persist([$leadContact, $fundRecipient]);
+        $this->persist([$fundRecipient]);
 
         foreach($definition->getProjects() as $projectDefinition) {
             $fundRecipient->addProject($this->createProject($projectDefinition));
         }
 
         return $fundRecipient;
+    }
+
+    public function createContact(ContactDefinition $definition): Contact
+    {
+        $email = $definition->getEmail();
+
+        $existingContact = $this->contacts[$email] ?? null;
+
+        if ($existingContact) {
+            if (
+                $definition->getName() !== $existingContact->getName() ||
+                $definition->getPhone() !== $existingContact->getPhone() ||
+                $definition->getPosition() !== $existingContact->getPosition()
+            ) {
+                throw new \RuntimeException('Contact with given email already exists, but with different details');
+            }
+
+            return $existingContact;
+        }
+
+        $contact = (new Contact())
+            ->setName($definition->getName())
+            ->setPosition($definition->getPosition())
+            ->setPhone($definition->getPhone())
+            ->setEmail($email);
+
+        $this->contacts[$email] = $contact;
+
+        $this->persist([$contact]);
+
+        return $contact;
     }
 
     public function createProject(ProjectDefinition $definition): Project
@@ -110,6 +138,13 @@ class FixtureHelper
 
     public function createCrstsReturn(CrstsReturnDefinition $definition): CrstsReturn
     {
+        $signoffContactDefinition = $definition->getSignoffContact();
+        $signoffContact = $signoffContactDefinition ?
+            $this->createContact($signoffContactDefinition) :
+            null;
+
+        $signoffBy = $signoffContact ? $signoffContact->getEmail() : null;
+
         $return = (new CrstsReturn())
             ->setComments($definition->getComments())
             ->setBusinessCase($definition->getBusinessCase())
@@ -126,7 +161,8 @@ class FixtureHelper
             ->setRagProgressRating($definition->getRagProgressRating())
             ->setRagProgressSummary($definition->getRagProgressSummary())
             ->setResourceFunding($definition->getResourceFunding())
-            ->setSignoffBy($definition->getSignoffBy())
+            ->setSignoffContact($signoffContact)
+            ->setSignoffBy($signoffBy)
             ->setSpendToDate($definition->getSpendToDate())
             ->setTotalCost($definition->getTotalCost());
 

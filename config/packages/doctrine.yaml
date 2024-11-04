@@ -16,6 +16,9 @@ doctrine:
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+
+        # lock_keys table is used by lock component, which is used by rate limiter
+        schema_filter: ~^(?!lock_keys)~
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

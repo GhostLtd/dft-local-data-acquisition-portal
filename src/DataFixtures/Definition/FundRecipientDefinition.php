@@ -10,11 +10,7 @@ class FundRecipientDefinition
     public function __construct(
         protected string $name,
         protected array  $projects,
-
-        protected string $leadContactName,
-        protected string $leadContactPosition,
-        protected string $leadContactPhone,
-        protected string $leadContactEmail,
+        protected ContactDefinition $contact,
     ) {}
 
     public function getName(): string
@@ -28,23 +24,8 @@ class FundRecipientDefinition
         return $this->projects;
     }
 
-    public function getLeadContactName(): string
+    public function getContact(): ContactDefinition
     {
-        return $this->leadContactName;
-    }
-
-    public function getLeadContactPosition(): string
-    {
-        return $this->leadContactPosition;
-    }
-
-    public function getLeadContactPhone(): string
-    {
-        return $this->leadContactPhone;
-    }
-
-    public function getLeadContactEmail(): string
-    {
-        return $this->leadContactEmail;
+        return $this->contact;
     }
 }

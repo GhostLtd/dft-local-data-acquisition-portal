@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\DataFixtures\Definition\ContactDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
 use App\DataFixtures\Definition\FundRecipientDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
@@ -23,6 +24,7 @@ class RandomFixtureGenerator
 {
     protected ?Faker\Generator $faker = null;
     protected ?int $seed = 12345; // Reproducibility
+    protected array $existingContacts = [];
 
     public function setSeed(?int $seed): static {
         $this->seed = $seed;
@@ -76,11 +78,27 @@ class RandomFixtureGenerator
         return new FundRecipientDefinition(
             CouncilName::generate(),
             $projects,
-            $this->faker->name(),
-            $this->faker->randomElement(['Chief', 'Head of transportation', 'Bursar', 'Transport Manager', 'Fund Manager']),
-            $this->faker->phoneNumber(),
-            $this->faker->email(),
+            $this->createRandomContact(),
         );
+    }
+
+    public function createRandomContact(): ContactDefinition
+    {
+        // Chance to re-use existing contact...
+        $contact = $this->faker->boolean(30) ?
+            $this->faker->randomElement($this->existingContacts) :
+            null;
+
+        if (!$contact) {
+            $this->existingContacts[] = $contact = new ContactDefinition(
+                $this->faker->name(),
+                $this->faker->randomElement(['Chief', 'Head of transportation', 'Bursar', 'Transport Manager', 'Fund Manager']),
+                $this->faker->phoneNumber(),
+                $this->faker->email(),
+            );
+        }
+
+        return $contact;
     }
 
     public function createRandomProject(): ProjectDefinition
@@ -169,7 +187,7 @@ class RandomFixtureGenerator
             $this->faker->randomElement(BusinessCase::cases()),
             $this->faker->dateTime(),
             $this->faker->text(),
-            $this->faker->email(),
+            $this->createRandomContact(),
             $milestones,
             $expenses,
         );

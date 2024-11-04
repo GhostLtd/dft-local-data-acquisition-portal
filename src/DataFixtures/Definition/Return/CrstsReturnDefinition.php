@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures\Definition\Return;
 
+use App\DataFixtures\Definition\ContactDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
 use App\Entity\Enum\BusinessCase;
@@ -32,7 +33,7 @@ class CrstsReturnDefinition
         protected ?BusinessCase $businessCase = null,
         protected ?\DateTimeInterface $expectedBusinessCaseApproval = null,
         protected ?string $progressUpdate = null,
-        protected ?string $signoffBy = null,
+        protected ?ContactDefinition $signoffContact = null,
         protected array $milestones = [],
         protected array $expenses = [],
     ) {}
@@ -122,9 +123,9 @@ class CrstsReturnDefinition
         return $this->progressUpdate;
     }
 
-    public function getSignoffBy(): ?string
+    public function getSignoffContact(): ?ContactDefinition
     {
-        return $this->signoffBy;
+        return $this->signoffContact;
     }
 
     /** @return array<MilestoneDefinition> */

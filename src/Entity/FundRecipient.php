@@ -17,7 +17,7 @@ class FundRecipient
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1top_info: Local Authority name
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Contact $leadContact = null; // 1top_info: Lead contact
 
