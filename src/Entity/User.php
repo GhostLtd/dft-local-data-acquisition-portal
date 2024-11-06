@@ -9,28 +9,29 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+// These fields are currently used to represent the "Lead contact" fields from 1top_info,
+// but later can be additionally used for storing other contacts
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use IdTrait;
 
-    #[ORM\Column(length: 255, unique: true)]
-    private ?string $email = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lastLogin = null;
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
+    #[ORM\Column(length: 255)]
+    private ?string $name = null; #1top_info
 
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
-        return $this;
-    }
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $position = null; #1top_info
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $phone = null; #1top_info
+
+    #[ORM\Column(length: 255, unique: true)]
+    private ?string $email = null; #1top_info
 
     public function getUserIdentifier(): string
     {
@@ -51,6 +52,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPassword(): ?string
     {
         return null;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getPosition(): ?string
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?string $position): static
+    {
+        $this->position = $position;
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+        return $this;
     }
 
     public function getRoles(): array

@@ -18,7 +18,7 @@ class Recipient
 
     #[ORM\OneToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Contact $leadContact = null; // 1top_info: Lead contact
+    private ?User $leadContact = null; // 1top_info: Lead contact
 
     /**
      * @var Collection<int, Project>
@@ -49,12 +49,12 @@ class Recipient
         return $this;
     }
 
-    public function getLeadContact(): ?Contact
+    public function getLeadContact(): ?User
     {
         return $this->leadContact;
     }
 
-    public function setLeadContact(Contact $leadContact): static
+    public function setLeadContact(User $leadContact): static
     {
         $this->leadContact = $leadContact;
         return $this;

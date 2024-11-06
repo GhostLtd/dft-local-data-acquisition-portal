@@ -2,13 +2,13 @@
 
 namespace App\Entity\ProjectReturn;
 
-use App\Entity\Contact;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Expense\ExpenseSeries;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\Traits\IdTrait;
+use App\Entity\User;
 use App\Repository\Return\CrstsProjectReturnRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -50,7 +50,7 @@ class CrstsProjectReturn
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    private ?Contact $signoffContact = null; // top_signoff
+    private ?User $signoffUser = null; // top_signoff
 
     /**
      * @var Collection<int, ExpenseSeries>
@@ -193,14 +193,14 @@ class CrstsProjectReturn
         return $this;
     }
 
-    public function getSignoffContact(): ?Contact
+    public function getSignoffUser(): ?User
     {
-        return $this->signoffContact;
+        return $this->signoffUser;
     }
 
-    public function setSignoffContact(?Contact $signoffContact): static
+    public function setSignoffUser(?User $signoffUser): static
     {
-        $this->signoffContact = $signoffContact;
+        $this->signoffUser = $signoffUser;
         return $this;
     }
 
