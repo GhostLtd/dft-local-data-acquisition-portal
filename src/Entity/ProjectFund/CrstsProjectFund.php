@@ -4,12 +4,12 @@ namespace App\Entity\ProjectFund;
 
 use App\Entity\Enum\CrstsPhase;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
-use App\Repository\CrstsProjectRepository;
+use App\Repository\ProjectFund\CrstsProjectFundRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CrstsProjectRepository::class)]
+#[ORM\Entity(repositoryClass: CrstsProjectFundRepository::class)]
 class CrstsProjectFund extends ProjectFund
 {
     #[ORM\Column]
