@@ -3,7 +3,7 @@
 namespace App\Entity\ProjectFund;
 
 use App\Entity\Enum\CrstsPhase;
-use App\Entity\Return\CrstsReturn;
+use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Repository\CrstsProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,9 +19,9 @@ class CrstsProjectFund extends ProjectFund
     private ?CrstsPhase $phase = null; // 1proj_info: Is this project funded by CRSTS1 or CRSTS2?
 
     /**
-     * @var Collection<int, CrstsReturn>
+     * @var Collection<int, CrstsProjectReturn>
      */
-    #[ORM\OneToMany(targetEntity: CrstsReturn::class, mappedBy: 'projectFund', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: CrstsProjectReturn::class, mappedBy: 'projectFund', orphanRemoval: true)]
     private Collection $returns;
 
     public function __construct()
@@ -52,14 +52,14 @@ class CrstsProjectFund extends ProjectFund
     }
 
     /**
-     * @return Collection<int, CrstsReturn>
+     * @return Collection<int, CrstsProjectReturn>
      */
     public function getReturns(): Collection
     {
         return $this->returns;
     }
 
-    public function addReturn(CrstsReturn $return): static
+    public function addReturn(CrstsProjectReturn $return): static
     {
         if (!$this->returns->contains($return)) {
             $this->returns->add($return);
@@ -69,7 +69,7 @@ class CrstsProjectFund extends ProjectFund
         return $this;
     }
 
-    public function removeReturn(CrstsReturn $return): static
+    public function removeReturn(CrstsProjectReturn $return): static
     {
         if ($this->returns->removeElement($return)) {
             // set the owning side to null (unless already changed)

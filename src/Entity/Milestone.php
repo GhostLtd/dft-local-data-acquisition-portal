@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Enum\MilestoneType;
-use App\Entity\Return\CrstsReturn;
+use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Entity\Traits\IdTrait;
 use App\Repository\MilestoneRepository;
 use Doctrine\DBAL\Types\Types;
@@ -22,7 +22,7 @@ class Milestone
 
     #[ORM\ManyToOne(inversedBy: 'milestones')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?CrstsReturn $return = null;
+    private ?CrstsProjectReturn $return = null;
 
     public function getType(): ?MilestoneType
     {
@@ -46,12 +46,12 @@ class Milestone
         return $this;
     }
 
-    public function getReturn(): ?CrstsReturn
+    public function getReturn(): ?CrstsProjectReturn
     {
         return $this->return;
     }
 
-    public function setReturn(?CrstsReturn $return): static
+    public function setReturn(?CrstsProjectReturn $return): static
     {
         $this->return = $return;
         return $this;

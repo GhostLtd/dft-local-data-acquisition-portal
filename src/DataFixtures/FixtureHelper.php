@@ -16,7 +16,7 @@ use App\Entity\Recipient;
 use App\Entity\Milestone;
 use App\Entity\Project;
 use App\Entity\ProjectFund\CrstsProjectFund;
-use App\Entity\Return\CrstsReturn;
+use App\Entity\ProjectReturn\CrstsProjectReturn;
 use Doctrine\ORM\EntityManagerInterface;
 
 class FixtureHelper
@@ -136,7 +136,7 @@ class FixtureHelper
         return $projectFund;
     }
 
-    public function createCrstsReturn(CrstsReturnDefinition $definition): CrstsReturn
+    public function createCrstsReturn(CrstsReturnDefinition $definition): CrstsProjectReturn
     {
         $signoffContactDefinition = $definition->getSignoffContact();
         $signoffContact = $signoffContactDefinition ?
@@ -145,7 +145,7 @@ class FixtureHelper
 
         $signoffBy = $signoffContact ? $signoffContact->getEmail() : null;
 
-        $return = (new CrstsReturn())
+        $return = (new CrstsProjectReturn())
             ->setComments($definition->getComments())
             ->setBusinessCase($definition->getBusinessCase())
             ->setAgreedFunding($definition->getAgreeFunding())
