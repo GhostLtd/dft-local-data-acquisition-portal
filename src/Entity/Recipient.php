@@ -2,15 +2,14 @@
 
 namespace App\Entity;
 
-use App\Entity\Project;
 use App\Entity\Traits\IdTrait;
-use App\Repository\FundRecipientRepository;
+use App\Repository\RecipientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: FundRecipientRepository::class)]
-class FundRecipient
+#[ORM\Entity(repositoryClass: RecipientRepository::class)]
+class Recipient
 {
     use IdTrait;
 

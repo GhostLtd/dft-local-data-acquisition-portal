@@ -12,7 +12,7 @@ use App\DataFixtures\Definition\Return\CrstsReturnDefinition;
 use App\Entity\Contact;
 use App\Entity\Expense\ExpenseEntry;
 use App\Entity\Expense\ExpenseSeries;
-use App\Entity\FundRecipient;
+use App\Entity\Recipient;
 use App\Entity\Milestone;
 use App\Entity\Project;
 use App\Entity\ProjectFund\CrstsProjectFund;
@@ -46,11 +46,11 @@ class FixtureHelper
 
     // ----------------------------------------------------------------------------------------------------
 
-    public function createFundRecipient(FundRecipientDefinition $definition): FundRecipient
+    public function createFundRecipient(FundRecipientDefinition $definition): Recipient
     {
         $leadContact = $this->createContact($definition->getContact());
 
-        $fundRecipient = (new FundRecipient())
+        $fundRecipient = (new Recipient())
             ->setName($definition->getName())
             ->setLeadContact($leadContact);
 

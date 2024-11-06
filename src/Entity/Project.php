@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\ProjectFund\ProjectFund;
-use App\Entity\FundRecipient;
 use App\Entity\Traits\IdTrait;
 use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +17,7 @@ class Project
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?FundRecipient $owner = null;
+    private ?Recipient $owner = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1proj_info: Project name
@@ -37,12 +36,12 @@ class Project
         $this->projectFunds = new ArrayCollection();
     }
 
-    public function getOwner(): ?FundRecipient
+    public function getOwner(): ?Recipient
     {
         return $this->owner;
     }
 
-    public function setOwner(?FundRecipient $owner): static
+    public function setOwner(?Recipient $owner): static
     {
         $this->owner = $owner;
         return $this;

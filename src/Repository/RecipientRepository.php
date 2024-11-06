@@ -2,18 +2,18 @@
 
 namespace App\Repository;
 
-use App\Entity\FundRecipient;
+use App\Entity\Recipient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<FundRecipient>
+ * @extends ServiceEntityRepository<Recipient>
  */
-class FundRecipientRepository extends ServiceEntityRepository
+class RecipientRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, FundRecipient::class);
+        parent::__construct($registry, Recipient::class);
     }
 
 //    /**

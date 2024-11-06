@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Contact;
-use App\Entity\FundRecipient;
+use App\Entity\Recipient;
 use App\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,7 +35,7 @@ class TestController extends AbstractController
         $contact = new Contact();
         $contact->setName('Mark')->setEmail('mark@example.com')->setPhone('01243 123456')->setPosition('PostgreSQL tester');
 
-        $fundRecipient = new FundRecipient();
+        $fundRecipient = new Recipient();
         $fundRecipient
             ->setName('Nottingham Tram')
             ->setLeadContact($contact);
