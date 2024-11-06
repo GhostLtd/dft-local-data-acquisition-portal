@@ -3,7 +3,10 @@
 namespace App\Entity\FundReturn;
 
 use App\Entity\Enum\Rating;
+use App\Entity\Expense\ExpenseSeries;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -41,6 +44,16 @@ class CrstsFundReturn extends FundReturn
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comments = null; // 2top_exp: Comment box.  Please provide some commentary on the programme expenditure table above.  Any expenditure post 26/27 MUST be explained.
 
+    /**
+     * @var Collection<int, ExpenseSeries>
+     */
+    #[ORM\ManyToMany(targetEntity: ExpenseSeries::class)]
+    private Collection $expenses;
+
+    public function __construct()
+    {
+        $this->expenses = new ArrayCollection();
+    }
 
     public function getYear(): ?int
     {
@@ -149,6 +162,29 @@ class CrstsFundReturn extends FundReturn
     public function setComments(?string $comments): static
     {
         $this->comments = $comments;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ExpenseSeries>
+     */
+    public function getExpenses(): Collection
+    {
+        return $this->expenses;
+    }
+
+    public function addExpense(ExpenseSeries $expense): static
+    {
+        if (!$this->expenses->contains($expense)) {
+            $this->expenses->add($expense);
+        }
+
+        return $this;
+    }
+
+    public function removeExpense(ExpenseSeries $expense): static
+    {
+        $this->expenses->removeElement($expense);
         return $this;
     }
 }
