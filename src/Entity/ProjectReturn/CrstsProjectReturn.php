@@ -53,22 +53,22 @@ class CrstsProjectReturn
     private ?Contact $signoffContact = null; // top_signoff
 
     /**
-     * @var Collection<int, Milestone>
-     */
-    #[ORM\OneToMany(targetEntity: Milestone::class, mappedBy: 'return', orphanRemoval: true)]
-    private Collection $milestones;
-
-    /**
      * @var Collection<int, ExpenseSeries>
      */
     #[ORM\ManyToMany(targetEntity: ExpenseSeries::class)]
     private Collection $expenses;
 
+    /**
+     * @var Collection<int, Milestone>
+     */
+    #[ORM\ManyToMany(targetEntity: Milestone::class)]
+    private Collection $milestones;
+
 
     public function __construct()
     {
-        $this->milestones = new ArrayCollection();
         $this->expenses = new ArrayCollection();
+        $this->milestones = new ArrayCollection();
     }
 
     public function getProjectFund(): ?CrstsProjectFund
@@ -171,36 +171,6 @@ class CrstsProjectReturn
     }
 
     /**
-     * @return Collection<int, Milestone>
-     */
-    public function getMilestones(): Collection
-    {
-        return $this->milestones;
-    }
-
-    public function addMilestone(Milestone $milestone): static
-    {
-        if (!$this->milestones->contains($milestone)) {
-            $this->milestones->add($milestone);
-            $milestone->setReturn($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMilestone(Milestone $milestone): static
-    {
-        if ($this->milestones->removeElement($milestone)) {
-            // set the owning side to null (unless already changed)
-            if ($milestone->getReturn() === $this) {
-                $milestone->setReturn(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, ExpenseSeries>
      */
     public function getExpenses(): Collection
@@ -231,6 +201,29 @@ class CrstsProjectReturn
     public function setSignoffContact(?Contact $signoffContact): static
     {
         $this->signoffContact = $signoffContact;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Milestone>
+     */
+    public function getMilestones(): Collection
+    {
+        return $this->milestones;
+    }
+
+    public function addMilestone(Milestone $milestone): static
+    {
+        if (!$this->milestones->contains($milestone)) {
+            $this->milestones->add($milestone);
+        }
+
+        return $this;
+    }
+
+    public function removeMilestone(Milestone $milestone): static
+    {
+        $this->milestones->removeElement($milestone);
         return $this;
     }
 }
