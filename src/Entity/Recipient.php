@@ -26,9 +26,16 @@ class Recipient
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'owner')]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, FundAward>
+     */
+    #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'recipient', orphanRemoval: true)]
+    private Collection $fundAwards;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
+        $this->fundAwards = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -77,6 +84,36 @@ class Recipient
             // set the owning side to null (unless already changed)
             if ($project->getOwner() === $this) {
                 $project->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FundAward>
+     */
+    public function getFundAwards(): Collection
+    {
+        return $this->fundAwards;
+    }
+
+    public function addFundAward(FundAward $fundAward): static
+    {
+        if (!$this->fundAwards->contains($fundAward)) {
+            $this->fundAwards->add($fundAward);
+            $fundAward->setRecipient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFundAward(FundAward $fundAward): static
+    {
+        if ($this->fundAwards->removeElement($fundAward)) {
+            // set the owning side to null (unless already changed)
+            if ($fundAward->getRecipient() === $this) {
+                $fundAward->setRecipient(null);
             }
         }
 
