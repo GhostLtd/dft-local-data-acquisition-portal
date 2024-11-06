@@ -2,18 +2,21 @@
 
 namespace App\DataFixtures;
 
-use App\DataFixtures\Definition\ContactDefinition;
+use App\DataFixtures\Definition\FundAwardDefinition;
+use App\DataFixtures\Definition\FundReturn\CrstsFundReturnDefinition;
+use App\DataFixtures\Definition\UserDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
-use App\DataFixtures\Definition\FundRecipientDefinition;
+use App\DataFixtures\Definition\RecipientDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
 use App\DataFixtures\Definition\ProjectDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
-use App\DataFixtures\Definition\Return\CrstsReturnDefinition;
+use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
 use App\DataFixtures\Generator\CouncilName;
 use App\Entity\Enum\ActiveTravelElements;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\CrstsPhase;
 use App\Entity\Enum\ExpenseType;
+use App\Entity\Enum\Fund;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
@@ -69,20 +72,109 @@ class RandomFixtureGenerator
         return $data;
     }
 
-    public function createRandomFundRecipient(): FundRecipientDefinition
+    public function createRandomRecipient(): RecipientDefinition
     {
         $this->initialise();
 
-        $projects = $this->repeat(ProjectDefinition::class, 0, 5, $this->createRandomProject(...));
+        /** @var array<ProjectDefinition> $projects */
+        $projects = $this->repeat(ProjectDefinition::class, 2, 5, $this->createRandomProject(...));
 
-        return new FundRecipientDefinition(
+        // Find all funds used by all of the projects
+        $funds = [];
+        foreach($projects as $projectDefinition) {
+            foreach($projectDefinition->getProjectFunds() as $fundDefinition) {
+                $fund = $fundDefinition->getFund();
+                $funds[$fund->value] = $fund;
+            }
+        }
+
+        return new RecipientDefinition(
             CouncilName::generate(),
+            $this->createRandomUser(),
             $projects,
-            $this->createRandomContact(),
+            array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $projects), $funds),
         );
     }
 
-    public function createRandomContact(): ContactDefinition
+    /**
+     * @param array<ProjectDefinition> $projects
+     */
+    public function createRandomFundAward(Fund $fund, array $projects): FundAwardDefinition
+    {
+        $returns = [];
+
+        $startingYear = $this->faker->numberBetween(2018, 2024);
+        $startingQuarter = $this->faker->numberBetween(1, 4);
+
+        $endingYear = $startingYear + $this->faker->numberBetween(1, 8);
+        $endingQuarter = ($startingQuarter + $this->faker->numberBetween(1, 4) % 4) + 1;
+
+        $expenses = $this->createRandomExpenses(
+            ExpenseType::filterForFund(),
+            $startingYear,
+            $startingYear + $this->faker->numberBetween(3, 8)
+        );
+
+        // Add project returns...
+        for($year=$startingYear; $year<=$endingYear; $year++) {
+            $loopStartingQuarter = ($year === $startingYear) ? $startingQuarter : 1;
+            $loopEndingQuarter = ($year === $endingYear) ? $endingQuarter : 4;
+
+            for($quarter=$loopStartingQuarter; $quarter<=$loopEndingQuarter; $quarter++) {
+                $projectReturns = [];
+
+                foreach($projects as $project) {
+                    $projectFund = null;
+                    foreach($project->getProjectFunds() as $loopProjectFund) {
+                        if ($loopProjectFund->getFund() === $fund) {
+                            $projectFund = $loopProjectFund;
+                            break;
+                        }
+                    }
+
+                    // This project isn't a recipient of this fund's funds...
+                    if (!$projectFund) {
+                        continue;
+                    }
+
+                    if ($fund === Fund::CRSTS) {
+                        if (!$projectFund instanceof CrstsProjectFundDefinition) {
+                            throw new \RuntimeException('ProjectFundDefinition / type mismatch');
+                        }
+
+                        if (!$projectFund->isRetained() || $quarter === 1) {
+                            $projectReturns[$project->getName()] = $this->createRandomCrstsProjectReturn($startingYear, $startingQuarter);
+                        }
+                    } else {
+                        throw new \RuntimeException("Unsupported Project Return Type: ".$project::class);
+                    }
+                }
+
+                $returns[] = match($fund) {
+                    Fund::CRSTS => new CrstsFundReturnDefinition(
+                        $this->createRandomUser(),
+                        $year,
+                        $quarter,
+                        $this->faker->text(),
+                        $this->faker->text(),
+                        $this->faker->randomElement(Rating::cases()),
+                        $this->faker->text(),
+                        $this->faker->randomElement(Rating::cases()),
+                        $this->faker->text(),
+                        $this->faker->text(),
+                        $this->faker->text(),
+                        $expenses,
+                        $projectReturns,
+                    ),
+                    default => throw new \RuntimeException("Unsupported FundReturnDefinition: {$fund->value}")
+                };
+            }
+        }
+
+        return new FundAwardDefinition($fund, $returns);
+    }
+
+    public function createRandomUser(): UserDefinition
     {
         // Chance to re-use existing contact...
         $contact = $this->faker->boolean(30) ?
@@ -90,7 +182,7 @@ class RandomFixtureGenerator
             null;
 
         if (!$contact) {
-            $this->existingContacts[] = $contact = new ContactDefinition(
+            $this->existingContacts[] = $contact = new UserDefinition(
                 $this->faker->name(),
                 $this->faker->randomElement(['Chief', 'Head of transportation', 'Bursar', 'Transport Manager', 'Fund Manager']),
                 $this->faker->phoneNumber(),
@@ -110,50 +202,32 @@ class RandomFixtureGenerator
             $projectFunds[] = $this->createRandomCrstsProjectFund();
         }
 
+        $projectId = $this->faker->currencyCode() . $this->faker->numberBetween(1, 9999);
+
         return new ProjectDefinition(
             $this->faker->sentence(),
             $this->faker->text(),
+            $this->faker->randomElement(TransportMode::cases()),
+            $this->faker->randomElements(ActiveTravelElements::cases(), null),
+            $this->faker->boolean(),
+            $this->faker->boolean(),
+            $projectId,
             $projectFunds,
         );
     }
 
     public function createRandomCrstsProjectFund(): CrstsProjectFundDefinition
     {
-        $retained = $this->faker->boolean();
-
-        $year = $this->faker->numberBetween(2018, 2024);
-        $quarter = $retained ? $this->faker->numberBetween(1, 4) : null;
-
-        // If retained, we do quarterly returns, otherwise yearly
-        $returns = $this->repeat(CrstsReturnDefinition::class, 1, 8, function() use (&$year, &$quarter, $retained) {
-            $return = $this->createRandomCrstsReturn($retained, $year, $quarter);
-
-            $year++;
-            if ($retained) {
-                $quarter++;
-            }
-
-            return $return;
-        });
-
-        $projectId = $this->faker->currencyCode() . $this->faker->numberBetween(1, 9999);
-
         return new CrstsProjectFundDefinition(
-            $this->faker->randomElement(TransportMode::cases()),
-            $this->faker->randomElements(ActiveTravelElements::cases(), null),
             $this->faker->boolean(),
-            $this->faker->boolean(),
-            $projectId,
-            $retained,
             $this->faker->randomElement(CrstsPhase::cases()),
-            $returns,
         );
     }
 
-    public function createRandomCrstsReturn(bool $isRetained, int $year, ?int $quarter): CrstsReturnDefinition
+    public function createRandomCrstsProjectReturn(int $startingYear, int $startingQuarter): CrstsProjectReturnDefinition
     {
         $milestones = [];
-        $earliestDate = null;
+        $earliestDate = new \DateTime("{$startingYear}-".(($startingQuarter-1)*3)."-01");
 
         // N.B. This logic is very simple, and might not generate logically coherent dates
         //      for milestones or expense date ranges.
@@ -164,22 +238,13 @@ class RandomFixtureGenerator
             $milestones[] = $milestone;
         }
 
-        $expenseStartYear = intval($this->faker->dateTimeBetween('-10 years')->format('Y'));
-        $expenseEndYear = intval($this->faker->dateTimeBetween(new \DateTime("{$expenseStartYear}-01-01"))->format('Y'));
+        $expenses = $this->createRandomExpenses(
+            ExpenseType::filterForProject(),
+            $startingYear,
+            $startingYear + $this->faker->numberBetween(3, 8)
+        );
 
-        $expenses = $this->createRandomExpenses($isRetained, $expenseStartYear, $expenseEndYear);
-
-        return new CrstsReturnDefinition(
-            $year,
-            $quarter,
-            $this->faker->text(),
-            $this->faker->text(),
-            $this->faker->randomElement(Rating::cases()),
-            $this->faker->text(),
-            $this->faker->randomElement(Rating::cases()),
-            $this->faker->text(),
-            $this->faker->text(),
-            $this->faker->text(),
+        return new CrstsProjectReturnDefinition(
             '£'.$this->faker->numberBetween(1_000, 99_000_000),
             '£'.$this->faker->numberBetween(1_000, 99_000_000),
             '£'.$this->faker->numberBetween(1_000, 99_000_000),
@@ -187,7 +252,6 @@ class RandomFixtureGenerator
             $this->faker->randomElement(BusinessCase::cases()),
             $this->faker->dateTime(),
             $this->faker->text(),
-            $this->createRandomContact(),
             $milestones,
             $expenses,
         );
@@ -205,27 +269,24 @@ class RandomFixtureGenerator
     }
 
     /**
+     * @param array<ExpenseType> $expenseTypes
      * @return array<ExpenseDefinition>
      */
-    public function createRandomExpenses(bool $isRetained, int $startYear, int $endYear): array
+    public function createRandomExpenses(array $expenseTypes, int $startYear, int $endYear): array
     {
         // N.B. The logic here is also very simple and hence the forecast / actual expenses
         //      are *extremely* unlikely to be coherent from one year to the next :)
 
         $expenses = [];
 
-        foreach(ExpenseType::cases() as $expenseType) {
+        foreach($expenseTypes as $expenseType) {
             $entries = [];
             for($expenseYear = $startYear; $expenseYear <= $endYear; $expenseYear++) {
                 $expenseNextYear = $expenseYear + 1;
                 $key = "{$expenseYear}/{$expenseNextYear}";
 
-                if ($isRetained) {
-                    for($quarter=1; $quarter<=4; $quarter++) {
-                        $entries["{$key} {$quarter}"] = $this->faker->numberBetween('1_000_000', '99_000_000');
-                    }
-                } else {
-                    $entries[$key] = $this->faker->numberBetween('1_000_000', '99_000_000');
+                for($quarter=1; $quarter<=4; $quarter++) {
+                    $entries["{$key} {$quarter}"] = $this->faker->numberBetween('1_000_000', '99_000_000');
                 }
             }
 

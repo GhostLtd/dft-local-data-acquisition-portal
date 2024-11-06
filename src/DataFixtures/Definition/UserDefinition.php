@@ -2,12 +2,12 @@
 
 namespace App\DataFixtures\Definition;
 
-class ContactDefinition
+class UserDefinition
 {
     public function __construct(
         protected string $name,
-        protected string $position,
-        protected string $phone,
+        protected ?string $position,
+        protected ?string $phone,
         protected string $email,
     ) {}
 
@@ -16,12 +16,12 @@ class ContactDefinition
         return $this->name;
     }
 
-    public function getPosition(): string
+    public function getPosition(): ?string
     {
         return $this->position;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }

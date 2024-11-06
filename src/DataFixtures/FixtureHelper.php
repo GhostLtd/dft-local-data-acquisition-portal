@@ -2,27 +2,32 @@
 
 namespace App\DataFixtures;
 
-use App\DataFixtures\Definition\ContactDefinition;
+use App\DataFixtures\Definition\FundAwardDefinition;
+use App\DataFixtures\Definition\FundReturn\CrstsFundReturnDefinition;
+use App\DataFixtures\Definition\UserDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
-use App\DataFixtures\Definition\FundRecipientDefinition;
+use App\DataFixtures\Definition\RecipientDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
 use App\DataFixtures\Definition\ProjectDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
-use App\DataFixtures\Definition\Return\CrstsReturnDefinition;
-use App\Entity\Contact;
+use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
+use App\Entity\Enum\Fund;
 use App\Entity\Expense\ExpenseEntry;
 use App\Entity\Expense\ExpenseSeries;
+use App\Entity\FundAward;
+use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Recipient;
 use App\Entity\Milestone;
 use App\Entity\Project;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
 class FixtureHelper
 {
     protected ?EntityManagerInterface $entityManager = null;
-    protected ?array $contacts = [];
+    protected array $users = [];
 
     public function setEntityManager(EntityManagerInterface $entityManager): static
     {
@@ -46,9 +51,9 @@ class FixtureHelper
 
     // ----------------------------------------------------------------------------------------------------
 
-    public function createFundRecipient(FundRecipientDefinition $definition): Recipient
+    public function createFundRecipient(RecipientDefinition $definition): Recipient
     {
-        $leadContact = $this->createContact($definition->getContact());
+        $leadContact = $this->createUser($definition->getLeadContact());
 
         $fundRecipient = (new Recipient())
             ->setName($definition->getName())
@@ -60,45 +65,87 @@ class FixtureHelper
             $fundRecipient->addProject($this->createProject($projectDefinition));
         }
 
+        $projects = $fundRecipient->getProjects()->toArray();
+        foreach($definition->getFundAwards() as $fundAwardDefinition) {
+            $fundRecipient->addFundAward($this->createFundAward($fundAwardDefinition, $projects));
+        }
+
         return $fundRecipient;
     }
 
-    public function createContact(ContactDefinition $definition): Contact
+    public function createUser(UserDefinition $definition): User
     {
         $email = $definition->getEmail();
 
-        $existingContact = $this->contacts[$email] ?? null;
+        $existingUser = $this->users[$email] ?? null;
 
-        if ($existingContact) {
+        if ($existingUser) {
             if (
-                $definition->getName() !== $existingContact->getName() ||
-                $definition->getPhone() !== $existingContact->getPhone() ||
-                $definition->getPosition() !== $existingContact->getPosition()
+                $definition->getName() !== $existingUser->getName() ||
+                $definition->getPhone() !== $existingUser->getPhone() ||
+                $definition->getPosition() !== $existingUser->getPosition()
             ) {
-                throw new \RuntimeException('Contact with given email already exists, but with different details');
+                throw new \RuntimeException('User with given email already exists, albeit with different details');
             }
 
-            return $existingContact;
+            return $existingUser;
         }
 
-        $contact = (new Contact())
+        $user = (new User())
             ->setName($definition->getName())
             ->setPosition($definition->getPosition())
             ->setPhone($definition->getPhone())
             ->setEmail($email);
 
-        $this->contacts[$email] = $contact;
+        $this->users[$email] = $user;
+        $this->persist([$user]);
+        return $user;
+    }
 
-        $this->persist([$contact]);
+    /**
+     * @param array<Project> $projects
+     */
+    public function createFundAward(FundAwardDefinition $fundAwardDefinition, array $projects=[]): FundAward
+    {
+        $fund = $fundAwardDefinition->getFund();
 
-        return $contact;
+        $fundAward = (new FundAward())
+            ->setType($fund);
+
+        $this->persist([$fundAward]);
+
+        foreach($fundAwardDefinition->getReturns() as $returnDefinition) {
+            if ($fund === Fund::CRSTS && $returnDefinition instanceof CrstsFundReturnDefinition) {
+                $return = $this->createCrstsFundReturn($returnDefinition, $projects);
+            } else {
+                throw new \RuntimeException("Unsupported returnDefinition type for fund {$fund->value}: ".$returnDefinition::class);
+            }
+
+            $signoffUserDefinition = $returnDefinition->getSignoffUser();
+            $signoffUser = $signoffUserDefinition ?
+                $this->createUser($signoffUserDefinition) :
+                null;
+
+            $return
+                ->setSignoffUser($signoffUser)
+                ->setSignoffEmail($signoffUser?->getEmail());
+
+            $fundAward->addReturn($return);
+        }
+
+        return $fundAward;
     }
 
     public function createProject(ProjectDefinition $definition): Project
     {
         $project = (new Project())
             ->setName($definition->getName())
-            ->setDescription($definition->getDescription());
+            ->setDescription($definition->getDescription())
+            ->setProjectIdentifier($definition->getProjectIdentifier())
+            ->setActiveTravelElements($definition->getActiveTravelElements())
+            ->setIncludesChargingPoints($definition->getIncludesChargingPoints())
+            ->setIncludesCleanAirElements($definition->getIncludesCleanAirElements())
+            ->setTransportMode($definition->getTransportMode());
 
         $this->persist([$project]);
 
@@ -120,53 +167,84 @@ class FixtureHelper
     {
         $projectFund = (new CrstsProjectFund())
             ->setRetained($definition->isRetained())
-            ->setPhase($definition->getPhase())
-            ->setProjectIdentifier($definition->getProjectIdentifier())
-            ->setActiveTravelElements($definition->getActiveTravelElements())
-            ->setIncludesChargingPoints($definition->getIncludesChargingPoints())
-            ->setIncludesCleanAirElements($definition->getIncludesCleanAirElements())
-            ->setTransportMode($definition->getTransportMode());
+            ->setPhase($definition->getPhase());
 
         $this->persist([$projectFund]);
-
-        foreach($definition->getReturns() as $returnDefinition) {
-            $projectFund->addReturn($this->createCrstsReturn($returnDefinition));
-        }
 
         return $projectFund;
     }
 
-    public function createCrstsReturn(CrstsReturnDefinition $definition): CrstsProjectReturn
+    /**
+     * @param array<Project> $projects
+     */
+    public function createCrstsFundReturn(CrstsFundReturnDefinition $definition, array $projects=[]): CrstsFundReturn
     {
-        $signoffContactDefinition = $definition->getSignoffContact();
-        $signoffContact = $signoffContactDefinition ?
-            $this->createContact($signoffContactDefinition) :
-            null;
-
-        $signoffBy = $signoffContact ? $signoffContact->getEmail() : null;
-
-        $return = (new CrstsProjectReturn())
+        $return = (new CrstsFundReturn())
             ->setComments($definition->getComments())
-            ->setBusinessCase($definition->getBusinessCase())
-            ->setAgreedFunding($definition->getAgreeFunding())
             ->setDeliveryConfidence($definition->getDeliveryConfidence())
             ->setLocalContribution($definition->getLocalContribution())
             ->setYear($definition->getYear())
             ->setQuarter($definition->getQuarter())
-            ->setExpectedBusinessCaseApproval($definition->getExpectedBusinessCaseApproval())
-            ->setOnTrackRating($definition->getOnTrackRating())
             ->setOverallConfidence($definition->getOverallConfidence())
             ->setProgressSummary($definition->getProgressSummary())
-            ->setProgressUpdate($definition->getProgressUpdate())
             ->setRagProgressRating($definition->getRagProgressRating())
             ->setRagProgressSummary($definition->getRagProgressSummary())
             ->setResourceFunding($definition->getResourceFunding())
-            ->setSignoffContact($signoffContact)
-            ->setSignoffBy($signoffBy)
-            ->setSpendToDate($definition->getSpendToDate())
-            ->setTotalCost($definition->getTotalCost());
+        ;
+
+        // TODO: We'll have different expense types for the fund vs project returns...
+        foreach($definition->getExpenses() as $expenseDefinition) {
+            $return->addExpense($this->createExpenseSeries($expenseDefinition));
+        }
+
+        foreach($definition->getProjectReturns() as $projectName => $projectReturnDefinition) {
+            $project = null;
+            foreach($projects as $loopProject) {
+                if ($projectName === $loopProject->getName()) {
+                    $project = $loopProject;
+                    break;
+                }
+            }
+
+            if (!$project) {
+                throw new \RuntimeException("Project referenced by return not found: {$projectName}");
+            }
+
+            $projectFund = null;
+            foreach($project->getProjectFunds() as $loopFund) {
+                $projectFund = match(true) {
+                    $loopFund instanceof CrstsProjectFund => $loopFund,
+                    default => null,
+                };
+
+                if ($projectFund) {
+                    break;
+                }
+            }
+
+            if (!$projectFund) {
+                throw new \RuntimeException("Project referenced by return is not funded by CRSTS: {$projectName}");
+            }
+
+            $return->addProjectReturn($this->createCrstsProjectReturn($projectReturnDefinition, $projectFund));
+        }
 
         $this->persist([$return]);
+
+        return $return;
+    }
+
+    public function createCrstsProjectReturn(CrstsProjectReturnDefinition $definition, CrstsProjectFund $projectFund): CrstsProjectReturn
+    {
+        $return = (new CrstsProjectReturn())
+            ->setProjectFund($projectFund)
+            ->setTotalCost($definition->getTotalCost())
+            ->setAgreedFunding($definition->getAgreeFunding())
+            ->setSpendToDate($definition->getSpendToDate())
+            ->setOnTrackRating($definition->getOnTrackRating())
+            ->setBusinessCase($definition->getBusinessCase())
+            ->setExpectedBusinessCaseApproval($definition->getExpectedBusinessCaseApproval())
+            ->setProgressUpdate($definition->getProgressUpdate());
 
         foreach($definition->getMilestones() as $milestoneDefinition) {
             $return->addMilestone($this->createMilestone($milestoneDefinition));
@@ -175,6 +253,8 @@ class FixtureHelper
         foreach($definition->getExpenses() as $expenseDefinition) {
             $return->addExpense($this->createExpenseSeries($expenseDefinition));
         }
+
+        $this->persist([$return]);
 
         return $return;
     }

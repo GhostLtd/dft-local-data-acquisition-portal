@@ -46,7 +46,7 @@ class AddDevFixturesCommand extends Command
 
         $numberOfEntries = $input->getArgument('number-of-entries-to-add');
         for($i=0; $i<$numberOfEntries; $i++) {
-            $this->fixtureHelper->createFundRecipient($this->fixtureGenerator->createRandomFundRecipient());
+            $this->fixtureHelper->createFundRecipient($this->fixtureGenerator->createRandomRecipient());
         }
 
         $this->entityManager->flush();

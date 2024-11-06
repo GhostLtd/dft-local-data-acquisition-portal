@@ -5,6 +5,7 @@ namespace App\Entity\ProjectReturn;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Expense\ExpenseSeries;
+use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\Traits\IdTrait;
@@ -23,6 +24,10 @@ class CrstsProjectReturn
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CrstsProjectFund $projectFund = null;
+
+    #[ORM\ManyToOne(inversedBy: 'projectReturns')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CrstsFundReturn $fundReturn = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $totalCost = null; // 2proj_exp: Total cost of project (<this fund> plus other expenditure)
@@ -45,13 +50,6 @@ class CrstsProjectReturn
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $progressUpdate = null; // 4proj_exp: Progress update (comment)
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $signoffBy = null; // top_signoff
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    private ?User $signoffUser = null; // top_signoff
-
     /**
      * @var Collection<int, ExpenseSeries>
      */
@@ -63,7 +61,6 @@ class CrstsProjectReturn
      */
     #[ORM\ManyToMany(targetEntity: Milestone::class)]
     private Collection $milestones;
-
 
     public function __construct()
     {
@@ -79,6 +76,18 @@ class CrstsProjectReturn
     public function setProjectFund(?CrstsProjectFund $projectFund): static
     {
         $this->projectFund = $projectFund;
+        return $this;
+    }
+
+
+    public function getFundReturn(): ?CrstsFundReturn
+    {
+        return $this->fundReturn;
+    }
+
+    public function setFundReturn(?CrstsFundReturn $fundReturn): static
+    {
+        $this->fundReturn = $fundReturn;
         return $this;
     }
 
@@ -159,17 +168,6 @@ class CrstsProjectReturn
         return $this;
     }
 
-    public function getSignoffBy(): ?string
-    {
-        return $this->signoffBy;
-    }
-
-    public function setSignoffBy(?string $signoffBy): static
-    {
-        $this->signoffBy = $signoffBy;
-        return $this;
-    }
-
     /**
      * @return Collection<int, ExpenseSeries>
      */
@@ -190,17 +188,6 @@ class CrstsProjectReturn
     public function removeExpense(ExpenseSeries $expense): static
     {
         $this->expenses->removeElement($expense);
-        return $this;
-    }
-
-    public function getSignoffUser(): ?User
-    {
-        return $this->signoffUser;
-    }
-
-    public function setSignoffUser(?User $signoffUser): static
-    {
-        $this->signoffUser = $signoffUser;
         return $this;
     }
 

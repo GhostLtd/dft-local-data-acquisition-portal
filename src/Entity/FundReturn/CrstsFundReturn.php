@@ -4,6 +4,7 @@ namespace App\Entity\FundReturn;
 
 use App\Entity\Enum\Rating;
 use App\Entity\Expense\ExpenseSeries;
+use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -50,9 +51,16 @@ class CrstsFundReturn extends FundReturn
     #[ORM\ManyToMany(targetEntity: ExpenseSeries::class)]
     private Collection $expenses;
 
+    /**
+     * @var Collection<int, CrstsProjectReturn>
+     */
+    #[ORM\OneToMany(targetEntity: CrstsProjectReturn::class, mappedBy: 'fundReturn', orphanRemoval: true)]
+    private Collection $projectReturns;
+
     public function __construct()
     {
         $this->expenses = new ArrayCollection();
+        $this->projectReturns = new ArrayCollection();
     }
 
     public function getYear(): ?int
@@ -185,6 +193,36 @@ class CrstsFundReturn extends FundReturn
     public function removeExpense(ExpenseSeries $expense): static
     {
         $this->expenses->removeElement($expense);
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CrstsProjectReturn>
+     */
+    public function getProjectReturns(): Collection
+    {
+        return $this->projectReturns;
+    }
+
+    public function addProjectReturn(CrstsProjectReturn $projectReturn): static
+    {
+        if (!$this->projectReturns->contains($projectReturn)) {
+            $this->projectReturns->add($projectReturn);
+            $projectReturn->setFundReturn($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectReturn(CrstsProjectReturn $projectReturn): static
+    {
+        if ($this->projectReturns->removeElement($projectReturn)) {
+            // set the owning side to null (unless already changed)
+            if ($projectReturn->getFundReturn() === $this) {
+                $projectReturn->setFundReturn(null);
+            }
+        }
+
         return $this;
     }
 }

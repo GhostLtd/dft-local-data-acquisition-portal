@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\Fund;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Traits\IdTrait;
 use App\Repository\FundAwardRepository;
@@ -17,6 +18,9 @@ class FundAward
     #[ORM\ManyToOne(inversedBy: 'fundAwards')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Recipient $recipient = null;
+
+    #[ORM\Column(enumType: Fund::class)]
+    private ?Fund $type = null;
 
     /**
      * @var Collection<int, FundReturn>
@@ -37,6 +41,17 @@ class FundAward
     public function setRecipient(?Recipient $recipient): static
     {
         $this->recipient = $recipient;
+        return $this;
+    }
+
+    public function getType(): ?Fund
+    {
+        return $this->type;
+    }
+
+    public function setType(Fund $type): static
+    {
+        $this->type = $type;
         return $this;
     }
 
