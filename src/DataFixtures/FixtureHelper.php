@@ -192,7 +192,6 @@ class FixtureHelper
             ->setResourceFunding($definition->getResourceFunding())
         ;
 
-        // TODO: We'll have different expense types for the fund vs project returns...
         foreach($definition->getExpenses() as $expenseDefinition) {
             $return->addExpense($this->createExpenseSeries($expenseDefinition));
         }
