@@ -20,6 +20,14 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
 
     public function loadUserByIdentifier(string $identifier): ?UserInterface
     {
-        return $this->findOneBy(['email' => $identifier]);
+        // N.B. This purposely uses a join rather than a leftJoin, so that users with no
+        //      assigned recipientRoles will not be eligible to log in.
+        return $this->createQueryBuilder('user')
+            ->select('user, recipientRoles')
+            ->join('user.recipientRoles', 'recipientRoles')
+            ->where('user.email = :email')
+            ->setParameter('email', $identifier)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

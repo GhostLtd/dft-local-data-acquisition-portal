@@ -22,6 +22,7 @@ use App\Entity\Project;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Entity\User;
+use App\Entity\UserRecipientRole;
 use Doctrine\ORM\EntityManagerInterface;
 
 class FixtureHelper
@@ -53,27 +54,29 @@ class FixtureHelper
 
     public function createFundRecipient(RecipientDefinition $definition): Recipient
     {
-        $leadContact = $this->createUser($definition->getLeadContact());
+        $recipient = (new Recipient())
+            ->setName($definition->getName());
 
-        $fundRecipient = (new Recipient())
-            ->setName($definition->getName())
+        $leadContact = $this->createUser($definition->getLeadContact(), $recipient);
+
+        $recipient
             ->setLeadContact($leadContact);
 
-        $this->persist([$fundRecipient]);
+        $this->persist([$recipient]);
 
         foreach($definition->getProjects() as $projectDefinition) {
-            $fundRecipient->addProject($this->createProject($projectDefinition));
+            $recipient->addProject($this->createProject($projectDefinition));
         }
 
-        $projects = $fundRecipient->getProjects()->toArray();
+        $projects = $recipient->getProjects()->toArray();
         foreach($definition->getFundAwards() as $fundAwardDefinition) {
-            $fundRecipient->addFundAward($this->createFundAward($fundAwardDefinition, $projects));
+            $recipient->addFundAward($this->createFundAward($fundAwardDefinition, $projects));
         }
 
-        return $fundRecipient;
+        return $recipient;
     }
 
-    public function createUser(UserDefinition $definition): User
+    public function createUser(UserDefinition $definition, ?Recipient $recipient=null): User
     {
         $email = $definition->getEmail();
 
@@ -96,6 +99,16 @@ class FixtureHelper
             ->setPosition($definition->getPosition())
             ->setPhone($definition->getPhone())
             ->setEmail($email);
+
+        if ($recipient) {
+            $recipientRole = (new UserRecipientRole())
+                ->setRecipient($recipient)
+                ->setRole('ACCESS'); // TODO - we'll later have more granular/specific roles to add here
+
+            $user->addRecipientRole($recipientRole);
+
+            $this->persist([$recipientRole]);
+        }
 
         $this->users[$email] = $user;
         $this->persist([$user]);

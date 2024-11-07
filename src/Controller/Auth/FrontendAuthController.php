@@ -51,7 +51,7 @@ class FrontendAuthController extends AbstractController
             $email = $form->getData()['email'];
 
             try {
-                $user = $userRepository->findOneBy(['email' => $email]);
+                $user = $userRepository->loadUserByIdentifier($email);
 
                 if ($user) {
                     $loginLimiter->consume($request)->ensureAccepted();

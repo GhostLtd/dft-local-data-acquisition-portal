@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Entity\Traits\IdTrait;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -31,7 +33,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $phone = null; #1top_info
 
     #[ORM\Column(length: 255, unique: true)]
-    private ?string $email = null; #1top_info
+    private ?string $email = null;
+
+    /**
+     * @var Collection<int, UserRecipientRole>
+     */
+    #[ORM\OneToMany(targetEntity: UserRecipientRole::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $recipientRoles;
+
+    public function __construct()
+    {
+        $this->recipientRoles = new ArrayCollection();
+    } #1top_info
 
     public function getUserIdentifier(): string
     {
@@ -105,5 +118,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials()
     {
+    }
+
+    /**
+     * @return Collection<int, UserRecipientRole>
+     */
+    public function getRecipientRoles(): Collection
+    {
+        return $this->recipientRoles;
+    }
+
+    public function addRecipientRole(UserRecipientRole $recipientRole): static
+    {
+        if (!$this->recipientRoles->contains($recipientRole)) {
+            $this->recipientRoles->add($recipientRole);
+            $recipientRole->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipientRole(UserRecipientRole $recipientRole): static
+    {
+        if ($this->recipientRoles->removeElement($recipientRole)) {
+            // set the owning side to null (unless already changed)
+            if ($recipientRole->getUser() === $this) {
+                $recipientRole->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -177,7 +177,7 @@ class RandomFixtureGenerator
     public function createRandomUser(): UserDefinition
     {
         // Chance to re-use existing contact...
-        $contact = $this->faker->boolean(30) ?
+        $contact = $this->faker->boolean(95) ?
             $this->faker->randomElement($this->existingContacts) :
             null;
 
