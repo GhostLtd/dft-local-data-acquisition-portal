@@ -10,4 +10,10 @@
 
 {% block content %}
     <p class="govuk-body">Hello world</p>
+
+    {% if is_granted('ROLE_USER') %}
+        <a href="{{ path('app_dashboard') }}" class="govuk-link">Dashboard</a>
+    {% else %}
+        <a href="{{ path('app_login') }}" class="govuk-link">Login</a>
+    {% endif %}
 {% endblock %}
