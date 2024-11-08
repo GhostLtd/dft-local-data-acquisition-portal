@@ -3,6 +3,12 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+    <style nonce="{{ csp_nonce('style') }}">
+            .govuk-body {
+                font-size: 200%;
+            }
+    </style>
+
     <div class="govuk-body">
         Admin dashboard...
     </div>

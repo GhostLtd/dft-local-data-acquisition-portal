@@ -1,2 +1,0 @@
-ghost_gov_uk_frontend:
-  secret: '%app_secret%'

@@ -14,4 +14,5 @@ return [
     Ghost\GovUkFrontendBundle\GhostGovUkFrontendBundle::class => ['all' => true],
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     Ghost\GovUkCoreBundle\GhostGovUkCoreBundle::class => ['all' => true],
+    Nelmio\SecurityBundle\NelmioSecurityBundle::class => ['all' => true],
 ];
