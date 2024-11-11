@@ -1,3 +1,10 @@
+admin:
+  pages:
+    dashboard:
+      title: Dashboard
+    maintenance:
+      title: Maintenance
+
 auth:
   error: Error
   login:

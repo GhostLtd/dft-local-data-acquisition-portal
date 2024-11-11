@@ -1,15 +1,9 @@
-{% extends 'admin/base.html.twig' %}
+{%- extends 'admin/base.html.twig' -%}
 
-{% block title %}Dashboard{% endblock %}
+{%- set current_page = 'dashboard' -%}
 
-{% block content %}
-    <style nonce="{{ csp_nonce('style') }}">
-            .govuk-body {
-                font-size: 200%;
-            }
-    </style>
-
+{%- block content -%}
     <div class="govuk-body">
         Admin dashboard...
     </div>
-{% endblock %}
+{%- endblock -%}
