@@ -1,0 +1,9 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set current_menu = 'maintenance' %}
+{% set current_page = 'maintenance_' ~ type %}
+
+{%- block content -%}
+    {% form_theme form '@GhostGovUkFrontend/theme.html.twig' %}
+    {{ form(form) }}
+{%- endblock -%}

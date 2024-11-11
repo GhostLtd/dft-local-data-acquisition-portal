@@ -1,0 +1,41 @@
+{%- extends 'admin/base.html.twig' -%}
+
+{%- set current_page = 'maintenance' -%}
+
+{%- block content -%}
+    {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
+
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import pagination, tableHead, tableRow, summaryListActionsList, tag -%}
+    {%- from "@GhostGovUkCore/list-page.html.twig" import listTableStart, listTableEnd -%}
+
+    <p class="govuk-body">{{ 'admin.maintenance.list.intro_copy' | trans }}</p>
+
+    {{- listTableStart(data, form) -}}
+    {%- for warning in data.entities -%}
+        {%- set actions = [
+            {
+                href: path('admin_maintenance_delete', {id: warning.id}),
+                text: 'admin.maintenance.list.delete' | trans,
+            },
+            {
+                href: path('admin_maintenance_edit', {id: warning.id}),
+                text: 'admin.maintenance.list.edit' | trans,
+            },
+        ] -%}
+        {{- tableRow([
+            warning.startDatetime | date('format.date.default' | trans),
+            warning.startDatetime | date('format.time.default' | trans),
+            warning.endTime | date('format.time.default' | trans),
+            {html: summaryListActionsList(actions)},
+        ]) -}}
+    {%- else -%}
+        {{- tableRow([
+            {
+                text: 'admin.maintenance.list.no_results' | trans({}, 'messages'),
+                colspan: data.fields | length + 1,
+            }
+        ]) -}}
+    {%- endfor -%}
+    {{- listTableEnd(data, form) -}}
+    <a class="govuk-button" href="{{ path('admin_maintenance_add') }}">{{ 'admin.maintenance.list.add' | trans }}</a>
+{%- endblock -%}

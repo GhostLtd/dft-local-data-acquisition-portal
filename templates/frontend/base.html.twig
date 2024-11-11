@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{% block pageTitle %}{{ "frontend.pages.#{current_page}.title" | trans }} | {{ parent() }}{% endblock %}
+
+{% set current_page_title = current_page_title ?? "frontend.pages.#{current_page}.title" %}
 
 {% block navigation %}
     {% if is_granted('ROLE_USER') %}
@@ -11,18 +14,21 @@
             </li>
         {%- endset %}
 
+        {%- set current_menu = current_menu ?? current_page -%}
+
         {{- serviceNavigation({
             classes: 'govuk-service-navigation__wrapper-full-width',
             serviceName: 'site.title' | trans,
             navigation: [
                 {
-                    href: "#",
-                    text: "Item 1"
+                    href: path('app_dashboard'),
+                    text: "Dashboard",
+                    active: current_menu == 'dashboard',
                 },
                 {
                     href: "#",
                     text: "Item 2",
-                    active: true
+                    active: current_menu == 'item-2',
                 }
             ],
             slots: {

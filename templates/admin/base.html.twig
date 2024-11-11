@@ -1,11 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "admin.pages.#{current_page}.title" | trans }}{% endblock %}
+{% block pageTitle %}{{ "admin.pages.#{current_page}.title" | trans }} | {{ "admin.site-title-prefix" | trans }}{{ parent() }}{% endblock %}
+
+{% set current_page_title = current_page_title ?? "admin.pages.#{current_page}.title" %}
 
 {% block navigation %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
 
-    {%- set current_page = current_page ?? null -%}
+    {%- set current_menu = current_menu ?? current_page -%}
 
     {{- serviceNavigation({
         classes: 'govuk-service-navigation__wrapper-full-width',
@@ -14,12 +16,12 @@
             {
                 href: path('admin_dashboard'),
                 text: "admin.pages.dashboard.title" | trans,
-                active: current_page == 'dashboard'
+                active: current_menu == 'dashboard'
             },
             {
                 href: path('admin_maintenance'),
                 text: "admin.pages.maintenance.title" | trans,
-                active: current_page == 'maintenance'
+                active: current_menu == 'maintenance'
             }
         ]
     }) -}}

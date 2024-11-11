@@ -1,9 +1,39 @@
 admin:
+  maintenance:
+    delete:
+      heading: 'Delete Maintenance Warning'
+      delete: &maintenanceDelete 'Are you sure you want to delete this Maintenance Warning?'
+      confirm.label: Yes, delete this warning
+      cancel.label: Cancel
+      warning: *maintenanceDelete
+
+      confirmed-notification:
+        heading: 'Delete confirmed'
+        content: The Maintenance Warning for {start, date, medium} has been deleted
+      cancelled-notification:
+        heading: 'Delete cancelled'
+        content: The Maintenance Warning for {start, date, medium} was not deleted
+    list:
+      add: Add maintenance warning
+      delete: Delete
+      edit: Edit
+      intro_copy: Maintenance Warnings show warnings of upcoming maintenance periods (when the service will be down) on the frontend.
+      no_results: No results
+    warning_form:
+      start: Start date/time
+      end: End time
   pages:
     dashboard:
       title: Dashboard
     maintenance:
-      title: Maintenance
+      title: Maintenance warnings
+    maintenance_add:
+      title: Add maintenance warning
+    maintenance_delete:
+      title: Delete maintenance warning
+    maintenance_edit:
+      title: Edit maintenance warning
+  site-title-prefix: "Admin: "
 
 auth:
   error: Error
@@ -146,5 +176,39 @@ errors:
     copy: |-
       You need to be logged in to access this page
 
-site:
-  title: Data acquisition portal
+form:
+  cancel: Cancel
+  submit: Submit
+
+format:
+  date:
+    written-with-year: 'jS F Y'
+    full-with-year: 'l, jS F Y'
+    full: 'l, jS F'
+    side-bar: 'j M Y'
+    default: 'd/m/Y'
+    year-and-month: 'F Y'
+  time:
+    default: 'g:i a'
+  date-time:
+    default: 'd/m/Y g:i a'
+
+frontend:
+  pages:
+    auth:
+      authenticate:
+        title: Login successful
+      check_email:
+        title: Check your email
+      sign-in:
+        title: Sign in
+    dashboard:
+      title: Dashboard
+
+maintenance-warning:
+  banner:
+    title: Important
+    heading: Scheduled maintenance
+    content: This service will be unavailable between {startTime} and {endTime} on {date}
+
+site.title: Data acquisition portal

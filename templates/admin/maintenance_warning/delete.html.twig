@@ -1,0 +1,26 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set current_menu = 'maintenance' %}
+{% set current_page = 'maintenance_delete' %}
+
+{%- block content -%}
+    {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import summaryListStart, summaryListEnd, summaryListRow, warningText -%}
+
+    {%- with {warning: subject} -%}
+
+        {{- summaryListStart({classes: 'govuk-!-margin-bottom-5'}) -}}
+            {{- summaryListRow({
+                key: 'Start',
+                value: warning.startDatetime | format_datetime
+            }) -}}
+            {{- summaryListRow({
+                key: 'End',
+                value: warning.endTime | format_time
+            }) -}}
+        {{- summaryListEnd() -}}
+        {{- warningText({text: "#{translation_prefix}.warning" | trans }) -}}
+
+        {{- form(form) -}}
+    {%- endwith -%}
+{%- endblock -%}

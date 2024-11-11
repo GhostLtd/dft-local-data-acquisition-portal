@@ -1,5 +1,7 @@
 {%- extends "@GhostGovUkCore/base.html.twig" %}
 
+{%- block pageTitle %}{{ 'site.title' | trans }}{% endblock -%}
+
 {% block stylesheets %}
     {{ encore_entry_link_tags('app') }}
 {% endblock %}
@@ -7,6 +9,17 @@
 {% block javascripts %}
     {{ encore_entry_script_tags('app') }}
 {% endblock %}
+
+{% block beforeContent %}
+    {{ parent() }}
+
+    {% from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner %}
+    {%- if maintenanceWarningBanner ?? null -%}
+        {{- notificationBanner(maintenanceWarningBanner) -}}
+    {%- endif -%}
+
+    <h1 class="{{ heading_class ?? 'govuk-heading-l' }}">{{ current_page_title | trans }}</h1>
+{% endblock -%}
 
 {%- block headerBar -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import header %}
@@ -17,9 +30,4 @@
 
 {% block phaseBanner %}
     {% block navigation %}{% endblock %}
-
-    {% from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner %}
-    {%- if maintenanceWarningBanner is defined -%}
-        {{- notificationBanner(maintenanceWarningBanner) -}}
-    {%- endif -%}
 {% endblock %}

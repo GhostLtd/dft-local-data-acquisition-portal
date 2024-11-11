@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Features;
 use App\Form\LoginType;
 use App\Messenger\AlphagovNotify\LoginEmail;
+use App\Repository\MaintenanceWarningRepository;
 use App\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +30,7 @@ class FrontendAuthController extends AbstractController
         Features                     $features,
         LoginLinkHandlerInterface    $loginLinkHandler,
         LoggerInterface              $logger,
-//        MaintenanceWarningRepository $maintenanceWarningRepository,
+        MaintenanceWarningRepository $maintenanceWarningRepository,
         MessageBusInterface          $messageBus,
         Request                      $request,
         RequestRateLimiterInterface  $loginLimiter,
@@ -86,7 +87,7 @@ class FrontendAuthController extends AbstractController
         return $this->render('auth/login.html.twig', [
             'form' => $form,
             'authenticationError' => $authenticationError,
-//            'maintenanceWarningBanner' => $maintenanceWarningRepository->getNotificationBanner(),
+            'maintenanceWarningBanner' => $maintenanceWarningRepository->getNotificationBanner(),
         ]);
     }
 
