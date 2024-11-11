@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block navigation %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
+
+    {{- serviceNavigation({
+        classes: 'govuk-service-navigation__wrapper-full-width',
+        serviceName: 'site.title' | trans,
+        navigation: [
+            {
+                href: "#",
+                text: "Item 1"
+            },
+            {
+                href: "#",
+                text: "Item 2",
+                active: true
+            }
+        ]
+    }) -}}
+{% endblock %}

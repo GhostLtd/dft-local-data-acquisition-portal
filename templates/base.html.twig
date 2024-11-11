@@ -16,34 +16,7 @@
 {%- endblock -%}
 
 {% block phaseBanner %}
-    {% if is_granted('ROLE_USER') %}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
-
-        {%- set signOutLink -%}
-            <li class="govuk-service-navigation__item govuk-service-navigation__margin-left-auto">
-                <a class="govuk-service-navigation__link" href="{{ path('app_logout') }}">{{ 'auth.sign_out' | trans }}</a>
-            </li>
-        {%- endset %}
-
-        {{- serviceNavigation({
-            classes: 'govuk-service-navigation__wrapper-full-width',
-            serviceName: 'site.title' | trans,
-            navigation: [
-                {
-                    href: "#",
-                    text: "Item 1"
-                },
-                {
-                    href: "#",
-                    text: "Item 2",
-                    active: true
-                }
-            ],
-            slots: {
-                navigationEnd: signOutLink
-            }
-        }) -}}
-    {% endif %}
+    {% block navigation %}{% endblock %}
 
     {% from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner %}
     {%- if maintenanceWarningBanner is defined -%}
