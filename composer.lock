@@ -1576,7 +1576,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.tomarq.net/ghost/govuk-core-bundle.git",
-                "reference": "1b6cc0664d47cee50ec126ae08695d9bd4e4bef2"
+                "reference": "3704c872909a692d16d7a4a8cfb37015b26a2b9b"
             },
             "require": {
                 "alphagov/notifications-php-client": "^6.2",
@@ -1635,7 +1635,7 @@
                 }
             ],
             "description": "Symfony bundle for core govuk-related classes",
-            "time": "2024-11-12T10:00:19+00:00"
+            "time": "2024-11-12T10:56:53+00:00"
         },
         {
             "name": "ghost/govuk-frontend-bundle",
