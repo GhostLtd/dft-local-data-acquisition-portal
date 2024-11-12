@@ -3,6 +3,12 @@ csp_report:
     methods: [POST]
     defaults: { _controller: nelmio_security.csp_reporter_controller::indexAction }
 
+core_controllers:
+    resource:
+        path: '@GhostGovUkCoreBundle/src/Controller'
+        namespace: Ghost\GovUkCoreBundle\Controller
+    type: attribute
+
 base:
     resource: '../src/Controller/*'
     type: attribute

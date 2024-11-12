@@ -26,3 +26,6 @@
         ]
     }) -}}
 {% endblock %}
+
+{# No need for the session warning in the admin, as we're logging in with IAP #}
+{% block sessionWarning %}{% endblock %}

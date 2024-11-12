@@ -204,6 +204,8 @@ frontend:
         title: Sign in
     dashboard:
       title: Dashboard
+    home:
+      title: Local data acquisition portal
 
 maintenance-warning:
   banner:
