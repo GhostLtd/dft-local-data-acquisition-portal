@@ -3,7 +3,15 @@
 {%- set current_page = 'dashboard' -%}
 
 {%- block content -%}
-    <div class="govuk-body">
-        Frontend dashboard...
-    </div>
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
+
+    {{ taskListStart() }}
+    {% for recipient in app.user.recipientsForWhichUserHasRoles %}
+        {{ taskListItem({
+            title: {text: recipient.name},
+            href: path('app_recipient', {id: recipient.id}),
+            status: {tag: {text: 'Unknown'}},
+        }, loop.index) }}
+    {% endfor %}
+    {{ taskListEnd() }}
 {%- endblock -%}

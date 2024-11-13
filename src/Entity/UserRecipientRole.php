@@ -15,7 +15,7 @@ class UserRecipientRole
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'usersRoles')]
+    #[ORM\ManyToOne(inversedBy: 'userRoles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Recipient $recipient = null;
 

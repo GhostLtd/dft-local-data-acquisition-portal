@@ -16,7 +16,7 @@ class Recipient
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1top_info: Local Authority name
 
-    #[ORM\ManyToOne(inversedBy: 'recipients')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $leadContact = null; // 1top_info: Lead contact
 

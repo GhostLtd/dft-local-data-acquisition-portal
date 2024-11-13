@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $phone = null; #1top_info
 
     #[ORM\Column(length: 255, unique: true)]
-    private ?string $email = null;
+    private ?string $email = null; #1top_info
 
     /**
      * @var Collection<int, UserRecipientRole>
@@ -41,17 +41,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: UserRecipientRole::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $recipientRoles;
 
-    /**
-     * @var Collection<int, Recipient>
-     */
-    #[ORM\OneToMany(targetEntity: Recipient::class, mappedBy: 'leadContact')]
-    private Collection $recipients;
-
     public function __construct()
     {
         $this->recipientRoles = new ArrayCollection();
-        $this->recipients = new ArrayCollection();
-    } #1top_info
+    }
 
     public function getUserIdentifier(): string
     {
@@ -157,33 +150,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Recipient>
-     */
-    public function getRecipients(): Collection
+    public function getRecipientsForWhichUserHasRoles(): array
     {
-        return $this->recipients;
-    }
-
-    public function addRecipient(Recipient $recipient): static
-    {
-        if (!$this->recipients->contains($recipient)) {
-            $this->recipients->add($recipient);
-            $recipient->setLeadContact($this);
+        // De-duplicates and orders...
+        $recipients = [];
+        foreach($this->getRecipientRoles() as $recipientRole) {
+            $recipient = $recipientRole->getRecipient();
+            $recipients[$recipient->getName()] = $recipient;
         }
 
-        return $this;
-    }
-
-    public function removeRecipient(Recipient $recipient): static
-    {
-        if ($this->recipients->removeElement($recipient)) {
-            // set the owning side to null (unless already changed)
-            if ($recipient->getLeadContact() === $this) {
-                $recipient->setLeadContact(null);
-            }
-        }
-
-        return $this;
+        ksort($recipients);
+        return array_values($recipients);
     }
 }

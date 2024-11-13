@@ -203,9 +203,11 @@ frontend:
       sign-in:
         title: Sign in
     dashboard:
-      title: Dashboard
+      title: Local authorities
     home:
       title: Local data acquisition portal
+    recipient:
+      title: "{recipientName}"
 
 maintenance-warning:
   banner:

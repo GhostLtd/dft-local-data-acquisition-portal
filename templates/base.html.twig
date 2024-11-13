@@ -18,7 +18,7 @@
         {{- notificationBanner(maintenanceWarningBanner) -}}
     {%- endif -%}
 
-    <h1 class="{{ heading_class ?? 'govuk-heading-l' }}">{{ current_page_title | trans }}</h1>
+    <h1 class="{{ heading_class ?? 'govuk-heading-l' }}">{{ current_page_title | trans(page_title_params ?? {}) }}</h1>
 {% endblock -%}
 
 {%- block headerBar -%}

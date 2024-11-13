@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block pageTitle %}{{ "frontend.pages.#{current_page}.title" | trans }} | {{ parent() }}{% endblock %}
+{% block pageTitle %}{{ "frontend.pages.#{current_page}.title" | trans(page_title_params ?? {}) }} | {{ parent() }}{% endblock %}
 
 {% set current_page_title = current_page_title ?? "frontend.pages.#{current_page}.title" %}
 
@@ -22,7 +22,7 @@
             navigation: [
                 {
                     href: path('app_dashboard'),
-                    text: "Dashboard",
+                    text: "frontend.pages.dashboard.title" | trans,
                     active: current_menu == 'dashboard',
                 },
                 {

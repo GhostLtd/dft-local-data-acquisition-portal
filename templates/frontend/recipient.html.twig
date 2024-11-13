@@ -1,0 +1,12 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set current_page = 'recipient' -%}
+{%- set page_title_params = {
+    recipientName: recipient.name
+} %}
+
+{%- block content -%}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
+
+    ...
+{%- endblock -%}
