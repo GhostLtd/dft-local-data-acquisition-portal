@@ -207,7 +207,7 @@ frontend:
     home:
       title: Local data acquisition portal
     fund_return:
-      title: "{recipientName}: {type} return for {year} Q{quarter}"
+      title: "{type} return for {year} Q{quarter}"
     recipient:
       title: "{recipientName}"
       fund_award_returns: Fund award returns

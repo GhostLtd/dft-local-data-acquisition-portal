@@ -1,9 +1,10 @@
-{%- extends 'frontend/base.html.twig' -%}
+{%- extends 'frontend/dashboard_base.html.twig' -%}
 
 {%- set current_page = 'recipient' -%}
 {%- set page_title_params = {
     recipientName: recipient.name
 } %}
+{%- set breadcrumb_components = ['recipient'] %}
 
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}

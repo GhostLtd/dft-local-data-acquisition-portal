@@ -1,14 +1,14 @@
-{%- extends 'frontend/base.html.twig' -%}
+{%- extends 'frontend/dashboard_base.html.twig' -%}
 
 {%- set current_page = 'fund_return' -%}
 {%- set page_title_params = {
     quarter: fundReturn.quarter,
-    recipientName: fundReturn.fundAward.recipient.name,
     type: fundReturn.fundAward.type.name,
     year: fundReturn.year,
 } %}
 
-{% set heading_class = 'govuk-heading-m' %}
+{%- set breadcrumb_components = ['recipient', 'fund_return'] %}
+{%- set recipient = fundReturn.fundAward.recipient -%}
 
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
