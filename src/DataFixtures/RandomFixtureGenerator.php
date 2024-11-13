@@ -12,7 +12,7 @@ use App\DataFixtures\Definition\ProjectDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
 use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
 use App\DataFixtures\Generator\CouncilName;
-use App\Entity\Enum\ActiveTravelElements;
+use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\CrstsPhase;
 use App\Entity\Enum\ExpenseType;
@@ -208,7 +208,7 @@ class RandomFixtureGenerator
             $this->faker->sentence(),
             $this->faker->text(),
             $this->faker->randomElement(TransportMode::cases()),
-            $this->faker->randomElements(ActiveTravelElements::cases(), null),
+            $this->faker->randomElement(ActiveTravelElement::cases()),
             $this->faker->boolean(),
             $this->faker->boolean(),
             $projectId,

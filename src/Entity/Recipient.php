@@ -16,7 +16,7 @@ class Recipient
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1top_info: Local Authority name
 
-    #[ORM\OneToOne]
+    #[ORM\ManyToOne(inversedBy: 'recipients')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $leadContact = null; // 1top_info: Lead contact
 
@@ -61,7 +61,7 @@ class Recipient
         return $this->leadContact;
     }
 
-    public function setLeadContact(User $leadContact): static
+    public function setLeadContact(?User $leadContact): static
     {
         $this->leadContact = $leadContact;
         return $this;

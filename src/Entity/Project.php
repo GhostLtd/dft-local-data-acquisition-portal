@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\ActiveTravelElements;
+use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\TransportMode;
 use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\Traits\IdTrait;
@@ -31,8 +31,8 @@ class Project
     #[ORM\Column(nullable: true, enumType: TransportMode::class)]
     private ?TransportMode $transportMode = null; // 1proj_info: Transport mode
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ActiveTravelElements::class)]
-    private array $activeTravelElements = []; // 1proj_info: Does this project have active travel elements?
+    #[ORM\Column(nullable: true, enumType: ActiveTravelElement::class)]
+    private ?ActiveTravelElement $activeTravelElement = null; // 1proj_info: Does this project have active travel elements?
 
     #[ORM\Column(nullable: true)]
     private ?bool $includesCleanAirElements = null; // 1proj_info: Will this project include clean air elements?
@@ -98,17 +98,14 @@ class Project
         return $this;
     }
 
-    /**
-     * @return ActiveTravelElements[]
-     */
-    public function getActiveTravelElements(): array
+    public function getActiveTravelElement(): ?ActiveTravelElement
     {
-        return $this->activeTravelElements;
+        return $this->activeTravelElement;
     }
 
-    public function setActiveTravelElements(array $activeTravelElements): static
+    public function setActiveTravelElement(?ActiveTravelElement $activeTravelElement): Project
     {
-        $this->activeTravelElements = $activeTravelElements;
+        $this->activeTravelElement = $activeTravelElement;
         return $this;
     }
 

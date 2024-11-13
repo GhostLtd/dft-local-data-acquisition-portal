@@ -3,20 +3,19 @@
 namespace App\DataFixtures\Definition;
 
 use App\DataFixtures\Definition\ProjectFund\AbstractProjectFundDefinition;
-use App\Entity\Enum\ActiveTravelElements;
+use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\TransportMode;
 
 class ProjectDefinition
 {
     /**
      * @param array<AbstractProjectFundDefinition> $projectFunds
-     * @param array<ActiveTravelElements> $activeTravelElements
      */
     public function __construct(
         protected string $name,
         protected string $description,
         protected ?TransportMode $transportMode = null,
-        protected array $activeTravelElements = [],
+        protected ?ActiveTravelElement $activeTravelElement = null,
         protected ?bool $includesCleanAirElements = null,
         protected ?bool $includesChargingPoints = null,
         protected ?string $projectIdentifier = null,
@@ -38,9 +37,9 @@ class ProjectDefinition
         return $this->transportMode;
     }
 
-    public function getActiveTravelElements(): array
+    public function getActiveTravelElement(): ?ActiveTravelElement
     {
-        return $this->activeTravelElements;
+        return $this->activeTravelElement;
     }
 
     public function getIncludesCleanAirElements(): ?bool

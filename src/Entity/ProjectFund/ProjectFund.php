@@ -2,7 +2,7 @@
 
 namespace App\Entity\ProjectFund;
 
-use App\Entity\Enum\ActiveTravelElements;
+use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
 use App\Entity\Project;

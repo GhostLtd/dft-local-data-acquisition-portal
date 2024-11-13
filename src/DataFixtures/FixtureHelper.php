@@ -155,7 +155,7 @@ class FixtureHelper
             ->setName($definition->getName())
             ->setDescription($definition->getDescription())
             ->setProjectIdentifier($definition->getProjectIdentifier())
-            ->setActiveTravelElements($definition->getActiveTravelElements())
+            ->setActiveTravelElement($definition->getActiveTravelElement())
             ->setIncludesChargingPoints($definition->getIncludesChargingPoints())
             ->setIncludesCleanAirElements($definition->getIncludesCleanAirElements())
             ->setTransportMode($definition->getTransportMode());

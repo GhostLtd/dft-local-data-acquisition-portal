@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum ActiveTravelElements: string
+enum ActiveTravelElement: string
 {
     case NO_ACTIVE_TRAVEL_ELEMENTS = "no_active_travel_elements";
     case AREA_WIDE_TRAFFIC_MANAGEMENT = "area_wide_traffic_management";
