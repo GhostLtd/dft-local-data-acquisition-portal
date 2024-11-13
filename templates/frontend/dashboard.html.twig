@@ -5,6 +5,10 @@
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
 
+    {# TODO: Intention here is that this page will list the local authorities and their "status", as in...
+             whether there are any outstanding returns for this authority.
+    #}
+
     {{ taskListStart() }}
     {% for recipient in app.user.recipientsForWhichUserHasRoles %}
         {{ taskListItem({

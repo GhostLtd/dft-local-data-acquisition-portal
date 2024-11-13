@@ -206,8 +206,11 @@ frontend:
       title: Local authorities
     home:
       title: Local data acquisition portal
+    fund_return:
+      title: "{recipientName}: {type} return for {year} Q{quarter}"
     recipient:
       title: "{recipientName}"
+      fund_award_returns: Fund award returns
 
 maintenance-warning:
   banner:
@@ -216,3 +219,11 @@ maintenance-warning:
     content: This service will be unavailable between {startTime} and {endTime} on {date}
 
 site.title: Data acquisition portal
+
+tags:
+  complete:
+    name: Complete
+    colour: green
+  in_progress:
+    name: In progress
+    colour: yellow

@@ -16,21 +16,22 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
      * @param array<string, CrstsProjectReturnDefinition> $projectReturns
      */
     public function __construct(
-        ?UserDefinition               $userDefinition = null,
-        protected ?int                $year = null,
-        protected ?int                $quarter = null,
-        protected ?string             $progressSummary = null,
-        protected ?string             $deliveryConfidence = null,
-        protected ?Rating             $overallConfidence = null,
-        protected ?string             $ragProgressSummary = null,
-        protected ?Rating             $ragProgressRating = null,
-        protected ?string             $localContribution = null,
-        protected ?string             $resourceFunding = null,
-        protected ?string             $comments = null,
-        protected array               $expenses = [],
-        protected array               $projectReturns = [],
-    ) {
-        parent::__construct($userDefinition);
+        ?UserDefinition   $signoffUser = null,
+        protected ?int    $year = null,
+        protected ?int    $quarter = null,
+        protected ?string $progressSummary = null,
+        protected ?string $deliveryConfidence = null,
+        protected ?Rating $overallConfidence = null,
+        protected ?string $ragProgressSummary = null,
+        protected ?Rating $ragProgressRating = null,
+        protected ?string $localContribution = null,
+        protected ?string $resourceFunding = null,
+        protected ?string $comments = null,
+        protected array   $expenses = [],
+        protected array   $projectReturns = [],
+    )
+    {
+        parent::__construct($signoffUser);
 
         foreach($this->projectReturns as $name => $_project) {
             if (!is_string($name)) {

@@ -14,13 +14,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CrstsFundReturnRepository::class)]
 class CrstsFundReturn extends FundReturn
 {
-
-    #[ORM\Column]
-    private ?int $year = null;
-
-    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $quarter = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $progressSummary = null; // 1top_info: Programme level progress summary
 
@@ -61,28 +54,6 @@ class CrstsFundReturn extends FundReturn
     {
         $this->expenses = new ArrayCollection();
         $this->projectReturns = new ArrayCollection();
-    }
-
-    public function getYear(): ?int
-    {
-        return $this->year;
-    }
-
-    public function setYear(int $year): static
-    {
-        $this->year = $year;
-        return $this;
-    }
-
-    public function getQuarter(): ?int
-    {
-        return $this->quarter;
-    }
-
-    public function setQuarter(?int $quarter): static
-    {
-        $this->quarter = $quarter;
-        return $this;
     }
 
     public function getProgressSummary(): ?string

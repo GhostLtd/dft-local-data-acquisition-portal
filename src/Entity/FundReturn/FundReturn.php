@@ -7,6 +7,7 @@ use App\Entity\FundAward;
 use App\Entity\Traits\IdTrait;
 use App\Entity\User;
 use App\Repository\FundReturn\FundReturnRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FundReturnRepository::class)]
@@ -19,6 +20,12 @@ class FundReturn
 {
     use IdTrait;
 
+    #[ORM\Column]
+    private ?int $year = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    private ?int $quarter = null;
+
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
     private ?FundAward $fundAward = null;
@@ -29,6 +36,28 @@ class FundReturn
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?User $signoffUser = null; // top_signoff
+
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function setYear(int $year): static
+    {
+        $this->year = $year;
+        return $this;
+    }
+
+    public function getQuarter(): ?int
+    {
+        return $this->quarter;
+    }
+
+    public function setQuarter(?int $quarter): static
+    {
+        $this->quarter = $quarter;
+        return $this;
+    }
 
     public function getFundAward(): ?FundAward
     {

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Frontend;
 
+use App\Entity\FundReturn\FundReturn;
 use App\Entity\Recipient;
 use App\Repository\MaintenanceWarningRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,14 @@ class DashboardController extends AbstractController
     {
         return $this->render('frontend/recipient.html.twig', [
             'recipient' => $recipient,
+        ]);
+    }
+
+    #[Route('/fund-return/{id}', name: 'app_fund_return')]
+    public function fundReturn(FundReturn $fundReturn): Response
+    {
+        return $this->render('frontend/fund_return.html.twig', [
+            'fundReturn' => $fundReturn,
         ]);
     }
 }

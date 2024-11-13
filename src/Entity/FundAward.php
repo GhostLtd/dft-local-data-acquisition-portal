@@ -26,6 +26,7 @@ class FundAward
      * @var Collection<int, FundReturn>
      */
     #[ORM\OneToMany(targetEntity: FundReturn::class, mappedBy: 'fundAward', orphanRemoval: true)]
+    #[ORM\OrderBy(['year' => 'DESC', 'quarter' => 'DESC'])]
     private Collection $returns;
 
     public function __construct()

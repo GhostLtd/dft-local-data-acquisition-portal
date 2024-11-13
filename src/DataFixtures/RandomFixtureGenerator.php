@@ -106,7 +106,7 @@ class RandomFixtureGenerator
         $startingQuarter = $this->faker->numberBetween(1, 4);
 
         $endingYear = $startingYear + $this->faker->numberBetween(1, 8);
-        $endingQuarter = ($startingQuarter + $this->faker->numberBetween(1, 4) % 4) + 1;
+        $endingQuarter = (($startingQuarter + $this->faker->numberBetween(1, 4)) % 4) + 1;
 
         $expenses = $this->createRandomExpenses(
             ExpenseType::filterForFund(),
@@ -121,6 +121,8 @@ class RandomFixtureGenerator
 
             for($quarter=$loopStartingQuarter; $quarter<=$loopEndingQuarter; $quarter++) {
                 $projectReturns = [];
+
+                $canBeUnsubmitted = $year === $endingYear && $quarter === $endingQuarter;
 
                 foreach($projects as $project) {
                     $projectFund = null;
@@ -151,7 +153,7 @@ class RandomFixtureGenerator
 
                 $returns[] = match($fund) {
                     Fund::CRSTS => new CrstsFundReturnDefinition(
-                        $this->createRandomUser(),
+                        $canBeUnsubmitted ? null : $this->createRandomUser(), // No signoff user for the most recent return...
                         $year,
                         $quarter,
                         $this->faker->text(),
