@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\DataFixtures\Definition\FundAwardDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
 use App\DataFixtures\Definition\RecipientDefinition;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -21,6 +22,11 @@ class FixtureDefinitionToJsonCommand extends Command
 {
     protected array $queue = [];
     protected array $classesSeen = [];
+
+    protected array $blacklist = [
+        CrstsProjectFundDefinition::class => ['fund' => true],
+        FundAwardDefinition::class => ['fund' => true],
+    ];
 
     public function __construct(
         #[Autowire('@property_info')]
@@ -65,6 +71,10 @@ class FixtureDefinitionToJsonCommand extends Command
         $jsonTypes = [];
 
         foreach($this->propertyInfoExtractor->getProperties($definitionClass) as $property) {
+            if ($this->blacklist[$definitionClass][$property] ?? null) {
+                continue;
+            }
+
             $types = $this->propertyInfoExtractor->getTypes($definitionClass, $property);
 
             /** @var Type $type */

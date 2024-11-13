@@ -14,7 +14,6 @@ use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
 use App\DataFixtures\Generator\CouncilName;
 use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\BusinessCase;
-use App\Entity\Enum\CrstsPhase;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\MilestoneType;
@@ -220,7 +219,6 @@ class RandomFixtureGenerator
     {
         return new CrstsProjectFundDefinition(
             $this->faker->boolean(),
-            $this->faker->randomElement(CrstsPhase::cases()),
         );
     }
 

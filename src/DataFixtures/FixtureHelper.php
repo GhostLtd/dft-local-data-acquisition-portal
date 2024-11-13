@@ -179,8 +179,7 @@ class FixtureHelper
     public function createCrstsProjectFund(CrstsProjectFundDefinition $definition): CrstsProjectFund
     {
         $projectFund = (new CrstsProjectFund())
-            ->setRetained($definition->isRetained())
-            ->setPhase($definition->getPhase());
+            ->setRetained($definition->isRetained());
 
         $this->persist([$projectFund]);
 
