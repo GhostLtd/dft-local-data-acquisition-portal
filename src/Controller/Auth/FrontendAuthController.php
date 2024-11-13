@@ -8,6 +8,7 @@ use App\Form\LoginType;
 use App\Messenger\AlphagovNotify\LoginEmail;
 use App\Repository\MaintenanceWarningRepository;
 use App\Repository\UserRepository;
+use App\Security\UserProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -19,6 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -34,7 +36,7 @@ class FrontendAuthController extends AbstractController
         MessageBusInterface          $messageBus,
         Request                      $request,
         RequestRateLimiterInterface  $loginLimiter,
-        UserRepository               $userRepository,
+        UserProvider                 $userProvider,
         TranslatorInterface          $translator,
     ): Response {
         $user = $this->getUser();
@@ -52,27 +54,23 @@ class FrontendAuthController extends AbstractController
             $email = $form->getData()['email'];
 
             try {
-                $user = $userRepository->loadUserByIdentifier($email);
+                $user = $userProvider->loadUserByIdentifier($email);
 
-                if ($user) {
-                    $loginLimiter->consume($request)->ensureAccepted();
-                    $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
+                $loginLimiter->consume($request)->ensureAccepted();
+                $loginLinkDetails = $loginLinkHandler->createLoginLink($user);
 
-                    if ($this->getParameter('kernel.environment') === 'dev' &&
-                        $features->isEnabled(Features::FEATURE_DEV_AUTO_LOGIN)
-                    ) {
-                        $logger->info("Login submitted: {$email} - success - DEV mode auto-redirect");
-                        return new RedirectResponse($loginLinkDetails->getUrl());
-                    }
-
-                    $logger->info("Login submitted: {$email} - check-email page, message dispatched");
-
-                    $messageBus->dispatch(
-                        new LoginEmail($email, ['login_link' => $loginLinkDetails->getUrl()])
-                    );
-                } else {
-                    $logger->info("Login submitted: {$email} - check-email page, no such user");
+                if ($this->getParameter('kernel.environment') === 'dev' &&
+                    $features->isEnabled(Features::FEATURE_DEV_AUTO_LOGIN)
+                ) {
+                    $logger->info("Login submitted: {$email} - success - DEV mode auto-redirect");
+                    return new RedirectResponse($loginLinkDetails->getUrl());
                 }
+
+                $logger->info("Login submitted: {$email} - check-email page, message dispatched");
+
+                $messageBus->dispatch(
+                    new LoginEmail($email, ['login_link' => $loginLinkDetails->getUrl()])
+                );
 
                 return $this->redirectToRoute('app_login_check_email');
             }
@@ -81,6 +79,9 @@ class FrontendAuthController extends AbstractController
                      'retry_after' => $e->getRateLimit()->getRetryAfter()->format('Y-m-d H:i:s'),
                 ]));
                 $logger->info("Login submitted: {$email} - failure - rate-limit hit");
+            }
+            catch(UserNotFoundException) {
+                $logger->info("Login submitted: {$email} - check-email page, no such user");
             }
         }
 
