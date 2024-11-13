@@ -9,7 +9,7 @@ use App\Entity\FundReturn\FundReturn;
 class FundAwardDefinition
 {
     /**
-     * @param array<FundReturn> $returns
+     * @param array<CrstsFundReturnDefinition> $returns
      */
     public function __construct(
         protected Fund $fund,
