@@ -23,10 +23,7 @@ class FixtureDefinitionToJsonCommand extends Command
     protected array $queue = [];
     protected array $classesSeen = [];
 
-    protected array $blacklist = [
-        CrstsProjectFundDefinition::class => ['fund' => true],
-        FundAwardDefinition::class => ['fund' => true],
-    ];
+    protected array $blacklist = [];
 
     public function __construct(
         #[Autowire('@property_info')]
@@ -163,7 +160,7 @@ class FixtureDefinitionToJsonCommand extends Command
             );
 
             $possibilitiesAsString = join('|', $possibilities);
-            return "({$possibilitiesAsString})";
+            return count($possibilities) > 1 ? "({$possibilitiesAsString})" : $possibilitiesAsString;
         } else {
             if (str_contains($className, 'Abstract')) {
                 $subClasses = $this->getSubclasses($className);
