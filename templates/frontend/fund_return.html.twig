@@ -1,14 +1,7 @@
-{%- extends 'frontend/dashboard_base.html.twig' -%}
+{%- extends 'frontend/base.html.twig' -%}
 
-{%- set current_page = 'fund_return' -%}
-{%- set page_title_params = {
-    quarter: fundReturn.quarter,
-    type: fundReturn.fundAward.type.name,
-    year: fundReturn.year,
-} %}
-
-{%- set breadcrumb_components = ['recipient', 'fund_return'] %}
-{%- set recipient = fundReturn.fundAward.recipient -%}
+{%- set page_title = breadcrumbBuilder.titleFor('fund_return') -%}
+{%- set heading_class = 'govuk-heading-m' -%}
 
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}

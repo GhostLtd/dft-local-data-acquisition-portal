@@ -82,6 +82,7 @@ class FrontendAuthController extends AbstractController
             }
             catch(UserNotFoundException) {
                 $logger->info("Login submitted: {$email} - check-email page, no such user");
+                return $this->redirectToRoute('app_login_check_email');
             }
         }
 

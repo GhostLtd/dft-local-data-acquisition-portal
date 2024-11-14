@@ -3,36 +3,47 @@
 namespace App\Controller\Frontend;
 
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\Recipient;
+use App\Entity\User;
 use App\Repository\MaintenanceWarningRepository;
+use App\Repository\RecipientRepository;
+use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_dashboard')]
     public function index(
+        DashboardBreadcrumbBuilder   $breadcrumbBuilder,
         MaintenanceWarningRepository $maintenanceWarningRepository,
+        RecipientRepository          $recipientRepository,
+        UserInterface                $user,
     ): Response
     {
-        return $this->render('frontend/dashboard.html.twig', [
-            'maintenanceWarningBanner' => $maintenanceWarningRepository->getNotificationBanner(),
-        ]);
-    }
+        if (!$user instanceof User) {
+            throw new NotFoundHttpException();
+        }
 
-    #[Route('/recipients/{id}', name: 'app_recipient')]
-    public function recipient(Recipient $recipient): Response
-    {
-        return $this->render('frontend/recipient.html.twig', [
-            'recipient' => $recipient,
+        return $this->render('frontend/dashboard.html.twig', [
+            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'maintenanceWarningBanner' => $maintenanceWarningRepository->getNotificationBanner(),
+            'recipients' => $recipientRepository->getRecipientsFundAwardsAndReturnsForUser($user),
         ]);
     }
 
     #[Route('/fund-return/{id}', name: 'app_fund_return')]
-    public function fundReturn(FundReturn $fundReturn): Response
+    public function fundReturn(
+        FundReturn                 $fundReturn,
+        DashboardBreadcrumbBuilder $breadcrumbBuilder,
+    ): Response
     {
+        $breadcrumbBuilder->setAtFundReturn($fundReturn);
+
         return $this->render('frontend/fund_return.html.twig', [
+            'breadcrumbBuilder' => $breadcrumbBuilder,
             'fundReturn' => $fundReturn,
         ]);
     }

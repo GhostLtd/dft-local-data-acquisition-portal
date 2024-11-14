@@ -1,33 +1,62 @@
-{%- extends "@GhostGovUkCore/base.html.twig" %}
+{%- extends "@GhostGovUkCore/base.html.twig" -%}
 
-{%- block pageTitle %}{{ 'site.title' | trans }}{% endblock -%}
+{%- if page_title is not defined -%}
+    {%- set page_title = page_title_key | trans(page_title_params ?? {}) -%}
+{%- endif -%}
 
-{% block stylesheets %}
-    {{ encore_entry_link_tags('app') }}
-{% endblock %}
+{%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('site.title' | trans)) -%}
 
-{% block javascripts %}
-    {{ encore_entry_script_tags('app') }}
-{% endblock %}
+{%- block pageTitle %}{{ page_title }}{{ page_title_suffix ?? '' }}{% endblock -%}
 
-{% block beforeContent %}
-    {{ parent() }}
+{%- block stylesheets -%}
+    {{- encore_entry_link_tags('app') -}}
+{%- endblock -%}
 
-    {% from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner %}
-    {%- if maintenanceWarningBanner ?? null -%}
-        {{- notificationBanner(maintenanceWarningBanner) -}}
-    {%- endif -%}
-
-    <h1 class="{{ heading_class ?? 'govuk-heading-l' }}">{{ current_page_title | trans(page_title_params ?? {}) }}</h1>
-{% endblock -%}
+{%- block javascripts -%}
+    {{- encore_entry_script_tags('app') -}}
+{%- endblock -%}
 
 {%- block headerBar -%}
-    {% from "@GhostGovUkFrontend/components/macros.html.twig" import header %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import header -%}
     {{- header({
         classes: 'govuk-header--full-width-border'
     }) -}}
 {%- endblock -%}
 
-{% block phaseBanner %}
-    {% block navigation %}{% endblock %}
-{% endblock %}
+{%- block phaseBanner -%}
+    {%- block navigation %}{% endblock -%}
+{%- endblock -%}
+
+{%- block beforeMainWrapper -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import breadcrumbs as breadcrumbsComponent -%}
+
+    {{- parent() -}}
+
+    {%- if breadcrumbs is not defined and breadcrumbBuilder is defined -%}
+        {%- set breadcrumbs = breadcrumbBuilder.breadcrumbs -%}
+    {%- endif -%}
+
+    {%- if (breadcrumbs ?? []) | length > 1 -%}
+        {{- breadcrumbsComponent({items: breadcrumbs}) -}}
+    {%- endif -%}
+{%- endblock -%}
+
+{%- block beforeContent -%}
+    {{- parent() -}}
+
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner -%}
+    {%- if maintenanceWarningBanner ?? null -%}
+        {{- notificationBanner(maintenanceWarningBanner) -}}
+    {%- endif -%}
+
+    {%- if page_heading is not defined -%}
+        {%- set page_heading = page_heading_key is defined ?
+            page_heading_key | trans(page_heading_params ?? {}) :
+            page_title
+        -%}
+    {%- endif -%}
+
+    {%- block pageHeading -%}
+        <h1 class="{{ page_heading_class ?? 'govuk-heading-l' }}">{{ page_heading }}</h1>
+    {%- endblock -%}
+{%- endblock -%}

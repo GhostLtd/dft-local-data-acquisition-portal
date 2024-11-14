@@ -149,17 +149,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-    public function getRecipientsForWhichUserHasRoles(): array
-    {
-        // De-duplicates and orders...
-        $recipients = [];
-        foreach($this->getRecipientRoles() as $recipientRole) {
-            $recipient = $recipientRole->getRecipient();
-            $recipients[$recipient->getName()] = $recipient;
-        }
-
-        ksort($recipients);
-        return array_values($recipients);
-    }
 }

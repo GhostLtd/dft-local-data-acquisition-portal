@@ -1,7 +1,7 @@
 {% extends 'admin/base.html.twig' %}
 
-{% set current_menu = 'maintenance' %}
-{% set current_page = 'maintenance_' ~ type %}
+{%- set page_title_key = "admin.pages.maintenance_#{type}.title" -%}
+{%- set current_menu = 'maintenance' -%}
 
 {%- block content -%}
     {% form_theme form '@GhostGovUkFrontend/theme.html.twig' %}

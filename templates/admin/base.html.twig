@@ -1,13 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block pageTitle %}{{ "admin.pages.#{current_page}.title" | trans }} | {{ "admin.site-title-prefix" | trans }}{{ parent() }}{% endblock %}
-
-{% set current_page_title = current_page_title ?? "admin.pages.#{current_page}.title" %}
+{%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('admin.site-title-suffix' | trans) ~ ('site.title' | trans)) -%}
 
 {% block navigation %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
 
-    {%- set current_menu = current_menu ?? current_page -%}
+    {%- set current_menu = current_menu ?? null -%}
 
     {{- serviceNavigation({
         classes: 'govuk-service-navigation__wrapper-full-width',

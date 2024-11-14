@@ -1,20 +1,16 @@
-{% extends 'base.html.twig' %}
+{%- extends 'base.html.twig' -%}
 
-{% block pageTitle %}{{ "frontend.pages.#{current_page}.title" | trans(page_title_params ?? {}) }} | {{ parent() }}{% endblock %}
-
-{% set current_page_title = current_page_title ?? "frontend.pages.#{current_page}.title" %}
-
-{% block navigation %}
-    {% if is_granted('ROLE_USER') %}
+{%- block navigation -%}
+    {%- if is_granted('ROLE_USER') -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
 
         {%- set signOutLink -%}
             <li class="govuk-service-navigation__item govuk-service-navigation__margin-left-auto">
                 <a class="govuk-service-navigation__link" href="{{ path('app_logout') }}">{{ 'auth.sign_out' | trans }}</a>
             </li>
-        {%- endset %}
+        {%- endset -%}
 
-        {%- set current_menu = current_menu ?? current_page -%}
+        {%- set current_menu = current_menu ?? null -%}
 
         {{- serviceNavigation({
             classes: 'govuk-service-navigation__wrapper-full-width',
@@ -24,16 +20,11 @@
                     href: path('app_dashboard'),
                     text: "frontend.pages.dashboard.title" | trans,
                     active: current_menu == 'dashboard',
-                },
-                {
-                    href: "#",
-                    text: "Item 2",
-                    active: current_menu == 'item-2',
                 }
             ],
             slots: {
                 navigationEnd: signOutLink
             }
         }) -}}
-    {% endif %}
-{% endblock %}
+    {%- endif -%}
+{%- endblock -%}

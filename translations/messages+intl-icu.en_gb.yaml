@@ -33,7 +33,7 @@ admin:
       title: Delete maintenance warning
     maintenance_edit:
       title: Edit maintenance warning
-  site-title-prefix: "Admin: "
+  site-title-suffix: "Admin: "
 
 auth:
   error: Error
@@ -200,17 +200,14 @@ frontend:
         title: Login successful
       check_email:
         title: Check your email
-      sign-in:
+      sign_in:
         title: Sign in
     dashboard:
       title: Local authorities
     home:
       title: Local data acquisition portal
     fund_return:
-      title: "{type} return for {year} Q{quarter}"
-    recipient:
-      title: "{recipientName}"
-      fund_award_returns: Fund award returns
+      title: "{recipientName}: {type} return for {year} Q{quarter}"
 
 maintenance-warning:
   banner:

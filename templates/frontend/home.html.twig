@@ -1,13 +1,14 @@
-{% extends 'frontend/base.html.twig' %}
+{%- extends 'frontend/base.html.twig' -%}
 
-{% set current_page = 'home' %}
+{%- set page_title_key = 'frontend.pages.home.title' -%}
+{%- set page_title_suffix = '' -%}
 
-{% block content %}
+{%- block content -%}
     <p class="govuk-body">Hello world</p>
 
-    {% if is_granted('ROLE_USER') %}
+    {%- if is_granted('ROLE_USER') -%}
         <a href="{{ path('app_dashboard') }}" class="govuk-link">Dashboard</a>
     {% else %}
         <a href="{{ path('app_login') }}" class="govuk-link">Login</a>
-    {% endif %}
-{% endblock %}
+    {%- endif -%}
+{%- endblock -%}
