@@ -1,7 +1,7 @@
 {%- extends 'frontend/base.html.twig' -%}
 
-{#{%- set current_page = 'dashboard' -%}#}
 {%- set page_title = breadcrumbBuilder.titleFor('dashboard') -%}
+{%- set current_menu = 'dashboard' -%}
 
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
