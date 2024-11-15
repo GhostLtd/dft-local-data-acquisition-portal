@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\Fund;
+use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\Traits\IdTrait;
 use App\Repository\RecipientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -155,5 +157,30 @@ class Recipient
         }
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------------
+
+    /**
+     * Returns a collection of the projects that this recipient has, that receive funding from the specified $fund
+     * @return Collection<Project>
+     */
+    public function getProjectsForFund(Fund $fund): Collection
+    {
+        return $this->projects->filter(fn(Project $p) => $p->getProjectFunds()->reduce(
+            fn(bool $carry, ProjectFund $projectFund) => $carry || $projectFund->getFund() === $fund,
+            false,
+        ));
+    }
+
+    /**
+     * Returns a collection of the projectFunds that this recipient has, that receive funding from the specified $fund
+     * @return Collection<ProjectFund>
+     */
+    public function getProjectFundsForFund(Fund $fund): Collection
+    {
+        return $this->projects
+            ->map(fn(Project $p) => $p->getProjectFundForFund($fund))
+            ->filter(fn(?ProjectFund $pf) => $pf !== null);
     }
 }

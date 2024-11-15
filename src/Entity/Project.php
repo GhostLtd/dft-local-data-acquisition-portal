@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Enum\ActiveTravelElement;
+use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
 use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\Traits\IdTrait;
@@ -170,5 +171,18 @@ class Project
         }
 
         return $this;
+    }
+
+    // --------------------------------------------------------------------------------
+
+    public function getProjectFundForFund(Fund $fund): ?ProjectFund
+    {
+        $matchingProjectFunds = $this->getProjectFunds()->filter(
+            fn(ProjectFund $pf) => $pf->getFund() === $fund
+        );
+
+        return $matchingProjectFunds->isEmpty() ?
+            null :
+            $matchingProjectFunds->first();
     }
 }

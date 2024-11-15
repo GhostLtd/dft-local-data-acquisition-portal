@@ -2,6 +2,7 @@
 
 namespace App\Entity\ProjectFund;
 
+use App\Entity\Enum\Fund;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Repository\ProjectFund\CrstsProjectFundRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -64,5 +65,16 @@ class CrstsProjectFund extends ProjectFund
         }
 
         return $this;
+    }
+
+    public function getFund(): Fund
+    {
+        return Fund::CRSTS;
+    }
+
+    public function isReturnRequiredFor(int $quarter): bool
+    {
+        // If project is retained, we require a return every quarter, otherwise only once a year
+        return $this->isRetained() || $quarter === 1;
     }
 }

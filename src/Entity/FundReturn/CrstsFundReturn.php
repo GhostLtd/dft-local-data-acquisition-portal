@@ -2,6 +2,7 @@
 
 namespace App\Entity\FundReturn;
 
+use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\Expense\ExpenseSeries;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
@@ -195,5 +196,10 @@ class CrstsFundReturn extends FundReturn
         }
 
         return $this;
+    }
+
+    public function getFund(): Fund
+    {
+        return Fund::CRSTS;
     }
 }

@@ -224,3 +224,7 @@ tags:
   in_progress:
     name: In progress
     colour: yellow
+  not_required:
+    name: Not required
+    colour: blue
+

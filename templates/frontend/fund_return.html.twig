@@ -6,5 +6,31 @@
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
 
-    ...
+    {{ taskListStart() }}
+    {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'complete' -%}
+    {{- taskListItem({
+        title: {text: 'Fund-level return details'},
+        href: '#',
+        status: {tag: {
+            text: "tags.#{fundTag}.name" | trans,
+            classes: "govuk-tag--" ~ ("tags.#{fundTag}.colour" | trans),
+        }},
+    }, 0) -}}
+    {{ taskListEnd() }}
+
+    <h2 class="govuk-heading-s">Projects</h2>
+    {{ taskListStart() }}
+    {% for projectFund in fundReturn.fundAward.recipient.getProjectFundsForFund(fundReturn.fundAward.type) %}
+        {%- set isRequired = projectFund.isReturnRequiredFor(fundReturn.quarter) -%}
+        {%- set tag = isRequired ? fundTag : 'not_required' -%}
+        {{- taskListItem({
+            title: {text: projectFund.project.name},
+            href: isRequired ? '#' : null,
+            status: {tag: {
+                text: "tags.#{tag}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),
+            }},
+        }, loop.index) -}}
+    {% endfor %}
+    {{ taskListEnd() }}
 {%- endblock -%}

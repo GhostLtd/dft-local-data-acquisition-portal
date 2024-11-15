@@ -15,9 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
 #[ORM\DiscriminatorMap([
+    Fund::BSIP->value => BsipProjectFund::class,
     Fund::CRSTS->value => CrstsProjectFund::class,
 ])]
-class ProjectFund
+abstract class ProjectFund
 {
     use IdTrait;
 
@@ -36,4 +37,9 @@ class ProjectFund
         $this->project = $project;
         return $this;
     }
+
+    // --------------------------------------------------------------------------------
+
+    abstract public function getFund(): Fund;
+    abstract public function isReturnRequiredFor(int $quarter): bool;
 }

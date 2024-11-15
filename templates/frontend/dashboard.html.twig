@@ -6,16 +6,16 @@
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
 
-    {% for recipient in recipients %}
+    {%- for recipient in recipients -%}
         <h2 class="govuk-heading-m">{{ recipient.name }}</h2>
 
         {# TODO: At a later date, this can be split into separate "outstanding"
                  and "completed" return pages, and paginated
         #}
 
-        {{ taskListStart() }}
-        {% for fundAward in recipient.fundAwards %}
-            {% for fundReturn in fundAward.returns%}
+        {{- taskListStart() -}}
+        {%- for fundAward in recipient.fundAwards -%}
+            {%- for fundReturn in fundAward.returns -%}
                 {%- set tag = fundReturn.signoffUser is null ? 'in_progress' : 'complete' -%}
                 {{- taskListItem({
                     title: {text: fundAward.type.name ~ ': ' ~ fundReturn.year ~ ' Q' ~ fundReturn.quarter},
@@ -25,8 +25,8 @@
                         classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),
                     }},
                 }, loop.index) -}}
-            {% endfor %}
-        {% endfor %}
-        {{ taskListEnd() }}
-    {% endfor %}
+            {%- endfor -%}
+        {%- endfor -%}
+        {{- taskListEnd() -}}
+    {%- endfor -%}
 {%- endblock -%}

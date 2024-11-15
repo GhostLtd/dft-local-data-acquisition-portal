@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorMap([
     Fund::CRSTS->value => CrstsFundReturn::class,
 ])]
-class FundReturn
+abstract class FundReturn
 {
     use IdTrait;
 
@@ -91,4 +91,6 @@ class FundReturn
         $this->signoffUser = $signoffUser;
         return $this;
     }
+
+    abstract public function getFund(): Fund;
 }
