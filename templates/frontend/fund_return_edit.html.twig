@@ -1,0 +1,12 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_heading = breadcrumbBuilder.titleFor('fund_return') -%}
+{%- set page_title = breadcrumbBuilder.titleFor('fund_return_edit') ~ ' | ' ~ breadcrumbBuilder.titleFor('fund_return') -%}
+{%- set page_heading_class = 'govuk-heading-m' -%}
+
+{%- block content -%}
+{#    <h2 class="govuk-heading-s">{{ "sections.fund.#{section.value}" | trans }}</h2>#}
+
+    {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
+    {{- form(form) -}}
+{%- endblock -%}

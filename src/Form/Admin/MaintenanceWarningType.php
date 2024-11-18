@@ -27,10 +27,10 @@ class MaintenanceWarningType extends AbstractType
                 'expanded' => false,
             ])
             ->add('submit', Gds\ButtonType::class, [
-                'label' => 'form.submit',
+                'label' => 'forms.buttons.submit',
             ])
             ->add('cancel', Gds\ButtonType::class, [
-                'label' => 'form.cancel',
+                'label' => 'forms.buttons.cancel',
                 'attr' => ['class' => 'govuk-button--secondary'],
             ])
             ;

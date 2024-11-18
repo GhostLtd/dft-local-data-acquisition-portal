@@ -176,9 +176,35 @@ errors:
     copy: |-
       You need to be logged in to access this page
 
-form:
-  cancel: Cancel
-  submit: Submit
+forms:
+  buttons:
+    cancel: Cancel
+    mark-as-complete: Mark as complete
+    save: Save
+    submit: Submit
+  crsts:
+    comments:
+      comments:
+        label: Comments
+    local_and_rdel:
+      local_contribution:
+        label: Local contribution
+        help: Please provide a current breakdown of local contribution achieved, by source.
+      resource_funding:
+        label: Resource (RDEL) funding
+        help: Please see Appendix A (?!)
+    overall_progress:
+      progress_summary:
+        label: Overall progress summary
+      delivery_confidence:
+        label: Overall delivery confidence
+      overall_confidence:
+        label: Overall confidence rating
+    quarterly_progress:
+      progress_summary:
+        label: Quarterly progress
+      progress_rating:
+        label: Quarterly rating
 
 format:
   date:
@@ -208,12 +234,21 @@ frontend:
       title: Local data acquisition portal
     fund_return:
       title: "{recipientName}: {type} return for {year} Q{quarter}"
+      fund_level_details: Fund-level return details
+      projects: Projects
 
 maintenance-warning:
   banner:
     title: Important
     heading: Scheduled maintenance
     content: This service will be unavailable between {startTime} and {endTime} on {date}
+
+sections:
+  fund:
+    overall_progress: Overall summary and delivery confidence
+    quarterly_progress: Progress this quarter
+    local_and_rdel: Local contribution and RDEL funding
+    comments: Comments
 
 site.title: Data acquisition portal
 

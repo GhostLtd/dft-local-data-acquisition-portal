@@ -6,21 +6,25 @@
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
 
-    {{ taskListStart() }}
+    <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_details' | trans }}</h2>
+    {{- taskListStart() -}}
     {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'complete' -%}
-    {{- taskListItem({
-        title: {text: 'Fund-level return details'},
-        href: '#',
-        status: {tag: {
-            text: "tags.#{fundTag}.name" | trans,
-            classes: "govuk-tag--" ~ ("tags.#{fundTag}.colour" | trans),
-        }},
-    }, 0) -}}
-    {{ taskListEnd() }}
 
-    <h2 class="govuk-heading-s">Projects</h2>
-    {{ taskListStart() }}
-    {% for projectFund in fundReturn.fundAward.recipient.getProjectFundsForFund(fundReturn.fundAward.type) %}
+    {%- for section in fundLevelSections -%}
+        {{- taskListItem({
+            title: {text: "sections.fund.#{section.value}" | trans},
+            href: path('app_fund_return_edit', {id: fundReturn.id, section: section.value}),
+            status: {tag: {
+                text: "tags.#{fundTag}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{fundTag}.colour" | trans),
+            }},
+        }, loop.index0) -}}
+    {%- endfor -%}
+    {{- taskListEnd() -}}
+
+    <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.projects' | trans }}</h2>
+    {{- taskListStart() -}}
+    {%- for projectFund in fundReturn.fundAward.recipient.getProjectFundsForFund(fundReturn.fundAward.type) -%}
         {%- set isRequired = projectFund.isReturnRequiredFor(fundReturn.quarter) -%}
         {%- set tag = isRequired ? fundTag : 'not_required' -%}
         {{- taskListItem({
@@ -31,6 +35,6 @@
                 classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),
             }},
         }, loop.index) -}}
-    {% endfor %}
-    {{ taskListEnd() }}
+    {%- endfor -%}
+    {{- taskListEnd() -}}
 {%- endblock -%}

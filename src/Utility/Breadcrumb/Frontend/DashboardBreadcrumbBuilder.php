@@ -2,6 +2,7 @@
 
 namespace App\Utility\Breadcrumb\Frontend;
 
+use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Utility\Breadcrumb\AbstractBreadcrumbBuilder;
 
@@ -25,6 +26,17 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
                 'type' => $fundReturn->getFundAward()->getType()->name,
                 'year' => $fundReturn->getYear(),
             ]
+        );
+    }
+
+    public function setAtFundReturnEdit(FundReturn $fundReturn, FundLevelSection $section): void
+    {
+        $this->setAtFundReturn($fundReturn);
+        $this->addItem(
+            'fund_return_edit',
+            "sections.fund.{$section->value}",
+            'app_fund_return_edit',
+            routeParameters: ['id' => $fundReturn->getId(), 'section' => $section->value],
         );
     }
 }
