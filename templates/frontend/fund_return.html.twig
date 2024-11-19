@@ -8,15 +8,14 @@
 
     <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_details' | trans }}</h2>
     {{- taskListStart() -}}
-    {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'complete' -%}
-
     {%- for section in fundLevelSections -%}
+        {%- set status = fundReturn.getStatusForSection(section) -%}
         {{- taskListItem({
             title: {text: "sections.fund.#{section.value}" | trans},
             href: path('app_fund_return_edit', {id: fundReturn.id, section: section.value}),
             status: {tag: {
-                text: "tags.#{fundTag}.name" | trans,
-                classes: "govuk-tag--" ~ ("tags.#{fundTag}.colour" | trans),
+                text: "tags.#{status.value}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
             }},
         }, loop.index0) -}}
     {%- endfor -%}
@@ -25,20 +24,23 @@
     <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
     {{- taskListStart() -}}
     {%- for expense in fundLevelExpenses -%}
+        {%- set status = fundReturn.getStatusForSection(expense) -%}
         {{- taskListItem({
             title: {
                 text: "enum.expense_type.#{expense.value}" | trans({fund: fundReturn.fund.name}),
             },
             href: '#',
             status: {tag: {
-                text: "tags.#{fundTag}.name" | trans,
-                classes: "govuk-tag--" ~ ("tags.#{fundTag}.colour" | trans),
+                text: "tags.#{status.value}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
             }},
         }, loop.index0) -}}
     {%- endfor -%}
     {{- taskListEnd() -}}
 
     <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.projects' | trans }}</h2>
+    {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
+
     {{- taskListStart() -}}
     {%- for projectFund in fundReturn.fundAward.recipient.getProjectFundsForFund(fundReturn.fundAward.type) -%}
         {%- set isRequired = projectFund.isReturnRequiredFor(fundReturn.quarter) -%}

@@ -16,7 +16,7 @@
         {{- taskListStart() -}}
         {%- for fundAward in recipient.fundAwards -%}
             {%- for fundReturn in fundAward.returns -%}
-                {%- set tag = fundReturn.signoffUser is null ? 'in_progress' : 'complete' -%}
+                {%- set tag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
                 {{- taskListItem({
                     title: {text: fundAward.type.name ~ ': ' ~ fundReturn.year ~ ' Q' ~ fundReturn.quarter},
                     href: path('app_fund_return', {id: fundReturn.id}),

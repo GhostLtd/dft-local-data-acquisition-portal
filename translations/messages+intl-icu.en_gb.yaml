@@ -191,7 +191,8 @@ errors:
 forms:
   buttons:
     cancel: Cancel
-    mark-as-complete: Mark as complete
+    mark_as_completed: Mark as completed
+    mark_as_in_progress: Mark as in progress
     save: Save
     submit: Submit
   crsts:
@@ -246,7 +247,7 @@ frontend:
       title: Local data acquisition portal
     fund_return:
       title: "{recipientName}: {type} return for {year} Q{quarter}"
-      fund_level_details: Fund-level return details
+      fund_level_details: Fund-level details
       fund_level_expenses: Fund-level expenses
       projects: Projects
 
@@ -266,13 +267,15 @@ sections:
 site.title: Data acquisition portal
 
 tags:
-  complete:
-    name: Complete
+  completed:
+    name: Completed
     colour: green
   in_progress:
     name: In progress
     colour: yellow
+  not_started:
+    name: Not started
+    colour: blue
   not_required:
     name: Not required
-    colour: blue
-
+    colour: grey

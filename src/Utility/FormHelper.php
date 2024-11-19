@@ -7,9 +7,25 @@ use Symfony\Component\Form\SubmitButton;
 
 class FormHelper
 {
-    public static function wasClicked(FormInterface $form, string $buttonName): bool
+    public static function whichButtonClicked(FormInterface $form, string|array $buttonNames): ?string
     {
-        $button = $form->get('buttons')->get($buttonName);
-        return $button instanceof SubmitButton && $button->isClicked();
+        $buttons = $form->get('buttons');
+
+        if (is_string($buttonNames)) {
+            $buttonNames = [$buttonNames];
+        }
+
+        foreach($buttonNames as $buttonName) {
+            if (!$buttons->has($buttonName)) {
+                continue;
+            }
+
+            $button = $buttons->get($buttonName);
+            if ($button instanceof SubmitButton && $button->isClicked()) {
+                return $buttonName;
+            }
+        }
+
+        return null;
     }
 }

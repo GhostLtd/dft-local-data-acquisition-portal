@@ -2,11 +2,16 @@
 
 namespace App\Entity\FundReturn;
 
+use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
+use App\Entity\Enum\CompletionStatus;
+use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundAward;
 use App\Entity\Traits\IdTrait;
 use App\Entity\User;
 use App\Repository\FundReturn\FundReturnRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -36,6 +41,17 @@ abstract class FundReturn
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?User $signoffUser = null; // top_signoff
+
+    /**
+     * @var Collection<int, FundReturnSectionStatus>
+     */
+    #[ORM\OneToMany(targetEntity: FundReturnSectionStatus::class, mappedBy: 'fundReturn', orphanRemoval: true)]
+    private Collection $sectionStatuses;
+
+    public function __construct()
+    {
+        $this->sectionStatuses = new ArrayCollection();
+    }
 
     public function getYear(): ?int
     {
@@ -90,6 +106,55 @@ abstract class FundReturn
     {
         $this->signoffUser = $signoffUser;
         return $this;
+    }
+
+    /**
+     * @return Collection<int, FundReturnSectionStatus>
+     */
+    public function getSectionStatuses(): Collection
+    {
+        return $this->sectionStatuses;
+    }
+
+    public function addSectionStatus(FundReturnSectionStatus $sectionStatus): static
+    {
+        if (!$this->sectionStatuses->contains($sectionStatus)) {
+            $this->sectionStatuses->add($sectionStatus);
+            $sectionStatus->setFundReturn($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSectionStatus(FundReturnSectionStatus $sectionStatus): static
+    {
+        if ($this->sectionStatuses->removeElement($sectionStatus)) {
+            // set the owning side to null (unless already changed)
+            if ($sectionStatus->getFundReturn() === $this) {
+                $sectionStatus->setFundReturn(null);
+            }
+        }
+
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------------
+
+    public function getFundReturnSectionStatusForSection(ExpenseType|FundLevelSection $enum): ?FundReturnSectionStatus
+    {
+        return $this->sectionStatuses->findFirst(fn(int $idx, FundReturnSectionStatus $status) => $status->getName() === $enum->name);
+    }
+
+    public function getStatusForSection(
+        ExpenseType|FundLevelSection $enum,
+        CompletionStatus             $default = CompletionStatus::NOT_STARTED
+    ): CompletionStatus
+    {
+        $fundReturnSectionStatus = $this->getFundReturnSectionStatusForSection($enum);
+
+        return $fundReturnSectionStatus ?
+            $fundReturnSectionStatus->getStatus() :
+            $default;
     }
 
     abstract public function getFund(): Fund;

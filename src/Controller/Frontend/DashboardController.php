@@ -2,25 +2,26 @@
 
 namespace App\Controller\Frontend;
 
-use App\Controller\Auth\FrontendAuthController;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\User;
-use App\Form\FundReturn\Crsts\CommentsType;
+use App\Event\FundReturnSectionUpdateEvent;
+use App\Form\ReturnBaseType;
 use App\Repository\MaintenanceWarningRepository;
 use App\Repository\RecipientRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\FormHelper;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class DashboardController extends AbstractController
 {
@@ -45,6 +46,7 @@ class DashboardController extends AbstractController
 
     #[Route('/fund-return/{id}', name: 'app_fund_return')]
     public function fundReturn(
+        #[MapEntity(expr: 'repository.findForDashboard(id)')]
         FundReturn                 $fundReturn,
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
     ): Response
@@ -63,6 +65,7 @@ class DashboardController extends AbstractController
     public function fundReturnEdit(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
         EntityManagerInterface     $entityManager,
+        EventDispatcherInterface   $eventDispatcher,
         FundLevelSection           $section,
         FundReturn                 $fundReturn,
         Request                    $request,
@@ -77,18 +80,16 @@ class DashboardController extends AbstractController
         $breadcrumbBuilder->setAtFundReturnEdit($fundReturn, $section);
         $cancelUrl = $this->generateUrl('app_fund_return', ['id' => $fundReturn->getId()]);
 
-        $form = $this->createForm($formClass, $fundReturn, ['cancel_url' => $cancelUrl,]);
+        $form = $this->createForm($formClass, $fundReturn, [
+            'cancel_url' => $cancelUrl,
+            'completion_status' => $fundReturn->getStatusForSection($section),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $wasCompleteClicked = FormHelper::wasClicked($form, 'mark-as-complete');
-            $wasSaveClicked = FormHelper::wasClicked($form, 'save');
-
-            if ($wasCompleteClicked) {
-                // TODO: Mark as complete
-            }
-
-            if ($wasCompleteClicked || $wasSaveClicked) {
+            $clickedButton = FormHelper::whichButtonClicked($form, [ReturnBaseType::SAVE, ReturnBaseType::MARK_AS_COMPLETED, ReturnBaseType::MARK_AS_IN_PROGRESS]);
+            if ($clickedButton) {
+                $eventDispatcher->dispatch(new FundReturnSectionUpdateEvent($fundReturn, $section, ['mode' => $clickedButton]));
                 $entityManager->flush();
                 return new RedirectResponse($cancelUrl);
             }
