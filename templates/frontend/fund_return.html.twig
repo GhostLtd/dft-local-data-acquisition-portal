@@ -22,6 +22,22 @@
     {%- endfor -%}
     {{- taskListEnd() -}}
 
+    <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
+    {{- taskListStart() -}}
+    {%- for expense in fundLevelExpenses -%}
+        {{- taskListItem({
+            title: {
+                text: "enum.expense_type.#{expense.value}" | trans({fund: fundReturn.fund.name}),
+            },
+            href: '#',
+            status: {tag: {
+                text: "tags.#{fundTag}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{fundTag}.colour" | trans),
+            }},
+        }, loop.index0) -}}
+    {%- endfor -%}
+    {{- taskListEnd() -}}
+
     <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.projects' | trans }}</h2>
     {{- taskListStart() -}}
     {%- for projectFund in fundReturn.fundAward.recipient.getProjectFundsForFund(fundReturn.fundAward.type) -%}

@@ -3,6 +3,7 @@
 namespace App\Controller\Frontend;
 
 use App\Controller\Auth\FrontendAuthController;
+use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\User;
@@ -54,10 +55,11 @@ class DashboardController extends AbstractController
             'breadcrumbBuilder' => $breadcrumbBuilder,
             'fundReturn' => $fundReturn,
             'fundLevelSections' => FundLevelSection::cases(),
+            'fundLevelExpenses' => ExpenseType::filterForFund(),
         ]);
     }
 
-    #[Route('/fund-return/{id}/{section}', name: 'app_fund_return_edit')]
+    #[Route('/fund-return/{id}/section/{section}', name: 'app_fund_return_edit')]
     public function fundReturnEdit(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
         EntityManagerInterface     $entityManager,

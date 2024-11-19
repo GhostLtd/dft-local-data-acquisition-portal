@@ -70,6 +70,18 @@ enum:
   crsts_phase:
     crsts1: CRSTS1
     crsts2: CRSTS2
+  expense_type:
+    fund_capital_expenditure: "{fund} Capital expenditure"
+    fund_capital_expenditure_baseline: "Baseline, {fund} Capital expenditure"
+    fund_capital_expenditure_inc_over_programming: "{fund} Capital expenditure including over-programming"
+    fund_capital_local_contribution: "Capital expenditure: MCA / LA local contribution"
+    fund_capital_third_party_contribution: "Capital expenditure: local 3rd party contribution"
+    fund_capital_other: "Capital expenditure: other (e.g. other DfT or government funding)"
+    fund_total_capital_expenditure: "Total capital expenditure"
+    fund_total_resource_expenditure: "Total resource expenditure"
+    fund_total_expenditure: "Total expenditure"
+    project_capital_spend_fund: "Capital (CDEL) spend, {fund}"
+    project_capital_spend_all_sources: "Capital (CDEL) spend, all sources"
   fund:
     CRSTS: CRSTS
   milestone_type:
@@ -235,6 +247,7 @@ frontend:
     fund_return:
       title: "{recipientName}: {type} return for {year} Q{quarter}"
       fund_level_details: Fund-level return details
+      fund_level_expenses: Fund-level expenses
       projects: Projects
 
 maintenance-warning:
