@@ -16,6 +16,7 @@ use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
+use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
@@ -221,6 +222,7 @@ class RandomFixtureGenerator
     {
         return new CrstsProjectFundDefinition(
             $this->faker->boolean(),
+            $this->faker->randomElement(FundedMostlyAs::class),
         );
     }
 

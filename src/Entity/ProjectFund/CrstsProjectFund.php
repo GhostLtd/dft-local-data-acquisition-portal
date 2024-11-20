@@ -3,6 +3,7 @@
 namespace App\Entity\ProjectFund;
 
 use App\Entity\Enum\Fund;
+use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Repository\ProjectFund\CrstsProjectFundRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,6 +15,9 @@ class CrstsProjectFund extends ProjectFund
 {
     #[ORM\Column]
     private ?bool $retained = null; // 1proj_info: Is this a retained scheme / project?
+
+    #[ORM\Column(nullable: true, enumType: FundedMostlyAs::class)]
+    private ?FundedMostlyAs $fundedMostlyAs = null;
 
     /**
      * @var Collection<int, CrstsProjectReturn>
@@ -76,5 +80,16 @@ class CrstsProjectFund extends ProjectFund
     {
         // If project is retained, we require a return every quarter, otherwise only once a year
         return $this->isRetained() || $quarter === 1;
+    }
+
+    public function getFundedMostlyAs(): ?FundedMostlyAs
+    {
+        return $this->fundedMostlyAs;
+    }
+
+    public function setFundedMostlyAs(?FundedMostlyAs $fundedMostlyAs): static
+    {
+        $this->fundedMostlyAs = $fundedMostlyAs;
+        return $this;
     }
 }
