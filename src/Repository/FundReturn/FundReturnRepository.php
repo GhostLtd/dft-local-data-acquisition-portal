@@ -19,16 +19,12 @@ class FundReturnRepository extends ServiceEntityRepository
 
     public function findForDashboard(string $id): ?FundReturn
     {
-        // If this query turns out to be too costly, split it into two so that
-        // projects/projectFunds are fetched separately.
         return $this
             ->createQueryBuilder('fundReturn')
-            ->select('fundReturn, sectionStatus, fundAward, recipient, projects, projectFunds')
+            ->select('fundReturn, sectionStatus, fundAward, recipient')
             ->leftJoin('fundReturn.sectionStatuses', 'sectionStatus')
             ->join('fundReturn.fundAward', 'fundAward')
             ->join('fundAward.recipient', 'recipient')
-            ->leftJoin('recipient.projects', 'projects')
-            ->leftJoin('projects.projectFunds', 'projectFunds')
             ->where('fundReturn.id = :id')
             ->setParameter('id', (new Ulid($id))->toRfc4122())
             ->getQuery()

@@ -28,7 +28,6 @@ class Project
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null; // 1proj_info: Project description
 
-
     #[ORM\Column(nullable: true, enumType: TransportMode::class)]
     private ?TransportMode $transportMode = null; // 1proj_info: Transport mode
 

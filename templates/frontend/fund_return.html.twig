@@ -12,7 +12,7 @@
         {%- set status = fundReturn.getStatusForSection(section) -%}
         {{- taskListItem({
             title: {text: "sections.fund.#{section.value}" | trans},
-            href: path('app_fund_return_edit', {id: fundReturn.id, section: section.value}),
+            href: path('app_fund_return_edit', {fundReturnId: fundReturn.id, section: section.value}),
             status: {tag: {
                 text: "tags.#{status.value}.name" | trans,
                 classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
@@ -42,12 +42,13 @@
     {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
 
     {{- taskListStart() -}}
-    {%- for projectFund in fundReturn.fundAward.recipient.getProjectFundsForFund(fundReturn.fundAward.type) -%}
+    {%- for projectFund in projectFunds -%}
         {%- set isRequired = projectFund.isReturnRequiredFor(fundReturn.quarter) -%}
         {%- set tag = isRequired ? fundTag : 'not_required' -%}
+        {%- set url = path('app_project_return', {fundReturnId: fundReturn.id, projectFundId: projectFund.id}) %}
         {{- taskListItem({
             title: {text: projectFund.project.name},
-            href: isRequired ? '#' : null,
+            href: isRequired ? url : null,
             status: {tag: {
                 text: "tags.#{tag}.name" | trans,
                 classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),

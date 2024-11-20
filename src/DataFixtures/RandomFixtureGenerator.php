@@ -123,7 +123,7 @@ class RandomFixtureGenerator
             for($quarter=$loopStartingQuarter; $quarter<=$loopEndingQuarter; $quarter++) {
                 $projectReturns = [];
 
-                $canBeUnsubmitted = $year === $endingYear && $quarter === $endingQuarter;
+                $mustBeSignedOff = $year !== $endingYear || $quarter !== $endingQuarter;
 
                 foreach($projects as $project) {
                     $projectFund = null;
@@ -144,7 +144,7 @@ class RandomFixtureGenerator
                             throw new \RuntimeException('ProjectFundDefinition / type mismatch');
                         }
 
-                        if (!$projectFund->isRetained() || $quarter === 1) {
+                        if ($projectFund->isRetained() || $quarter === 1) {
                             $projectReturns[$project->getName()] = $this->createRandomCrstsProjectReturn($startingYear, $startingQuarter);
                         }
                     } else {
@@ -154,7 +154,7 @@ class RandomFixtureGenerator
 
                 $returns[] = match($fund) {
                     Fund::CRSTS => new CrstsFundReturnDefinition(
-                        $canBeUnsubmitted ? null : $this->createRandomUser(), // No signoff user for the most recent return...
+                        $mustBeSignedOff ? null : $this->createRandomUser(), // No signoff user for the most recent return...
                         $year,
                         $quarter,
                         $this->faker->text(),

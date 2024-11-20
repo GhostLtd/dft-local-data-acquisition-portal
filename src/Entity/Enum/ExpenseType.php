@@ -20,17 +20,24 @@ enum ExpenseType: string
     /**
      * @return array<ExpenseType>
      */
-    public static function filterForFund(): array
+    public static function filterForFund(Fund $fund): array
     {
-        return self::filterByPrefix('fund_');
+        // $fund not currently used to decided fields, as we only really have one fund
+        return match($fund) {
+            Fund::CRSTS => self::filterByPrefix('fund_'),
+            Fund::BSIP => throw new \RuntimeException('Not yet supported'),
+        };
     }
 
     /**
      * @return array<ExpenseType>
      */
-    public static function filterForProject(): array
+    public static function filterForProject(Fund $fund): array
     {
-        return self::filterByPrefix('project_');
+        return match($fund) {
+            Fund::CRSTS => self::filterByPrefix('project_'),
+            Fund::BSIP => throw new \RuntimeException('Not yet supported'),
+        };
     }
 
     /**

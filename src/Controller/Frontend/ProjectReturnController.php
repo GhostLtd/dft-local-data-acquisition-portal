@@ -1,0 +1,103 @@
+<?php
+
+namespace App\Controller\Frontend;
+
+use App\Entity\Enum\ExpenseType;
+use App\Entity\Enum\FundLevelSection;
+use App\Entity\Enum\ProjectLevelSection;
+use App\Entity\FundReturn\FundReturn;
+use App\Entity\ProjectFund\ProjectFund;
+use App\Entity\ProjectReturn\ProjectReturn;
+use App\Event\FundReturnSectionUpdateEvent;
+use App\Event\ProjectReturnSectionUpdateEvent;
+use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\FormHelper;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
+class ProjectReturnController extends AbstractController
+{
+    #[Route('/fund-return/{fundReturnId}/project/{projectFundId}', name: 'app_project_return')]
+    public function projectReturn(
+        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
+        FundReturn                 $fundReturn,
+        #[MapEntity(expr: 'repository.findForDashboard(projectFundId)')]
+        ProjectFund                $projectFund,
+        DashboardBreadcrumbBuilder $breadcrumbBuilder,
+    ): Response
+    {
+        $projectReturn = $fundReturn->getProjectReturnForProjectFund($projectFund);
+        $breadcrumbBuilder->setAtProjectFund($fundReturn, $projectFund);
+
+        // TODO: Check projectFund belongs to fundReturn
+
+        $fund = $fundReturn->getFund();
+
+        return $this->render('frontend/project_return.html.twig', [
+            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'fundReturn' => $fundReturn,
+            'projectReturn' => $projectReturn,
+            'projectLevelSections' => ProjectLevelSection::filterForFund($fund),
+            'projectLevelExpenses' => ExpenseType::filterForProject($fund),
+        ]);
+    }
+
+
+    #[Route('/fund-return/{fundReturnId}/project/{projectFundId}/section/{section}', name: 'app_project_return_edit')]
+    public function projectReturnEdit(
+        DashboardBreadcrumbBuilder $breadcrumbBuilder,
+        EntityManagerInterface     $entityManager,
+        EventDispatcherInterface   $eventDispatcher,
+        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
+        FundReturn                 $fundReturn,
+        #[MapEntity(expr: 'repository.findForDashboard(projectFundId)')]
+        ProjectFund                $projectFund,
+        ProjectLevelSection        $section,
+        Request                    $request,
+    ): Response
+    {
+        $formClass = $section::getFormClassForFundAndSection($fundReturn->getFund(), $section);
+
+        if (!$formClass) {
+            throw new NotFoundHttpException();
+        }
+
+        $projectReturn = $fundReturn->getProjectReturnForProjectFund($projectFund);
+        $breadcrumbBuilder->setAtProjectFundEdit($fundReturn, $projectFund, $section);
+
+        $cancelUrl = $this->generateUrl('app_project_return', [
+            'fundReturnId' => $fundReturn->getId(),
+            'projectFundId' => $projectFund->getId()
+        ]);
+
+        $form = $this->createForm($formClass, $projectFund, [
+            'cancel_url' => $cancelUrl,
+            'completion_status' => $projectReturn->getStatusForSection($section),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $clickedButton = FormHelper::whichButtonClicked($form);
+            if ($clickedButton) {
+                $eventDispatcher->dispatch(new ProjectReturnSectionUpdateEvent($projectReturn, $section, ['mode' => $clickedButton]));
+                $entityManager->flush();
+                return new RedirectResponse($cancelUrl);
+            }
+        }
+
+        return $this->render('frontend/project_return_edit.html.twig', [
+            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'form' => $form,
+            'fundReturn' => $fundReturn,
+            'projectReturn' => $projectReturn,
+            'section' => $section,
+        ]);
+    }
+}

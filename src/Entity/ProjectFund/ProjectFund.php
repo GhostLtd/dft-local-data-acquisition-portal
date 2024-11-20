@@ -6,8 +6,10 @@ use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
 use App\Entity\Project;
+use App\Entity\ProjectReturn\ProjectReturn;
 use App\Entity\Traits\IdTrait;
 use App\Repository\ProjectFund\ProjectFundRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -42,4 +44,7 @@ abstract class ProjectFund
 
     abstract public function getFund(): Fund;
     abstract public function isReturnRequiredFor(int $quarter): bool;
+
+    /** @return Collection<int, ProjectReturn> */
+    abstract public function getReturns(): Collection;
 }

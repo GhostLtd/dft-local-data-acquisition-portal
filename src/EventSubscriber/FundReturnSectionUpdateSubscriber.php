@@ -3,8 +3,9 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Enum\CompletionStatus;
-use App\Entity\FundReturn\FundReturnSectionStatus;
 use App\Event\FundReturnSectionUpdateEvent;
+use App\Event\ProjectReturnSectionUpdateEvent;
+use App\Event\ReturnSectionUpdateEvent;
 use App\Form\ReturnBaseType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -17,33 +18,27 @@ class FundReturnSectionUpdateSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FundReturnSectionUpdateEvent::class => 'onFundReturnSectionUpdateEvent',
+            FundReturnSectionUpdateEvent::class => 'onReturnSectionUpdateEvent',
+            ProjectReturnSectionUpdateEvent::class => 'onReturnSectionUpdateEvent',
         ];
     }
 
-    public function onFundReturnSectionUpdateEvent(FundReturnSectionUpdateEvent $event): void
+    public function onReturnSectionUpdateEvent(ReturnSectionUpdateEvent $event): void
     {
-        $fundReturn = $event->getFundReturn();
-        $section = $event->getSection();
-        $fundStatus = $fundReturn->getFundReturnSectionStatusForSection($section);
+        $status = $event->getOrCreateSectionStatus();
 
-        if (!$fundStatus) {
-            $fundStatus = (new FundReturnSectionStatus())
-                ->setStatus(CompletionStatus::NOT_STARTED)
-                ->setName($section->name);
-
-            $fundReturn->addSectionStatus($fundStatus);
-            $this->entityManager->persist($fundStatus);
+        if (!$this->entityManager->contains($status)) {
+            $this->entityManager->persist($status);
         }
 
         $mode = $event->getMode();
         if ($mode === ReturnBaseType::MARK_AS_COMPLETED) {
-            $fundStatus->setStatus(CompletionStatus::COMPLETED);
+            $status->setStatus(CompletionStatus::COMPLETED);
         } else if (
             $mode === ReturnBaseType::MARK_AS_IN_PROGRESS ||
-            $fundStatus->getStatus() !== CompletionStatus::COMPLETED
+            $status->getStatus() !== CompletionStatus::COMPLETED
         ) {
-            $fundStatus->setStatus(CompletionStatus::IN_PROGRESS);
+            $status->setStatus(CompletionStatus::IN_PROGRESS);
         }
     }
 }

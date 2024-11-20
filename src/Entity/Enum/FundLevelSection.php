@@ -28,4 +28,12 @@ enum FundLevelSection: string
             default => null,
         };
     }
+
+    public static function filterForFund(Fund $fund): array
+    {
+        return match($fund) {
+            Fund::CRSTS => [self::OVERALL_PROGRESS, self::QUARTERLY_PROGRESS, self::LOCAL_AND_RDEL, self::COMMENTS],
+            Fund::BSIP => throw new \RuntimeException('Not yet supported'),
+        };
+    }
 }

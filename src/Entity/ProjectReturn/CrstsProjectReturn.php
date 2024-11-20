@@ -3,6 +3,7 @@
 namespace App\Entity\ProjectReturn;
 
 use App\Entity\Enum\BusinessCase;
+use App\Entity\Enum\Fund;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Expense\ExpenseSeries;
 use App\Entity\FundReturn\CrstsFundReturn;
@@ -17,10 +18,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CrstsProjectReturnRepository::class)]
-class CrstsProjectReturn
+class CrstsProjectReturn extends ProjectReturn
 {
-    use IdTrait;
-
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CrstsProjectFund $projectFund = null;
@@ -64,6 +63,7 @@ class CrstsProjectReturn
 
     public function __construct()
     {
+        parent::__construct();
         $this->expenses = new ArrayCollection();
         $this->milestones = new ArrayCollection();
     }
@@ -212,5 +212,10 @@ class CrstsProjectReturn
     {
         $this->milestones->removeElement($milestone);
         return $this;
+    }
+
+    public function getFund(): Fund
+    {
+        return Fund::CRSTS;
     }
 }

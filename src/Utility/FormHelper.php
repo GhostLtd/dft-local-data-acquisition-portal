@@ -7,21 +7,18 @@ use Symfony\Component\Form\SubmitButton;
 
 class FormHelper
 {
-    public static function whichButtonClicked(FormInterface $form, string|array $buttonNames): ?string
+    // Returns the name of the button which was kept (optionally limiting the response to only one of $amongstTheseButtonNames)
+    public static function whichButtonClicked(FormInterface $form, null|string|array $amongstTheseButtonNames=null): ?string
     {
-        $buttons = $form->get('buttons');
-
-        if (is_string($buttonNames)) {
-            $buttonNames = [$buttonNames];
+        if (is_string($amongstTheseButtonNames)) {
+            $amongstTheseButtonNames = [$amongstTheseButtonNames];
         }
 
-        foreach($buttonNames as $buttonName) {
-            if (!$buttons->has($buttonName)) {
-                continue;
-            }
+        foreach($form->get('buttons') as $button) {
+            $buttonName = $button->getName();
+            $matchesLimitingCriteria = $amongstTheseButtonNames === null || in_array($buttonName, $amongstTheseButtonNames);
 
-            $button = $buttons->get($buttonName);
-            if ($button instanceof SubmitButton && $button->isClicked()) {
+            if ($button instanceof SubmitButton && $button->isClicked() && $matchesLimitingCriteria) {
                 return $buttonName;
             }
         }

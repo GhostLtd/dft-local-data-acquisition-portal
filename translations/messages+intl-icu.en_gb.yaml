@@ -84,6 +84,9 @@ enum:
     project_capital_spend_all_sources: "Capital (CDEL) spend, all sources"
   fund:
     CRSTS: CRSTS
+  funded_mostly_as:
+    CDEL: CDEL (Capital)
+    RDEL: RDEL (Resource)
   milestone_type:
     start_development: Start development
     end_development: End development
@@ -213,6 +216,16 @@ forms:
         label: Overall delivery confidence
       overall_confidence:
         label: Overall confidence rating
+    project_details:
+        name:
+          label: Project name
+        description:
+          label: Project description
+        project_identifier:
+          label: Project ID
+        funded_mostly_as:
+          label: Funding type
+          help: Select which type of funding is used more
     quarterly_progress:
       progress_summary:
         label: Quarterly progress
@@ -242,7 +255,7 @@ frontend:
       sign_in:
         title: Sign in
     dashboard:
-      title: Local authorities
+      title: Home
     home:
       title: Local data acquisition portal
     fund_return:
@@ -250,6 +263,11 @@ frontend:
       fund_level_details: Fund-level details
       fund_level_expenses: Fund-level expenses
       projects: Projects
+    project_return:
+      title: "{projectName}"
+      back_to_fund_return: "Back to {fundName} return"
+      project_level_details: Project-level details
+      project_level_expenses: Project-level expenses
 
 maintenance-warning:
   banner:
@@ -263,6 +281,8 @@ sections:
     quarterly_progress: Progress this quarter
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
+  project:
+    project_details: Project details
 
 site.title: Data acquisition portal
 

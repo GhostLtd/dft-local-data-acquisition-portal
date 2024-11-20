@@ -19,7 +19,7 @@
                 {%- set tag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
                 {{- taskListItem({
                     title: {text: fundAward.type.name ~ ': ' ~ fundReturn.year ~ ' Q' ~ fundReturn.quarter},
-                    href: path('app_fund_return', {id: fundReturn.id}),
+                    href: path('app_fund_return', {fundReturnId: fundReturn.id}),
                     status: {tag: {
                         text: "tags.#{tag}.name" | trans,
                         classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),

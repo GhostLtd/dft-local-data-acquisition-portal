@@ -5,7 +5,9 @@ namespace App\Entity\FundReturn;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\Expense\ExpenseSeries;
+use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
+use App\Entity\ProjectReturn\ProjectReturn;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -53,6 +55,7 @@ class CrstsFundReturn extends FundReturn
 
     public function __construct()
     {
+        parent::__construct();
         $this->expenses = new ArrayCollection();
         $this->projectReturns = new ArrayCollection();
     }

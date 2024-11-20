@@ -1,0 +1,41 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title = breadcrumbBuilder.titleFor('project_return') -%}
+{%- set page_heading_class = 'govuk-heading-m' -%}
+
+{%- block content -%}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
+
+    <h2 class="govuk-heading-s">{{ 'frontend.pages.project_return.project_level_details' | trans }}</h2>
+    {{- taskListStart() -}}
+    {%- for section in projectLevelSections -%}
+        {%- set status = projectReturn.getStatusForSection(section) -%}
+
+        {{- taskListItem({
+            title: {text: "sections.project.#{section.value}" | trans},
+            href: path('app_project_return_edit', {fundReturnId: fundReturn.id, projectFundId: projectReturn.projectFund.id, section: section.value}),
+            status: {tag: {
+                text: "tags.#{status.value}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+            }},
+        }, loop.index0) -}}
+    {%- endfor -%}
+    {{- taskListEnd() -}}
+
+    <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
+    {{- taskListStart() -}}
+    {%- for expense in projectLevelExpenses -%}
+        {%- set status = projectReturn.getStatusForSection(expense) -%}
+        {{- taskListItem({
+            title: {
+                text: "enum.expense_type.#{expense.value}" | trans({fund: fundReturn.fund.name}),
+            },
+            href: '#',
+            status: {tag: {
+                text: "tags.#{status.value}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+            }},
+        }, loop.index0) -}}
+    {%- endfor -%}
+    {{- taskListEnd() -}}
+{% endblock %}

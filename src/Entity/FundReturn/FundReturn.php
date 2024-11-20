@@ -7,6 +7,8 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\CompletionStatus;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundAward;
+use App\Entity\ProjectFund\ProjectFund;
+use App\Entity\ProjectReturn\ProjectReturn;
 use App\Entity\Traits\IdTrait;
 use App\Entity\User;
 use App\Repository\FundReturn\FundReturnRepository;
@@ -158,4 +160,18 @@ abstract class FundReturn
     }
 
     abstract public function getFund(): Fund;
+
+    /** @return Collection<int, ProjectReturn> */
+    abstract public function getProjectReturns(): Collection;
+
+    public function getProjectReturnForProjectFund(ProjectFund $projectFund): ?ProjectReturn
+    {
+        foreach($this->getProjectReturns() as $projectReturn) {
+            if ($projectReturn->getProjectFund() === $projectFund) {
+                return $projectReturn;
+            }
+        }
+
+        return null;
+    }
 }
