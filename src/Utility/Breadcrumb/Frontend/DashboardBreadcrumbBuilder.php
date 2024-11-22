@@ -13,7 +13,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
 {
     protected function addInitialItems(): void
     {
-        $this->addItem('dashboard', 'frontend.pages.dashboard.title', 'app_dashboard');
+        $this->addItem('dashboard', 'frontend.pages.dashboard.breadcrumb', 'app_dashboard');
     }
 
     public function setAtFundReturn(FundReturn $fundReturn): void

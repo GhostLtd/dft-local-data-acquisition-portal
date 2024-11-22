@@ -10,7 +10,7 @@ use App\Form\ReturnBaseType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FundReturnSectionUpdateSubscriber implements EventSubscriberInterface
+class ReturnSectionUpdateSubscriber implements EventSubscriberInterface
 {
     public function __construct(protected EntityManagerInterface $entityManager)
     {}

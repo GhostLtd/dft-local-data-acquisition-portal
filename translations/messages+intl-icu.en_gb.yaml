@@ -255,7 +255,8 @@ frontend:
       sign_in:
         title: Sign in
     dashboard:
-      title: Home
+      breadcrumb: Home
+      title: Local Authorities
     home:
       title: Local data acquisition portal
     fund_return:
