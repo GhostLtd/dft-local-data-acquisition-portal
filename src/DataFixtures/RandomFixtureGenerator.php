@@ -110,7 +110,7 @@ class RandomFixtureGenerator
         $endingQuarter = (($startingQuarter + $this->faker->numberBetween(1, 4)) % 4) + 1;
 
         $expenses = $this->createRandomExpenses(
-            ExpenseType::filterForFund(),
+            ExpenseType::filterForFund($fund),
             $startingYear,
             $startingYear + $this->faker->numberBetween(3, 8)
         );
@@ -222,6 +222,7 @@ class RandomFixtureGenerator
     {
         return new CrstsProjectFundDefinition(
             $this->faker->boolean(),
+            $this->faker->boolean(),
             $this->faker->randomElement(FundedMostlyAs::class),
         );
     }
@@ -241,7 +242,7 @@ class RandomFixtureGenerator
         }
 
         $expenses = $this->createRandomExpenses(
-            ExpenseType::filterForProject(),
+            ExpenseType::filterForProject(Fund::CRSTS),
             $startingYear,
             $startingYear + $this->faker->numberBetween(3, 8)
         );

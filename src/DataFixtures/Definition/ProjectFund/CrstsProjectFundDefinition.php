@@ -9,6 +9,7 @@ class CrstsProjectFundDefinition extends AbstractProjectFundDefinition
 {
     public function __construct(
         protected ?bool           $retained = null,
+        protected ?bool           $previouslyTcf = null,
         protected ?FundedMostlyAs $fundedMostlyAs = null,
     ) {}
 
@@ -20,6 +21,11 @@ class CrstsProjectFundDefinition extends AbstractProjectFundDefinition
     public function getFund(): Fund
     {
         return Fund::CRSTS;
+    }
+
+    public function getPreviouslyTcf(): ?bool
+    {
+        return $this->previouslyTcf;
     }
 
     public function getFundedMostlyAs(): ?FundedMostlyAs

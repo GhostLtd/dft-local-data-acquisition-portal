@@ -19,6 +19,9 @@ class CrstsProjectFund extends ProjectFund
     #[ORM\Column(nullable: true, enumType: FundedMostlyAs::class)]
     private ?FundedMostlyAs $fundedMostlyAs = null; // 1proj_info: CDEL or RDEL
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $previouslyTcf = null;
+
     /**
      * @var Collection<int, CrstsProjectReturn>
      */
@@ -90,6 +93,17 @@ class CrstsProjectFund extends ProjectFund
     public function setFundedMostlyAs(?FundedMostlyAs $fundedMostlyAs): static
     {
         $this->fundedMostlyAs = $fundedMostlyAs;
+        return $this;
+    }
+
+    public function isPreviouslyTcf(): ?bool
+    {
+        return $this->previouslyTcf;
+    }
+
+    public function setPreviouslyTcf(?bool $previouslyTcf): static
+    {
+        $this->previouslyTcf = $previouslyTcf;
         return $this;
     }
 }

@@ -180,6 +180,7 @@ class FixtureHelper
     {
         $projectFund = (new CrstsProjectFund())
             ->setRetained($definition->isRetained())
+            ->setPreviouslyTcf($definition->getPreviouslyTcf())
             ->setFundedMostlyAs($definition->getFundedMostlyAs());
 
         $this->persist([$projectFund]);

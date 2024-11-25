@@ -3,9 +3,9 @@
 namespace App\Form\ProjectReturn\Crsts;
 
 use App\Entity\Enum\FundedMostlyAs;
-use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Form\ReturnBaseType;
+use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
 use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
@@ -41,6 +41,12 @@ class ProjectDetailsType extends AbstractType
                 'choice_label' => fn(FundedMostlyAs $choice) => "enum.funded_mostly_as.{$choice->value}",
                 'choice_value' => fn(FundedMostlyAs $choice) => $choice->value,
                 'property_path' => 'projectFund.fundedMostlyAs',
+            ])
+            ->add('previouslyTcf', BooleanChoiceType::class, [
+                'label' => 'forms.project.project_elements.previously_tcf.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => 'forms.project.project_elements.previously_tcf.help',
+                'property_path' => 'projectFund.previouslyTcf',
             ]);
     }
 
