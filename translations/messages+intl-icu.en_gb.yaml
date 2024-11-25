@@ -111,6 +111,14 @@ enum:
     amber_red: Amber / Red
     red: Red
   transport_mode:
+    categories:
+      multi_modal: Multi-modal
+      active_travel: Active travel
+      bus: Bus
+      rail: Rail
+      tram: Tram / metro / light rail
+      road: Road / Highways maintenance
+      other: Other
     multi_modal:
       interchange_with_active_travel: Interchange or travel hub, with Active Travel elements
       interchange_without_active_travel: Interchange or travel hub, without Active Travel elements
@@ -231,6 +239,34 @@ forms:
         label: Quarterly progress
       progress_rating:
         label: Quarterly rating
+  project:
+    transport_mode:
+      category:
+        label: Transport mode
+        help: ''
+      active_travel:
+        label: Choose active travel transport mode
+        help: ''
+      bus:
+        label: Choose bus transport mode
+        help: ''
+      multi_modal:
+        label: Choose multi-modal transport mode
+        help: ''
+      other:
+        label: Choose other transport mode
+        help: ''
+      rail:
+        label: Choose rail transport mode
+        help: ''
+      road:
+        label: Choose road / highways maintenance transport mode
+        help: ''
+      tram:
+        label: Choose tram / metro / light rail transport mode
+        help: ''
+
+
 
 format:
   date:
@@ -284,6 +320,7 @@ sections:
     comments: Comments
   project:
     project_details: Project details
+    transport_mode: Transport mode
 
 site.title: Data acquisition portal
 

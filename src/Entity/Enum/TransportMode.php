@@ -48,28 +48,22 @@ enum TransportMode: string
     case ROAD_OTHER = "road.other";
 
     // Other
-    case OTHER_STAFFING_AND_RESOURCING = "road.other_staffing_and_resourcing";
+    case OTHER_STAFFING_AND_RESOURCING = "other.staffing_and_resourcing";
     case OTHER_OTHER = "other.other";
 
     /**
      * @return array<TransportMode>
      */
-    public static function filterByCategory(string $category): array
+    public static function filterByCategory(TransportModeCategory $category): array
     {
         return array_values(
-            array_filter(self::cases(), fn(\UnitEnum $e) => str_starts_with($e->value, "{$category}."))
+            array_filter(self::cases(), fn(TransportMode $e) => str_starts_with($e->value, "{$category->value}."))
         );
     }
 
-    /**
-     * @return array<string>
-     */
-    public static function getCategories(): array
+    public function category(): TransportModeCategory
     {
-        return array_values(
-            array_unique(
-                array_map(fn(\UnitEnum $e) => explode('.', $e->value)[0], self::cases())
-            )
-        );
+        $categoryValue = substr($this->value, 0, strpos($this->value, "."));
+        return TransportModeCategory::from($categoryValue);
     }
 }

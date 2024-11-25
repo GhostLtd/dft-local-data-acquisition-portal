@@ -17,7 +17,7 @@ class CrstsProjectFund extends ProjectFund
     private ?bool $retained = null; // 1proj_info: Is this a retained scheme / project?
 
     #[ORM\Column(nullable: true, enumType: FundedMostlyAs::class)]
-    private ?FundedMostlyAs $fundedMostlyAs = null;
+    private ?FundedMostlyAs $fundedMostlyAs = null; // 1proj_info: CDEL or RDEL
 
     /**
      * @var Collection<int, CrstsProjectReturn>
