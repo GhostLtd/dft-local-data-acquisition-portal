@@ -47,7 +47,7 @@ auth:
   sign_out: Sign out
 
 enum:
-  active_travel:
+  active_travel_element:
     no_active_travel_elements: No active travel elements
     area_wide_traffic_management: Area-wide traffic management (including by TROs, whether permanent or experimental)
     bus_priority_measures: Bus priority measures that also enable Active Travel (e.g. bus gates)
@@ -240,6 +240,19 @@ forms:
       progress_rating:
         label: Quarterly rating
   project:
+    project_elements:
+      has_active_travel_elements:
+        label: Does the project have active travel elements?
+        help: ''
+      active_travel_element:
+        label: Active travel element
+        help: Pick the leading active travel intervention type
+      includes_charging_points:
+        label: Does this project include charging points for electric vehicles?
+        help: ''
+      includes_clean_air_elements:
+        label: Does this project include clean air elements?
+        help: ''
     transport_mode:
       category:
         label: Transport mode
@@ -265,8 +278,6 @@ forms:
       tram:
         label: Choose tram / metro / light rail transport mode
         help: ''
-
-
 
 format:
   date:
@@ -320,6 +331,7 @@ sections:
     comments: Comments
   project:
     project_details: Project details
+    project_elements: Project elements
     transport_mode: Transport mode
 
 site.title: Data acquisition portal
