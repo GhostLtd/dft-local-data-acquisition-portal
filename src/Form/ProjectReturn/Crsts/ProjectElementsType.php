@@ -3,7 +3,7 @@
 namespace App\Form\ProjectReturn\Crsts;
 
 use App\Entity\Enum\ActiveTravelElement;
-use App\Entity\ProjectFund\ProjectFund;
+use App\Entity\ProjectReturn\ProjectReturn;
 use App\Form\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
@@ -33,7 +33,7 @@ class ProjectElementsType extends AbstractType implements DataMapperInterface
                 'label' => 'forms.project.project_elements.active_travel_element.label',
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
                 'help' => 'forms.project.project_elements.active_travel_element.help',
-                'choices' => ActiveTravelElement::cases(),
+                'choices' => ActiveTravelElement::casesExcludingNoElements(),
                 'choice_label' => fn(ActiveTravelElement $choice) => "enum.active_travel_element.{$choice->value}",
                 'choice_value' => fn(?ActiveTravelElement $choice) => $choice?->value,
             ])
@@ -56,22 +56,22 @@ class ProjectElementsType extends AbstractType implements DataMapperInterface
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', ProjectFund::class);
+        $resolver->setDefault('data_class', ProjectReturn::class);
     }
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
-        if (!$viewData instanceof ProjectFund) {
+        if (!$viewData instanceof ProjectReturn) {
             return;
         }
 
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
 
-        $project = $viewData->getProject();
+        $project = $viewData->getProjectFund()->getProject();
         $activeTravelElement = $project->getActiveTravelElement();
 
-        $forms['hasActiveTravelElements']->setData($activeTravelElement !== null);
+        $forms['hasActiveTravelElements']->setData($activeTravelElement?->isNoActiveElement());
         $forms['activeTravelElement']->setData($activeTravelElement);
         $forms['includesChargingPoints']->setData($project->includesChargingPoints());
         $forms['includesCleanAirElements']->setData($project->includesCleanAirElements());
@@ -79,17 +79,17 @@ class ProjectElementsType extends AbstractType implements DataMapperInterface
 
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
-        if (!$viewData instanceof ProjectFund) {
+        if (!$viewData instanceof ProjectReturn) {
             return;
         }
 
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
 
-        $project = $viewData->getProject();
+        $project = $viewData->getProjectFund()->getProject();
         $activeTravelElement = $forms['hasActiveTravelElements']->getData() ?
             $forms['activeTravelElement']->getData() :
-            null;
+            ActiveTravelElement::NO_ACTIVE_TRAVEL_ELEMENTS;
 
         $project
             ->setActiveTravelElement($activeTravelElement)

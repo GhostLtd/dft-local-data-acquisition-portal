@@ -77,7 +77,7 @@ class ProjectReturnController extends AbstractController
             'projectFundId' => $projectFund->getId()
         ]);
 
-        $form = $this->createForm($formClass, $projectFund, [
+        $form = $this->createForm($formClass, $projectReturn, [
             'cancel_url' => $cancelUrl,
             'completion_status' => $projectReturn->getStatusForSection($section),
         ]);

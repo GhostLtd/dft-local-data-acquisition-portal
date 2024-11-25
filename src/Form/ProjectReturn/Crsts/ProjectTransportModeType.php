@@ -2,16 +2,11 @@
 
 namespace App\Form\ProjectReturn\Crsts;
 
-use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\TransportMode;
 use App\Entity\Enum\TransportModeCategory;
-use App\Entity\Project;
-use App\Entity\ProjectFund\CrstsProjectFund;
-use App\Entity\ProjectFund\ProjectFund;
+use App\Entity\ProjectReturn\ProjectReturn;
 use App\Form\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
-use Ghost\GovUkFrontendBundle\Form\Type\InputType;
-use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -59,19 +54,19 @@ class ProjectTransportModeType extends AbstractType implements DataMapperInterfa
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', ProjectFund::class);
+        $resolver->setDefault('data_class', ProjectReturn::class);
     }
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
-        if (!$viewData instanceof ProjectFund) {
+        if (!$viewData instanceof ProjectReturn) {
             return;
         }
 
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
 
-        $project = $viewData->getProject();
+        $project = $viewData->getProjectFund()->getProject();
         $transportMode = $project?->getTransportMode();
 
         if (!$transportMode) {
@@ -85,7 +80,7 @@ class ProjectTransportModeType extends AbstractType implements DataMapperInterfa
 
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
-        if (!$viewData instanceof ProjectFund) {
+        if (!$viewData instanceof ProjectReturn) {
             return;
         }
 
@@ -95,6 +90,6 @@ class ProjectTransportModeType extends AbstractType implements DataMapperInterfa
         $category = $forms['transportModeCategory']->getData();
         $transportMode = $category ? $forms['transportMode'.ucfirst($category->value)]->getData() : null;
 
-        $viewData->getProject()->setTransportMode($transportMode);
+        $viewData->getProjectFund()->getProject()->setTransportMode($transportMode);
     }
 }

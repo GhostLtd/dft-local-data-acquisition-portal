@@ -4,6 +4,7 @@ namespace App\Form\ProjectReturn\Crsts;
 
 use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\ProjectFund\CrstsProjectFund;
+use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Form\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
@@ -20,17 +21,17 @@ class ProjectDetailsType extends AbstractType
             ->add('name', InputType::class, [
                 'label' => 'forms.crsts.project_details.name.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
-                'property_path' => 'project.name',
+                'property_path' => 'projectFund.project.name',
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'forms.crsts.project_details.description.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
-                'property_path' => 'project.description',
+                'property_path' => 'projectFund.project.description',
             ])
             ->add('projectIdentifier', InputType::class, [
                 'label' => 'forms.crsts.project_details.project_identifier.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
-                'property_path' => 'project.projectIdentifier',
+                'property_path' => 'projectFund.project.projectIdentifier',
             ])
             ->add('fundedMostlyAs', ChoiceType::class, [
                 'label' => 'forms.crsts.project_details.funded_mostly_as.label',
@@ -39,6 +40,7 @@ class ProjectDetailsType extends AbstractType
                 'choices' => FundedMostlyAs::cases(),
                 'choice_label' => fn(FundedMostlyAs $choice) => "enum.funded_mostly_as.{$choice->value}",
                 'choice_value' => fn(FundedMostlyAs $choice) => $choice->value,
+                'property_path' => 'projectFund.fundedMostlyAs',
             ]);
     }
 
@@ -49,6 +51,6 @@ class ProjectDetailsType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', CrstsProjectFund::class);
+        $resolver->setDefault('data_class', CrstsProjectReturn::class);
     }
 }

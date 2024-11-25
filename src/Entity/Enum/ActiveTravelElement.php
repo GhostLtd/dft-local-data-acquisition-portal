@@ -17,4 +17,17 @@ enum ActiveTravelElement: string
     case RESTRICTION_OR_REDUCTION_OF_PARKING = "restriction_or_reduction_of_parking";
     case SCHOOL_STREETS = "school_streets";
     case OTHER = "other";
+
+    /**
+     * @return array<static>
+     */
+    public static function casesExcludingNoElements(): array
+    {
+        return array_filter(self::cases(), fn(ActiveTravelElement $e) => $e !== ActiveTravelElement::NO_ACTIVE_TRAVEL_ELEMENTS);
+    }
+
+    public function isNoActiveElement(): bool
+    {
+        return $this->value !== ActiveTravelElement::NO_ACTIVE_TRAVEL_ELEMENTS->value;
+    }
 }
