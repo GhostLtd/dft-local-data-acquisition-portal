@@ -123,7 +123,7 @@ class RandomFixtureGenerator
             for($quarter=$loopStartingQuarter; $quarter<=$loopEndingQuarter; $quarter++) {
                 $projectReturns = [];
 
-                $mustBeSignedOff = $year !== $endingYear || $quarter !== $endingQuarter;
+                $mustBeSignedOff = $year === $endingYear && $quarter === $endingQuarter;
 
                 foreach($projects as $project) {
                     $projectFund = null;
