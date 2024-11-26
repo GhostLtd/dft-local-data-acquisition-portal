@@ -61,6 +61,10 @@ enum:
     restriction_or_reduction_of_parking: Restriction or reduction of car parking availability
     school_streets: School streets
     other: Other active travel
+  benefit_cost_ratio_type:
+    na: Not known - N/A
+    tbc: Not known - To be confirmed
+    value: Value known
   business_case:
     working_towards_sobc: Working towards SOBC
     working_towards_obc: Working towards OBC
@@ -207,6 +211,13 @@ forms:
     save: Save
     submit: Submit
   crsts:
+    benefit_cost_ratio:
+      type:
+        label: Is the benefit-cost ratio (BCR) for this project known?
+        help: ''
+      value:
+        label: What is the benefit-cost ratio (BCR) value?
+        help: For example, 1.25
     comments:
       comments:
         label: Comments
@@ -225,15 +236,20 @@ forms:
       overall_confidence:
         label: Overall confidence rating
     project_details:
-        name:
-          label: Project name
-        description:
-          label: Project description
-        project_identifier:
-          label: Project ID
-        funded_mostly_as:
-          label: Funding type
-          help: Select which type of funding is used more
+      benefit_cost_ratio:
+        label: Benefit-cost ratio
+      description:
+        label: Project description
+      funded_mostly_as:
+        label: Funding type
+        help: Select which type of funding is used more
+      name:
+        label: Project name
+      previously_tcf:
+        label: Was this previously a scheme in Transporting Cities Fund (TCF)?
+        help: ''
+      project_identifier:
+        label: Project ID
     quarterly_progress:
       progress_summary:
         label: Quarterly progress
@@ -252,9 +268,6 @@ forms:
         help: ''
       includes_clean_air_elements:
         label: Does this project include clean air elements?
-        help: ''
-      previously_tcf:
-        label: Was this previously a scheme in Transporting Cities Fund (TCF)?
         help: ''
     transport_mode:
       category:

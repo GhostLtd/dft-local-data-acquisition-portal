@@ -33,6 +33,16 @@ class ProjectDetailsType extends AbstractType
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'property_path' => 'projectFund.project.projectIdentifier',
             ])
+            ->add('previouslyTcf', BooleanChoiceType::class, [
+                'label' => 'forms.crsts.project_details.previously_tcf.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => 'forms.crsts.project_details.previously_tcf.help',
+                'property_path' => 'projectFund.previouslyTcf',
+            ])
+            ->add('benefitCostRatio', BenefitCostRatioType::class, [
+                'label' => false,
+                'property_path' => 'projectFund.benefitCostRatio',
+            ])
             ->add('fundedMostlyAs', ChoiceType::class, [
                 'label' => 'forms.crsts.project_details.funded_mostly_as.label',
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
@@ -42,12 +52,7 @@ class ProjectDetailsType extends AbstractType
                 'choice_value' => fn(FundedMostlyAs $choice) => $choice->value,
                 'property_path' => 'projectFund.fundedMostlyAs',
             ])
-            ->add('previouslyTcf', BooleanChoiceType::class, [
-                'label' => 'forms.project.project_elements.previously_tcf.label',
-                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'help' => 'forms.project.project_elements.previously_tcf.help',
-                'property_path' => 'projectFund.previouslyTcf',
-            ]);
+        ;
     }
 
     public function getParent(): string

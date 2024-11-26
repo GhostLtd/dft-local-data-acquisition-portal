@@ -16,6 +16,7 @@ use App\Entity\Expense\ExpenseEntry;
 use App\Entity\Expense\ExpenseSeries;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
+use App\Entity\ProjectFund\BenefitCostRatio;
 use App\Entity\Recipient;
 use App\Entity\Milestone;
 use App\Entity\Project;
@@ -178,10 +179,15 @@ class FixtureHelper
 
     public function createCrstsProjectFund(CrstsProjectFundDefinition $definition): CrstsProjectFund
     {
+        $bcr = (new BenefitCostRatio())
+            ->setType($definition->getBenefitCostRatioType())
+            ->setValue($definition->getBenefitCostRatioValue());
+
         $projectFund = (new CrstsProjectFund())
             ->setRetained($definition->isRetained())
             ->setPreviouslyTcf($definition->getPreviouslyTcf())
-            ->setFundedMostlyAs($definition->getFundedMostlyAs());
+            ->setFundedMostlyAs($definition->getFundedMostlyAs())
+            ->setBenefitCostRatio($bcr);
 
         $this->persist([$projectFund]);
 

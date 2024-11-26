@@ -22,6 +22,9 @@ class CrstsProjectFund extends ProjectFund
     #[ORM\Column(nullable: true)]
     private ?bool $previouslyTcf = null;
 
+    #[ORM\Embedded(class: BenefitCostRatio::class)]
+    private ?BenefitCostRatio $benefitCostRatio = null;
+
     /**
      * @var Collection<int, CrstsProjectReturn>
      */
@@ -104,6 +107,17 @@ class CrstsProjectFund extends ProjectFund
     public function setPreviouslyTcf(?bool $previouslyTcf): static
     {
         $this->previouslyTcf = $previouslyTcf;
+        return $this;
+    }
+
+    public function getBenefitCostRatio(): ?BenefitCostRatio
+    {
+        return $this->benefitCostRatio;
+    }
+
+    public function setBenefitCostRatio(?BenefitCostRatio $benefitCostRatio): static
+    {
+        $this->benefitCostRatio = $benefitCostRatio;
         return $this;
     }
 }

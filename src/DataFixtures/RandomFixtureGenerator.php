@@ -13,6 +13,7 @@ use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
 use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
 use App\DataFixtures\Generator\CouncilName;
 use App\Entity\Enum\ActiveTravelElement;
+use App\Entity\Enum\BenefitCostRatioType;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
@@ -21,6 +22,7 @@ use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
 use App\Entity\Enum\TransportMode;
+use App\Entity\ProjectFund\BenefitCostRatio;
 use Faker;
 
 class RandomFixtureGenerator
@@ -220,10 +222,17 @@ class RandomFixtureGenerator
 
     public function createRandomCrstsProjectFund(): CrstsProjectFundDefinition
     {
+        $bcrType = $this->faker->randomElement(BenefitCostRatioType::cases());
+        $bcrValue = $bcrType === BenefitCostRatioType::VALUE ?
+            strval($this->faker->randomFloat(2, 0, 10)) :
+            null;
+
         return new CrstsProjectFundDefinition(
             $this->faker->boolean(),
             $this->faker->boolean(),
             $this->faker->randomElement(FundedMostlyAs::class),
+            $bcrType,
+            $bcrValue,
         );
     }
 
