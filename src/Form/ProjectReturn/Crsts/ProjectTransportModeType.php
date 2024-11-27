@@ -43,6 +43,8 @@ class ProjectTransportModeType extends AbstractType implements DataMapperInterfa
                 'choices' => $choices,
                 'choice_label' => fn(TransportMode $choice) => "enum.transport_mode.{$choice->value}",
                 'choice_value' => fn(?TransportMode $choice) => $choice->value ?? null,
+                'expanded' => false,
+                'placeholder' => 'forms.generic.placeholder',
             ]);
         }
     }

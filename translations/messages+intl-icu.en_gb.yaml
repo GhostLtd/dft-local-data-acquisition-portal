@@ -210,6 +210,9 @@ forms:
     mark_as_in_progress: Mark as in progress
     save: Save
     submit: Submit
+  generic:
+    placeholder: Please select an option
+
   crsts:
     benefit_cost_ratio:
       type:
@@ -263,6 +266,7 @@ forms:
       active_travel_element:
         label: Active travel element
         help: Pick the leading active travel intervention type
+        placeholder: Please select an active travel element
       includes_charging_points:
         label: Does this project include charging points for electric vehicles?
         help: ''

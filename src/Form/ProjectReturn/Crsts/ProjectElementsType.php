@@ -36,6 +36,8 @@ class ProjectElementsType extends AbstractType implements DataMapperInterface
                 'choices' => ActiveTravelElement::casesExcludingNoElements(),
                 'choice_label' => fn(ActiveTravelElement $choice) => "enum.active_travel_element.{$choice->value}",
                 'choice_value' => fn(?ActiveTravelElement $choice) => $choice?->value,
+                'expanded' => false,
+                'placeholder' => 'forms.generic.placeholder',
             ])
             ->add('includesChargingPoints', BooleanChoiceType::class, [
                 'label' => 'forms.project.project_elements.includes_charging_points.label',
