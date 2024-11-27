@@ -2,6 +2,8 @@
 
 namespace App\Entity\Enum;
 
+use App\DTO\ProjectLevelSectionConfiguration;
+use App\Form\ProjectReturn\Crsts\OverallFundingType;
 use App\Form\ProjectReturn\Crsts\ProjectDetailsType;
 use App\Form\ProjectReturn\Crsts\ProjectElementsType;
 use App\Form\ProjectReturn\Crsts\ProjectTransportModeType;
@@ -13,23 +15,32 @@ enum ProjectLevelSection: string
     case TRANSPORT_MODE = 'transport_mode';
     case PROJECT_ELEMENTS = 'project_elements'; // active travel, charging points, clean air elements
 
-    public static function getFormClassForFundAndSection(Fund $fund, ProjectLevelSection $section): ?string
+    case OVERALL_FUNDING = 'overall_funding'; // total scheme cost, agreed crsts funding
+
+    /**
+     * @return array<ProjectLevelSectionConfiguration>
+     */
+    public static function getConfigurationForFund(Fund $fund): array
     {
         return match($fund) {
-            Fund::CRSTS => match($section) {
-                self::PROJECT_DETAILS => ProjectDetailsType::class,
-                self::TRANSPORT_MODE => ProjectTransportModeType::class,
-                self::PROJECT_ELEMENTS => ProjectElementsType::class,
-            },
-            default => null,
+            Fund::CRSTS => [
+                new ProjectLevelSectionConfiguration(self::PROJECT_DETAILS, ProjectDetailsType::class),
+                new ProjectLevelSectionConfiguration(self::TRANSPORT_MODE, ProjectTransportModeType::class),
+                new ProjectLevelSectionConfiguration(self::PROJECT_ELEMENTS, ProjectElementsType::class),
+                new ProjectLevelSectionConfiguration(self::OVERALL_FUNDING, OverallFundingType::class, isDisplayedInExpensesList: true),
+            ],
+            default => [],
         };
     }
 
-    public static function filterForFund(Fund $fund): array
+    public function getConfiguration(Fund $fund): ?ProjectLevelSectionConfiguration
     {
-        return match($fund) {
-            Fund::CRSTS => [self::PROJECT_DETAILS, self::TRANSPORT_MODE, self::PROJECT_ELEMENTS],
-            Fund::BSIP => throw new \RuntimeException('Not yet supported'),
-        };
+        foreach(self::getConfigurationForFund($fund) as $configuration) {
+            if ($configuration->getSection() === $this) {
+                return $configuration;
+            }
+        }
+
+        return null;
     }
 }

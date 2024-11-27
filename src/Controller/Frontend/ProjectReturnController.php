@@ -44,7 +44,7 @@ class ProjectReturnController extends AbstractController
             'breadcrumbBuilder' => $breadcrumbBuilder,
             'fundReturn' => $fundReturn,
             'projectReturn' => $projectReturn,
-            'projectLevelSections' => ProjectLevelSection::filterForFund($fund),
+            'projectLevelSectionsConfiguration' => ProjectLevelSection::getConfigurationForFund($fund),
             'projectLevelExpenses' => ExpenseType::filterForProject($fund),
         ]);
     }
@@ -63,9 +63,9 @@ class ProjectReturnController extends AbstractController
         Request                    $request,
     ): Response
     {
-        $formClass = $section::getFormClassForFundAndSection($fundReturn->getFund(), $section);
+        $config = $section->getConfiguration($fundReturn->getFund());
 
-        if (!$formClass) {
+        if (!$config) {
             throw new NotFoundHttpException();
         }
 
@@ -77,7 +77,7 @@ class ProjectReturnController extends AbstractController
             'projectFundId' => $projectFund->getId()
         ]);
 
-        $form = $this->createForm($formClass, $projectReturn, [
+        $form = $this->createForm($config->getFormClass(), $projectReturn, [
             'cancel_url' => $cancelUrl,
             'completion_status' => $projectReturn->getStatusForSection($section),
         ]);

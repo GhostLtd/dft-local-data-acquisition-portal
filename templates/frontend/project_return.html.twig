@@ -8,22 +8,13 @@
 
     <h2 class="govuk-heading-s">{{ 'frontend.pages.project_return.project_level_details' | trans }}</h2>
     {{- taskListStart() -}}
-    {%- for section in projectLevelSections -%}
-        {%- set status = projectReturn.getStatusForSection(section) -%}
-
-        {{- taskListItem({
-            title: {text: "sections.project.#{section.value}" | trans},
-            href: path('app_project_return_edit', {fundReturnId: fundReturn.id, projectFundId: projectReturn.projectFund.id, section: section.value}),
-            status: {tag: {
-                text: "tags.#{status.value}.name" | trans,
-                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
-            }},
-        }, loop.index0) -}}
-    {%- endfor -%}
+    {{- _self.projectLevelSectionsList(_context, isDisplayedInExpensesList: false) -}}
     {{- taskListEnd() -}}
 
     <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
     {{- taskListStart() -}}
+    {{- _self.projectLevelSectionsList(_context, isDisplayedInExpensesList: true) -}}
+
     {%- for expense in projectLevelExpenses -%}
         {%- set status = projectReturn.getStatusForSection(expense) -%}
         {{- taskListItem({
@@ -39,3 +30,23 @@
     {%- endfor -%}
     {{- taskListEnd() -}}
 {% endblock %}
+
+{% macro projectLevelSectionsList(context, isDisplayedInExpensesList) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem -%}
+
+    {%- set filteredConfigurations = context.projectLevelSectionsConfiguration | filter(c => c.isDisplayedInExpensesList == isDisplayedInExpensesList) -%}
+
+    {%- for configuration in filteredConfigurations -%}
+        {%- set section = configuration.section -%}
+        {%- set status = context.projectReturn.getStatusForSection(section) -%}
+
+        {{- taskListItem({
+            title: {text: "sections.project.#{section.value}" | trans},
+            href: path('app_project_return_edit', {fundReturnId: context.fundReturn.id, projectFundId: context.projectReturn.projectFund.id, section: section.value}),
+            status: {tag: {
+                text: "tags.#{status.value}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+            }},
+        }, loop.index0) -}}
+    {%- endfor -%}
+{% endmacro %}

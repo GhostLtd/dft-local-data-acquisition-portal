@@ -28,10 +28,10 @@ class CrstsProjectReturn extends ProjectReturn
     #[ORM\JoinColumn(nullable: false)]
     private ?CrstsFundReturn $fundReturn = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, length: 255, precision: 10, scale: 2, nullable: true)]
     private ?string $totalCost = null; // 2proj_exp: Total cost of project (<this fund> plus other expenditure)
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::DECIMAL, length: 255, precision: 10, scale: 2, nullable: true)]
     private ?string $agreedFunding = null; // 2proj_exp: Agreed funding, <this fund>
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -107,7 +107,7 @@ class CrstsProjectReturn extends ProjectReturn
         return $this->agreedFunding;
     }
 
-    public function setAgreedFunding(string $agreedFunding): static
+    public function setAgreedFunding(?string $agreedFunding): static
     {
         $this->agreedFunding = $agreedFunding;
         return $this;

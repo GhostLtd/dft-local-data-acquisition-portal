@@ -350,6 +350,7 @@ sections:
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
   project:
+    overall_funding: Overall funding totals
     project_details: Project details
     project_elements: Project elements
     transport_mode: Transport mode
