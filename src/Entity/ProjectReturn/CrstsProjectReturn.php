@@ -9,19 +9,20 @@ use App\Entity\Expense\ExpenseSeries;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
-use App\Entity\Traits\IdTrait;
-use App\Entity\User;
 use App\Repository\Return\CrstsProjectReturnRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
+use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CrstsProjectReturnRepository::class)]
 class CrstsProjectReturn extends ProjectReturn
 {
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Valid(groups: ['project_details'])]
     private ?CrstsProjectFund $projectFund = null;
 
     #[ORM\ManyToOne(inversedBy: 'projectReturns')]
@@ -29,9 +30,11 @@ class CrstsProjectReturn extends ProjectReturn
     private ?CrstsFundReturn $fundReturn = null;
 
     #[ORM\Column(type: Types::DECIMAL, length: 255, precision: 10, scale: 2, nullable: true)]
+    #[Decimal(precision: 10, scale: 2, groups: ['overall_funding'])]
     private ?string $totalCost = null; // 2proj_exp: Total cost of project (<this fund> plus other expenditure)
 
     #[ORM\Column(type: Types::DECIMAL, length: 255, precision: 10, scale: 2, nullable: true)]
+    #[Decimal(precision: 10, scale: 2, groups: ['overall_funding'])]
     private ?string $agreedFunding = null; // 2proj_exp: Agreed funding, <this fund>
 
     #[ORM\Column(length: 255, nullable: true)]

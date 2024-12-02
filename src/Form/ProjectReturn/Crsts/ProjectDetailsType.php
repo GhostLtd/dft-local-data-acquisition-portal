@@ -62,6 +62,9 @@ class ProjectDetailsType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', CrstsProjectReturn::class);
+        $resolver->setDefaults([
+            'data_class' => CrstsProjectReturn::class,
+            'validation_groups' => ['project_details'],
+        ]);
     }
 }

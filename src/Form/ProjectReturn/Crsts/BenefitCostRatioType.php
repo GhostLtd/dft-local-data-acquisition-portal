@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BenefitCostRatioType extends AbstractType implements DataMapperInterface
 {
@@ -31,12 +32,21 @@ class BenefitCostRatioType extends AbstractType implements DataMapperInterface
                         [];
                 },
             ])
+            // We can't use a DecimalType here, because its validation triggers even when we've specified
+            // N/A or TBC for "type" and this field is hidden (see
             ->add('value', InputType::class, [
                 'label' => 'forms.crsts.benefit_cost_ratio.value.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'help' => 'forms.crsts.benefit_cost_ratio.value.help',
                 'property_path' => 'value',
             ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => BenefitCostRatio::class,
+        ]);
     }
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void

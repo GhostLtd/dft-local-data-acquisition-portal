@@ -6,6 +6,7 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Repository\ProjectFund\CrstsProjectFundRepository;
+use App\Validator\Constraint as AppAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,6 +24,7 @@ class CrstsProjectFund extends ProjectFund
     private ?bool $previouslyTcf = null;
 
     #[ORM\Embedded(class: BenefitCostRatio::class)]
+    #[AppAssert\BenefitCostRatio(groups: ['project_details'])]
     private ?BenefitCostRatio $benefitCostRatio = null;
 
     /**

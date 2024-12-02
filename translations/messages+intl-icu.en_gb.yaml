@@ -231,6 +231,11 @@ forms:
       resource_funding:
         label: Resource (RDEL) funding
         help: Please see Appendix A (?!)
+    overall_funding:
+      agreed_funding:
+        label: Agreed funding
+      total_cost:
+        label: Total cost
     overall_progress:
       progress_summary:
         label: Overall progress summary
