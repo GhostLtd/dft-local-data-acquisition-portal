@@ -13,6 +13,9 @@
 
     <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
     {{- taskListStart() -}}
+    {# We want to show some of the projectLevelSection items in the expenses area, because although they are not
+       expenses in the entity sense, they ask financial questions that are expense-related.
+    #}
     {{- _self.projectLevelSectionsList(_context, isDisplayedInExpensesList: true) -}}
 
     {%- for expense in projectLevelExpenses -%}

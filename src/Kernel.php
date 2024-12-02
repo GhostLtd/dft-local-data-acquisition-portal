@@ -2,7 +2,6 @@
 
 namespace App;
 
-use Ghost\GovUkCoreBundle\Features;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 

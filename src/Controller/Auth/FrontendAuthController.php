@@ -7,7 +7,6 @@ use App\Features;
 use App\Form\LoginType;
 use App\Messenger\AlphagovNotify\LoginEmail;
 use App\Repository\MaintenanceWarningRepository;
-use App\Repository\UserRepository;
 use App\Security\UserProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
