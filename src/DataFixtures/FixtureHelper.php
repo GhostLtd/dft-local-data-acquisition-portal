@@ -187,7 +187,8 @@ class FixtureHelper
             ->setRetained($definition->isRetained())
             ->setPreviouslyTcf($definition->getPreviouslyTcf())
             ->setFundedMostlyAs($definition->getFundedMostlyAs())
-            ->setBenefitCostRatio($bcr);
+            ->setBenefitCostRatio($bcr)
+            ->setPhase($definition->getPhase());
 
         $this->persist([$projectFund]);
 

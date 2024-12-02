@@ -5,7 +5,7 @@ namespace App\Entity\Enum;
 enum ExpenseType: string
 {
     case FUND_CAPITAL_EXPENDITURE = "fund_capital_expenditure";
-    case FUND_CAPITAL_EXPENDITURE_BASELINE = "fund_capital_expenditure_baseline";
+//    case FUND_CAPITAL_EXPENDITURE_BASELINE = "fund_capital_expenditure_baseline";
     case FUND_CAPITAL_EXPENDITURE_WITH_OVER_PROGRAMMING = "fund_capital_expenditure_inc_over_programming";
     case FUND_CAPITAL_LOCAL_CONTRIBUTION = "fund_capital_local_contribution";
     case FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION = "fund_capital_third_party_contribution";
