@@ -1,0 +1,33 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_heading = breadcrumbBuilder.titleFor('fund_return_expense_edit') -%}
+{%- set page_title = breadcrumbBuilder.titleFor('fund_return_expense_edit') ~ ' | ' ~ breadcrumbBuilder.titleFor('fund_return') -%}
+{%- set page_heading_class = 'govuk-heading-m' -%}
+
+{%- block content -%}
+    {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tableStart, tableEnd, tableRowStart, tableRowEnd, tableHeader, tableCell -%}
+
+    {# See App\Utility\ExpensesTableHelper #}
+    {{- form_start(form) -}}
+    {{- tableStart() -}}
+    {%- for row in expensesTable -%}
+        {{- tableRowStart(row.options) -}}
+        {%- for cell in row.cells -%}
+            {%- if cell.type == 'header' -%}
+                {%- set html -%}
+                    {{- cell.options.text -}}
+                    {%- if cell.attributes.add_actual_or_forecast ?? null -%}
+                        <span class="actual-or-forecast">{{ cell.attributes.text }}</span>
+                    {%- endif -%}
+                {%- endset -%}
+                {{- tableHeader({...cell.options, html}) -}}
+            {%- elseif cell.type == 'cell' -%}
+                {{- tableCell({...cell.options, html: form_row(form[cell.options.key])}) }}
+            {%- endif -%}
+        {%- endfor -%}
+        {{- tableRowEnd() -}}
+    {%- endfor -%}
+    {{- tableEnd() -}}
+    {{- form_end(form) -}}
+{%- endblock -%}

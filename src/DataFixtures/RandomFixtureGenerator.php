@@ -15,7 +15,6 @@ use App\DataFixtures\Generator\CouncilName;
 use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\BenefitCostRatioType;
 use App\Entity\Enum\BusinessCase;
-use App\Entity\Enum\CrstsPhase;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\FundedMostlyAs;
@@ -23,6 +22,7 @@ use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
 use App\Entity\Enum\TransportMode;
+use App\Utility\CrstsHelper;
 use Faker;
 
 class RandomFixtureGenerator
@@ -105,17 +105,12 @@ class RandomFixtureGenerator
     {
         $returns = [];
 
-        $startingYear = $this->faker->numberBetween(2018, 2024);
-        $startingQuarter = $this->faker->numberBetween(1, 4);
+        $startingYear = 2022;
+        $startingQuarter = 1;
 
-        $endingYear = $startingYear + $this->faker->numberBetween(1, 8);
-        $endingQuarter = (($startingQuarter + $this->faker->numberBetween(1, 4)) % 4) + 1;
-
-        $expenses = $this->createRandomExpenses(
-            ExpenseType::filterForFund($fund),
-            $startingYear,
-            $startingYear + $this->faker->numberBetween(3, 8)
-        );
+        $now = new \DateTime();
+        $endingYear = intval($now->format('Y'));
+        $endingQuarter = intval(ceil(intval($now->format('m')) / 3));
 
         // Add project returns...
         for($year=$startingYear; $year<=$endingYear; $year++) {
@@ -141,21 +136,27 @@ class RandomFixtureGenerator
                         continue;
                     }
 
-                    if ($fund === Fund::CRSTS) {
+                    if ($fund === Fund::CRSTS1) {
                         if (!$projectFund instanceof CrstsProjectFundDefinition) {
                             throw new \RuntimeException('ProjectFundDefinition / type mismatch');
                         }
 
                         if ($projectFund->isRetained() || $quarter === 1) {
-                            $projectReturns[$project->getName()] = $this->createRandomCrstsProjectReturn($startingYear, $startingQuarter);
+                            $projectReturns[$project->getName()] = $this->createRandomCrstsProjectReturn($year, $quarter);
                         }
                     } else {
                         throw new \RuntimeException("Unsupported Project Return Type: ".$project::class);
                     }
                 }
 
+                $expenses = $this->createRandomCrstsExpenses(
+                    ExpenseType::filterForFund($fund),
+                    $year,
+                    $quarter,
+                );
+
                 $returns[] = match($fund) {
-                    Fund::CRSTS => new CrstsFundReturnDefinition(
+                    Fund::CRSTS1 => new CrstsFundReturnDefinition(
                         $mustBeSignedOff ? null : $this->createRandomUser(), // No signoff user for the most recent return...
                         $year,
                         $quarter,
@@ -228,7 +229,6 @@ class RandomFixtureGenerator
             null;
 
         return new CrstsProjectFundDefinition(
-            CrstsPhase::CRSTS1,
             $this->faker->boolean(),
             $this->faker->boolean(),
             $this->faker->randomElement(FundedMostlyAs::class),
@@ -237,30 +237,26 @@ class RandomFixtureGenerator
         );
     }
 
-    public function createRandomCrstsProjectReturn(int $startingYear, int $startingQuarter): CrstsProjectReturnDefinition
+    public function createRandomCrstsProjectReturn(int $returnYear, int $returnQuarter): CrstsProjectReturnDefinition
     {
         $milestones = [];
-        $earliestDate = new \DateTime("{$startingYear}-".(($startingQuarter-1)*3)."-01");
+        $milestoneEarliestDate = new \DateTime('2022-01-01');
 
         // N.B. This logic is very simple, and might not generate logically coherent dates
         //      for milestones or expense date ranges.
 
         foreach(MilestoneType::cases() as $milestoneType) {
-            $milestone = $this->createRandomMilestone($milestoneType, $earliestDate);
-            $earliestDate = $milestone->getDate();
+            $milestone = $this->createRandomMilestone($milestoneType, $milestoneEarliestDate, new \DateTime("2028-01-01"));
+            $milestoneEarliestDate = $milestone->getDate();
             $milestones[] = $milestone;
         }
 
-        $expenses = $this->createRandomExpenses(
-            ExpenseType::filterForProject(Fund::CRSTS),
-            $startingYear,
-            $startingYear + $this->faker->numberBetween(3, 8)
-        );
+        $expenses = $this->createRandomCrstsExpenses(ExpenseType::filterForProject(Fund::CRSTS1), $returnYear, $returnQuarter);
 
         return new CrstsProjectReturnDefinition(
             strval($this->faker->randomFloat(2, 1_000, 99_000_000)),
-            strval($this->faker->numberBetween(2, 1_000, 99_000_000)),
-            strval($this->faker->numberBetween(2, 1_000, 99_000_000)),
+            strval($this->faker->numberBetween(1_000, 99_000_000)),
+            strval($this->faker->numberBetween(1_000, 99_000_000)),
             $this->faker->randomElement(OnTrackRating::cases()),
             $this->faker->randomElement(BusinessCase::cases()),
             $this->faker->dateTime(),
@@ -270,14 +266,9 @@ class RandomFixtureGenerator
         );
     }
 
-    public function createRandomMilestone(?MilestoneType $milestoneType=null, \DateTime $earliestDate=null): MilestoneDefinition
+    public function createRandomMilestone(?MilestoneType $milestoneType, \DateTime $earliestDate, \DateTime $latestDate): MilestoneDefinition
     {
-        if (!$milestoneType) {
-            $milestoneType = $this->faker->randomElement(MilestoneType::cases());
-        }
-
-        $date = $this->faker->dateTimeBetween($earliestDate ?? '-10 years');
-
+        $date = $this->faker->dateTimeBetween($earliestDate, $latestDate);
         return new MilestoneDefinition($milestoneType, $date);
     }
 
@@ -285,25 +276,27 @@ class RandomFixtureGenerator
      * @param array<ExpenseType> $expenseTypes
      * @return array<ExpenseDefinition>
      */
-    public function createRandomExpenses(array $expenseTypes, int $startYear, int $endYear): array
+    public function createRandomCrstsExpenses(array $expenseTypes, int $returnYear, int $returnQuarter): array
     {
         // N.B. The logic here is also very simple and hence the forecast / actual expenses
         //      are *extremely* unlikely to be coherent from one year to the next :)
 
+        $divisionConfigurations = CrstsHelper::getExpenseDivisionConfigurations($returnYear, $returnQuarter);
+
         $expenses = [];
 
         foreach($expenseTypes as $expenseType) {
-            $entries = [];
-            for($expenseYear = $startYear; $expenseYear <= $endYear; $expenseYear++) {
-                $expenseNextYear = $expenseYear + 1;
-                $key = "{$expenseYear}/{$expenseNextYear}";
-
-                for($quarter=1; $quarter<=4; $quarter++) {
-                    $entries["{$key} {$quarter}"] = $this->faker->numberBetween('1_000_000', '99_000_000');
+            foreach($divisionConfigurations as $divisionConfiguration) {
+                foreach($divisionConfiguration->getSubDivisionConfigurations() as $subDivisionConfiguration) {
+                    $expenses[] = new ExpenseDefinition(
+                        $expenseType,
+                        $divisionConfiguration->getSlug(),
+                        $subDivisionConfiguration->getSlug(),
+                        $subDivisionConfiguration->isForecast(),
+                        $this->faker->numberBetween(1_000_000, 99_000_000)
+                    );
                 }
             }
-
-            $expenses[] = new ExpenseDefinition($expenseType, $entries);
         }
 
         return $expenses;

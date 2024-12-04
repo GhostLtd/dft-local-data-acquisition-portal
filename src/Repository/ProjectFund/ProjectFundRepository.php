@@ -29,7 +29,8 @@ class ProjectFundRepository extends ServiceEntityRepository
         return match($fund) {
             null => ProjectFund::class,
             Fund::BSIP => BsipProjectFund::class,
-            Fund::CRSTS => CrstsProjectFund::class,
+            Fund::CRSTS1 => CrstsProjectFund::class,
+            Fund::CRSTS2 => throw new \RuntimeException('Not yet supported'),
         };
     }
 

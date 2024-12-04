@@ -2,7 +2,6 @@
 
 namespace App\Entity\ProjectFund;
 
-use App\Entity\Enum\CrstsPhase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
@@ -33,9 +32,6 @@ class CrstsProjectFund extends ProjectFund
      */
     #[ORM\OneToMany(targetEntity: CrstsProjectReturn::class, mappedBy: 'projectFund', orphanRemoval: true)]
     private Collection $returns;
-
-    #[ORM\Column(enumType: CrstsPhase::class)]
-    private ?CrstsPhase $phase = null;
 
     public function __construct()
     {
@@ -85,7 +81,7 @@ class CrstsProjectFund extends ProjectFund
 
     public function getFund(): Fund
     {
-        return Fund::CRSTS;
+        return Fund::CRSTS1;
     }
 
     public function isReturnRequiredFor(int $quarter): bool
@@ -124,18 +120,6 @@ class CrstsProjectFund extends ProjectFund
     public function setBenefitCostRatio(?BenefitCostRatio $benefitCostRatio): static
     {
         $this->benefitCostRatio = $benefitCostRatio;
-        return $this;
-    }
-
-    public function getPhase(): ?CrstsPhase
-    {
-        return $this->phase;
-    }
-
-    public function setPhase(CrstsPhase $phase): static
-    {
-        $this->phase = $phase;
-
         return $this;
     }
 }

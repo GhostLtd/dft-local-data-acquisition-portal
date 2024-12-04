@@ -74,20 +74,26 @@ enum:
   crsts_phase:
     crsts1: CRSTS1
     crsts2: CRSTS2
+  expense_category:
+    fund_capital: "{fund} Capital"
+    fund_resource: "{fund} Resource"
+    local_capital_contributions: "Local capital contributions"
+    other_capital_contributions: "Other capital contributions"
   expense_type:
-    fund_capital_expenditure: "{fund} Capital expenditure"
-    fund_capital_expenditure_baseline: "Baseline, {fund} Capital expenditure"
-    fund_capital_expenditure_inc_over_programming: "{fund} Capital expenditure including over-programming"
-    fund_capital_local_contribution: "Capital expenditure: MCA / LA local contribution"
-    fund_capital_third_party_contribution: "Capital expenditure: local 3rd party contribution"
-    fund_capital_other: "Capital expenditure: other (e.g. other DfT or government funding)"
-    fund_total_capital_expenditure: "Total capital expenditure"
-    fund_total_resource_expenditure: "Total resource expenditure"
-    fund_total_expenditure: "Total expenditure"
-    project_capital_spend_fund: "Capital (CDEL) spend, {fund}"
-    project_capital_spend_all_sources: "Capital (CDEL) spend, all sources"
+    fex: "{fund} expenditure"
+    feb: "Baseline, {fund} expenditure"
+    fop: "{fund} expenditure including over-programming"
+    fob: "Baseline, {fund} expenditure including over-programming"
+    flc: "MCA/LA"
+    flb: "Baseline, local capital contributions"
+    ftp: "3rd-party"
+    fot: "Total"
+    fre: "Total"
+    psp: "Capital (CDEL) spend, {fund}"
+    psa: "Capital (CDEL) spend, all sources"
   fund:
-    CRSTS: CRSTS
+    CRSTS1: CRSTS
+    CRSTS2: CRSTS2
   funded_mostly_as:
     CDEL: CDEL (Capital)
     RDEL: RDEL (Resource)
@@ -224,6 +230,11 @@ forms:
     comments:
       comments:
         label: Comments
+    expenses:
+      actual: Actual
+      forecast: Forecast
+      sub_total: Sub-total
+      total: Total
     local_and_rdel:
       local_contribution:
         label: Local contribution
@@ -329,6 +340,7 @@ frontend:
     dashboard:
       breadcrumb: Home
       title: Local Authorities
+      fund_title: "{fundName}: {year} Q{quarter}"
     home:
       title: Local data acquisition portal
     fund_return:

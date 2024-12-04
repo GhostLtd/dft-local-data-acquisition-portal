@@ -5,7 +5,8 @@ namespace App\Entity\ProjectReturn;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\OnTrackRating;
-use App\Entity\Expense\ExpenseSeries;
+use App\Entity\ExpenseEntry;
+use App\Entity\ExpensesContainerInterface;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
@@ -18,7 +19,7 @@ use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CrstsProjectReturnRepository::class)]
-class CrstsProjectReturn extends ProjectReturn
+class CrstsProjectReturn extends ProjectReturn implements ExpensesContainerInterface
 {
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
@@ -53,9 +54,9 @@ class CrstsProjectReturn extends ProjectReturn
     private ?string $progressUpdate = null; // 4proj_exp: Progress update (comment)
 
     /**
-     * @var Collection<int, ExpenseSeries>
+     * @var Collection<int, ExpenseEntry>
      */
-    #[ORM\ManyToMany(targetEntity: ExpenseSeries::class)]
+    #[ORM\ManyToMany(targetEntity: ExpenseEntry::class)]
     private Collection $expenses;
 
     /**
@@ -172,14 +173,14 @@ class CrstsProjectReturn extends ProjectReturn
     }
 
     /**
-     * @return Collection<int, ExpenseSeries>
+     * @return Collection<int, ExpenseEntry>
      */
     public function getExpenses(): Collection
     {
         return $this->expenses;
     }
 
-    public function addExpense(ExpenseSeries $expense): static
+    public function addExpense(ExpenseEntry $expense): static
     {
         if (!$this->expenses->contains($expense)) {
             $this->expenses->add($expense);
@@ -188,7 +189,7 @@ class CrstsProjectReturn extends ProjectReturn
         return $this;
     }
 
-    public function removeExpense(ExpenseSeries $expense): static
+    public function removeExpense(ExpenseEntry $expense): static
     {
         $this->expenses->removeElement($expense);
         return $this;
@@ -219,6 +220,6 @@ class CrstsProjectReturn extends ProjectReturn
 
     public function getFund(): Fund
     {
-        return Fund::CRSTS;
+        return Fund::CRSTS1;
     }
 }

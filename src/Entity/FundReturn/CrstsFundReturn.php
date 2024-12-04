@@ -2,10 +2,13 @@
 
 namespace App\Entity\FundReturn;
 
+use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
-use App\Entity\Expense\ExpenseSeries;
+use App\Entity\ExpenseEntry;
+use App\Entity\ExpensesContainerInterface;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
+use App\Utility\CrstsHelper;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,7 +16,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CrstsFundReturnRepository::class)]
-class CrstsFundReturn extends FundReturn
+class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 {
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $progressSummary = null; // 1top_info: Programme level progress summary
@@ -40,9 +43,9 @@ class CrstsFundReturn extends FundReturn
     private ?string $comments = null; // 2top_exp: Comment box.  Please provide some commentary on the programme expenditure table above.  Any expenditure post 26/27 MUST be explained.
 
     /**
-     * @var Collection<int, ExpenseSeries>
+     * @var Collection<int, ExpenseEntry>
      */
-    #[ORM\ManyToMany(targetEntity: ExpenseSeries::class)]
+    #[ORM\ManyToMany(targetEntity: ExpenseEntry::class)]
     private Collection $expenses;
 
     /**
@@ -147,14 +150,14 @@ class CrstsFundReturn extends FundReturn
     }
 
     /**
-     * @return Collection<int, ExpenseSeries>
+     * @return Collection<int, ExpenseEntry>
      */
     public function getExpenses(): Collection
     {
         return $this->expenses;
     }
 
-    public function addExpense(ExpenseSeries $expense): static
+    public function addExpense(ExpenseEntry $expense): static
     {
         if (!$this->expenses->contains($expense)) {
             $this->expenses->add($expense);
@@ -163,7 +166,7 @@ class CrstsFundReturn extends FundReturn
         return $this;
     }
 
-    public function removeExpense(ExpenseSeries $expense): static
+    public function removeExpense(ExpenseEntry $expense): static
     {
         $this->expenses->removeElement($expense);
         return $this;
@@ -201,8 +204,14 @@ class CrstsFundReturn extends FundReturn
 
     public function getFund(): Fund
     {
-        return Fund::CRSTS;
+        return Fund::CRSTS1;
     }
 
-
+    /**
+     * @return array<int, DivisionConfiguration>
+     */
+    public function getExpenseDivisionConfigurations(): array
+    {
+        return CrstsHelper::getExpenseDivisionConfigurations($this->getYear(), $this->getQuarter());
+    }
 }

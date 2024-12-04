@@ -9,3 +9,39 @@ section.govuk-service-navigation__wrapper-full-width {
 li.govuk-service-navigation__margin-left-auto {
   margin-left: auto;
 }
+
+form.expenses table {
+  .actual-or-forecast {
+    display: block;
+    font-weight: normal;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 0;
+  }
+
+  .govuk-table__header,
+  .govuk-table__cell {
+    padding-right: 5px;
+  }
+
+  .govuk-table__cell {
+    min-width: 60px;
+  }
+
+  th,
+  input[type="text"] {
+    @include govuk-font-size($size: 16);
+  }
+
+  input[type="text"] {
+    text-align: right;
+  }
+
+  .header_row {
+    position: sticky;
+    top: 0;
+    background: #eee;
+    z-index: 100;
+  }
+}

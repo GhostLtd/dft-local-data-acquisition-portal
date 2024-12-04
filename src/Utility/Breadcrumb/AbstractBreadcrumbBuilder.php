@@ -18,15 +18,20 @@ abstract class AbstractBreadcrumbBuilder
     }
 
     protected function addItem(
-        string $key,
-        string $translationKey,
-        string $routeName,
-        array  $routeParameters = [],
-        array  $translationParameters = []
+        string  $key,
+        string  $routeName,
+        array   $routeParameters = [],
+        ?string $translationKey = null,
+        array   $translationParameters = [],
+        ?string $text = null,
     ): void
     {
+        if ($text === null && $translationKey === null) {
+            throw new \RuntimeException('BreadcrumbBuilder->addItem() - either text or translationKey must be set');
+        }
+
         $this->items[$key] = [
-            'text' => $this->translator->trans($translationKey, $translationParameters),
+            'text' => $text ?? $this->translator->trans($translationKey, $translationParameters),
             'href' => $this->router->generate($routeName, $routeParameters),
         ];
     }

@@ -3,14 +3,12 @@
 namespace App\DataFixtures\Definition\ProjectFund;
 
 use App\Entity\Enum\BenefitCostRatioType;
-use App\Entity\Enum\CrstsPhase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\FundedMostlyAs;
 
 class CrstsProjectFundDefinition extends AbstractProjectFundDefinition
 {
     public function __construct(
-        protected CrstsPhase            $phase,
         protected ?bool                 $retained = null,
         protected ?bool                 $previouslyTcf = null,
         protected ?FundedMostlyAs       $fundedMostlyAs = null,
@@ -25,7 +23,7 @@ class CrstsProjectFundDefinition extends AbstractProjectFundDefinition
 
     public function getFund(): Fund
     {
-        return Fund::CRSTS;
+        return Fund::CRSTS1;
     }
 
     public function getPreviouslyTcf(): ?bool
@@ -46,10 +44,5 @@ class CrstsProjectFundDefinition extends AbstractProjectFundDefinition
     public function getBenefitCostRatioType(): ?BenefitCostRatioType
     {
         return $this->benefitCostRatioType;
-    }
-
-    public function getPhase(): CrstsPhase
-    {
-        return $this->phase;
     }
 }

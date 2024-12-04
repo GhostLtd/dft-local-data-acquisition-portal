@@ -2,6 +2,7 @@
 
 namespace App\Entity\FundReturn;
 
+use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\CompletionStatus;
@@ -21,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
 #[ORM\DiscriminatorMap([
-    Fund::CRSTS->value => CrstsFundReturn::class,
+    Fund::CRSTS1->value => CrstsFundReturn::class,
 ])]
 abstract class FundReturn
 {
@@ -142,17 +143,22 @@ abstract class FundReturn
 
     // --------------------------------------------------------------------------------
 
-    public function getFundReturnSectionStatusForSection(ExpenseType|FundLevelSection $enum): ?FundReturnSectionStatus
+    public function getFundReturnSectionStatusForName(string $name): ?FundReturnSectionStatus
     {
-        return $this->sectionStatuses->findFirst(fn(int $idx, FundReturnSectionStatus $status) => $status->getName() === $enum->name);
+        return $this->sectionStatuses->findFirst(fn(int $idx, FundReturnSectionStatus $status) => $status->getName() === $name);
     }
 
     public function getStatusForSection(
-        ExpenseType|FundLevelSection $enum,
-        CompletionStatus             $default = CompletionStatus::NOT_STARTED
+        DivisionConfiguration|FundLevelSection $section,
+        CompletionStatus                       $default = CompletionStatus::NOT_STARTED
     ): CompletionStatus
     {
-        $fundReturnSectionStatus = $this->getFundReturnSectionStatusForSection($enum);
+        $name = match($section::class) {
+            DivisionConfiguration::class => $section->getTitle(),
+            FundLevelSection::class => $section->name,
+        };
+
+        $fundReturnSectionStatus = $this->getFundReturnSectionStatusForName($name);
 
         return $fundReturnSectionStatus ?
             $fundReturnSectionStatus->getStatus() :
@@ -164,11 +170,25 @@ abstract class FundReturn
     /** @return Collection<int, ProjectReturn> */
     abstract public function getProjectReturns(): Collection;
 
+    /** @return array<int, DivisionConfiguration> */
+    abstract public function getExpenseDivisionConfigurations(): array;
+
     public function getProjectReturnForProjectFund(ProjectFund $projectFund): ?ProjectReturn
     {
         foreach($this->getProjectReturns() as $projectReturn) {
             if ($projectReturn->getProjectFund() === $projectFund) {
                 return $projectReturn;
+            }
+        }
+
+        return null;
+    }
+
+    public function findExpenseDivisionConfigurationBySlug(string $slug): ?DivisionConfiguration
+    {
+        foreach($this->getExpenseDivisionConfigurations() as $expenseDivisionConfiguration) {
+            if ($expenseDivisionConfiguration->getSlug() === $slug) {
+                return $expenseDivisionConfiguration;
             }
         }
 

@@ -9,6 +9,7 @@ use App\Form\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -62,7 +63,7 @@ class ProjectTransportModeType extends AbstractType implements DataMapperInterfa
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
         if (!$viewData instanceof ProjectReturn) {
-            return;
+            throw new UnexpectedTypeException($viewData, ProjectReturn::class);
         }
 
         $forms = iterator_to_array($forms);
@@ -83,7 +84,7 @@ class ProjectTransportModeType extends AbstractType implements DataMapperInterfa
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
         if (!$viewData instanceof ProjectReturn) {
-            return;
+            throw new UnexpectedTypeException($viewData, ProjectReturn::class);
         }
 
         $forms = iterator_to_array($forms);

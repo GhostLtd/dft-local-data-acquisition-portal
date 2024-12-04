@@ -6,13 +6,12 @@ use App\Entity\Enum\ExpenseType;
 
 class ExpenseDefinition
 {
-
-    /**
-     * @param array<string, string> $entries
-     */
     public function __construct(
         protected ExpenseType $type,
-        protected array $entries,
+        protected string      $division,
+        protected string      $subDivision,
+        protected bool        $forecast,
+        protected ?string     $value,
     ) {}
 
     public function getType(): ExpenseType
@@ -20,8 +19,23 @@ class ExpenseDefinition
         return $this->type;
     }
 
-    public function getEntries(): array
+    public function getDivision(): string
     {
-        return $this->entries;
+        return $this->division;
+    }
+
+    public function getSubDivision(): string
+    {
+        return $this->subDivision;
+    }
+
+    public function isForecast(): bool
+    {
+        return $this->forecast;
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->value;
     }
 }

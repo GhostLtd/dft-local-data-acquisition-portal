@@ -13,9 +13,7 @@ abstract class ReturnSectionUpdateEvent extends Event
     /** @var array<string, string> */
     protected array $options;
 
-    public function __construct(
-        array                                  $options,
-    )
+    public function __construct(array $options)
     {
         $this->options = (new OptionsResolver())
             ->setDefault('mode', ReturnBaseType::SAVE)

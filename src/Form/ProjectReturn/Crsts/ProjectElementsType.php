@@ -9,6 +9,7 @@ use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -64,7 +65,7 @@ class ProjectElementsType extends AbstractType implements DataMapperInterface
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
         if (!$viewData instanceof ProjectReturn) {
-            return;
+            throw new UnexpectedTypeException($viewData, ProjectReturn::class);
         }
 
         $forms = iterator_to_array($forms);
@@ -82,7 +83,7 @@ class ProjectElementsType extends AbstractType implements DataMapperInterface
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
         if (!$viewData instanceof ProjectReturn) {
-            return;
+            throw new UnexpectedTypeException($viewData, ProjectReturn::class);
         }
 
         $forms = iterator_to_array($forms);

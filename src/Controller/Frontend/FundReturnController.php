@@ -5,10 +5,12 @@ namespace App\Controller\Frontend;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\ProjectReturn\ProjectReturn;
+use App\Form\FundReturn\Crsts\ExpensesType;
+use App\Utility\CrstsHelper;
 use App\Event\FundReturnSectionUpdateEvent;
 use App\Repository\ProjectFund\ProjectFundRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\ExpensesTableHelper;
 use App\Utility\FormHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -45,9 +47,9 @@ class FundReturnController extends AbstractController
 
         return $this->render('frontend/fund_return.html.twig', [
             'breadcrumbBuilder' => $breadcrumbBuilder,
-            'fundReturn' => $fundReturn,
+            'expenseDivisions' => $fundReturn->getExpenseDivisionConfigurations(),
             'fundLevelSections' => FundLevelSection::filterForFund($fund),
-            'fundLevelExpenses' => ExpenseType::filterForFund($fund),
+            'fundReturn' => $fundReturn,
             'projectFunds' => $projectFunds
         ]);
     }
@@ -69,7 +71,7 @@ class FundReturnController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        $breadcrumbBuilder->setAtFundReturnEdit($fundReturn, $section);
+        $breadcrumbBuilder->setAtFundReturnSectionEdit($fundReturn, $section);
         $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()]);
 
         $form = $this->createForm($formClass, $fundReturn, [
@@ -92,6 +94,57 @@ class FundReturnController extends AbstractController
             'form' => $form,
             'fundReturn' => $fundReturn,
             'section' => $section,
+        ]);
+    }
+
+
+    #[Route('/fund-return/{fundReturnId}/expense/{divisionSlug}', name: 'app_fund_return_expense_edit')]
+    public function fundReturnExpense(
+        DashboardBreadcrumbBuilder $breadcrumbBuilder,
+        EntityManagerInterface     $entityManager,
+        EventDispatcherInterface   $eventDispatcher,
+        string                     $divisionSlug,
+        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
+        FundReturn                 $fundReturn,
+        Request                    $request,
+        ExpensesTableHelper        $tableHelper,
+    ): Response
+    {
+        $divisionConfiguration = $fundReturn->findExpenseDivisionConfigurationBySlug($divisionSlug);
+
+        if (!$divisionConfiguration) {
+            throw new NotFoundHttpException();
+        }
+
+        $breadcrumbBuilder->setAtFundReturnExpenseEdit($fundReturn, $divisionConfiguration);
+        $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()]);
+
+        $expensesTableHelper = $tableHelper
+            ->setDivisionConfiguration($divisionConfiguration)
+            ->setRowGroupConfigurations(CrstsHelper::getExpenseRowsConfiguration())
+            ->setFund($fundReturn->getFund());
+
+        $form = $this->createForm(ExpensesType::class, $fundReturn, [
+            'cancel_url' => $cancelUrl,
+            'completion_status' => $fundReturn->getStatusForSection($divisionConfiguration),
+            'expenses_table_helper' => $expensesTableHelper,
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $clickedButton = FormHelper::whichButtonClicked($form);
+            if ($clickedButton) {
+                $eventDispatcher->dispatch(new FundReturnSectionUpdateEvent($fundReturn, $divisionConfiguration, ['mode' => $clickedButton]));
+                $entityManager->flush();
+                return new RedirectResponse($cancelUrl);
+            }
+        }
+
+        return $this->render('frontend/fund_return_expenses_edit.html.twig', [
+            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'expensesTable' => $expensesTableHelper->getTableRows(),
+            'form' => $form,
         ]);
     }
 }

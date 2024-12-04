@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-use App\DTO\ProjectLevelSectionConfiguration;
+use App\Entity\Config\ProjectLevelSectionConfiguration;
 use App\Form\ProjectReturn\Crsts\OverallFundingType;
 use App\Form\ProjectReturn\Crsts\ProjectDetailsType;
 use App\Form\ProjectReturn\Crsts\ProjectElementsType;
@@ -23,7 +23,7 @@ enum ProjectLevelSection: string
     public static function getConfigurationForFund(Fund $fund): array
     {
         return match($fund) {
-            Fund::CRSTS => [
+            Fund::CRSTS1 => [
                 new ProjectLevelSectionConfiguration(self::PROJECT_DETAILS, ProjectDetailsType::class),
                 new ProjectLevelSectionConfiguration(self::TRANSPORT_MODE, ProjectTransportModeType::class),
                 new ProjectLevelSectionConfiguration(self::PROJECT_ELEMENTS, ProjectElementsType::class),

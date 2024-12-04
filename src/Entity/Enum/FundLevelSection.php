@@ -19,7 +19,7 @@ enum FundLevelSection: string
     public static function getFormClassForFundAndSection(Fund $fund, FundLevelSection $section): ?string
     {
         return match($fund) {
-            Fund::CRSTS => match($section) {
+            Fund::CRSTS1 => match($section) {
                 self::OVERALL_PROGRESS => OverallProgressType::class,
                 self::QUARTERLY_PROGRESS => QuarterlyProgressType::class,
                 self::LOCAL_AND_RDEL => LocalAndRdelType::class,
@@ -32,8 +32,8 @@ enum FundLevelSection: string
     public static function filterForFund(Fund $fund): array
     {
         return match($fund) {
-            Fund::CRSTS => [self::OVERALL_PROGRESS, self::QUARTERLY_PROGRESS, self::LOCAL_AND_RDEL, self::COMMENTS],
-            Fund::BSIP => throw new \RuntimeException('Not yet supported'),
+            Fund::CRSTS1 => [self::OVERALL_PROGRESS, self::QUARTERLY_PROGRESS, self::LOCAL_AND_RDEL, self::COMMENTS],
+            Fund::CRSTS2, Fund::BSIP => throw new \RuntimeException('Not yet supported'),
         };
     }
 }

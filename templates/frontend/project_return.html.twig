@@ -18,12 +18,10 @@
     #}
     {{- _self.projectLevelSectionsList(_context, isDisplayedInExpensesList: true) -}}
 
-    {%- for expense in projectLevelExpenses -%}
-        {%- set status = projectReturn.getStatusForSection(expense) -%}
+    {%- for division in expenseDivisions -%}
+        {%- set status = projectReturn.getStatusForSection(division) -%}
         {{- taskListItem({
-            title: {
-                text: "enum.expense_type.#{expense.value}" | trans({fund: fundReturn.fund.name}),
-            },
+            title: {text: division.title},
             href: '#',
             status: {tag: {
                 text: "tags.#{status.value}.name" | trans,

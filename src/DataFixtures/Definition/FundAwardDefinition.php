@@ -16,7 +16,7 @@ class FundAwardDefinition
         protected array $returns = []
     ) {
         $expectedReturnType = match($fund) {
-            Fund::CRSTS => CrstsFundReturnDefinition::class,
+            Fund::CRSTS1 => CrstsFundReturnDefinition::class,
         };
 
         foreach($returns as $return) {

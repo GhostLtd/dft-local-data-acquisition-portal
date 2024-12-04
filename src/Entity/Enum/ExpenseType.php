@@ -4,18 +4,27 @@ namespace App\Entity\Enum;
 
 enum ExpenseType: string
 {
-    case FUND_CAPITAL_EXPENDITURE = "fund_capital_expenditure";
-//    case FUND_CAPITAL_EXPENDITURE_BASELINE = "fund_capital_expenditure_baseline";
-    case FUND_CAPITAL_EXPENDITURE_WITH_OVER_PROGRAMMING = "fund_capital_expenditure_inc_over_programming";
-    case FUND_CAPITAL_LOCAL_CONTRIBUTION = "fund_capital_local_contribution";
-    case FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION = "fund_capital_third_party_contribution";
-    case FUND_CAPITAL_OTHER = "fund_capital_other";
-    case FUND_CAPITAL_TOTAL = "fund_total_capital_expenditure";
-    case FUND_RESOURCE_TOTAL = "fund_total_resource_expenditure";
-    case FUND_TOTAL = "fund_total_expenditure";
+    case FUND_CAPITAL_EXPENDITURE = "fex";
+    case FUND_CAPITAL_EXPENDITURE_BASELINE = "feb";
+    case FUND_CAPITAL_EXPENDITURE_WITH_OVER_PROGRAMMING = "fop";
+    case FUND_CAPITAL_EXPENDITURE_WITH_OVER_PROGRAMMING_BASELINE = "fob";
+    case FUND_CAPITAL_LOCAL_CONTRIBUTION = "flc";
+    case FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION = "ftp";
+    case FUND_CAPITAL_LOCAL_CONTRIBUTION_BASELINE = "flb";
+    case FUND_CAPITAL_OTHER = "fot";
+    case FUND_RESOURCE_EXPENDITURE = "fre";
 
-    case PROJECT_CAPITAL_SPEND_FUND = "project_capital_spend_fund";
-    case PROJECT_CAPITAL_SPEND_ALL_SOURCES = "project_capital_spend_all_sources";
+    case PROJECT_CAPITAL_SPEND_FUND = "psp";
+    case PROJECT_CAPITAL_SPEND_ALL_SOURCES = "psa";
+
+    public function isBaseline(): bool
+    {
+        return in_array($this, [
+            self::FUND_CAPITAL_EXPENDITURE_BASELINE,
+            self::FUND_CAPITAL_EXPENDITURE_WITH_OVER_PROGRAMMING_BASELINE,
+            self::FUND_CAPITAL_LOCAL_CONTRIBUTION_BASELINE,
+        ]);
+    }
 
     /**
      * @return array<ExpenseType>
@@ -24,8 +33,8 @@ enum ExpenseType: string
     {
         // $fund not currently used to decided fields, as we only really have one fund
         return match($fund) {
-            Fund::CRSTS => self::filterByPrefix('fund_'),
-            Fund::BSIP => throw new \RuntimeException('Not yet supported'),
+            Fund::CRSTS1 => self::filterByPrefix('FUND_'),
+            Fund::CRSTS2, Fund::BSIP => throw new \RuntimeException('Not yet supported'),
         };
     }
 
@@ -35,8 +44,8 @@ enum ExpenseType: string
     public static function filterForProject(Fund $fund): array
     {
         return match($fund) {
-            Fund::CRSTS => self::filterByPrefix('project_'),
-            Fund::BSIP => throw new \RuntimeException('Not yet supported'),
+            Fund::CRSTS1 => self::filterByPrefix('PROJECT_'),
+            Fund::CRSTS2, Fund::BSIP => throw new \RuntimeException('Not yet supported'),
         };
     }
 
@@ -46,7 +55,7 @@ enum ExpenseType: string
     protected static function filterByPrefix(string $prefix): array
     {
         return array_values(
-            array_filter(self::cases(), fn(\UnitEnum $e) => str_starts_with($e->value, $prefix))
+            array_filter(self::cases(), fn(\UnitEnum $e) => str_starts_with($e->name, $prefix))
         );
     }
 }

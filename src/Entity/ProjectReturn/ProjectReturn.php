@@ -2,6 +2,7 @@
 
 namespace App\Entity\ProjectReturn;
 
+use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\CompletionStatus;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
@@ -18,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
 #[ORM\DiscriminatorMap([
-    Fund::CRSTS->value => CrstsProjectReturn::class,
+    Fund::CRSTS1->value => CrstsProjectReturn::class,
 ])]
 abstract class ProjectReturn
 {
@@ -67,17 +68,22 @@ abstract class ProjectReturn
 
     // --------------------------------------------------------------------------------
 
-    public function getProjectReturnSectionStatusForSection(ExpenseType|ProjectLevelSection $enum): ?ProjectReturnSectionStatus
+    public function getProjectReturnSectionStatusForName(string $name): ?ProjectReturnSectionStatus
     {
-        return $this->sectionStatuses->findFirst(fn(int $idx, ProjectReturnSectionStatus $status) => $status->getName() === $enum->name);
+        return $this->sectionStatuses->findFirst(fn(int $idx, ProjectReturnSectionStatus $status) => $status->getName() === $name);
     }
 
     public function getStatusForSection(
-        ExpenseType|ProjectLevelSection $enum,
+        DivisionConfiguration|ProjectLevelSection $section,
         CompletionStatus             $default = CompletionStatus::NOT_STARTED
     ): CompletionStatus
     {
-        $projectReturnSectionStatus = $this->getProjectReturnSectionStatusForSection($enum);
+        $name = match($section::class) {
+            DivisionConfiguration::class => $section->getTitle(),
+            ProjectLevelSection::class => $section->name,
+        };
+
+        $projectReturnSectionStatus = $this->getProjectReturnSectionStatusForName($name);
 
         return $projectReturnSectionStatus ?
             $projectReturnSectionStatus->getStatus() :

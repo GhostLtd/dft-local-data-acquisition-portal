@@ -23,13 +23,11 @@
 
     <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
     {{- taskListStart() -}}
-    {%- for expense in fundLevelExpenses -%}
-        {%- set status = fundReturn.getStatusForSection(expense) -%}
+    {%- for division in expenseDivisions -%}
+        {%- set status = fundReturn.getStatusForSection(division) -%}
         {{- taskListItem({
-            title: {
-                text: "enum.expense_type.#{expense.value}" | trans({fund: fundReturn.fund.name}),
-            },
-            href: '#',
+            title: {text: division.title},
+            href: path('app_fund_return_expense_edit', {fundReturnId: fundReturn.id, divisionSlug: division.slug}),
             status: {tag: {
                 text: "tags.#{status.value}.name" | trans,
                 classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),

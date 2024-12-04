@@ -2,15 +2,12 @@
 
 namespace App\Entity\ProjectFund;
 
-use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\Fund;
-use App\Entity\Enum\TransportMode;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\ProjectReturn;
 use App\Entity\Traits\IdTrait;
 use App\Repository\ProjectFund\ProjectFundRepository;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectFundRepository::class)]
@@ -18,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
 #[ORM\DiscriminatorMap([
     Fund::BSIP->value => BsipProjectFund::class,
-    Fund::CRSTS->value => CrstsProjectFund::class,
+    Fund::CRSTS1->value => CrstsProjectFund::class,
 ])]
 abstract class ProjectFund
 {

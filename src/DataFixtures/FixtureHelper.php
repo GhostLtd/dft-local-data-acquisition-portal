@@ -12,8 +12,7 @@ use App\DataFixtures\Definition\ProjectDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
 use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
 use App\Entity\Enum\Fund;
-use App\Entity\Expense\ExpenseEntry;
-use App\Entity\Expense\ExpenseSeries;
+use App\Entity\ExpenseEntry;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\ProjectFund\BenefitCostRatio;
@@ -129,7 +128,7 @@ class FixtureHelper
         $this->persist([$fundAward]);
 
         foreach($fundAwardDefinition->getReturns() as $returnDefinition) {
-            if ($fund === Fund::CRSTS && $returnDefinition instanceof CrstsFundReturnDefinition) {
+            if ($fund === Fund::CRSTS1 && $returnDefinition instanceof CrstsFundReturnDefinition) {
                 $return = $this->createCrstsFundReturn($returnDefinition, $projects);
             } else {
                 throw new \RuntimeException("Unsupported returnDefinition type for fund {$fund->value}: ".$returnDefinition::class);
@@ -187,8 +186,7 @@ class FixtureHelper
             ->setRetained($definition->isRetained())
             ->setPreviouslyTcf($definition->getPreviouslyTcf())
             ->setFundedMostlyAs($definition->getFundedMostlyAs())
-            ->setBenefitCostRatio($bcr)
-            ->setPhase($definition->getPhase());
+            ->setBenefitCostRatio($bcr);
 
         $this->persist([$projectFund]);
 
@@ -214,7 +212,7 @@ class FixtureHelper
         ;
 
         foreach($definition->getExpenses() as $expenseDefinition) {
-            $return->addExpense($this->createExpenseSeries($expenseDefinition));
+            $return->addExpense($this->createExpense($expenseDefinition));
         }
 
         foreach($definition->getProjectReturns() as $projectName => $projectReturnDefinition) {
@@ -271,7 +269,7 @@ class FixtureHelper
         }
 
         foreach($definition->getExpenses() as $expenseDefinition) {
-            $return->addExpense($this->createExpenseSeries($expenseDefinition));
+            $return->addExpense($this->createExpense($expenseDefinition));
         }
 
         $this->persist([$return]);
@@ -290,24 +288,17 @@ class FixtureHelper
         return $milestone;
     }
 
-    public function createExpenseSeries(ExpenseDefinition $definition): ExpenseSeries
+    public function createExpense(ExpenseDefinition $definition): ExpenseEntry
     {
-        $type = $definition->getType();
+        $expense = (new ExpenseEntry())
+            ->setType($definition->getType())
+            ->setDivision($definition->getDivision())
+            ->setSubDivision($definition->getSubDivision())
+            ->setForecast($definition->isForecast())
+            ->setValue($definition->getValue());
 
-        $expenseSeries = (new ExpenseSeries())
-            ->setType($type);
+        $this->persist([$expense]);
 
-        $this->persist([$expenseSeries]);
-
-        foreach($definition->getEntries() as $description => $value) {
-            $entry = (new ExpenseEntry())
-                ->setDescription($description)
-                ->setValue($value);
-
-            $expenseSeries->addEntry($entry);
-            $this->persist([$entry]);
-        }
-
-        return $expenseSeries;
+        return $expense;
     }
 }
