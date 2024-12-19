@@ -47,7 +47,7 @@ class FundReturnController extends AbstractController
 
         return $this->render('frontend/fund_return.html.twig', [
             'breadcrumbBuilder' => $breadcrumbBuilder,
-            'expenseDivisions' => $fundReturn->getExpenseDivisionConfigurations(),
+            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
             'fundLevelSections' => FundLevelSection::filterForFund($fund),
             'fundReturn' => $fundReturn,
             'projectFunds' => $projectFunds
@@ -110,7 +110,7 @@ class FundReturnController extends AbstractController
         ExpensesTableHelper        $tableHelper,
     ): Response
     {
-        $divisionConfiguration = $fundReturn->findExpenseDivisionConfigurationBySlug($divisionSlug);
+        $divisionConfiguration = $fundReturn->findDivisionConfigurationBySlug($divisionSlug);
 
         if (!$divisionConfiguration) {
             throw new NotFoundHttpException();

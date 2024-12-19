@@ -3,7 +3,7 @@
 namespace App\Utility;
 
 use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
-use App\Entity\Config\ExpenseDivision\SubDivisionConfiguration;
+use App\Entity\Config\ExpenseDivision\ColumnConfiguration;
 use App\Entity\Config\ExpenseRow\CategoryConfiguration;
 use App\Entity\Config\ExpenseRow\RowGroupInterface;
 use App\Entity\Config\ExpenseRow\TotalConfiguration;
@@ -76,29 +76,29 @@ class CrstsHelper
         foreach(range(2022, $endYear) as $year) {
             $nextYear = substr(strval($year + 1), 2);
 
-            $subDivisionConfigurations = [];
+            $columnConfigurations = [];
 
             foreach([1, 2, 3, 4] as $quarter) {
                 $isFuture = ($year > $returnYear) || ($year === $returnYear && $quarter > $returnQuarter);
 
                 if (!$isFuture) {
-                    $subDivisionConfigurations[] =
-                        new SubDivisionConfiguration("Q{$quarter}", isForecast: false);
+                    $columnConfigurations[] =
+                        new ColumnConfiguration("Q{$quarter}", isForecast: false);
                 }
             }
 
-            if ($returnQuarter === 4 && empty($subDivisionConfigurations)) {
+            if ($returnQuarter === 4 && empty($columnConfigurations)) {
                 // The yearly forecast is only shown if:
                 //   a) The return is for Q4
                 //   b) The year has no active quarters in it
 
-                $subDivisionConfigurations[] =
-                    new SubDivisionConfiguration('Yearly forecast', isForecast: true);
+                $columnConfigurations[] =
+                    new ColumnConfiguration('Yearly forecast', isForecast: true);
             }
 
 
-            if (count($subDivisionConfigurations) > 0) {
-                $divisionConfiguration[] = new DivisionConfiguration("{$year}/{$nextYear}", $subDivisionConfigurations);
+            if (count($columnConfigurations) > 0) {
+                $divisionConfiguration[] = new DivisionConfiguration("{$year}/{$nextYear}", $columnConfigurations);
             }
         }
 
@@ -106,7 +106,7 @@ class CrstsHelper
             // This is a forecast and only added in Q4
             $postTitle = "Post-{$endYear}/" . substr(strval($endYear + 1), 2);
             $divisionConfiguration[] = new DivisionConfiguration($postTitle, [
-                new SubDivisionConfiguration("Forecast", isForecast: true),
+                new ColumnConfiguration("Forecast", isForecast: true),
             ]);
         }
 

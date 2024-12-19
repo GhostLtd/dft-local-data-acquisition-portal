@@ -11,9 +11,9 @@ use App\Entity\ProjectReturn\ProjectReturnSectionStatus;
 class ProjectReturnSectionUpdateEvent extends ReturnSectionUpdateEvent
 {
     public function __construct(
-        protected ProjectReturn                   $projectReturn,
+        protected ProjectReturn                             $projectReturn,
         protected DivisionConfiguration|ProjectLevelSection $section,
-        array                                     $options,
+        array                                               $options,
     )
     {
         parent::__construct($options);

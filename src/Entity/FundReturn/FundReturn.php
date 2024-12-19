@@ -171,7 +171,7 @@ abstract class FundReturn
     abstract public function getProjectReturns(): Collection;
 
     /** @return array<int, DivisionConfiguration> */
-    abstract public function getExpenseDivisionConfigurations(): array;
+    abstract public function getDivisionConfigurations(): array;
 
     public function getProjectReturnForProjectFund(ProjectFund $projectFund): ?ProjectReturn
     {
@@ -184,11 +184,11 @@ abstract class FundReturn
         return null;
     }
 
-    public function findExpenseDivisionConfigurationBySlug(string $slug): ?DivisionConfiguration
+    public function findDivisionConfigurationBySlug(string $slug): ?DivisionConfiguration
     {
-        foreach($this->getExpenseDivisionConfigurations() as $expenseDivisionConfiguration) {
-            if ($expenseDivisionConfiguration->getSlug() === $slug) {
-                return $expenseDivisionConfiguration;
+        foreach($this->getDivisionConfigurations() as $divisionConfiguration) {
+            if ($divisionConfiguration->getSlug() === $slug) {
+                return $divisionConfiguration;
             }
         }
 

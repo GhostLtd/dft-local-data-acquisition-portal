@@ -45,7 +45,7 @@ class ProjectReturnController extends AbstractController
             'fundReturn' => $fundReturn,
             'projectReturn' => $projectReturn,
             'projectLevelSectionsConfiguration' => ProjectLevelSection::getConfigurationForFund($fund),
-            'expenseDivisions' => $fundReturn->getExpenseDivisionConfigurations(),
+            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
         ]);
     }
 

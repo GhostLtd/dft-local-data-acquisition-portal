@@ -86,7 +86,7 @@ class ExpensesTableHelper
             new Header(['colspan' => 2])
         ];
 
-        foreach($this->divisionConfiguration->getSubDivisionConfigurations() as $subDiv) {
+        foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
             $forecastOrActual = $subDiv->isForecast() ? 'forecast' : 'actual';
             $cells[] = new Header([
                 'text' => $subDiv->getTitle(),
@@ -144,13 +144,13 @@ class ExpensesTableHelper
                         throw new \RuntimeException('Unexpected row configuration');
                     }
 
-                    $subDivisionConfigurations = $this->divisionConfiguration->getSubDivisionConfigurations();
+                    $columnConfigurations = $this->divisionConfiguration->getColumnConfigurations();
 
                     $cells[] = new Header([
                         'text' => $title,
                     ]);
 
-                    foreach($subDivisionConfigurations as $subDiv) {
+                    foreach($columnConfigurations as $subDiv) {
                         $colSlug = $subDiv->getSlug();
 
                         $cells[] = new Cell([
@@ -189,7 +189,7 @@ class ExpensesTableHelper
                     new Header(['text' => $title, 'colspan' => 2]),
                 ];
 
-                foreach($this->divisionConfiguration->getSubDivisionConfigurations() as $subDiv) {
+                foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
                     $colSlug = $subDiv->getSlug();
 
                     $cells[] = new Cell([

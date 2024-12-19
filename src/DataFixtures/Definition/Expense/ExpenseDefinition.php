@@ -9,7 +9,7 @@ class ExpenseDefinition
     public function __construct(
         protected ExpenseType $type,
         protected string      $division,
-        protected string      $subDivision,
+        protected string      $column,
         protected bool        $forecast,
         protected ?string     $value,
     ) {}
@@ -24,9 +24,9 @@ class ExpenseDefinition
         return $this->division;
     }
 
-    public function getSubDivision(): string
+    public function getColumn(): string
     {
-        return $this->subDivision;
+        return $this->column;
     }
 
     public function isForecast(): bool

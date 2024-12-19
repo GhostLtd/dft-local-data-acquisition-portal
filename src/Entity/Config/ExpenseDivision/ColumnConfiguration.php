@@ -4,7 +4,7 @@ namespace App\Entity\Config\ExpenseDivision;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
-class SubDivisionConfiguration
+class ColumnConfiguration
 {
     public function __construct(
         protected string $title,

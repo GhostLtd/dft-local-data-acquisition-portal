@@ -57,6 +57,10 @@ function initForForm(form, autoCommas) {
     // Iterate all cells, updating their cell value and then hook a change listener for editable cells
     for(let i=0; i<cells.length; i++) {
         const cell = cells[i]
+        if (cell.attributes.getNamedItem('type').value !== 'text') {
+            continue;
+        }
+
         updateCellTotal(cell)
 
         let isDisabled = (cell.attributes.getNamedItem('disabled')?.value === '1');

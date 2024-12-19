@@ -210,7 +210,7 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     /**
      * @return array<int, DivisionConfiguration>
      */
-    public function getExpenseDivisionConfigurations(): array
+    public function getDivisionConfigurations(): array
     {
         return CrstsHelper::getExpenseDivisionConfigurations($this->getYear(), $this->getQuarter());
     }

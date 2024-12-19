@@ -2,19 +2,18 @@
 
 namespace App\Entity\Config\ExpenseDivision;
 
-use App\Entity\Config\ExpenseDivision\SubDivisionConfiguration;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
-// Divisions map to column sections on the spreadsheet (e.g. 2022/23)
-// SubDivisions then map to the sub-columns on the spreadsheet (e.g. Q1)
+// Divisions map to groupings of columns on the spreadsheet (e.g. 2022/23)
+// Columns then map to the individual columns on the spreadsheet (e.g. Q1)
 class DivisionConfiguration
 {
     /**
-     * @param array<int, SubDivisionConfiguration> $subDivisionConfigurations
+     * @param array<int, ColumnConfiguration> $columnConfigurations
      */
     public function __construct(
         protected string $title,
-        protected array  $subDivisionConfigurations,
+        protected array  $columnConfigurations,
     ) {}
 
     public function getTitle(): string
@@ -29,15 +28,15 @@ class DivisionConfiguration
     }
 
     /**
-     * @return array<int, SubDivisionConfiguration>
+     * @return array<int, ColumnConfiguration>
      */
-    public function getSubDivisionConfigurations(): array
+    public function getColumnConfigurations(): array
     {
-        return $this->subDivisionConfigurations;
+        return $this->columnConfigurations;
     }
 
     public function shouldHaveTotal(): bool
     {
-        return count($this->getSubDivisionConfigurations()) > 1;
+        return count($this->getColumnConfigurations()) > 1;
     }
 }

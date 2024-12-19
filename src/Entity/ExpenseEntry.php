@@ -19,8 +19,8 @@ class ExpenseEntry
     #[ORM\Column(length: 16)]
     private ?string $division = null;
 
-    #[ORM\Column(length: 16)]
-    private ?string $subDivision = null;
+    #[ORM\Column(name: 'col', length: 16)]
+    private ?string $column = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
     private ?string $value = null;
@@ -50,14 +50,14 @@ class ExpenseEntry
         return $this;
     }
 
-    public function getSubDivision(): ?string
+    public function getColumn(): ?string
     {
-        return $this->subDivision;
+        return $this->column;
     }
 
-    public function setSubDivision(string $subDivision): static
+    public function setColumn(string $column): static
     {
-        $this->subDivision = $subDivision;
+        $this->column = $column;
         return $this;
     }
 

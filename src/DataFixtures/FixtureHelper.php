@@ -293,7 +293,7 @@ class FixtureHelper
         $expense = (new ExpenseEntry())
             ->setType($definition->getType())
             ->setDivision($definition->getDivision())
-            ->setSubDivision($definition->getSubDivision())
+            ->setColumn($definition->getColumn())
             ->setForecast($definition->isForecast())
             ->setValue($definition->getValue());
 

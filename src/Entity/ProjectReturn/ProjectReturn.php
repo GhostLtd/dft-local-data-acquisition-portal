@@ -75,7 +75,7 @@ abstract class ProjectReturn
 
     public function getStatusForSection(
         DivisionConfiguration|ProjectLevelSection $section,
-        CompletionStatus             $default = CompletionStatus::NOT_STARTED
+        CompletionStatus                          $default = CompletionStatus::NOT_STARTED
     ): CompletionStatus
     {
         $name = match($section::class) {

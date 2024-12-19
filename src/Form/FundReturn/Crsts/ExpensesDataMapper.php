@@ -42,7 +42,7 @@ class ExpensesDataMapper implements DataMapperInterface
             $divSlug = $expense->getDivision();
             $expenseValue = $expense->getType()->value;
 
-            $key = "expense__{$divSlug}__{$expenseValue}__{$expense->getSubDivision()}";
+            $key = "expense__{$divSlug}__{$expenseValue}__{$expense->getColumn()}";
 
             if (isset($forms[$key])) {
                 $forms[$key]->setData($expense->getValue());
@@ -87,7 +87,7 @@ class ExpensesDataMapper implements DataMapperInterface
                 if (!$expenseEntry) {
                     $expenseEntry = (new ExpenseEntry())
                         ->setDivision($divSlug)
-                        ->setSubDivision($subSlug)
+                        ->setColumn($subSlug)
                         ->setType($expenseType);
 
                     $viewData->addExpense($expenseEntry);
@@ -112,7 +112,7 @@ class ExpensesDataMapper implements DataMapperInterface
                 continue;
             }
 
-            $key = "expense__{$divSlug}__{$expense->getType()->value}__{$expense->getSubDivision()}";
+            $key = "expense__{$divSlug}__{$expense->getType()->value}__{$expense->getColumn()}";
             if (!isset($touchedExpenses[$key])) {
                 $viewData->removeExpense($expense);
             }
@@ -124,7 +124,7 @@ class ExpensesDataMapper implements DataMapperInterface
     {
         foreach($viewData->getExpenses() as $expense) {
             if ($expense->getDivision() === $divSlug &&
-                $expense->getSubDivision() === $subSlug &&
+                $expense->getColumn() === $subSlug &&
                 $expense->getType() === $expenseType
             ) {
                 return $expense;
