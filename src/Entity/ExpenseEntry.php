@@ -7,6 +7,7 @@ use App\Entity\Traits\IdTrait;
 use App\Repository\ExpenseEntryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 
 #[ORM\Entity(repositoryClass: ExpenseEntryRepository::class)]
 class ExpenseEntry
@@ -22,6 +23,7 @@ class ExpenseEntry
     #[ORM\Column(name: 'col', length: 16)]
     private ?string $column = null;
 
+    // N.B. See ExpenseValidator
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
     private ?string $value = null;
 

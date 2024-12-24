@@ -10,12 +10,15 @@ use App\Entity\ExpensesContainerInterface;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Utility\CrstsHelper;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
+use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Callback;
 
 #[ORM\Entity(repositoryClass: CrstsFundReturnRepository::class)]
+#[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 {
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -45,7 +48,7 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     /**
      * @var Collection<int, ExpenseEntry>
      */
-    #[ORM\ManyToMany(targetEntity: ExpenseEntry::class)]
+    #[ORM\ManyToMany(targetEntity: ExpenseEntry::class)] // N.B. Validator is at class level
     private Collection $expenses;
 
     /**

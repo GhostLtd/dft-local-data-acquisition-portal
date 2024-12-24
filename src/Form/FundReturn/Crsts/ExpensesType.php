@@ -3,6 +3,7 @@
 namespace App\Form\FundReturn\Crsts;
 
 use App\Entity\Enum\ExpenseType;
+use App\Entity\ExpensesContainerInterface;
 use App\Form\ReturnBaseType;
 use App\Utility\ExpensesTableHelper;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
@@ -58,7 +59,9 @@ class ExpensesType extends AbstractType
                 'data-auto-total' => '1',
                 'data-auto-commas' => '1',
                 'class' => 'expenses',
-            ]);
+            ])
+            ->setDefault('validation_groups', ['expenses'])
+            ->setDefault('data_class', ExpensesContainerInterface::class);
     }
 
     public function getParent(): string
