@@ -120,7 +120,7 @@ class FundReturnController extends AbstractController
 
         $expensesTableHelper = $tableHelper
             ->setDivisionConfiguration($divisionConfiguration)
-            ->setRowGroupConfigurations(CrstsHelper::getExpenseRowsConfiguration())
+            ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
         $form = $this->createForm(ExpensesType::class, $fundReturn, [

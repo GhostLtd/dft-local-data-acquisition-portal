@@ -94,7 +94,7 @@ class ExpensesDataMapper implements DataMapperInterface
                     $this->entityManager->persist($expenseEntry);
                 }
 
-                // Remove commas which get inserted by the javascript for readability reasons
+                // Remove commas, which get inserted by the javascript to enhance readability
                 $value = str_replace(',', '', $value);
 
                 $expenseEntry
@@ -116,7 +116,6 @@ class ExpensesDataMapper implements DataMapperInterface
             if (!isset($touchedExpenses[$key])) {
                 $viewData->removeExpense($expense);
             }
-
         }
     }
 

@@ -30,7 +30,7 @@ class CrstsHelper
     /**
      * @return array<int, RowGroupInterface>
      */
-    public static function getExpenseRowsConfiguration(): array
+    public static function getFundExpenseRowsConfiguration(): array
     {
         return [
             new CategoryConfiguration(
