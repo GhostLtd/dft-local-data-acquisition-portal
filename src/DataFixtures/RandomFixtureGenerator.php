@@ -290,8 +290,8 @@ class RandomFixtureGenerator
                 foreach($divisionConfiguration->getColumnConfigurations() as $columnConfiguration) {
                     $expenses[] = new ExpenseDefinition(
                         $expenseType,
-                        $divisionConfiguration->getSlug(),
-                        $columnConfiguration->getSlug(),
+                        $divisionConfiguration->getKey(),
+                        $columnConfiguration->getKey(),
                         $columnConfiguration->isForecast(),
                         $this->faker->numberBetween(1_000_000, 99_000_000)
                     );

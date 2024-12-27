@@ -39,10 +39,10 @@ class ExpensesDataMapper implements DataMapperInterface
         $collection = $viewData->getExpenses();
 
         foreach($collection as $expense) {
-            $divSlug = $expense->getDivision();
+            $divKey = $expense->getDivision();
             $expenseValue = $expense->getType()->value;
 
-            $key = "expense__{$divSlug}__{$expenseValue}__{$expense->getColumn()}";
+            $key = "expense__{$divKey}__{$expenseValue}__{$expense->getColumn()}";
 
             if (isset($forms[$key])) {
                 $forms[$key]->setData($expense->getValue());
@@ -63,7 +63,7 @@ class ExpensesDataMapper implements DataMapperInterface
 
         $touchedExpenses = [];
 
-        $divSlug = $this->tableHelper->getDivisionConfiguration()->getSlug();
+        $divKey = $this->tableHelper->getDivisionConfiguration()->getKey();
 
         // Update the expenses collection based upon the form data
         foreach($this->tableHelper->getAllCells() as $cell) {
@@ -73,8 +73,8 @@ class ExpensesDataMapper implements DataMapperInterface
                 continue;
             }
 
-            ['sub_division' => $subSlug, 'expense_type' => $expenseType, 'is_forecast' => $isForecast] = $cell->getAttributes();
-            $expenseEntry = $this->findExpenseEntry($viewData, $divSlug, $subSlug, $expenseType);
+            ['sub_division' => $subKey, 'expense_type' => $expenseType, 'is_forecast' => $isForecast] = $cell->getAttributes();
+            $expenseEntry = $this->findExpenseEntry($viewData, $divKey, $subKey, $expenseType);
 
             $value = $forms[$key]?->getData();
 
@@ -86,8 +86,8 @@ class ExpensesDataMapper implements DataMapperInterface
             } else {
                 if (!$expenseEntry) {
                     $expenseEntry = (new ExpenseEntry())
-                        ->setDivision($divSlug)
-                        ->setColumn($subSlug)
+                        ->setDivision($divKey)
+                        ->setColumn($subKey)
                         ->setType($expenseType);
 
                     $viewData->addExpense($expenseEntry);
@@ -108,22 +108,22 @@ class ExpensesDataMapper implements DataMapperInterface
         // Remove any expenseEntries for this div (e.g. 2022/23) that we haven't updated
         // (another way: any expenseEntries that aren't expected base upon the given divisionConfiguration + types)
         foreach($viewData->getExpenses() as $expense) {
-            if ($expense->getDivision() !== $divSlug) {
+            if ($expense->getDivision() !== $divKey) {
                 continue;
             }
 
-            $key = "expense__{$divSlug}__{$expense->getType()->value}__{$expense->getColumn()}";
+            $key = "expense__{$divKey}__{$expense->getType()->value}__{$expense->getColumn()}";
             if (!isset($touchedExpenses[$key])) {
                 $viewData->removeExpense($expense);
             }
         }
     }
 
-    protected function findExpenseEntry(ExpensesContainerInterface $viewData, string $divSlug, string $subSlug, ExpenseType $expenseType): ?ExpenseEntry
+    protected function findExpenseEntry(ExpensesContainerInterface $viewData, string $divKey, string $column, ExpenseType $expenseType): ?ExpenseEntry
     {
         foreach($viewData->getExpenses() as $expense) {
-            if ($expense->getDivision() === $divSlug &&
-                $expense->getColumn() === $subSlug &&
+            if ($expense->getDivision() === $divKey &&
+                $expense->getColumn() === $column &&
                 $expense->getType() === $expenseType
             ) {
                 return $expense;

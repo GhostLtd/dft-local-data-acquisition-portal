@@ -122,7 +122,7 @@ class CrstsHelper
 
             if (count($columnConfigurations) > 0) {
                 $divisionConfiguration[] = new DivisionConfiguration(
-                    "{$year}/{$nextYear}",
+                    "{$year}-{$nextYear}",
                     $columnConfigurations,
                     label: new TranslatableMessage('forms.crsts.expenses.division_year_title', ['startYear' => $year, 'endYear' => $nextYear]),
                 );
@@ -131,12 +131,13 @@ class CrstsHelper
 
         if ($returnQuarter === 4) {
             // This is a forecast and only added in Q4
-            $endYearPlusOne = substr(strval($endYear + 1), 2);
-            $postTitle = "Post-{$endYear}/{$endYearPlusOne}";
-            $divisionConfiguration[] = new DivisionConfiguration($postTitle, [
-                new ColumnConfiguration("forecast", isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.forecast')),
-            ],
-                label: new TranslatableMessage('forms.crsts.expenses.division_post_title', ['startYear' => $endYear, 'endYear' => $endYearPlusOne])
+            $nextYear = substr(strval($endYear + 1), 2);
+            $divisionConfiguration[] = new DivisionConfiguration(
+                "post-{$endYear}-{$nextYear}",
+                [
+                    new ColumnConfiguration("forecast", isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.forecast'))
+                ],
+                label: new TranslatableMessage('forms.crsts.expenses.division_post_title', ['startYear' => $endYear, 'endYear' => $nextYear])
             );
         }
 

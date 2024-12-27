@@ -2,7 +2,6 @@
 
 namespace App\Entity\Config\ExpenseDivision;
 
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -14,20 +13,16 @@ class DivisionConfiguration
      * @param array<int, ColumnConfiguration> $columnConfigurations
      */
     public function __construct(
-        protected string                          $title,
-        protected array                           $columnConfigurations,
-        protected null|string|TranslatableMessage $label = null,
+        protected string                     $key,
+        protected array                      $columnConfigurations,
+        protected string|TranslatableMessage $label,
     ) {}
 
-    public function getTitle(): string
+    // This is used to index the values in the DB, in the expenses collection, and also as
+    // a slug in URLs, so needs to be suitable for both cases.
+    public function getKey(): string
     {
-        return $this->title;
-    }
-
-    public function getSlug(): string
-    {
-        $slugger = new AsciiSlugger();
-        return $slugger->slug(strtolower($this->title));
+        return $this->key;
     }
 
     /**
@@ -53,6 +48,6 @@ class DivisionConfiguration
             );
         }
 
-        return $this->label ?? $this->title;
+        return $this->label;
     }
 }

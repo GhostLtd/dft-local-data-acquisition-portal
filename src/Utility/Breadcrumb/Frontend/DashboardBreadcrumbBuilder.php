@@ -80,7 +80,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
                 'projectFundId' => $projectFund->getId(),
-                'divisionSlug' => $division->getSlug(),
+                'divisionKey' => $division->getKey(),
             ],
             text: $division->getLabel(),
         );
@@ -103,7 +103,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
         $this->addItem(
             'fund_return_expense_edit',
             'app_fund_return_expense_edit',
-            routeParameters: ['fundReturnId' => $fundReturn->getId(), 'divisionSlug' => $division->getSlug()],
+            routeParameters: ['fundReturnId' => $fundReturn->getId(), 'divisionKey' => $division->getKey()],
             text: $division->getLabel(),
         );
     }

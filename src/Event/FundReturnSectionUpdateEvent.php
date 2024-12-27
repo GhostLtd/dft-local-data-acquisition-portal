@@ -22,7 +22,7 @@ class FundReturnSectionUpdateEvent extends ReturnSectionUpdateEvent
     public function getOrCreateSectionStatus(): FundReturnSectionStatus
     {
         $name = match($this->section::class) {
-            DivisionConfiguration::class => $this->section->getTitle(),
+            DivisionConfiguration::class => $this->section->getKey(),
             FundLevelSection::class => $this->section->name,
         };
 

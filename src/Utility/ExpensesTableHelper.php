@@ -60,14 +60,14 @@ class ExpensesTableHelper
      */
     public function getTableRows(): array
     {
-        $cacheKey = $this->fund->value . '-' . $this->divisionConfiguration->getSlug();
+        $cacheKey = $this->fund->value . '-' . $this->divisionConfiguration->getKey();
         if (isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
 
         $tableRows = [];
 
-        $divSlug = $this->divisionConfiguration->getSlug();
+        $divKey = $this->divisionConfiguration->getKey();
 
         $totalTitle = new TranslatableMessage('forms.crsts.expenses.total');
         $extraParameters = ['fund' => new TranslatableMessage("enum.fund.{$this->fund->value}")];
@@ -122,20 +122,20 @@ class ExpensesTableHelper
 
                     // categories comprise rows of either expenses (e.g. "Q1 Actual") or totals
                     if ($row instanceof TotalConfiguration) {
-                        $rowSlug = $row->getSlug();
+                        $rowKey = $row->getKey();
                         $disabled = true;
                         $attributes = [
-                            'total_rows_to_sum' => $row->getSlugsOfRowsToSum(),
-                            'row_slug' => $rowSlug,
+                            'total_rows_to_sum' => $row->getKeysOfRowsToSum(),
+                            'row_key' => $rowKey,
                         ];
                         $isPossiblyADataCell = false;
                     } else if ($row instanceof ExpenseType) {
-                        $rowSlug = $row->value;
+                        $rowKey = $row->value;
                         $disabled = $row->isBaseline();
                         $attributes = [
-                            'division' => $divSlug,
+                            'division' => $divKey,
                             'expense_type' => $row,
-                            'row_slug' => $row->value,
+                            'row_key' => $row->value,
                         ];
                         $isPossiblyADataCell = true;
                     } else {
@@ -152,14 +152,14 @@ class ExpensesTableHelper
                     ]);
 
                     foreach($columnConfigurations as $subDiv) {
-                        $colSlug = $subDiv->getSlug();
+                        $colKey = $subDiv->getKey();
 
                         $cells[] = new Cell([
                             'disabled' => $disabled,
-                            'key' => "expense__{$divSlug}__{$rowSlug}__{$colSlug}",
+                            'key' => "expense__{$divKey}__{$rowKey}__{$colKey}",
                             'text' => $this->cellTitle($rowTitle, $subDiv->getLabel($extraParameters), $groupLabel)
                         ], array_merge($attributes, [
-                            'sub_division' => $colSlug,
+                            'sub_division' => $colKey,
                             'is_forecast' => $subDiv->isForecast(),
                             'is_data_cell' => $isPossiblyADataCell,
                         ]));
@@ -169,7 +169,7 @@ class ExpensesTableHelper
                     if ($this->divisionConfiguration->shouldHaveTotal()) {
                         $cells[] = new Cell([
                             'disabled' => true,
-                            'key' => "expense__{$divSlug}__{$rowSlug}__total",
+                            'key' => "expense__{$divKey}__{$rowKey}__total",
                             'text' => $this->cellTitle($rowTitle, $totalTitle, $groupLabel)
                         ], array_merge($attributes, [
                             'sub_division' => 'total',
@@ -183,7 +183,7 @@ class ExpensesTableHelper
                     }
                 }
             } else if ($group instanceof TotalConfiguration) {
-                $rowSlug = $group->getSlug();
+                $rowKey = $group->getKey();
                 $rowTitle = $group->getLabel($extraParameters);
 
                 $cells = [
@@ -191,18 +191,18 @@ class ExpensesTableHelper
                 ];
 
                 foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
-                    $colSlug = $subDiv->getSlug();
+                    $colKey = $subDiv->getKey();
 
                     $cells[] = new Cell([
                         'disabled' => true,
-                        'key' => "expense__{$rowSlug}__{$colSlug}",
+                        'key' => "expense__{$rowKey}__{$colKey}",
                         'text' => $this->cellTitle($rowTitle, $subDiv->getLabel($extraParameters))
                     ], [
-                        'sub_division' => $colSlug,
+                        'sub_division' => $colKey,
                         'is_forecast' => false,
                         'is_data_cell' => false,
-                        'total_rows_to_sum' => $group->getSlugsOfRowsToSum(),
-                        'row_slug' => $rowSlug,
+                        'total_rows_to_sum' => $group->getKeysOfRowsToSum(),
+                        'row_key' => $rowKey,
                     ]);
                 }
 
@@ -210,12 +210,12 @@ class ExpensesTableHelper
                 if ($this->divisionConfiguration->shouldHaveTotal()) {
                     $cells[] = new Cell([
                         'disabled' => true,
-                        'key' => "expense__{$rowSlug}__total",
+                        'key' => "expense__{$rowKey}__total",
                         'text' => $this->cellTitle($rowTitle, $totalTitle)
                     ], [
                         'sub_division' => 'total',
                         'is_row_total' => true,
-                        'row_slug' => $rowSlug,
+                        'row_key' => $rowKey,
                     ]);
                 }
 

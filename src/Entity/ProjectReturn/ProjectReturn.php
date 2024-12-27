@@ -79,7 +79,7 @@ abstract class ProjectReturn
     ): CompletionStatus
     {
         $name = match($section::class) {
-            DivisionConfiguration::class => $section->getTitle(),
+            DivisionConfiguration::class => $section->getKey(),
             ProjectLevelSection::class => $section->name,
         };
 
@@ -97,10 +97,10 @@ abstract class ProjectReturn
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;
 
-    public function findDivisionConfigurationBySlug(string $slug): ?DivisionConfiguration
+    public function findDivisionConfigurationByKey(string $key): ?DivisionConfiguration
     {
         foreach($this->getDivisionConfigurations() as $divisionConfiguration) {
-            if ($divisionConfiguration->getSlug() === $slug) {
+            if ($divisionConfiguration->getKey() === $key) {
                 return $divisionConfiguration;
             }
         }

@@ -27,7 +27,7 @@
         {%- set status = fundReturn.getStatusForSection(division) -%}
         {{- taskListItem({
             title: {text: division.label | trans},
-            href: path('app_fund_return_expense_edit', {fundReturnId: fundReturn.id, divisionSlug: division.slug}),
+            href: path('app_fund_return_expense_edit', {fundReturnId: fundReturn.id, divisionKey: division.key}),
             status: {tag: {
                 text: "tags.#{status.value}.name" | trans,
                 classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),

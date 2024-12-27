@@ -104,12 +104,12 @@ class ProjectReturnController extends AbstractController
         ]);
     }
 
-    #[Route('/fund-return/{fundReturnId}/project/{projectFundId}/expense/{divisionSlug}', name: 'app_project_return_expense_edit')]
+    #[Route('/fund-return/{fundReturnId}/project/{projectFundId}/expense/{divisionKey}', name: 'app_project_return_expense_edit')]
     public function projectReturnExpense(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
         EntityManagerInterface     $entityManager,
         EventDispatcherInterface   $eventDispatcher,
-        string                     $divisionSlug,
+        string                     $divisionKey,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn                 $fundReturn,
         #[MapEntity(expr: 'repository.findForDashboard(projectFundId)')]
@@ -119,7 +119,7 @@ class ProjectReturnController extends AbstractController
     ): Response
     {
         $projectReturn = $fundReturn->getProjectReturnForProjectFund($projectFund);
-        $divisionConfiguration = $projectReturn->findDivisionConfigurationBySlug($divisionSlug);
+        $divisionConfiguration = $projectReturn->findDivisionConfigurationByKey($divisionKey);
 
         if (!$divisionConfiguration) {
             throw new NotFoundHttpException();

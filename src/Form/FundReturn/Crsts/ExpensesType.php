@@ -35,7 +35,7 @@ class ExpensesType extends AbstractType
 
             $attributes = array_filter([
                 'data-col' => $cell->getAttribute('sub_division'),
-                'data-row' => $cell->getAttribute('row_slug'),
+                'data-row' => $cell->getAttribute('row_key'),
                 'data-total-sum-rows-in-column' => $rowsToSum,
                 'data-total-sum-entire-row' => $cell->getAttribute('is_row_total') ? '1' : null,
             ], fn(mixed $value): bool => $value !== null);

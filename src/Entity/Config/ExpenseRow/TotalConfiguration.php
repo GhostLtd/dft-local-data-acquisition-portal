@@ -3,34 +3,27 @@
 namespace App\Entity\Config\ExpenseRow;
 
 use App\Entity\Config\LabelProviderInterface;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class TotalConfiguration implements LabelProviderInterface, RowGroupInterface
 {
     /**
-     * @param array<int, string> $slugsOfRowsToSum
+     * @param array<int, string> $keysOfRowsToSum
      */
     public function __construct(
-        protected string $title,
-        protected array  $slugsOfRowsToSum,
+        protected string                          $key,
+        protected array                           $keysOfRowsToSum,
         protected null|string|TranslatableMessage $label,
     ) {}
 
-    public function getTitle(): string
+    public function getKey(): string
     {
-        return $this->title;
+        return $this->key;
     }
 
-    public function getSlug(): string
+    public function getKeysOfRowsToSum(): array
     {
-        $slugger = new AsciiSlugger();
-        return $slugger->slug(strtolower($this->title));
-    }
-
-    public function getSlugsOfRowsToSum(): array
-    {
-        return $this->slugsOfRowsToSum;
+        return $this->keysOfRowsToSum;
     }
 
     public function getLabel(array $extraParameters = []): string|TranslatableMessage
@@ -43,6 +36,6 @@ class TotalConfiguration implements LabelProviderInterface, RowGroupInterface
             );
         }
 
-        return $this->label ?? $this->title;
+        return $this->label ?? $this->key;
     }
 }

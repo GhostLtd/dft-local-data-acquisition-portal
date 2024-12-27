@@ -8,7 +8,7 @@ use App\Form\ProjectReturn\Crsts\ProjectDetailsType;
 use App\Form\ProjectReturn\Crsts\ProjectElementsType;
 use App\Form\ProjectReturn\Crsts\ProjectTransportModeType;
 
-// N.B. Not used in the database, but rather to key slugs + translation keys for project-level returns
+// N.B. Not used in the database, but rather as keys + translation keys for project-level returns
 enum ProjectLevelSection: string
 {
     case PROJECT_DETAILS = 'project_details'; // e.g. name, description, id, retained, cdel/rdel

@@ -154,7 +154,7 @@ abstract class FundReturn
     ): CompletionStatus
     {
         $name = match($section::class) {
-            DivisionConfiguration::class => $section->getTitle(),
+            DivisionConfiguration::class => $section->getKey(),
             FundLevelSection::class => $section->name,
         };
 
@@ -184,10 +184,10 @@ abstract class FundReturn
         return null;
     }
 
-    public function findDivisionConfigurationBySlug(string $slug): ?DivisionConfiguration
+    public function findDivisionConfigurationByKey(string $key): ?DivisionConfiguration
     {
         foreach($this->getDivisionConfigurations() as $divisionConfiguration) {
-            if ($divisionConfiguration->getSlug() === $slug) {
+            if ($divisionConfiguration->getKey() === $key) {
                 return $divisionConfiguration;
             }
         }

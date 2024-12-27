@@ -22,7 +22,7 @@ class ProjectReturnSectionUpdateEvent extends ReturnSectionUpdateEvent
     public function getOrCreateSectionStatus(): ProjectReturnSectionStatus
     {
         $name = match($this->section::class) {
-            DivisionConfiguration::class => $this->section->getTitle(),
+            DivisionConfiguration::class => $this->section->getKey(),
             ProjectLevelSection::class => $this->section->name,
         };
 

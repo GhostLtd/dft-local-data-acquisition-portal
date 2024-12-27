@@ -3,21 +3,20 @@
 namespace App\Entity\Config\ExpenseDivision;
 
 use App\Entity\Config\LabelProviderInterface;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 class ColumnConfiguration implements LabelProviderInterface
 {
     public function __construct(
-        protected string                            $title,
+        protected string                            $key,
         protected bool                              $isForecast,
         protected null|string|TranslatableInterface $label = null,
     ) {}
 
-    public function getTitle(): string
+    public function getKey(): string
     {
-        return $this->title;
+        return $this->key;
     }
 
     public function getLabel(array $extraParameters = []): string|TranslatableInterface
@@ -30,13 +29,7 @@ class ColumnConfiguration implements LabelProviderInterface
             );
         }
 
-        return $this->label ?? $this->title;
-    }
-
-    public function getSlug(): string
-    {
-        $slugger = new AsciiSlugger();
-        return $slugger->slug(strtolower($this->title));
+        return $this->label ?? $this->key;
     }
 
     public function isForecast(): bool

@@ -7,7 +7,7 @@ use App\Form\FundReturn\Crsts\LocalAndRdelType;
 use App\Form\FundReturn\Crsts\OverallProgressType;
 use App\Form\FundReturn\Crsts\QuarterlyProgressType;
 
-// N.B. Not used in the database, but rather to key slugs + translation keys for fund-level returns
+// N.B. Not used in the database, but rather as keys + translation keys for fund-level returns
 enum FundLevelSection: string
 {
     case OVERALL_PROGRESS = 'overall_progress';
