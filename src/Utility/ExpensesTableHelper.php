@@ -159,7 +159,7 @@ class ExpensesTableHelper
                             'key' => "expense__{$divKey}__{$rowKey}__{$colKey}",
                             'text' => $this->cellTitle($rowTitle, $subDiv->getLabel($extraParameters), $groupLabel)
                         ], array_merge($attributes, [
-                            'sub_division' => $colKey,
+                            'col_key' => $colKey,
                             'is_forecast' => $subDiv->isForecast(),
                             'is_data_cell' => $isPossiblyADataCell,
                         ]));
@@ -172,7 +172,7 @@ class ExpensesTableHelper
                             'key' => "expense__{$divKey}__{$rowKey}__total",
                             'text' => $this->cellTitle($rowTitle, $totalTitle, $groupLabel)
                         ], array_merge($attributes, [
-                            'sub_division' => 'total',
+                            'col_key' => 'total',
                             'is_row_total' => true,
                         ]));
                     }
@@ -198,11 +198,11 @@ class ExpensesTableHelper
                         'key' => "expense__{$rowKey}__{$colKey}",
                         'text' => $this->cellTitle($rowTitle, $subDiv->getLabel($extraParameters))
                     ], [
-                        'sub_division' => $colKey,
+                        'col_key' => $colKey,
+                        'row_key' => $rowKey,
                         'is_forecast' => false,
                         'is_data_cell' => false,
                         'total_rows_to_sum' => $group->getKeysOfRowsToSum(),
-                        'row_key' => $rowKey,
                     ]);
                 }
 
@@ -213,7 +213,7 @@ class ExpensesTableHelper
                         'key' => "expense__{$rowKey}__total",
                         'text' => $this->cellTitle($rowTitle, $totalTitle)
                     ], [
-                        'sub_division' => 'total',
+                        'col_key' => 'total',
                         'is_row_total' => true,
                         'row_key' => $rowKey,
                     ]);

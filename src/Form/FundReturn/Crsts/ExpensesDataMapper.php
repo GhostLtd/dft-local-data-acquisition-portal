@@ -73,7 +73,7 @@ class ExpensesDataMapper implements DataMapperInterface
                 continue;
             }
 
-            ['sub_division' => $subKey, 'expense_type' => $expenseType, 'is_forecast' => $isForecast] = $cell->getAttributes();
+            ['col_key' => $subKey, 'expense_type' => $expenseType, 'is_forecast' => $isForecast] = $cell->getAttributes();
             $expenseEntry = $this->findExpenseEntry($viewData, $divKey, $subKey, $expenseType);
 
             $value = $forms[$key]?->getData();
