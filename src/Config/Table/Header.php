@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Config\Table;
+namespace App\Config\Table;
 
 class Header extends AbstractCell
 {

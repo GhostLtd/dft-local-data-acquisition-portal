@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Entity\Config\ExpenseRow;
+namespace App\Config\ExpenseRow;
 
+use App\Config\ExpenseRow\RowGroupInterface;
 use App\Entity\Enum\ExpenseType;
 
 class AbstractRowContainer implements RowGroupInterface

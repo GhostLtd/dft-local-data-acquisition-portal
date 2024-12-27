@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Config\Table;
+namespace App\Config\Table;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

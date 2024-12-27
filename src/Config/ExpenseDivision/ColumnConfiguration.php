@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity\Config\ExpenseDivision;
+namespace App\Config\ExpenseDivision;
 
-use App\Entity\Config\LabelProviderInterface;
+use App\Config\LabelProviderInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

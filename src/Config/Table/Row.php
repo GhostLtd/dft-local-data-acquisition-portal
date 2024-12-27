@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Entity\Config\Table;
+namespace App\Config\Table;
 
+use App\Config\Table\AbstractElement;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class Row extends AbstractElement

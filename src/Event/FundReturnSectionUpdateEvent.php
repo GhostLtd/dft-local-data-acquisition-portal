@@ -2,7 +2,7 @@
 
 namespace App\Event;
 
-use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
+use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\CompletionStatus;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundReturn\FundReturn;

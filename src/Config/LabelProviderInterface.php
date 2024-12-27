@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Config;
+namespace App\Config;
 
 use Symfony\Contracts\Translation\TranslatableInterface;
 

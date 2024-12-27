@@ -2,12 +2,12 @@
 
 namespace App\Utility;
 
-use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
-use App\Entity\Config\ExpenseDivision\ColumnConfiguration;
-use App\Entity\Config\ExpenseRow\CategoryConfiguration;
-use App\Entity\Config\ExpenseRow\RowGroupInterface;
-use App\Entity\Config\ExpenseRow\TotalConfiguration;
-use App\Entity\Config\ExpenseRow\UngroupedConfiguration;
+use App\Config\ExpenseDivision\DivisionConfiguration;
+use App\Config\ExpenseDivision\ColumnConfiguration;
+use App\Config\ExpenseRow\CategoryConfiguration;
+use App\Config\ExpenseRow\RowGroupInterface;
+use App\Config\ExpenseRow\TotalConfiguration;
+use App\Config\ExpenseRow\UngroupedConfiguration;
 use App\Entity\Enum\ExpenseCategory;
 use App\Entity\Enum\ExpenseType;
 use Symfony\Component\Translation\TranslatableMessage;

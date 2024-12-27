@@ -2,7 +2,7 @@
 
 namespace App\Utility\Breadcrumb\Frontend;
 
-use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
+use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\ProjectLevelSection;
 use App\Entity\FundReturn\FundReturn;

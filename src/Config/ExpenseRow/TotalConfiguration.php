@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Entity\Config\ExpenseRow;
+namespace App\Config\ExpenseRow;
 
-use App\Entity\Config\LabelProviderInterface;
+use App\Config\ExpenseRow\RowGroupInterface;
+use App\Config\LabelProviderInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class TotalConfiguration implements LabelProviderInterface, RowGroupInterface

@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Entity\Config\Table;
+namespace App\Config\Table;
+
+use App\Config\Table\AbstractCell;
 
 class Cell extends AbstractCell
 {

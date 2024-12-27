@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-use App\Entity\Config\LabelProviderInterface;
+use App\Config\LabelProviderInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 
 enum ExpenseType: string implements LabelProviderInterface

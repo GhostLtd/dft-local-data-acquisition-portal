@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-use App\Entity\Config\ProjectLevelSectionConfiguration;
+use App\Config\ProjectLevelSectionConfiguration;
 use App\Form\ProjectReturn\Crsts\OverallFundingType;
 use App\Form\ProjectReturn\Crsts\ProjectDetailsType;
 use App\Form\ProjectReturn\Crsts\ProjectElementsType;

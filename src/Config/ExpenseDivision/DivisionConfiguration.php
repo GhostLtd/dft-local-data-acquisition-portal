@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Entity\Config\ExpenseDivision;
+namespace App\Config\ExpenseDivision;
 
+use App\Config\ExpenseDivision\ColumnConfiguration;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 

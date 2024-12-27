@@ -2,7 +2,7 @@
 
 namespace App\Entity\ProjectReturn;
 
-use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
+use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\OnTrackRating;

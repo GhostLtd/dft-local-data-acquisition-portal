@@ -2,7 +2,7 @@
 
 namespace App\Entity\FundReturn;
 
-use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
+use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\ExpenseEntry;

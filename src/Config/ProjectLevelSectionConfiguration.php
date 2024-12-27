@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Config;
+namespace App\Config;
 
 use App\Entity\Enum\ProjectLevelSection;
 use Symfony\Component\Form\FormInterface;

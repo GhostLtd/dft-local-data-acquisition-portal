@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Config\ExpenseRow;
+namespace App\Config\ExpenseRow;
 
 class UngroupedConfiguration extends AbstractRowContainer
 {
