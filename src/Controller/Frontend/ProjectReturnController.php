@@ -133,7 +133,7 @@ class ProjectReturnController extends AbstractController
             ->setRowGroupConfigurations(CrstsHelper::getProjectExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
-        $form = $this->createForm(ExpensesType::class, $fundReturn, [
+        $form = $this->createForm(ExpensesType::class, $projectReturn, [
             'cancel_url' => $cancelUrl,
             'completion_status' => $fundReturn->getStatusForSection($divisionConfiguration),
             'expenses_table_helper' => $expensesTableHelper,
