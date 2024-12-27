@@ -18,9 +18,9 @@ class InstanceOfExtension extends AbstractExtension
     {
         try {
             $reflClass = new \ReflectionClass($class);
-        } catch (\ReflectionException) {
+            return $reflClass->isInstance($object);
+        } catch (\ReflectionException|\TypeError) {
             return false;
         }
-        return $reflClass->isInstance($object);
     }
 }

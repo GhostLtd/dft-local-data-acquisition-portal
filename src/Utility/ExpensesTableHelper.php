@@ -11,7 +11,7 @@ use App\Entity\Config\Table\Header;
 use App\Entity\Config\Table\Row;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Creates the logical structure for an expenses table based upon the rowGroupConfiguration (row specification) and
@@ -32,10 +32,6 @@ class ExpensesTableHelper
     protected Fund $fund;
 
     protected array $cache = [];
-
-    public function __construct(
-        protected TranslatorInterface $translator,
-    ) {}
 
     /**
      * @param array<int, RowGroupInterface> $rowGroupConfigurations
@@ -63,7 +59,7 @@ class ExpensesTableHelper
      */
     public function getTableRows(): array
     {
-        $cacheKey = $this->fund->value.'-'.$this->divisionConfiguration->getSlug();
+        $cacheKey = $this->fund->value . '-' . $this->divisionConfiguration->getSlug();
         if (isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
@@ -72,12 +68,8 @@ class ExpensesTableHelper
 
         $divSlug = $this->divisionConfiguration->getSlug();
 
-        $fundName = $this->translator->trans("enum.fund.{$this->fund->value}");
-        $actualOrForecast = [
-            false => $this->translator->trans('forms.crsts.expenses.actual'),
-            true => $this->translator->trans('forms.crsts.expenses.forecast'),
-        ];
-        $totalTitle = $this->translator->trans('forms.crsts.expenses.total');
+        $totalTitle = new TranslatableMessage('forms.crsts.expenses.total');
+        $extraParameters = ['fund' => new TranslatableMessage("enum.fund.{$this->fund->value}")];
 
         // Table header row...
         // --------------------------------------------------------------------------------
@@ -87,12 +79,8 @@ class ExpensesTableHelper
         ];
 
         foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
-            $forecastOrActual = $subDiv->isForecast() ? 'forecast' : 'actual';
             $cells[] = new Header([
-                'text' => $subDiv->getTitle(),
-            ], [
-                'add_actual_or_forecast' => true,
-                'text' => $this->translator->trans("forms.crsts.expenses.{$forecastOrActual}")
+                'text' => $subDiv->getLabel($extraParameters),
             ]);
         }
 
@@ -110,11 +98,11 @@ class ExpensesTableHelper
             // groups comprise either categories (e.g. "CRSTS Capital") or totals
             if ($group instanceof CategoryConfiguration) {
                 foreach($group->getRowConfigurations() as $idx => $row) {
+                    $groupLabel = $group->getLabel($extraParameters);
+
                     if ($idx === 0) {
                         $cells[] = new Header([
-                            'text' => $this->translator->trans("enum.expense_category.{$group->getCategory()->value}", [
-                                'fund' => $fundName,
-                            ]),
+                            'text' => $groupLabel,
                             'rowspan' => $group->rowCount(),
                         ]);
                     }
@@ -122,7 +110,6 @@ class ExpensesTableHelper
                     // categories comprise rows of either expenses (e.g. "Q1 Actual") or totals
                     if ($row instanceof TotalConfiguration) {
                         $rowSlug = $row->getSlug();
-                        $title = $this->translator->trans($row->getTitle());
                         $disabled = true;
                         $attributes = [
                             'total_rows_to_sum' => $row->getSlugsOfRowsToSum(),
@@ -131,7 +118,6 @@ class ExpensesTableHelper
                         $isPossiblyADataCell = false;
                     } else if ($row instanceof ExpenseType) {
                         $rowSlug = $row->value;
-                        $title = $this->translator->trans("enum.expense_type.{$row->value}", ['fund' => $fundName]);
                         $disabled = $row->isBaseline();
                         $attributes = [
                             'division' => $divSlug,
@@ -146,8 +132,10 @@ class ExpensesTableHelper
 
                     $columnConfigurations = $this->divisionConfiguration->getColumnConfigurations();
 
+                    $rowTitle = $row->getLabel($extraParameters);
+
                     $cells[] = new Header([
-                        'text' => $title,
+                        'text' => $rowTitle,
                     ]);
 
                     foreach($columnConfigurations as $subDiv) {
@@ -156,7 +144,7 @@ class ExpensesTableHelper
                         $cells[] = new Cell([
                             'disabled' => $disabled,
                             'key' => "expense__{$divSlug}__{$rowSlug}__{$colSlug}",
-                            'text' => "{$title} {$subDiv->getTitle()} ({$actualOrForecast[$subDiv->isForecast()]})",
+                            'text' => $this->cellTitle($rowTitle, $subDiv->getLabel($extraParameters), $groupLabel)
                         ], array_merge($attributes, [
                             'sub_division' => $colSlug,
                             'is_forecast' => $subDiv->isForecast(),
@@ -169,7 +157,7 @@ class ExpensesTableHelper
                         $cells[] = new Cell([
                             'disabled' => true,
                             'key' => "expense__{$divSlug}__{$rowSlug}__total",
-                            'text' => "{$title} {$totalTitle}",
+                            'text' => $this->cellTitle($rowTitle, $totalTitle, $groupLabel)
                         ], array_merge($attributes, [
                             'sub_division' => 'total',
                             'is_row_total' => true,
@@ -183,10 +171,10 @@ class ExpensesTableHelper
                 }
             } else if ($group instanceof TotalConfiguration) {
                 $rowSlug = $group->getSlug();
-                $title = $this->translator->trans($group->getTitle());
+                $rowTitle = $group->getLabel($extraParameters);
 
                 $cells = [
-                    new Header(['text' => $title, 'colspan' => 2]),
+                    new Header(['text' => $rowTitle, 'colspan' => 2]),
                 ];
 
                 foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
@@ -195,7 +183,7 @@ class ExpensesTableHelper
                     $cells[] = new Cell([
                         'disabled' => true,
                         'key' => "expense__{$rowSlug}__{$colSlug}",
-                        'text' => "{$title} {$subDiv->getTitle()}",
+                        'text' => $this->cellTitle($rowTitle, $subDiv->getLabel($extraParameters))
                     ], [
                         'sub_division' => $colSlug,
                         'is_forecast' => false,
@@ -210,7 +198,7 @@ class ExpensesTableHelper
                     $cells[] = new Cell([
                         'disabled' => true,
                         'key' => "expense__{$rowSlug}__total",
-                        'text' => "{$title} {$totalTitle}",
+                        'text' => $this->cellTitle($rowTitle, $totalTitle)
                     ], [
                         'sub_division' => 'total',
                         'is_row_total' => true,
@@ -264,5 +252,18 @@ class ExpensesTableHelper
             fn(Row $row) => array_filter($row->getCells(), fn($cell) => $cell instanceof Cell),
             $this->getTableRows()
         ));
+    }
+
+    protected function cellTitle(
+        TranslatableMessage|string      $rowLabel,
+        TranslatableMessage|string      $columnLabel,
+        TranslatableMessage|string|null $groupLabel = null
+    ): TranslatableMessage
+    {
+        return new TranslatableMessage('forms.crsts.expenses.cell_title', [
+            'group' => $groupLabel ?? '',
+            'row' => $rowLabel,
+            'column' => $columnLabel,
+        ]);
     }
 }

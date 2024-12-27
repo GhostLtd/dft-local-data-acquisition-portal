@@ -3,6 +3,7 @@
 namespace App\Entity\Config\ExpenseRow;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class TotalConfiguration implements RowGroupInterface
 {
@@ -12,6 +13,7 @@ class TotalConfiguration implements RowGroupInterface
     public function __construct(
         protected string $title,
         protected array  $slugsOfRowsToSum,
+        protected null|string|TranslatableMessage $label,
     ) {}
 
     public function getTitle(): string
@@ -28,5 +30,18 @@ class TotalConfiguration implements RowGroupInterface
     public function getSlugsOfRowsToSum(): array
     {
         return $this->slugsOfRowsToSum;
+    }
+
+    public function getLabel(array $extraParameters = []): string|TranslatableMessage
+    {
+        if ($this->label instanceof TranslatableMessage && !empty($extraParameters)) {
+            return new TranslatableMessage(
+                $this->label->getMessage(),
+                array_merge($extraParameters, $this->label->getParameters()),
+                $this->label->getDomain()
+            );
+        }
+
+        return $this->label ?? $this->title;
     }
 }

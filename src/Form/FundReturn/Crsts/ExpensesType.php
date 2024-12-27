@@ -44,7 +44,6 @@ class ExpensesType extends AbstractType
                 'label' => $options['text'],
                 'disabled' => $options['disabled'] ?? null,
                 'label_attr' => ['class' => 'govuk-visually-hidden'],
-                'translation_domain' => false,
                 'attr' => $attributes,
             ]);
         }

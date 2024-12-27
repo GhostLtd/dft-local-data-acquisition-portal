@@ -3,6 +3,7 @@
 namespace App\Entity\Config\Table;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 
 abstract class AbstractCell extends AbstractElement
 {
@@ -16,6 +17,6 @@ abstract class AbstractCell extends AbstractElement
             ])
             ->setAllowedTypes('colspan', ['int', 'null'])
             ->setAllowedTypes('rowspan', ['int', 'null'])
-            ->setAllowedTypes('text', ['string']);
+            ->setAllowedTypes('text', ['string', TranslatableMessage::class]);
     }
 }

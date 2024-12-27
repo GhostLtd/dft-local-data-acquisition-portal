@@ -9,6 +9,7 @@ use App\Entity\Config\ExpenseRow\RowGroupInterface;
 use App\Entity\Config\ExpenseRow\TotalConfiguration;
 use App\Entity\Enum\ExpenseCategory;
 use App\Entity\Enum\ExpenseType;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class CrstsHelper
 {
@@ -32,11 +33,13 @@ class CrstsHelper
                 [
                     ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION,
                     ExpenseType::FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION,
-                    new TotalConfiguration('forms.crsts.expenses.sub_total', [
-                        ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION,
-                        ExpenseType::FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION,
-                    ]),
-                     ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION_BASELINE,
+                    new TotalConfiguration('SubTotal', [
+                            ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION,
+                            ExpenseType::FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION,
+                        ],
+                        new TranslatableMessage('forms.crsts.expenses.sub_total')
+                    ),
+                    ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION_BASELINE,
                 ]
             ),
             new CategoryConfiguration(
@@ -50,7 +53,7 @@ class CrstsHelper
                 ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION,
                 ExpenseType::FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION,
                 ExpenseType::FUND_CAPITAL_OTHER,
-            ]),
+            ], new TranslatableMessage('forms.crsts.expenses.total')),
             new CategoryConfiguration(
                 ExpenseCategory::FUND_RESOURCE,
                 [
@@ -83,7 +86,13 @@ class CrstsHelper
 
                 if (!$isFuture) {
                     $columnConfigurations[] =
-                        new ColumnConfiguration("Q{$quarter}", isForecast: false);
+                        new ColumnConfiguration(
+                            "Q{$quarter}",
+                            isForecast: false,
+                            label: new TranslatableMessage("forms.crsts.expenses.Q{$quarter}", [
+                                'actual_or_forecast' => new TranslatableMessage('forms.crsts.expenses.actual_or_forecast', ['is_forecast' => 'false']),
+                            ])
+                        );
                 }
             }
 

@@ -16,9 +16,10 @@
         {%- for cell in row.cells -%}
             {%- if cell.type == 'header' -%}
                 {%- set html -%}
-                    {{- cell.options.text -}}
-                    {%- if cell.attributes.add_actual_or_forecast ?? null -%}
-                        <span class="actual-or-forecast">{{ cell.attributes.text }}</span>
+                    {%- if cell.options.text is instanceof('\\Symfony\\Component\\Translation\\TranslatableMessage') -%}
+                        {{- cell.options.text | trans | nl2br -}}
+                    {%- else -%}
+                        {{- cell.options.text | nl2br -}}
                     {%- endif -%}
                 {%- endset -%}
                 {{- tableHeader({...cell.options, html}) -}}

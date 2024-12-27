@@ -2,6 +2,8 @@
 
 namespace App\Entity\Config\ExpenseRow;
 
-interface RowGroupInterface
+use App\Entity\Config\LabelProviderInterface;
+
+interface RowGroupInterface extends LabelProviderInterface
 {
 }

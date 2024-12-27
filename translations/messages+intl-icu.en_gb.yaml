@@ -231,8 +231,24 @@ forms:
       comments:
         label: Comments
     expenses:
-      actual: Actual
-      forecast: Forecast
+      cell_title: "{group} {row} {column}"
+      actual_or_forecast: >-
+        {is_forecast, select,
+          true  {Forecast}
+          other {Actual}
+        }
+      Q1: |-
+        Q1
+        {actual_or_forecast}
+      Q2: |-
+        Q2
+        {actual_or_forecast}
+      Q3: |-
+        Q3
+        {actual_or_forecast}
+      Q4: |-
+        Q4
+        {actual_or_forecast}
       sub_total: Sub-total
       total: Total
     local_and_rdel:

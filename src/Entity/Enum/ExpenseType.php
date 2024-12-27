@@ -2,7 +2,10 @@
 
 namespace App\Entity\Enum;
 
-enum ExpenseType: string
+use App\Entity\Config\LabelProviderInterface;
+use Symfony\Component\Translation\TranslatableMessage;
+
+enum ExpenseType: string implements LabelProviderInterface
 {
     case FUND_CAPITAL_EXPENDITURE = "fex";
     case FUND_CAPITAL_EXPENDITURE_BASELINE = "feb";
@@ -24,6 +27,11 @@ enum ExpenseType: string
             self::FUND_CAPITAL_EXPENDITURE_WITH_OVER_PROGRAMMING_BASELINE,
             self::FUND_CAPITAL_LOCAL_CONTRIBUTION_BASELINE,
         ]);
+    }
+
+    public function getLabel(array $extraParameters=[]): TranslatableMessage
+    {
+        return new TranslatableMessage("enum.expense_type.{$this->value}", $extraParameters);
     }
 
     /**
