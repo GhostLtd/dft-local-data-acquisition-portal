@@ -71,6 +71,21 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
         );
     }
 
+    public function setAtProjectExpenseEdit(FundReturn $fundReturn, ProjectFund $projectFund, DivisionConfiguration $division): void
+    {
+        $this->setAtProjectFund($fundReturn, $projectFund);
+        $this->addItem(
+            'project_return_expense_edit',
+            'app_project_return_expense_edit',
+            routeParameters: [
+                'fundReturnId' => $fundReturn->getId(),
+                'projectFundId' => $projectFund->getId(),
+                'divisionSlug' => $division->getSlug(),
+            ],
+            text: $division->getLabel(),
+        );
+    }
+
     public function setAtFundReturnSectionEdit(FundReturn $fundReturn, FundLevelSection $section): void
     {
         $this->setAtFundReturn($fundReturn);
@@ -89,7 +104,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
             'fund_return_expense_edit',
             'app_fund_return_expense_edit',
             routeParameters: ['fundReturnId' => $fundReturn->getId(), 'divisionSlug' => $division->getSlug()],
-            text: $division->getTitle(),
+            text: $division->getLabel(),
         );
     }
 }

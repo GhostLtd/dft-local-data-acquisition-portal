@@ -2,10 +2,11 @@
 
 namespace App\Entity\Config\ExpenseRow;
 
+use App\Entity\Config\LabelProviderInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Translation\TranslatableMessage;
 
-class TotalConfiguration implements RowGroupInterface
+class TotalConfiguration implements LabelProviderInterface, RowGroupInterface
 {
     /**
      * @param array<int, string> $slugsOfRowsToSum

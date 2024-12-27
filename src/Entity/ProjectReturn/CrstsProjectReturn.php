@@ -2,6 +2,7 @@
 
 namespace App\Entity\ProjectReturn;
 
+use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\OnTrackRating;
@@ -11,6 +12,7 @@ use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Repository\Return\CrstsProjectReturnRepository;
+use App\Utility\CrstsHelper;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -221,5 +223,14 @@ class CrstsProjectReturn extends ProjectReturn implements ExpensesContainerInter
     public function getFund(): Fund
     {
         return Fund::CRSTS1;
+    }
+
+    /**
+     * @return array<int, DivisionConfiguration>
+     */
+    public function getDivisionConfigurations(): array
+    {
+        $fundReturn = $this->getFundReturn();
+        return CrstsHelper::getExpenseDivisionConfigurations($fundReturn->getYear(), $fundReturn->getQuarter());
     }
 }

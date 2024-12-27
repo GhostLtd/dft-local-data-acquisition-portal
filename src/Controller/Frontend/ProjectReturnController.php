@@ -10,7 +10,10 @@ use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\ProjectReturn\ProjectReturn;
 use App\Event\FundReturnSectionUpdateEvent;
 use App\Event\ProjectReturnSectionUpdateEvent;
+use App\Form\FundReturn\Crsts\ExpensesType;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\CrstsHelper;
+use App\Utility\ExpensesTableHelper;
 use App\Utility\FormHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -98,6 +101,59 @@ class ProjectReturnController extends AbstractController
             'fundReturn' => $fundReturn,
             'projectReturn' => $projectReturn,
             'section' => $section,
+        ]);
+    }
+
+    #[Route('/fund-return/{fundReturnId}/project/{projectFundId}/expense/{divisionSlug}', name: 'app_project_return_expense_edit')]
+    public function projectReturnExpense(
+        DashboardBreadcrumbBuilder $breadcrumbBuilder,
+        EntityManagerInterface     $entityManager,
+        EventDispatcherInterface   $eventDispatcher,
+        string                     $divisionSlug,
+        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
+        FundReturn                 $fundReturn,
+        #[MapEntity(expr: 'repository.findForDashboard(projectFundId)')]
+        ProjectFund                $projectFund,
+        Request                    $request,
+        ExpensesTableHelper        $tableHelper,
+    ): Response
+    {
+        $projectReturn = $fundReturn->getProjectReturnForProjectFund($projectFund);
+        $divisionConfiguration = $projectReturn->findDivisionConfigurationBySlug($divisionSlug);
+
+        if (!$divisionConfiguration) {
+            throw new NotFoundHttpException();
+        }
+
+        $breadcrumbBuilder->setAtProjectExpenseEdit($fundReturn, $projectFund, $divisionConfiguration);
+        $cancelUrl = $this->generateUrl('app_project_return', ['fundReturnId' => $fundReturn->getId(), 'projectFundId' => $projectFund->getId()]);
+
+        $expensesTableHelper = $tableHelper
+            ->setDivisionConfiguration($divisionConfiguration)
+            ->setRowGroupConfigurations(CrstsHelper::getProjectExpenseRowsConfiguration())
+            ->setFund($fundReturn->getFund());
+
+        $form = $this->createForm(ExpensesType::class, $fundReturn, [
+            'cancel_url' => $cancelUrl,
+            'completion_status' => $fundReturn->getStatusForSection($divisionConfiguration),
+            'expenses_table_helper' => $expensesTableHelper,
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $clickedButton = FormHelper::whichButtonClicked($form);
+            if ($clickedButton) {
+                $eventDispatcher->dispatch(new ProjectReturnSectionUpdateEvent($projectReturn, $divisionConfiguration, ['mode' => $clickedButton]));
+                $entityManager->flush();
+                return new RedirectResponse($cancelUrl);
+            }
+        }
+
+        return $this->render('frontend/project_return_expenses_edit.html.twig', [
+            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'expensesTable' => $expensesTableHelper->getTableRows(),
+            'form' => $form,
         ]);
     }
 }

@@ -231,12 +231,14 @@ forms:
       comments:
         label: Comments
     expenses:
-      cell_title: "{group} {row} {column}"
       actual_or_forecast: >-
         {is_forecast, select,
           true  {Forecast}
           other {Actual}
         }
+      cell_title: "{group} {row} {column}"
+      division_post_title: Post-{startYear}/{endYear}
+      forecast: Forecast
       Q1: |-
         Q1
         {actual_or_forecast}
@@ -251,6 +253,8 @@ forms:
         {actual_or_forecast}
       sub_total: Sub-total
       total: Total
+      division_year_title: "{startYear}/{endYear}"
+      yearly_forecast: Yearly forecast
     local_and_rdel:
       local_contribution:
         label: Local contribution

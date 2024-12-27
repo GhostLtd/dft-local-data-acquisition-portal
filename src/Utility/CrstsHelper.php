@@ -7,12 +7,26 @@ use App\Entity\Config\ExpenseDivision\ColumnConfiguration;
 use App\Entity\Config\ExpenseRow\CategoryConfiguration;
 use App\Entity\Config\ExpenseRow\RowGroupInterface;
 use App\Entity\Config\ExpenseRow\TotalConfiguration;
+use App\Entity\Config\ExpenseRow\UngroupedConfiguration;
 use App\Entity\Enum\ExpenseCategory;
 use App\Entity\Enum\ExpenseType;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class CrstsHelper
 {
+    /**
+     * @return array<int, RowGroupInterface>
+     */
+    public static function getProjectExpenseRowsConfiguration(): array
+    {
+        return [
+            new UngroupedConfiguration([
+                ExpenseType::PROJECT_CAPITAL_SPEND_FUND,
+                ExpenseType::PROJECT_CAPITAL_SPEND_ALL_SOURCES,
+            ]),
+        ];
+    }
+
     /**
      * @return array<int, RowGroupInterface>
      */
@@ -102,21 +116,28 @@ class CrstsHelper
                 //   b) The year has no active quarters in it
 
                 $columnConfigurations[] =
-                    new ColumnConfiguration('Yearly forecast', isForecast: true);
+                    new ColumnConfiguration('yearly', isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.yearly_forecast'));
             }
 
 
             if (count($columnConfigurations) > 0) {
-                $divisionConfiguration[] = new DivisionConfiguration("{$year}/{$nextYear}", $columnConfigurations);
+                $divisionConfiguration[] = new DivisionConfiguration(
+                    "{$year}/{$nextYear}",
+                    $columnConfigurations,
+                    label: new TranslatableMessage('forms.crsts.expenses.division_year_title', ['startYear' => $year, 'endYear' => $nextYear]),
+                );
             }
         }
 
         if ($returnQuarter === 4) {
             // This is a forecast and only added in Q4
-            $postTitle = "Post-{$endYear}/" . substr(strval($endYear + 1), 2);
+            $endYearPlusOne = substr(strval($endYear + 1), 2);
+            $postTitle = "Post-{$endYear}/{$endYearPlusOne}";
             $divisionConfiguration[] = new DivisionConfiguration($postTitle, [
-                new ColumnConfiguration("Forecast", isForecast: true),
-            ]);
+                new ColumnConfiguration("forecast", isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.forecast')),
+            ],
+                label: new TranslatableMessage('forms.crsts.expenses.division_post_title', ['startYear' => $endYear, 'endYear' => $endYearPlusOne])
+            );
         }
 
         return $divisionConfiguration;

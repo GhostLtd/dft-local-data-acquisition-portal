@@ -6,6 +6,7 @@ use App\Entity\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Config\ExpenseRow\CategoryConfiguration;
 use App\Entity\Config\ExpenseRow\RowGroupInterface;
 use App\Entity\Config\ExpenseRow\TotalConfiguration;
+use App\Entity\Config\ExpenseRow\UngroupedConfiguration;
 use App\Entity\Config\Table\Cell;
 use App\Entity\Config\Table\Header;
 use App\Entity\Config\Table\Row;
@@ -74,8 +75,16 @@ class ExpensesTableHelper
         // Table header row...
         // --------------------------------------------------------------------------------
 
+        $hasCategories = false;
+        foreach($this->rowGroupConfigurations as $rowGroupConfiguration) {
+            if ($rowGroupConfiguration instanceof CategoryConfiguration) {
+                $hasCategories = true;
+                break;
+            }
+        }
+
         $cells = [
-            new Header(['colspan' => 2])
+            new Header($hasCategories ? ['colspan' => 2] : [])
         ];
 
         foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
@@ -96,15 +105,19 @@ class ExpensesTableHelper
             $cells = [];
 
             // groups comprise either categories (e.g. "CRSTS Capital") or totals
-            if ($group instanceof CategoryConfiguration) {
+            if ($group instanceof CategoryConfiguration || $group instanceof UngroupedConfiguration) {
                 foreach($group->getRowConfigurations() as $idx => $row) {
-                    $groupLabel = $group->getLabel($extraParameters);
+                    if ($group instanceof CategoryConfiguration) {
+                        $groupLabel = $group->getLabel($extraParameters);
 
-                    if ($idx === 0) {
-                        $cells[] = new Header([
-                            'text' => $groupLabel,
-                            'rowspan' => $group->rowCount(),
-                        ]);
+                        if ($idx === 0) {
+                            $cells[] = new Header([
+                                'text' => $groupLabel,
+                                'rowspan' => $group->rowCount(),
+                            ]);
+                        }
+                    } else {
+                        $groupLabel = '';
                     }
 
                     // categories comprise rows of either expenses (e.g. "Q1 Actual") or totals

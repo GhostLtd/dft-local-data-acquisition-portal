@@ -2,11 +2,12 @@
 
 namespace App\Entity\Config\ExpenseRow;
 
+use App\Entity\Config\LabelProviderInterface;
 use App\Entity\Enum\ExpenseCategory;
 use App\Entity\Enum\ExpenseType;
 use Symfony\Component\Translation\TranslatableMessage;
 
-class CategoryConfiguration implements RowGroupInterface
+class CategoryConfiguration extends AbstractRowContainer implements LabelProviderInterface
 {
     /**
      * @param array<int, ExpenseType|TotalConfiguration> $rowConfigurations
@@ -14,32 +15,13 @@ class CategoryConfiguration implements RowGroupInterface
     public function __construct(
         protected ExpenseCategory $category,
         protected array           $rowConfigurations,
-    ) {}
+    ) {
+        parent::__construct($rowConfigurations);
+    }
 
     public function getCategory(): ExpenseCategory
     {
         return $this->category;
-    }
-
-    /**
-     * @return array<int, ExpenseType|TotalConfiguration>
-     */
-    public function getRowConfigurations(): array
-    {
-        return $this->rowConfigurations;
-    }
-
-    public function rowCount(): int
-    {
-        return count($this->rowConfigurations);
-    }
-
-    /**
-     * @return array<int, ExpenseType>
-     */
-    public function getExpenseTypes(): array
-    {
-        return array_values(array_filter($this->rowConfigurations, fn(ExpenseType|TotalConfiguration $e) => $e instanceof ExpenseType));
     }
 
     public function getLabel(array $extraParameters=[]): string|TranslatableMessage

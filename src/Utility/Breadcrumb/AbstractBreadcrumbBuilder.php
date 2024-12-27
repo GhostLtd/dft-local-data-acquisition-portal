@@ -3,6 +3,7 @@
 namespace App\Utility\Breadcrumb;
 
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractBreadcrumbBuilder
@@ -18,16 +19,20 @@ abstract class AbstractBreadcrumbBuilder
     }
 
     protected function addItem(
-        string  $key,
-        string  $routeName,
-        array   $routeParameters = [],
-        ?string $translationKey = null,
-        array   $translationParameters = [],
-        ?string $text = null,
+        string                            $key,
+        string                            $routeName,
+        array                             $routeParameters = [],
+        ?string                           $translationKey = null,
+        array                             $translationParameters = [],
+        null|string|TranslatableInterface $text = null,
     ): void
     {
         if ($text === null && $translationKey === null) {
             throw new \RuntimeException('BreadcrumbBuilder->addItem() - either text or translationKey must be set');
+        }
+
+        if ($text instanceof TranslatableInterface) {
+            $text = $text->trans($this->translator);
         }
 
         $this->items[$key] = [
