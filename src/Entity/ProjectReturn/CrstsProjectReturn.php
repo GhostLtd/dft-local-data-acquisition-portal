@@ -13,14 +13,17 @@ use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Repository\Return\CrstsProjectReturnRepository;
 use App\Utility\CrstsHelper;
+use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CrstsProjectReturnRepository::class)]
+#[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsProjectReturn extends ProjectReturn implements ExpensesContainerInterface
 {
     #[ORM\ManyToOne(inversedBy: 'returns')]
