@@ -67,7 +67,7 @@ class CrstsHelper
                 ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION,
                 ExpenseType::FUND_CAPITAL_THIRD_PARTY_CONTRIBUTION,
                 ExpenseType::FUND_CAPITAL_OTHER,
-            ], new TranslatableMessage('forms.crsts.expenses.total')),
+            ], new TranslatableMessage('forms.crsts.expenses.total_row')),
             new CategoryConfiguration(
                 ExpenseCategory::FUND_RESOURCE,
                 [

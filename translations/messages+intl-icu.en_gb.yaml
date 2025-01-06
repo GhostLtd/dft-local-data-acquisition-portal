@@ -87,8 +87,8 @@ enum:
     flc: "MCA/LA"
     flb: "Baseline, local capital contributions"
     ftp: "3rd-party"
-    fot: "Total"
-    fre: "Total"
+    fot: ""
+    fre: ""
     psp: "Capital (CDEL) spend, {fund}"
     psa: "Capital (CDEL) spend, all sources"
   fund:
@@ -253,6 +253,9 @@ forms:
         {actual_or_forecast}
       sub_total: Sub-total
       total: Total
+      total_row: |-
+        Total 
+        (excluding baselines and over-programming)
       division_year_title: "{startYear}/{endYear}"
       yearly_forecast: Yearly forecast
     local_and_rdel:
