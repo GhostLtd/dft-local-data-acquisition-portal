@@ -1,15 +1,9 @@
-parameters:
-    DEFAULT_DRIVER: pdo_pgsql
-    DEFAULT_HOST: "127.0.0.1"
-    DEFAULT_NAME: ldap
-    DEFAULT_USER: ldap
-
 doctrine:
     dbal:
-        driver: '%env(string:default:DEFAULT_DRIVER:APP_DATABASE_DRIVER)%'
-        host: '%env(string:default:DEFAULT_HOST:APP_DATABASE_HOST)%'
-        dbname: '%env(string:default:DEFAULT_NAME:APP_DATABASE_NAME)%'
-        user: '%env(string:default:DEFAULT_USER:APP_DATABASE_USER)%'
+        driver: '%env(APP_DATABASE_DRIVER)%'
+        host: '%env(APP_DATABASE_HOST)%'
+        dbname: '%env(APP_DATABASE_NAME)%'
+        user: '%env(APP_DATABASE_USER)%'
         password: '%env(APP_DATABASE_PASSWORD)%'
         server_version: '%env(APP_DATABASE_SERVER_VERSION)%'
         charset: utf8
