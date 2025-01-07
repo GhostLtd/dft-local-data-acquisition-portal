@@ -194,4 +194,11 @@ abstract class FundReturn
 
         return null;
     }
+
+    public function getNextYearAsTwoDigits(): ?string
+    {
+        return $this->year ?
+            substr(strval($this->year + 1), 2) :
+            null;
+    }
 }

@@ -35,6 +35,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
                 'quarter' => $fundReturn->getQuarter(),
                 'type' => new TranslatableMessage($typeKey),
                 'year' => $fundReturn->getYear(),
+                'nextYear' => $fundReturn->getNextYearAsTwoDigits(),
             ]
         );
     }

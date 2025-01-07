@@ -238,26 +238,32 @@ forms:
         }
       cell_title: "{group} {row} {column}"
       division_post_title: Post-{startYear}/{endYear}
-      forecast: Forecast
+      forecast: |-
+        Forecast
+        (£)
       Q1: |-
-        Q1
-        {actual_or_forecast}
+        Q1 {actual_or_forecast} 
+        (£)
       Q2: |-
-        Q2
-        {actual_or_forecast}
+        Q2 {actual_or_forecast} 
+        (£)
       Q3: |-
-        Q3
-        {actual_or_forecast}
+        Q3 {actual_or_forecast} 
+        (£)
       Q4: |-
-        Q4
-        {actual_or_forecast}
+        Q4 {actual_or_forecast} 
+        (£)
       sub_total: Sub-total
-      total: Total
+      total: |-
+        Total
+        (£)
       total_row: |-
         Total 
         (excluding baselines and over-programming)
       division_year_title: "{startYear}/{endYear}"
-      yearly_forecast: Yearly forecast
+      yearly_forecast: |-
+        Yearly forecast
+        (£)
     local_and_rdel:
       local_contribution:
         label: Local contribution
@@ -363,11 +369,11 @@ frontend:
     dashboard:
       breadcrumb: Home
       title: Local Authorities
-      fund_title: "{fundName}: {year} Q{quarter}"
+      fund_title: "{fundName}: {year}/{nextYear} Q{quarter}"
     home:
       title: Local data acquisition portal
     fund_return:
-      title: "{recipientName}: {type} return for {year} Q{quarter}"
+      title: "{recipientName}: {type} return for {year}/{nextYear} Q{quarter}"
       fund_level_details: Fund-level details
       fund_level_expenses: Fund-level expenses
       projects: Projects

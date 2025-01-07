@@ -16,11 +16,15 @@ class OverallFundingType extends AbstractType
         $builder
             ->add('totalCost', InputType::class, [
                 'label' => 'forms.crsts.overall_funding.total_cost.label',
-                'label_attr' => ['class' => 'govuk-label--s']
+                'label_attr' => ['class' => 'govuk-label--s'],
+                'prefix' => '£',
+                'attr' => ['class' => 'govuk-input--width-10'],
             ])
             ->add('agreedFunding', InputType::class, [
                 'label' => 'forms.crsts.overall_funding.agreed_funding.label',
-                'label_attr' => ['class' => 'govuk-label--s']
+                'label_attr' => ['class' => 'govuk-label--s'],
+                'prefix' => '£',
+                'attr' => ['class' => 'govuk-input--width-10'],
             ])
         ;
     }

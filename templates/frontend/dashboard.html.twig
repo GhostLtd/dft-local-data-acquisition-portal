@@ -23,6 +23,7 @@
                             fundName: "enum.fund.#{fundAward.type.name}" | trans,
                             quarter: fundReturn.quarter,
                             year: fundReturn.year,
+                            nextYear: fundReturn.nextYearAsTwoDigits,
                         })
                     },
                     href: path('app_fund_return', {fundReturnId: fundReturn.id}),
