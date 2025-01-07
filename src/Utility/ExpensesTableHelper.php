@@ -106,8 +106,8 @@ class ExpensesTableHelper
 
             // groups comprise either categories (e.g. "CRSTS Capital") or totals
             if ($group instanceof CategoryConfiguration || $group instanceof UngroupedConfiguration) {
+                $isSingleRowGroup = count($group->getRowConfigurations()) === 1;
                 foreach($group->getRowConfigurations() as $idx => $row) {
-                    $isSingleCellRow = count($group->getRowConfigurations()) === 1;
 
                     if ($group instanceof CategoryConfiguration) {
                         $groupLabel = $group->getLabel($extraParameters);
@@ -116,7 +116,7 @@ class ExpensesTableHelper
                             $cells[] = new Header([
                                 'text' => $groupLabel,
                                 'rowspan' => $group->rowCount(),
-                                'colspan' => $isSingleCellRow ? 2 : 1,
+                                'colspan' => $isSingleRowGroup ? 2 : 1,
                             ]);
                         }
                     } else {
@@ -150,7 +150,7 @@ class ExpensesTableHelper
 
                     $rowTitle = $row->getLabel($extraParameters);
 
-                    if (!$isSingleCellRow) {
+                    if (!$isSingleRowGroup) {
                         $cells[] = new Header([
                             'text' => $rowTitle,
                         ]);
