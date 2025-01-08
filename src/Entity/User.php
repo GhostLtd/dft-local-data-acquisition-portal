@@ -11,8 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-// These fields are currently used to represent the "Lead contact" fields from 1top_info,
-// but later can be additionally used for storing other contacts
+// These fields are currently used to represent a Recipient's owner as well as the
+// "Lead contact" fields from 1top_info, but later can be additionally used for
+// storing other contacts
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]

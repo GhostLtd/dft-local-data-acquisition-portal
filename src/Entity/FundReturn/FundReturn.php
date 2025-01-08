@@ -38,11 +38,24 @@ abstract class FundReturn
     private ?FundAward $fundAward = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    private ?string $signoffName = null; // top_signoff
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $signoffEmail = null; // top_signoff
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $signoffDate = null; // top_signoff
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?User $signoffUser = null; // top_signoff
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?User $leadContact = null; // 1top_info: Lead contact
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $leadContactName = null; // 1top_info: Lead contact
 
     /**
      * @var Collection<int, FundReturnSectionStatus>
@@ -88,6 +101,17 @@ abstract class FundReturn
         return $this;
     }
 
+    public function getSignoffName(): ?string
+    {
+        return $this->signoffName;
+    }
+
+    public function setSignoffName(?string $signoffName): static
+    {
+        $this->signoffName = $signoffName;
+        return $this;
+    }
+
     public function getSignoffEmail(): ?string
     {
         return $this->signoffEmail;
@@ -99,6 +123,17 @@ abstract class FundReturn
         return $this;
     }
 
+    public function getSignoffDate(): ?\DateTimeInterface
+    {
+        return $this->signoffDate;
+    }
+
+    public function setSignoffDate(?\DateTimeInterface $signoffDate): static
+    {
+        $this->signoffDate = $signoffDate;
+        return $this;
+    }
+
     public function getSignoffUser(): ?User
     {
         return $this->signoffUser;
@@ -107,6 +142,28 @@ abstract class FundReturn
     public function setSignoffUser(?User $signoffUser): static
     {
         $this->signoffUser = $signoffUser;
+        return $this;
+    }
+
+    public function getLeadContact(): ?User
+    {
+        return $this->leadContact;
+    }
+
+    public function setLeadContact(?User $leadContact): static
+    {
+        $this->leadContact = $leadContact;
+        return $this;
+    }
+
+    public function getLeadContactName(): ?string
+    {
+        return $this->leadContactName;
+    }
+
+    public function setLeadContactName(?string $leadContactName): static
+    {
+        $this->leadContactName = $leadContactName;
         return $this;
     }
 

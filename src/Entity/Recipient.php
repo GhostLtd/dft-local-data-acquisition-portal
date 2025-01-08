@@ -20,7 +20,7 @@ class Recipient
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $leadContact = null; // 1top_info: Lead contact
+    private ?User $owner = null;
 
     /**
      * @var Collection<int, Project>
@@ -58,14 +58,14 @@ class Recipient
         return $this;
     }
 
-    public function getLeadContact(): ?User
+    public function getOwner(): ?User
     {
-        return $this->leadContact;
+        return $this->owner;
     }
 
-    public function setLeadContact(?User $leadContact): static
+    public function setOwner(?User $owner): static
     {
-        $this->leadContact = $leadContact;
+        $this->owner = $owner;
         return $this;
     }
 

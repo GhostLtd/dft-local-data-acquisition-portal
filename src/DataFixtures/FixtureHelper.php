@@ -57,11 +57,9 @@ class FixtureHelper
         $recipient = (new Recipient())
             ->setName($definition->getName());
 
-        $leadContact = $this->createUser($definition->getLeadContact(), $recipient);
+        $owner = $this->createUser($definition->getOwner(), $recipient);
 
-        $recipient
-            ->setLeadContact($leadContact);
-
+        $recipient->setOwner($owner);
         $this->persist([$recipient]);
 
         foreach($definition->getProjects() as $projectDefinition) {
@@ -139,9 +137,18 @@ class FixtureHelper
                 $this->createUser($signoffUserDefinition) :
                 null;
 
+            $leadContactDefinition = $returnDefinition->getLeadContact();
+            $leadContact = $leadContactDefinition ?
+                $this->createUser($leadContactDefinition) :
+                null;
+
             $return
                 ->setSignoffUser($signoffUser)
-                ->setSignoffEmail($signoffUser?->getEmail());
+                ->setSignoffName($signoffUser?->getName())
+                ->setSignoffEmail($signoffUser?->getEmail())
+                ->setSignoffDate($returnDefinition->getSignoffDate())
+                ->setLeadContact($leadContact)
+                ->setLeadContactName($leadContact?->getName());
 
             $fundAward->addReturn($return);
         }

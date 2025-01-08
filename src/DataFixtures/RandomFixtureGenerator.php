@@ -155,9 +155,26 @@ class RandomFixtureGenerator
                     $quarter,
                 );
 
+                $quarterStartDate = $this->getStartDateForFinancialYearAndQuarter($year, $quarter);
+
+                $leadContactUser = $this->createRandomUser();
+
+                // No signoff user for the most recent return...
+                if ($mustBeSignedOff) {
+                    $signoffDeadline = (clone $quarterStartDate)->modify('+3 months');
+
+                    $signoffUser = $this->faker->boolean(90) ? $leadContactUser : $this->createRandomUser();
+                    $signoffDatetime = $this->faker->dateTimeBetween($quarterStartDate, $signoffDeadline);
+                } else {
+                    $signoffUser = null;
+                    $signoffDatetime = null;
+                }
+
                 $returns[] = match($fund) {
                     Fund::CRSTS1 => new CrstsFundReturnDefinition(
-                        $mustBeSignedOff ? null : $this->createRandomUser(), // No signoff user for the most recent return...
+                        $signoffUser,
+                        $signoffDatetime,
+                        $leadContactUser,
                         $year,
                         $quarter,
                         $this->faker->text(),
@@ -300,5 +317,18 @@ class RandomFixtureGenerator
         }
 
         return $expenses;
+    }
+
+    protected function getStartDateForFinancialYearAndQuarter(int $year, int $quarter): \DateTime
+    {
+        $quarter += 1;
+        if ($quarter === 5) {
+            $year += 1;
+            $quarter = 1;
+        }
+
+        $month = (($quarter - 1) * 3) + 1;
+
+        return new \DateTime("{$year}/{$month}/1");
     }
 }

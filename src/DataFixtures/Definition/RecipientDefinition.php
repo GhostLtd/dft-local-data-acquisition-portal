@@ -10,7 +10,7 @@ class RecipientDefinition
      */
     public function __construct(
         protected string         $name,
-        protected UserDefinition $leadContact,
+        protected UserDefinition $owner,
         protected array          $projects,
         protected array          $fundAwards,
     ) {}
@@ -20,9 +20,9 @@ class RecipientDefinition
         return $this->name;
     }
 
-    public function getLeadContact(): UserDefinition
+    public function getOwner(): UserDefinition
     {
-        return $this->leadContact;
+        return $this->owner;
     }
 
     /** @return array<ProjectDefinition> */
