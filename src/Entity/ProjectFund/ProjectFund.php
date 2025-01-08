@@ -4,9 +4,11 @@ namespace App\Entity\ProjectFund;
 
 use App\Entity\Enum\Fund;
 use App\Entity\Project;
+use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Entity\ProjectReturn\ProjectReturn;
 use App\Entity\Traits\IdTrait;
 use App\Repository\ProjectFund\ProjectFundRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -25,6 +27,17 @@ abstract class ProjectFund
     #[ORM\JoinColumn(nullable: false)]
     private ?Project $project = null;
 
+    /**
+     * @var Collection<int, ProjectReturn>
+     */
+    #[ORM\OneToMany(targetEntity: ProjectReturn::class, mappedBy: 'projectFund', orphanRemoval: true)]
+    private Collection $returns;
+
+    public function __construct()
+    {
+        $this->returns = new ArrayCollection();
+    }
+
 
     public function getProject(): ?Project
     {
@@ -37,11 +50,38 @@ abstract class ProjectFund
         return $this;
     }
 
+    /**
+     * @return Collection<int, ProjectReturn>
+     */
+    public function getReturns(): Collection
+    {
+        return $this->returns;
+    }
+
+    public function addReturn(ProjectReturn $return): static
+    {
+        if (!$this->returns->contains($return)) {
+            $this->returns->add($return);
+            $return->setProjectFund($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReturn(ProjectReturn $return): static
+    {
+        if ($this->returns->removeElement($return)) {
+            // set the owning side to null (unless already changed)
+            if ($return->getProjectFund() === $this) {
+                $return->setProjectFund(null);
+            }
+        }
+
+        return $this;
+    }
+
     // --------------------------------------------------------------------------------
 
     abstract public function getFund(): Fund;
     abstract public function isReturnRequiredFor(int $quarter): bool;
-
-    /** @return Collection<int, ProjectReturn> */
-    abstract public function getReturns(): Collection;
 }

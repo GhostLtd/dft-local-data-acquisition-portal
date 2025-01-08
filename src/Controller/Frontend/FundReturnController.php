@@ -4,6 +4,7 @@ namespace App\Controller\Frontend;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\FundLevelSection;
+use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\FundReturn\FundReturnSectionStatus;
 use App\Form\FundReturn\Crsts\ExpensesType;
@@ -16,10 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class FundReturnController extends AbstractReturnController
 {
     #[Route('/fund-return/{fundReturnId}', name: 'app_fund_return')]
+    #[IsGranted(Role::CAN_VIEW, 'fundReturn')]
     public function fundReturn(
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn                 $fundReturn,

@@ -3,34 +3,43 @@
 namespace App\Repository;
 
 use App\Entity\Recipient;
-use App\Entity\User;
+use App\Utility\DoctrineUlidHelper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Component\Uid\Ulid;
 
 /**
  * @extends ServiceEntityRepository<Recipient>
  */
 class RecipientRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry              $registry,
+        protected DoctrineUlidHelper $doctrineUlidHelper,
+    ) {
         parent::__construct($registry, Recipient::class);
     }
 
-    public function getRecipientsFundAwardsAndReturnsForUser(User $user): array
+    /**
+     * @param array<int, Ulid> $recipientIds
+     * @return array<int, Recipient>
+     */
+    public function getRecipientsFundAwardsAndReturns(array $recipientIds): array
     {
-        return $this->createQueryBuilder('recipient')
+        $qb = $this->createQueryBuilder('recipient');
+        $whereInSQL = $this->doctrineUlidHelper->getSqlForWhereInAndInjectParams($qb, 'recipient', $recipientIds);
+
+        return $qb
             ->select('recipient, fundAward, return')
-            ->join('recipient.userRoles', 'recipientRole')
-            ->join('recipientRole.user', 'user')
+            ->join('recipient.owner', 'owner')
             ->join('recipient.fundAwards', 'fundAward')
             ->join('fundAward.returns', 'return')
-            ->where('user.id = :userId')
+            ->where("recipient.id IN ({$whereInSQL})")
             ->orderBy('recipient.name', 'ASC')
             ->addOrderBy('fundAward.type', 'ASC')
             ->addOrderBy('return.year', 'DESC')
             ->addOrderBy('return.quarter', 'DESC')
-            ->setParameter('userId', $user->getId()->toRfc4122())
             ->getQuery()
             ->getResult();
     }

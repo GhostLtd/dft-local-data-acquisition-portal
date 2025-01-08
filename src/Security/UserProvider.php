@@ -41,8 +41,8 @@ class UserProvider implements UserProviderInterface
 
         $user = $this->userRepository
             ->createQueryBuilder('user')
-            ->select('user, recipientRoles')
-            ->join('user.recipientRoles', 'recipientRoles')
+            ->select('user, permissions')
+            ->leftJoin('user.permissions', 'permissions')
             ->where('user.email = :email')
             ->setParameter('email', $identifier)
             ->getQuery()

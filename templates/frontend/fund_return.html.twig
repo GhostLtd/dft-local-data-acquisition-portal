@@ -6,52 +6,61 @@
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
 
-    <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_details' | trans }}</h2>
-    {{- taskListStart() -}}
-    {%- for section in fundLevelSections -%}
-        {%- set status = fundReturn.getStatusForSection(section) -%}
-        {{- taskListItem({
-            title: {text: "sections.fund.#{section.value}" | trans},
-            href: path('app_fund_return_edit', {fundReturnId: fundReturn.id, section: section.value}),
-            status: {tag: {
-                text: "tags.#{status.value}.name" | trans,
-                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
-            }},
-        }, loop.index0) -}}
-    {%- endfor -%}
-    {{- taskListEnd() -}}
+    {%- set visibleFundLevelSections = fundLevelSections | filter(s => is_granted('CAN_VIEW', {subject: fundReturn, section: s.value})) -%}
+    {%- if visibleFundLevelSections is not empty -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_details' | trans }}</h2>
+        {{- taskListStart() -}}
+        {%- for section in visibleFundLevelSections -%}
+            {%- set status = fundReturn.getStatusForSection(section) -%}
+            {{- taskListItem({
+                title: {text: "sections.fund.#{section.value}" | trans},
+                href: path('app_fund_return_edit', {fundReturnId: fundReturn.id, section: section.value}),
+                status: {tag: {
+                    text: "tags.#{status.value}.name" | trans,
+                    classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+                }},
+            }, loop.index0) -}}
+        {%- endfor -%}
+        {{- taskListEnd() -}}
+    {%- endif -%}
 
-    <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
-    {{- taskListStart() -}}
-    {%- for division in expenseDivisions -%}
-        {%- set status = fundReturn.getStatusForSection(division) -%}
-        {{- taskListItem({
-            title: {text: division.label | trans},
-            href: path('app_fund_return_expense_edit', {fundReturnId: fundReturn.id, divisionKey: division.key}),
-            status: {tag: {
-                text: "tags.#{status.value}.name" | trans,
-                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
-            }},
-        }, loop.index0) -}}
-    {%- endfor -%}
-    {{- taskListEnd() -}}
+    {%- set visibleExpenseDivisions = expenseDivisions | filter(e => is_granted('CAN_VIEW', {subject: fundReturn, section: e.key})) -%}
+    {%- if visibleExpenseDivisions is not empty -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
+        {{- taskListStart() -}}
+        {%- for division in visibleExpenseDivisions -%}
+            {%- set status = fundReturn.getStatusForSection(division) -%}
+            {{- taskListItem({
+                title: {text: division.label | trans},
+                href: path('app_fund_return_expense_edit', {fundReturnId: fundReturn.id, divisionKey: division.key}),
+                status: {tag: {
+                    text: "tags.#{status.value}.name" | trans,
+                    classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+                }},
+            }, loop.index0) -}}
+        {%- endfor -%}
+        {{- taskListEnd() -}}
+    {%- endif -%}
 
-    <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.projects' | trans }}</h2>
-    {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
+    {%- set visibleProjectFunds = projectFunds | filter(f => is_granted('CAN_VIEW', fundReturn.getProjectReturnForProjectFund(f))) -%}
+    {%- if visibleProjectFunds is not empty -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.projects' | trans }}</h2>
+        {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
 
-    {{- taskListStart() -}}
-    {%- for projectFund in projectFunds -%}
-        {%- set isRequired = projectFund.isReturnRequiredFor(fundReturn.quarter) -%}
-        {%- set tag = isRequired ? fundTag : 'not_required' -%}
-        {%- set url = path('app_project_return', {fundReturnId: fundReturn.id, projectFundId: projectFund.id}) %}
-        {{- taskListItem({
-            title: {text: projectFund.project.name},
-            href: isRequired ? url : null,
-            status: {tag: {
-                text: "tags.#{tag}.name" | trans,
-                classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),
-            }},
-        }, loop.index) -}}
-    {%- endfor -%}
-    {{- taskListEnd() -}}
+        {{- taskListStart() -}}
+        {%- for projectFund in visibleProjectFunds -%}
+            {%- set isRequired = projectFund.isReturnRequiredFor(fundReturn.quarter) -%}
+            {%- set tag = isRequired ? fundTag : 'not_required' -%}
+            {%- set url = path('app_project_return', {fundReturnId: fundReturn.id, projectFundId: projectFund.id}) -%}
+            {{- taskListItem({
+                title: {text: projectFund.project.name},
+                href: isRequired ? url : null,
+                status: {tag: {
+                    text: "tags.#{tag}.name" | trans,
+                    classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),
+                }},
+            }, loop.index) -}}
+        {%- endfor -%}
+        {{- taskListEnd() -}}
+    {%- endif -%}
 {%- endblock -%}

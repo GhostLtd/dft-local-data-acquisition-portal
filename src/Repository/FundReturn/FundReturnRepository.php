@@ -5,6 +5,7 @@ namespace App\Repository\FundReturn;
 use App\Entity\FundReturn\FundReturn;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 
 /**
@@ -26,7 +27,7 @@ class FundReturnRepository extends ServiceEntityRepository
             ->join('fundReturn.fundAward', 'fundAward')
             ->join('fundAward.recipient', 'recipient')
             ->where('fundReturn.id = :id')
-            ->setParameter('id', (new Ulid($id))->toRfc4122())
+            ->setParameter('id', new Ulid($id), UlidType::NAME)
             ->getQuery()
             ->getOneOrNullResult();
     }

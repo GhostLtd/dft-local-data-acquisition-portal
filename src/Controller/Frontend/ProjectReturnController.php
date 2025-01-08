@@ -4,6 +4,7 @@ namespace App\Controller\Frontend;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\ProjectLevelSection;
+use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\ProjectReturn\ProjectReturn;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ProjectReturnController extends AbstractReturnController
 {
@@ -30,6 +32,8 @@ class ProjectReturnController extends AbstractReturnController
     ): Response
     {
         $projectReturn = $fundReturn->getProjectReturnForProjectFund($projectFund);
+        $this->denyAccessUnlessGranted(Role::CAN_VIEW, $projectReturn);
+
         $breadcrumbBuilder->setAtProjectFund($fundReturn, $projectFund);
 
         // TODO: Check projectFund belongs to fundReturn

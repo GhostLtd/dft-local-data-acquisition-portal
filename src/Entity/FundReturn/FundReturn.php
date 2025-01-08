@@ -63,8 +63,15 @@ abstract class FundReturn
     #[ORM\OneToMany(targetEntity: FundReturnSectionStatus::class, mappedBy: 'fundReturn', orphanRemoval: true)]
     private Collection $sectionStatuses;
 
+    /**
+     * @var Collection<int, ProjectReturn>
+     */
+    #[ORM\OneToMany(targetEntity: ProjectReturn::class, mappedBy: 'fundReturn', orphanRemoval: true)]
+    private Collection $projectReturns;
+
     public function __construct()
     {
+        $this->projectReturns = new ArrayCollection();
         $this->sectionStatuses = new ArrayCollection();
     }
 
@@ -197,6 +204,36 @@ abstract class FundReturn
         return $this;
     }
 
+    /**
+     * @return Collection<int, ProjectReturn>
+     */
+    public function getProjectReturns(): Collection
+    {
+        return $this->projectReturns;
+    }
+
+    public function addProjectReturn(ProjectReturn $projectReturn): static
+    {
+        if (!$this->projectReturns->contains($projectReturn)) {
+            $this->projectReturns->add($projectReturn);
+            $projectReturn->setFundReturn($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectReturn(ProjectReturn $projectReturn): static
+    {
+        if ($this->projectReturns->removeElement($projectReturn)) {
+            // set the owning side to null (unless already changed)
+            if ($projectReturn->getFundReturn() === $this) {
+                $projectReturn->setFundReturn(null);
+            }
+        }
+
+        return $this;
+    }
+
     // --------------------------------------------------------------------------------
 
     public function getFundReturnSectionStatusForName(string $name): ?FundReturnSectionStatus
@@ -239,9 +276,6 @@ abstract class FundReturn
     }
 
     abstract public function getFund(): Fund;
-
-    /** @return Collection<int, ProjectReturn> */
-    abstract public function getProjectReturns(): Collection;
 
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;

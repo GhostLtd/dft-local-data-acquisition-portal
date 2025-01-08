@@ -9,6 +9,7 @@ use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\Recipient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 
 /**
@@ -47,7 +48,7 @@ class ProjectFundRepository extends ServiceEntityRepository
             ->where('recipient.id = :recipient')
             ->orderBy('project.name', 'ASC')
             ->getQuery()
-            ->setParameter('recipient', $recipient->getId()->toRfc4122())
+            ->setParameter('recipient', $recipient->getId(), UlidType::NAME)
             ->getResult();
     }
 
@@ -58,7 +59,7 @@ class ProjectFundRepository extends ServiceEntityRepository
             ->join('projectFund.project', 'project')
             ->where('projectFund.id = :id')
             ->getQuery()
-            ->setParameter('id', (new Ulid($id))->toRfc4122())
+            ->setParameter('id', new Ulid($id), UlidType::NAME)
             ->getOneOrNullResult();
     }
 }

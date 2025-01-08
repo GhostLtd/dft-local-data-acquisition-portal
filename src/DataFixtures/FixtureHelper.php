@@ -22,7 +22,7 @@ use App\Entity\Project;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Entity\User;
-use App\Entity\UserRecipientRole;
+use App\Entity\UserPermission;
 use Doctrine\ORM\EntityManagerInterface;
 
 class FixtureHelper
@@ -99,13 +99,7 @@ class FixtureHelper
             ->setEmail($email);
 
         if ($recipient) {
-            $recipientRole = (new UserRecipientRole())
-                ->setRecipient($recipient)
-                ->setRole('ACCESS'); // TODO - we'll later have more granular/specific roles to add here
-
-            $user->addRecipientRole($recipientRole);
-
-            $this->persist([$recipientRole]);
+            $recipient->setOwner($user);
         }
 
         $this->users[$email] = $user;

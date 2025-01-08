@@ -51,17 +51,10 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     #[ORM\ManyToMany(targetEntity: ExpenseEntry::class)] // N.B. Validator is at class level
     private Collection $expenses;
 
-    /**
-     * @var Collection<int, CrstsProjectReturn>
-     */
-    #[ORM\OneToMany(targetEntity: CrstsProjectReturn::class, mappedBy: 'fundReturn', orphanRemoval: true)]
-    private Collection $projectReturns;
-
     public function __construct()
     {
         parent::__construct();
         $this->expenses = new ArrayCollection();
-        $this->projectReturns = new ArrayCollection();
     }
 
     public function getProgressSummary(): ?string
@@ -172,36 +165,6 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     public function removeExpense(ExpenseEntry $expense): static
     {
         $this->expenses->removeElement($expense);
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, CrstsProjectReturn>
-     */
-    public function getProjectReturns(): Collection
-    {
-        return $this->projectReturns;
-    }
-
-    public function addProjectReturn(CrstsProjectReturn $projectReturn): static
-    {
-        if (!$this->projectReturns->contains($projectReturn)) {
-            $this->projectReturns->add($projectReturn);
-            $projectReturn->setFundReturn($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProjectReturn(CrstsProjectReturn $projectReturn): static
-    {
-        if ($this->projectReturns->removeElement($projectReturn)) {
-            // set the owning side to null (unless already changed)
-            if ($projectReturn->getFundReturn() === $this) {
-                $projectReturn->setFundReturn(null);
-            }
-        }
-
         return $this;
     }
 

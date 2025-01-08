@@ -13,6 +13,7 @@ use App\Repository\ProjectReturn\ProjectReturnRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: ProjectReturnRepository::class)]
 #[ORM\InheritanceType('JOINED')]
@@ -24,6 +25,15 @@ abstract class ProjectReturn
 {
     use IdTrait;
 
+    #[ORM\ManyToOne(inversedBy: 'returns')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Valid(groups: ['project_details'])]
+    private ?ProjectFund $projectFund = null;
+
+    #[ORM\ManyToOne(inversedBy: 'projectReturns')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?FundReturn $fundReturn = null;
+
     /**
      * @var Collection<int, ProjectReturnSectionStatus>
      */
@@ -34,6 +44,29 @@ abstract class ProjectReturn
     {
         $this->sectionStatuses = new ArrayCollection();
     }
+
+    public function getProjectFund(): ?ProjectFund
+    {
+        return $this->projectFund;
+    }
+
+    public function setProjectFund(?ProjectFund $projectFund): static
+    {
+        $this->projectFund = $projectFund;
+        return $this;
+    }
+
+    public function getFundReturn(): ?FundReturn
+    {
+        return $this->fundReturn;
+    }
+
+    public function setFundReturn(?FundReturn $fundReturn): static
+    {
+        $this->fundReturn = $fundReturn;
+        return $this;
+    }
+
 
     /**
      * @return Collection<int, ProjectReturnSectionStatus>
@@ -111,8 +144,6 @@ abstract class ProjectReturn
     }
 
     abstract public function getFund(): Fund;
-    abstract public function getFundReturn(): ?FundReturn;
-    abstract public function getProjectFund(): ?ProjectFund;
 
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;

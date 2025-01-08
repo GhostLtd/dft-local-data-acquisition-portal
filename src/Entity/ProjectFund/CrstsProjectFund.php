@@ -27,17 +27,6 @@ class CrstsProjectFund extends ProjectFund
     #[AppAssert\BenefitCostRatio(groups: ['project_details'])]
     private ?BenefitCostRatio $benefitCostRatio = null;
 
-    /**
-     * @var Collection<int, CrstsProjectReturn>
-     */
-    #[ORM\OneToMany(targetEntity: CrstsProjectReturn::class, mappedBy: 'projectFund', orphanRemoval: true)]
-    private Collection $returns;
-
-    public function __construct()
-    {
-        $this->returns = new ArrayCollection();
-    }
-
     public function isRetained(): ?bool
     {
         return $this->retained;
@@ -46,36 +35,6 @@ class CrstsProjectFund extends ProjectFund
     public function setRetained(bool $retained): static
     {
         $this->retained = $retained;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, CrstsProjectReturn>
-     */
-    public function getReturns(): Collection
-    {
-        return $this->returns;
-    }
-
-    public function addReturn(CrstsProjectReturn $return): static
-    {
-        if (!$this->returns->contains($return)) {
-            $this->returns->add($return);
-            $return->setProjectFund($this);
-        }
-
-        return $this;
-    }
-
-    public function removeReturn(CrstsProjectReturn $return): static
-    {
-        if ($this->returns->removeElement($return)) {
-            // set the owning side to null (unless already changed)
-            if ($return->getProjectFund() === $this) {
-                $return->setProjectFund(null);
-            }
-        }
-
         return $this;
     }
 

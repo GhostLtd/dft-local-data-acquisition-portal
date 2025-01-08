@@ -12,7 +12,10 @@ doctrine:
         use_savepoints: true
 
         # lock_keys table is used by lock component, which is used by rate limiter
-        schema_filter: ~^(?!lock_keys)~
+        # permissions_view:
+        #   - needs to be listed below in schema_ignore_classes, otherwise doctrine will try to create it as a table
+        #   - also needs to be here so that liip-test-fixtures-bundle's ORMPurger doesn't try to empty the view
+        schema_filter: ~^(?!(lock_keys|permissions_view))~
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -29,7 +32,8 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
-
+        schema_ignore_classes:
+            - 'App\Entity\PermissionsView'
 when@test:
     doctrine:
         dbal:

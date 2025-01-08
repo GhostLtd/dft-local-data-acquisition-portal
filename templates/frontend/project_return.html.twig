@@ -6,38 +6,54 @@
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
 
-    <h2 class="govuk-heading-s">{{ 'frontend.pages.project_return.project_level_details' | trans }}</h2>
-    {{- taskListStart() -}}
-    {{- _self.projectLevelSectionsList(_context, isDisplayedInExpensesList: false) -}}
-    {{- taskListEnd() -}}
+    {%- set visibleProjectLevelSections = projectLevelSectionsConfiguration
+        | filter(c => c.isDisplayedInExpensesList == false)
+        | filter(c => is_granted('CAN_VIEW', {subject: projectReturn, section: c.section.value}))
+    -%}
 
-    <h2 class="govuk-heading-s">{{ 'frontend.pages.project_return.project_level_expenses' | trans }}</h2>
-    {{- taskListStart() -}}
-    {# We want to show some of the projectLevelSection items in the expenses area, because although they are not
-       expenses in the entity sense, they ask financial questions that are expense-related.
-    #}
-    {{- _self.projectLevelSectionsList(_context, isDisplayedInExpensesList: true) -}}
+    {%- if visibleProjectLevelSections is not empty -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.project_return.project_level_details' | trans }}</h2>
+        {{- taskListStart() -}}
+        {{- _self.projectLevelSectionsList(_context, visibleProjectLevelSections) -}}
+        {{- taskListEnd() -}}
+    {%- endif -%}
 
-    {%- for division in expenseDivisions -%}
-        {%- set status = projectReturn.getStatusForSection(division) -%}
-        {{- taskListItem({
-            title: {text: division.label | trans},
-            href: path('app_project_return_expense_edit', {fundReturnId: fundReturn.id, projectFundId: projectReturn.projectFund.id, divisionKey: division.key}),
-            status: {tag: {
-                text: "tags.#{status.value}.name" | trans,
-                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
-            }},
-        }, loop.index0) -}}
-    {%- endfor -%}
-    {{- taskListEnd() -}}
+    {%- set visibleProjectLevelSectionsDisplayInExpensesList = projectLevelSectionsConfiguration
+        | filter(c => c.isDisplayedInExpensesList == true)
+        | filter(c => is_granted('CAN_VIEW', {subject: projectReturn, section: c.section.value}))
+    -%}
+
+    {%- set visibleExpenseDivision = expenseDivisions | filter(d => is_granted('CAN_VIEW', {subject: projectReturn, section: d.key})) %}
+
+    {%- if visibleProjectLevelSectionsDisplayInExpensesList is not empty
+        or visibleExpenseDivision is not empty
+    -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.project_return.project_level_expenses' | trans }}</h2>
+        {{- taskListStart() -}}
+        {# We want to show some of the projectLevelSection items in the expenses area, because although they are not
+           expenses in the entity sense, they ask financial questions that are expense-related.
+        #}
+        {{- _self.projectLevelSectionsList(_context, visibleProjectLevelSectionsDisplayInExpensesList) -}}
+
+        {%- for division in visibleExpenseDivision -%}
+            {%- set status = projectReturn.getStatusForSection(division) -%}
+            {{- taskListItem({
+                title: {text: division.label | trans},
+                href: path('app_project_return_expense_edit', {fundReturnId: fundReturn.id, projectFundId: projectReturn.projectFund.id, divisionKey: division.key}),
+                status: {tag: {
+                    text: "tags.#{status.value}.name" | trans,
+                    classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+                }},
+            }, loop.index0) -}}
+        {%- endfor -%}
+        {{- taskListEnd() -}}
+    {%- endif -%}
 {% endblock %}
 
-{% macro projectLevelSectionsList(context, isDisplayedInExpensesList) %}
+{% macro projectLevelSectionsList(context, configurations) %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem -%}
 
-    {%- set filteredConfigurations = context.projectLevelSectionsConfiguration | filter(c => c.isDisplayedInExpensesList == isDisplayedInExpensesList) -%}
-
-    {%- for configuration in filteredConfigurations -%}
+    {%- for configuration in configurations -%}
         {%- set section = configuration.section -%}
         {%- set status = context.projectReturn.getStatusForSection(section) -%}
 

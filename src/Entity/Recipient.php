@@ -18,7 +18,7 @@ class Recipient
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1top_info: Local Authority name
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'recipientsOwned')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
@@ -34,17 +34,10 @@ class Recipient
     #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'recipient', orphanRemoval: true)]
     private Collection $fundAwards;
 
-    /**
-     * @var Collection<int, UserRecipientRole>
-     */
-    #[ORM\OneToMany(targetEntity: UserRecipientRole::class, mappedBy: 'recipient', orphanRemoval: true)]
-    private Collection $userRoles;
-
     public function __construct()
     {
         $this->projects = new ArrayCollection();
         $this->fundAwards = new ArrayCollection();
-        $this->userRoles = new ArrayCollection();
     }
 
     public function getName(): ?string
@@ -123,36 +116,6 @@ class Recipient
             // set the owning side to null (unless already changed)
             if ($fundAward->getRecipient() === $this) {
                 $fundAward->setRecipient(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserRecipientRole>
-     */
-    public function getUserRoles(): Collection
-    {
-        return $this->userRoles;
-    }
-
-    public function addUsersRole(UserRecipientRole $usersRole): static
-    {
-        if (!$this->userRoles->contains($usersRole)) {
-            $this->userRoles->add($usersRole);
-            $usersRole->setRecipient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUsersRole(UserRecipientRole $usersRole): static
-    {
-        if ($this->userRoles->removeElement($usersRole)) {
-            // set the owning side to null (unless already changed)
-            if ($usersRole->getRecipient() === $this) {
-                $usersRole->setRecipient(null);
             }
         }
 

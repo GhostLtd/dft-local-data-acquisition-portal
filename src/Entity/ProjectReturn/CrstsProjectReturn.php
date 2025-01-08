@@ -11,6 +11,7 @@ use App\Entity\ExpensesContainerInterface;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
+use App\Entity\ProjectFund\ProjectFund;
 use App\Repository\Return\CrstsProjectReturnRepository;
 use App\Utility\CrstsHelper;
 use App\Validator\ExpensesValidator;
@@ -26,15 +27,6 @@ use Symfony\Component\Validator\Constraints\Valid;
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsProjectReturn extends ProjectReturn implements ExpensesContainerInterface
 {
-    #[ORM\ManyToOne(inversedBy: 'returns')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Valid(groups: ['project_details'])]
-    private ?CrstsProjectFund $projectFund = null;
-
-    #[ORM\ManyToOne(inversedBy: 'projectReturns')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?CrstsFundReturn $fundReturn = null;
-
     #[ORM\Column(type: Types::DECIMAL, length: 255, precision: 10, scale: 2, nullable: true)]
     #[Decimal(precision: 10, scale: 2, groups: ['overall_funding'])]
     private ?string $totalCost = null; // 2proj_exp: Total cost of project (<this fund> plus other expenditure)
@@ -79,25 +71,22 @@ class CrstsProjectReturn extends ProjectReturn implements ExpensesContainerInter
 
     public function getProjectFund(): ?CrstsProjectFund
     {
-        return $this->projectFund;
+        $projectFund = parent::getProjectFund();
+
+        if ($projectFund !== null && !$projectFund instanceof CrstsProjectFund) {
+            throw new \InvalidArgumentException('parent::getProjectFund() returned non-CrstsProjectFund');
+        }
+
+        return $projectFund;
     }
 
-    public function setProjectFund(?CrstsProjectFund $projectFund): static
+    public function setProjectFund(?ProjectFund $projectFund): static
     {
-        $this->projectFund = $projectFund;
-        return $this;
-    }
+        if ($projectFund !== null && !$projectFund instanceof CrstsProjectFund) {
+            throw new \InvalidArgumentException('setProjectFund() called with non-CrstsProjectFund');
+        }
 
-
-    public function getFundReturn(): ?CrstsFundReturn
-    {
-        return $this->fundReturn;
-    }
-
-    public function setFundReturn(?CrstsFundReturn $fundReturn): static
-    {
-        $this->fundReturn = $fundReturn;
-        return $this;
+        return parent::setProjectFund($projectFund);
     }
 
     public function getTotalCost(): ?string

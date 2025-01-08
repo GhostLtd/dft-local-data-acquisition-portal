@@ -6,6 +6,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\ProjectReturn\ProjectReturn;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 
 /**
@@ -24,7 +25,7 @@ class ProjectReturnRepository extends ServiceEntityRepository
             ->createQueryBuilder('projectReturn')
             ->select('projectReturn')
             ->where('projectReturn.id = :id')
-            ->setParameter('id', (new Ulid($id))->toRfc4122())
+            ->setParameter('id', new Ulid($id), UlidType::NAME)
             ->getQuery()
             ->getOneOrNullResult();
     }

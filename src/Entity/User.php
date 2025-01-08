@@ -37,14 +37,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null; #1top_info
 
     /**
-     * @var Collection<int, UserRecipientRole>
+     * @var Collection<int, UserPermission>
      */
-    #[ORM\OneToMany(targetEntity: UserRecipientRole::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $recipientRoles;
+    #[ORM\OneToMany(targetEntity: UserPermission::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $permissions;
+
+    /**
+     * @var Collection<int, Recipient>
+     */
+    #[ORM\OneToMany(targetEntity: Recipient::class, mappedBy: 'owner')]
+    private Collection $recipientsOwned;
 
     public function __construct()
     {
-        $this->recipientRoles = new ArrayCollection();
+        $this->permissions = new ArrayCollection();
+        $this->recipientsOwned = new ArrayCollection();
     }
 
     public function getUserIdentifier(): string
@@ -114,7 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return [Roles::ROLE_USER];
+        return ['ROLE_USER'];
     }
 
     public function eraseCredentials(): void
@@ -122,29 +129,59 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, UserRecipientRole>
+     * @return Collection<int, UserPermission>
      */
-    public function getRecipientRoles(): Collection
+    public function getPermissions(): Collection
     {
-        return $this->recipientRoles;
+        return $this->permissions;
     }
 
-    public function addRecipientRole(UserRecipientRole $recipientRole): static
+    public function addPermission(UserPermission $permission): static
     {
-        if (!$this->recipientRoles->contains($recipientRole)) {
-            $this->recipientRoles->add($recipientRole);
-            $recipientRole->setUser($this);
+        if (!$this->permissions->contains($permission)) {
+            $this->permissions->add($permission);
+            $permission->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeRecipientRole(UserRecipientRole $recipientRole): static
+    public function removePermission(UserPermission $permission): static
     {
-        if ($this->recipientRoles->removeElement($recipientRole)) {
+        if ($this->permissions->removeElement($permission)) {
             // set the owning side to null (unless already changed)
-            if ($recipientRole->getUser() === $this) {
-                $recipientRole->setUser(null);
+            if ($permission->getUser() === $this) {
+                $permission->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Recipient>
+     */
+    public function getRecipientsOwned(): Collection
+    {
+        return $this->recipientsOwned;
+    }
+
+    public function addRecipientsOwned(Recipient $recipientsOwned): static
+    {
+        if (!$this->recipientsOwned->contains($recipientsOwned)) {
+            $this->recipientsOwned->add($recipientsOwned);
+            $recipientsOwned->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipientsOwned(Recipient $recipientsOwned): static
+    {
+        if ($this->recipientsOwned->removeElement($recipientsOwned)) {
+            // set the owning side to null (unless already changed)
+            if ($recipientsOwned->getOwner() === $this) {
+                $recipientsOwned->setOwner(null);
             }
         }
 
