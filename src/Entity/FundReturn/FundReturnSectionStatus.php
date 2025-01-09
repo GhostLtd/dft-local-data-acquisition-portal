@@ -2,22 +2,20 @@
 
 namespace App\Entity\FundReturn;
 
-use App\Entity\Enum\CompletionStatus;
+use App\Entity\SectionStatusInterface;
+use App\Entity\SectionStatusTrait;
 use App\Entity\Traits\IdTrait;
 use App\Repository\FundReturn\FundReturnSectionStatusRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FundReturnSectionStatusRepository::class)]
 #[ORM\UniqueConstraint(columns: ['name', 'status'])]
-class FundReturnSectionStatus
+class FundReturnSectionStatus implements SectionStatusInterface
 {
-    use IdTrait;
+    use IdTrait, SectionStatusTrait;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
-
-    #[ORM\Column(enumType: CompletionStatus::class)]
-    private ?CompletionStatus $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'sectionStatuses')]
     #[ORM\JoinColumn(nullable: false)]
@@ -31,17 +29,6 @@ class FundReturnSectionStatus
     public function setName(string $name): static
     {
         $this->name = $name;
-        return $this;
-    }
-
-    public function getStatus(): ?CompletionStatus
-    {
-        return $this->status;
-    }
-
-    public function setStatus(CompletionStatus $status): static
-    {
-        $this->status = $status;
         return $this;
     }
 

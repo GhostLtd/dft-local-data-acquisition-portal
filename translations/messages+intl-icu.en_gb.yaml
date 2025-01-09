@@ -212,8 +212,8 @@ errors:
 forms:
   buttons:
     cancel: Cancel
-    mark_as_completed: Mark as completed
-    mark_as_in_progress: Mark as in progress
+    transition_complete: Mark as completed
+    transition_re_open: Mark as in progress
     save: Save
     submit: Submit
   generic:

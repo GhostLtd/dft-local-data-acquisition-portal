@@ -3,7 +3,6 @@
 namespace App\Entity\FundReturn;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
-use App\Entity\Enum\ExpenseType;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\CompletionStatus;
 use App\Entity\Enum\FundLevelSection;
@@ -148,21 +147,38 @@ abstract class FundReturn
         return $this->sectionStatuses->findFirst(fn(int $idx, FundReturnSectionStatus $status) => $status->getName() === $name);
     }
 
+    public function getOrCreateFundReturnSectionStatus(DivisionConfiguration|FundLevelSection $section): FundReturnSectionStatus
+    {
+        $name = self::getSectionName($section);
+        $status = $this->getFundReturnSectionStatusForName($name);
+        if (!$status) {
+            $status = (new FundReturnSectionStatus())
+                ->setStatus(CompletionStatus::NOT_STARTED)
+                ->setName($name);
+
+            $this->addSectionStatus($status);
+        }
+        return $status;
+    }
+
     public function getStatusForSection(
         DivisionConfiguration|FundLevelSection $section,
         CompletionStatus                       $default = CompletionStatus::NOT_STARTED
     ): CompletionStatus
     {
-        $name = match($section::class) {
-            DivisionConfiguration::class => $section->getKey(),
-            FundLevelSection::class => $section->name,
-        };
-
-        $fundReturnSectionStatus = $this->getFundReturnSectionStatusForName($name);
+        $fundReturnSectionStatus = $this->getFundReturnSectionStatusForName(self::getSectionName($section));
 
         return $fundReturnSectionStatus ?
             $fundReturnSectionStatus->getStatus() :
             $default;
+    }
+
+    static public function getSectionName(DivisionConfiguration|FundLevelSection $section): string
+    {
+        return match($section::class) {
+            DivisionConfiguration::class => $section->getKey(),
+            FundLevelSection::class => $section->name,
+        };
     }
 
     abstract public function getFund(): Fund;

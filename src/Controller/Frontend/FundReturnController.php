@@ -2,27 +2,22 @@
 
 namespace App\Controller\Frontend;
 
-use App\Entity\Enum\ExpenseType;
+use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundReturn\FundReturn;
+use App\Entity\FundReturn\FundReturnSectionStatus;
 use App\Form\FundReturn\Crsts\ExpensesType;
 use App\Utility\CrstsHelper;
-use App\Event\FundReturnSectionUpdateEvent;
 use App\Repository\ProjectFund\ProjectFundRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\ExpensesTableHelper;
-use App\Utility\FormHelper;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class FundReturnController extends AbstractController
+class FundReturnController extends AbstractReturnController
 {
     #[Route('/fund-return/{fundReturnId}', name: 'app_fund_return')]
     public function fundReturn(
@@ -57,8 +52,6 @@ class FundReturnController extends AbstractController
     #[Route('/fund-return/{fundReturnId}/section/{section}', name: 'app_fund_return_edit')]
     public function fundReturnEdit(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        EntityManagerInterface     $entityManager,
-        EventDispatcherInterface   $eventDispatcher,
         FundLevelSection           $section,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn                 $fundReturn,
@@ -66,7 +59,6 @@ class FundReturnController extends AbstractController
     ): Response
     {
         $formClass = $section::getFormClassForFundAndSection($fundReturn->getFund(), $section);
-
         if (!$formClass) {
             throw new NotFoundHttpException();
         }
@@ -74,19 +66,13 @@ class FundReturnController extends AbstractController
         $breadcrumbBuilder->setAtFundReturnSectionEdit($fundReturn, $section);
         $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()]);
 
+        $fundReturnSectionStatus = $this->getSectionStatus($fundReturn, $section);
         $form = $this->createForm($formClass, $fundReturn, [
             'cancel_url' => $cancelUrl,
-            'completion_status' => $fundReturn->getStatusForSection($section),
+            'completion_status' => $fundReturnSectionStatus,
         ]);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $clickedButton = FormHelper::whichButtonClicked($form);
-            if ($clickedButton) {
-                $eventDispatcher->dispatch(new FundReturnSectionUpdateEvent($fundReturn, $section, ['mode' => $clickedButton]));
-                $entityManager->flush();
-                return new RedirectResponse($cancelUrl);
-            }
+        if ($response = $this->processForm($form, $request, $fundReturnSectionStatus, $cancelUrl)) {
+            return $response;
         }
 
         return $this->render('frontend/fund_return_edit.html.twig', [
@@ -100,8 +86,6 @@ class FundReturnController extends AbstractController
     #[Route('/fund-return/{fundReturnId}/expense/{divisionKey}', name: 'app_fund_return_expense_edit')]
     public function fundReturnExpense(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        EntityManagerInterface     $entityManager,
-        EventDispatcherInterface   $eventDispatcher,
         string                     $divisionKey,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn                 $fundReturn,
@@ -123,21 +107,15 @@ class FundReturnController extends AbstractController
             ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
+        $fundReturnSectionStatus = $this->getSectionStatus($fundReturn, $divisionConfiguration);
         $form = $this->createForm(ExpensesType::class, $fundReturn, [
             'cancel_url' => $cancelUrl,
-            'completion_status' => $fundReturn->getStatusForSection($divisionConfiguration),
+            'completion_status' => $fundReturnSectionStatus,
             'expenses_table_helper' => $expensesTableHelper,
         ]);
 
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $clickedButton = FormHelper::whichButtonClicked($form);
-            if ($clickedButton) {
-                $eventDispatcher->dispatch(new FundReturnSectionUpdateEvent($fundReturn, $divisionConfiguration, ['mode' => $clickedButton]));
-                $entityManager->flush();
-                return new RedirectResponse($cancelUrl);
-            }
+        if ($response = $this->processForm($form, $request, $fundReturnSectionStatus, $cancelUrl)) {
+            return $response;
         }
 
         return $this->render('frontend/fund_return_expenses_edit.html.twig', [
@@ -145,5 +123,14 @@ class FundReturnController extends AbstractController
             'expensesTable' => $expensesTableHelper->getTableRows(),
             'form' => $form,
         ]);
+    }
+
+    protected function getSectionStatus(FundReturn $fundReturn, DivisionConfiguration|FundLevelSection $section): FundReturnSectionStatus
+    {
+        $fundReturnSectionStatus = $fundReturn->getOrCreateFundReturnSectionStatus($section);
+        if (!$this->entityManager->contains($fundReturnSectionStatus)) {
+            $this->entityManager->persist($fundReturnSectionStatus);
+        }
+        return $fundReturnSectionStatus;
     }
 }

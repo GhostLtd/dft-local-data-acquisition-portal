@@ -1,0 +1,39 @@
+# config/packages/workflow.yaml
+parameters:
+  not_required: !php/enum App\Entity\Enum\CompletionStatus::NOT_REQUIRED->value
+  not_started: !php/enum App\Entity\Enum\CompletionStatus::NOT_STARTED->value
+  in_progress: !php/enum App\Entity\Enum\CompletionStatus::IN_PROGRESS->value
+  completed: !php/enum App\Entity\Enum\CompletionStatus::COMPLETED->value
+
+framework:
+  workflows:
+    completion_state:
+      type: 'state_machine'
+      marking_store:
+        type: 'method'
+        property: 'statusAsString'
+      # The "supports" option is useful only if you are using Twig functions ('workflow_*')
+      supports:
+        - App\Entity\FundReturn\FundReturnSectionStatus
+        - App\Entity\ProjectReturn\ProjectReturnSectionStatus
+#      initial_marking: start
+      places:
+        - '%not_required%'
+        - '%not_started%'
+        - '%in_progress%'
+        - '%completed%'
+      transitions:
+        start:
+          from: '%not_started%'
+          to: '%in_progress%'
+        complete:
+          from: ['%not_started%', '%in_progress%']
+          to: '%completed%'
+          metadata:
+            show_on_form: true
+        re_open:
+          from: '%completed%'
+          to: '%in_progress%'
+          metadata:
+            show_on_form: true
+
