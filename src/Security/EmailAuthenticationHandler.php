@@ -35,8 +35,8 @@ class EmailAuthenticationHandler implements AuthenticationEntryPointInterface, A
     {
         $this->loginLimiter->reset($this->requestStack->getMainRequest());
 
-        $user = $request->request->get('user', '<none>');
-        $this->logger->info("Login successful: {$user}");
+        $user = $token->getUser();
+        $this->logger->info("Login successful: {$user->getUserIdentifier()}");
 
         if (!$user instanceof User) {
             throw new UnsupportedUserException();
