@@ -18,4 +18,14 @@ framework:
         #pools:
             #my.dedicated.cache: null
 
-        app: cache.adapter.array
+#        app: cache.adapter.array
+
+services:
+    # Override the default cache for rate_limiter as per https://symfony.com/doc/current/rate_limiter.html#storing-rate-limiter-state
+    cache.rate_limiter:
+        parent: 'cache.adapter.doctrine_dbal'
+        tags: [{ name: 'cache.pool', namespace: 'rate-limiter' }]
+
+    cache.messenger.restart_workers_signal:
+        parent: 'cache.adapter.doctrine_dbal'
+        tags: [{ name: 'cache.pool', namespace: 'messenger-restart-signal' }]
