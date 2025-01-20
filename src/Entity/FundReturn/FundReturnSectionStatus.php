@@ -9,7 +9,7 @@ use App\Repository\FundReturn\FundReturnSectionStatusRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FundReturnSectionStatusRepository::class)]
-#[ORM\UniqueConstraint(columns: ['name', 'status'])]
+#[ORM\UniqueConstraint(columns: ['name', 'status', 'fund_return_id'])]
 class FundReturnSectionStatus implements SectionStatusInterface
 {
     use IdTrait, SectionStatusTrait;

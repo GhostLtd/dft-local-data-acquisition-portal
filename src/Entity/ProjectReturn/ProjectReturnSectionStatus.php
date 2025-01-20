@@ -9,6 +9,7 @@ use App\Repository\ProjectReturn\ProjectReturnSectionStatusRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProjectReturnSectionStatusRepository::class)]
+#[ORM\UniqueConstraint(columns: ['name', 'status', 'project_return_id'])]
 class ProjectReturnSectionStatus implements SectionStatusInterface
 {
     use IdTrait, SectionStatusTrait;
