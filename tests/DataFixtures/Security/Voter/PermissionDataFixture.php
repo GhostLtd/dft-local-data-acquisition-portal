@@ -104,7 +104,7 @@ class PermissionDataFixture extends Fixture
     protected function createProjectAndProjectFund(string $name, string $referenceName, Fund $type, Authority $authority): array
     {
         $project = (new Project())
-            ->setOwner($authority)
+            ->setAuthority($authority)
             ->setName($name);
 
         if ($type === Fund::CRSTS1) {

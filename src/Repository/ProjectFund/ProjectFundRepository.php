@@ -44,7 +44,7 @@ class ProjectFundRepository extends ServiceEntityRepository
             ->select('projectFund, project')
             ->from($projectFundClass, 'projectFund')
             ->join('projectFund.project', 'project')
-            ->join('project.owner', 'authority')
+            ->join('project.authority', 'authority')
             ->where('authority.id = :authority_id')
             ->orderBy('project.name', 'ASC')
             ->getQuery()

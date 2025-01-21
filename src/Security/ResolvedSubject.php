@@ -19,7 +19,7 @@ class ResolvedSubject
         protected mixed   $entity,
         protected ?string $section,
         protected ?array  $idMap,
-        protected ?User   $owner,
+        protected ?User   $admin,
         protected ?Fund   $fund,
     ) {}
 
@@ -49,9 +49,9 @@ class ResolvedSubject
         return $this->idMap;
     }
 
-    public function getOwner(): ?User
+    public function getAdmin(): ?User
     {
-        return $this->owner;
+        return $this->admin;
     }
 
     public function getFund(): ?Fund

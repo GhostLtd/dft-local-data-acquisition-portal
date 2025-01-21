@@ -20,7 +20,7 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
     const array EDIT_ONLY = [Role::CAN_EDIT];
     const array ALL_PERMISSIONS = [Permission::SUBMITTER, Permission::CHECKER, Permission::EDITOR, Permission::EDITOR];
 
-    public function dataOwner(): \Generator
+    public function dataAdmin(): \Generator
     {
         $testCases = [
             [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:1', null], // Invalid - can't submit/complete/edit a authority
@@ -74,9 +74,9 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
     }
 
     /**
-     * @dataProvider dataOwner
+     * @dataProvider dataAdmin
      */
-    public function testOwner(string $role, bool $expectedResult, string $userRef, string $subjectClass, string $subjectRef, ?string $sectionType): void
+    public function testAdmin(string $role, bool $expectedResult, string $userRef, string $subjectClass, string $subjectRef, ?string $sectionType): void
     {
         $this->performTest(...func_get_args());
     }

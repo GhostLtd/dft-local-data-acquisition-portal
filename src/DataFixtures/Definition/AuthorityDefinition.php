@@ -10,7 +10,7 @@ class AuthorityDefinition
      */
     public function __construct(
         protected string         $name,
-        protected UserDefinition $owner,
+        protected UserDefinition $admin,
         protected array          $projects,
         protected array          $fundAwards,
     ) {}
@@ -22,7 +22,7 @@ class AuthorityDefinition
 
     public function getAdmin(): UserDefinition
     {
-        return $this->owner;
+        return $this->admin;
     }
 
     /** @return array<ProjectDefinition> */

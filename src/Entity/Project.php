@@ -20,7 +20,7 @@ class Project
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Authority $owner = null;
+    private ?Authority $authority = null;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1proj_info: Project name
@@ -54,14 +54,14 @@ class Project
         $this->projectFunds = new ArrayCollection();
     }
 
-    public function getOwner(): ?Authority
+    public function getAuthority(): ?Authority
     {
-        return $this->owner;
+        return $this->authority;
     }
 
-    public function setOwner(?Authority $owner): static
+    public function setAuthority(?Authority $authority): static
     {
-        $this->owner = $owner;
+        $this->authority = $authority;
         return $this;
     }
 

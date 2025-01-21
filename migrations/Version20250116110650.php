@@ -86,7 +86,7 @@ FROM user_permission u
     JOIN fund_return ON project_return.fund_return_id = fund_return.id
     JOIN project_fund ON project_return.project_fund_id = project_fund.id
     JOIN project ON project_fund.project_id = project.id
-    JOIN authority ON project.owner_id = authority.id
+    JOIN authority ON project.authority_id = authority.id
 WHERE u.entity_class = 'App\Entity\ProjectReturn\ProjectReturn'
 
 UNION
@@ -103,7 +103,7 @@ SELECT
     u.section_types AS section_types
 FROM user_permission u
     JOIN project ON project.id = u.entity_id
-    JOIN authority ON project.owner_id = authority.id
+    JOIN authority ON project.authority_id = authority.id
 WHERE u.entity_class = 'App\Entity\Project'
 EOQ);
     }

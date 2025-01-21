@@ -30,7 +30,7 @@ class UserReachableEntityResolver
     }
 
     /**
-     * Based on the permissions and owners, and looking *downstream*, what things are reachable?
+     * Based on the permissions and admins, and looking *downstream*, what things are reachable?
      *
      * By "downstream" it is meant for example that:
      * - from a permission on a FundReturn, we can infer the ability to view the

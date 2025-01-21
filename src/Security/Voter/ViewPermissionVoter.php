@@ -44,8 +44,8 @@ class ViewPermissionVoter extends Voter
 
         $resolvedSubject = $this->subjectResolver->resolveSubjectForRole($subject, Role::CAN_VIEW);
 
-        if ($user === $resolvedSubject->getOwner()) {
-            // dump("{$baseEntityClass} {$subject->getId()} - Found a match - is owner");
+        if ($user === $resolvedSubject->getAdmin()) {
+            // dump("{$baseEntityClass} {$subject->getId()} - Found a match - is admin");
             return true;
         }
 

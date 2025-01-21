@@ -27,7 +27,7 @@ class SubjectResolver
             return null;
         }
 
-        $owner = null;
+        $admin = null;
         $fundType = null;
         $idMap = [];
 
@@ -46,10 +46,10 @@ class SubjectResolver
 
         if ($subject instanceof Authority) {
             $idMap[Authority::class] = $subject->getId();
-            $owner = $subject->getAdmin();
+            $admin = $subject->getAdmin();
         }
 
-        return new ResolvedSubject($baseEntityClass, $subject, $section, $idMap, $owner, $fundType);
+        return new ResolvedSubject($baseEntityClass, $subject, $section, $idMap, $admin, $fundType);
     }
 
     protected function parseSubjectForRole(mixed $subject, string $role): ?array

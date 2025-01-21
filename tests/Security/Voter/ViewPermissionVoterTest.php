@@ -13,7 +13,7 @@ use App\Entity\Authority;
 
 class ViewPermissionVoterTest extends AbstractPermissionVoterTest
 {
-    public function dataOwner(): array
+    public function dataAdmin(): array
     {
         return [
             [true,  'admin:1', Authority::class, 'authority:1', null],
@@ -50,9 +50,9 @@ class ViewPermissionVoterTest extends AbstractPermissionVoterTest
     }
 
     /**
-     * @dataProvider dataOwner
+     * @dataProvider dataAdmin
      */
-    public function testOwner(bool $expectedResult, string $userRef, string $subjectClass, string $subjectRef, ?string $sectionType): void
+    public function testAdmin(bool $expectedResult, string $userRef, string $subjectClass, string $subjectRef, ?string $sectionType): void
     {
         $this->performTest(Role::CAN_VIEW, ...func_get_args());
     }

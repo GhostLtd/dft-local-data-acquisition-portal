@@ -40,7 +40,7 @@ class PermissionVoter extends Voter
             return false;
         }
 
-        if ($resolvedSubject->getOwner() === $user) {
+        if ($resolvedSubject->getAdmin() === $user) {
             return true;
         }
 

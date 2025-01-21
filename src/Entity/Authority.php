@@ -25,7 +25,7 @@ class Authority
     /**
      * @var Collection<int, Project>
      */
-    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'owner')]
+    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'authority')]
     private Collection $projects;
 
     /**
@@ -74,7 +74,7 @@ class Authority
     {
         if (!$this->projects->contains($project)) {
             $this->projects->add($project);
-            $project->setOwner($this);
+            $project->setAuthority($this);
         }
 
         return $this;
@@ -84,8 +84,8 @@ class Authority
     {
         if ($this->projects->removeElement($project)) {
             // set the owning side to null (unless already changed)
-            if ($project->getOwner() === $this) {
-                $project->setOwner(null);
+            if ($project->getAuthority() === $this) {
+                $project->setAuthority(null);
             }
         }
 
