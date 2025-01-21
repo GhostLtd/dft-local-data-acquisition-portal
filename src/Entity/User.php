@@ -45,13 +45,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Recipient>
      */
-    #[ORM\OneToMany(targetEntity: Recipient::class, mappedBy: 'owner')]
-    private Collection $recipientsOwned;
+    #[ORM\OneToMany(targetEntity: Recipient::class, mappedBy: 'admin')]
+    private Collection $recipientsAdminOf;
 
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
-        $this->recipientsOwned = new ArrayCollection();
+        $this->recipientsAdminOf = new ArrayCollection();
     }
 
     public function getUserIdentifier(): string
@@ -161,27 +161,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Recipient>
      */
-    public function getRecipientsOwned(): Collection
+    public function getRecipientsAdminOf(): Collection
     {
-        return $this->recipientsOwned;
+        return $this->recipientsAdminOf;
     }
 
-    public function addRecipientsOwned(Recipient $recipientsOwned): static
+    public function addRecipientAdminOf(Recipient $recipient): static
     {
-        if (!$this->recipientsOwned->contains($recipientsOwned)) {
-            $this->recipientsOwned->add($recipientsOwned);
-            $recipientsOwned->setOwner($this);
+        if (!$this->recipientsAdminOf->contains($recipient)) {
+            $this->recipientsAdminOf->add($recipient);
+            $recipient->setAdmin($this);
         }
 
         return $this;
     }
 
-    public function removeRecipientsOwned(Recipient $recipientsOwned): static
+    public function removeRecipientAdminOf(Recipient $recipient): static
     {
-        if ($this->recipientsOwned->removeElement($recipientsOwned)) {
+        if ($this->recipientsAdminOf->removeElement($recipient)) {
             // set the owning side to null (unless already changed)
-            if ($recipientsOwned->getOwner() === $this) {
-                $recipientsOwned->setOwner(null);
+            if ($recipient->getAdmin() === $this) {
+                $recipient->setAdmin(null);
             }
         }
 

@@ -93,7 +93,7 @@ class PermissionDataFixture extends Fixture
     {
         $recipient = (new Recipient())
             ->setName($name)
-            ->setOwner($admin);
+            ->setAdmin($admin);
 
         return $this->persistAndAddReference($recipient, $referenceName);
     }

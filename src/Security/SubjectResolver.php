@@ -46,7 +46,7 @@ class SubjectResolver
 
         if ($subject instanceof Recipient) {
             $idMap[Recipient::class] = $subject->getId();
-            $owner = $subject->getOwner();
+            $owner = $subject->getAdmin();
         }
 
         return new ResolvedSubject($baseEntityClass, $subject, $section, $idMap, $owner, $fundType);

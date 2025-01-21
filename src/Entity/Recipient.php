@@ -18,9 +18,9 @@ class Recipient
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1top_info: Local Authority name
 
-    #[ORM\ManyToOne(inversedBy: 'recipientsOwned')]
+    #[ORM\ManyToOne(inversedBy: 'recipientsAdminOf')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $owner = null;
+    private ?User $admin = null;
 
     /**
      * @var Collection<int, Project>
@@ -51,14 +51,14 @@ class Recipient
         return $this;
     }
 
-    public function getOwner(): ?User
+    public function getAdmin(): ?User
     {
-        return $this->owner;
+        return $this->admin;
     }
 
-    public function setOwner(?User $owner): static
+    public function setAdmin(?User $admin): static
     {
-        $this->owner = $owner;
+        $this->admin = $admin;
         return $this;
     }
 

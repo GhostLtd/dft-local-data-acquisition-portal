@@ -59,7 +59,7 @@ class FixtureHelper
 
         $owner = $this->createUser($definition->getOwner(), $recipient);
 
-        $recipient->setOwner($owner);
+        $recipient->setAdmin($owner);
         $this->persist([$recipient]);
 
         foreach($definition->getProjects() as $projectDefinition) {
@@ -99,7 +99,7 @@ class FixtureHelper
             ->setEmail($email);
 
         if ($recipient) {
-            $recipient->setOwner($user);
+            $recipient->setAdmin($user);
         }
 
         $this->users[$email] = $user;

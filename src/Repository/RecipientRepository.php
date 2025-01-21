@@ -31,8 +31,8 @@ class RecipientRepository extends ServiceEntityRepository
         $whereInSQL = $this->doctrineUlidHelper->getSqlForWhereInAndInjectParams($qb, 'recipient', $recipientIds);
 
         return $qb
-            ->select('recipient, fundAward, return')
-            ->join('recipient.owner', 'owner')
+            ->select('recipient, admin, fundAward, return')
+            ->join('recipient.admin', 'admin')
             ->join('recipient.fundAwards', 'fundAward')
             ->join('fundAward.returns', 'return')
             ->where("recipient.id IN ({$whereInSQL})")

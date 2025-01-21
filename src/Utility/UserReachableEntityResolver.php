@@ -65,7 +65,7 @@ class UserReachableEntityResolver
         };
 
         if ($entityType === Recipient::class) {
-            foreach($user->getRecipientsOwned() as $recipient) {
+            foreach($user->getRecipientsAdminOf() as $recipient) {
                 $add($recipient->getId());
             }
 
