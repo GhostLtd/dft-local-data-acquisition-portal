@@ -6,7 +6,7 @@ use App\Entity\Enum\Permission;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\ProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Entity\UserPermission;
 
 class UserPermissionValidator
@@ -19,7 +19,7 @@ class UserPermissionValidator
         $fundTypes = $userPermission->getFundTypes();
 
         if ($permission === Permission::SUBMITTER) {
-            if (!in_array($entityClass, [Recipient::class, FundReturn::class])) {
+            if (!in_array($entityClass, [Authority::class, FundReturn::class])) {
                 return false;
             }
 
@@ -27,16 +27,16 @@ class UserPermissionValidator
                 return false;
             }
 
-            if ($fundTypes !== null && $entityClass !== Recipient::class) {
+            if ($fundTypes !== null && $entityClass !== Authority::class) {
                 return false;
             }
         } else if (in_array($permission, [Permission::CHECKER, Permission::EDITOR, Permission::VIEWER])) {
-            if (!in_array($entityClass, [Recipient::class, FundReturn::class, Project::class, ProjectReturn::class])) {
+            if (!in_array($entityClass, [Authority::class, FundReturn::class, Project::class, ProjectReturn::class])) {
                 return false;
             }
 
             if ($sectionTypes !== null) {
-                if ($entityClass === Recipient::class) {
+                if ($entityClass === Authority::class) {
                     return false;
                 }
 

@@ -6,7 +6,7 @@ use App\Entity\Enum\Fund;
 use App\Entity\ProjectFund\BsipProjectFund;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\ProjectFund\ProjectFund;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -35,7 +35,7 @@ class ProjectFundRepository extends ServiceEntityRepository
         };
     }
 
-    public function getProjectFundsForRecipient(Recipient $recipient, Fund $fund=null): array
+    public function getProjectFundsForAuthority(Authority $authority, Fund $fund=null): array
     {
         $projectFundClass = $this->getProjectFundClassForFund($fund);
 
@@ -44,11 +44,11 @@ class ProjectFundRepository extends ServiceEntityRepository
             ->select('projectFund, project')
             ->from($projectFundClass, 'projectFund')
             ->join('projectFund.project', 'project')
-            ->join('project.owner', 'recipient')
-            ->where('recipient.id = :recipient')
+            ->join('project.owner', 'authority')
+            ->where('authority.id = :authority_id')
             ->orderBy('project.name', 'ASC')
             ->getQuery()
-            ->setParameter('recipient', $recipient->getId(), UlidType::NAME)
+            ->setParameter('authority_id', $authority->getId(), UlidType::NAME)
             ->getResult();
     }
 

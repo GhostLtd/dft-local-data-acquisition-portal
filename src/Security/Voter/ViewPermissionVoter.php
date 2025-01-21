@@ -7,7 +7,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\PermissionsView;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\ProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Entity\User;
 use App\Security\SubjectResolver;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,10 +56,10 @@ class ViewPermissionVoter extends Voter
         $subjectSection = $resolvedSubject->getSection();
 
         $permissionClassChain = match ($subjectBaseClass) {
-            Recipient::class => [Recipient::class],
-            FundReturn::class => [FundReturn::class, Recipient::class],
-            ProjectReturn::class => [ProjectReturn::class, Project::class, FundReturn::class, Recipient::class],
-            Project::class => [Project::class, Recipient::class],
+            Authority::class => [Authority::class],
+            FundReturn::class => [FundReturn::class, Authority::class],
+            ProjectReturn::class => [ProjectReturn::class, Project::class, FundReturn::class, Authority::class],
+            Project::class => [Project::class, Authority::class],
         };
 
         foreach($permissionViews as $permissionView) {
@@ -89,7 +89,7 @@ class ViewPermissionVoter extends Voter
 
             foreach($permissionClassChain as $class) {
                 $permissionEntityId = match ($class) {
-                    Recipient::class => $permissionView->getRecipientId(),
+                    Authority::class => $permissionView->getAuthorityId(),
                     FundReturn::class => $permissionView->getFundReturnId(),
                     ProjectReturn::class => $permissionView->getProjectReturnId(),
                     Project::class => $permissionView->getProjectId(),

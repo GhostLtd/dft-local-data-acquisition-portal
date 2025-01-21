@@ -4,7 +4,7 @@ namespace App\Controller\Frontend;
 
 use App\Entity\User;
 use App\Repository\MaintenanceWarningRepository;
-use App\Repository\RecipientRepository;
+use App\Repository\AuthorityRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\UserReachableEntityResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +19,7 @@ class DashboardController extends AbstractController
     public function index(
         DashboardBreadcrumbBuilder   $breadcrumbBuilder,
         MaintenanceWarningRepository $maintenanceWarningRepository,
-        RecipientRepository          $recipientRepository,
+        AuthorityRepository          $authorityRepository,
         UserInterface                $user,
         UserReachableEntityResolver  $userReachableEntityResolver,
     ): Response
@@ -28,12 +28,12 @@ class DashboardController extends AbstractController
             throw new NotFoundHttpException();
         }
 
-        $recipientIds = $userReachableEntityResolver->getRecipientIdsViewableBy($user);
+        $authorityIds = $userReachableEntityResolver->getAuthorityIdsViewableBy($user);
 
         return $this->render('frontend/dashboard.html.twig', [
             'breadcrumbBuilder' => $breadcrumbBuilder,
             'maintenanceWarningBanner' => $maintenanceWarningRepository->getNotificationBanner(),
-            'recipients' => $recipientRepository->getRecipientsFundAwardsAndReturns($recipientIds),
+            'authorities' => $authorityRepository->getAuthoritiesFundAwardsAndReturns($authorityIds),
         ]);
     }
 }

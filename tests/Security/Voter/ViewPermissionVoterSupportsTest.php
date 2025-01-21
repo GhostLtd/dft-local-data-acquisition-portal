@@ -7,7 +7,7 @@ use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Security\Voter\ViewPermissionVoter;
 use App\Tests\AbstractFunctionalTest;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
@@ -26,8 +26,8 @@ class ViewPermissionVoterSupportsTest extends AbstractFunctionalTest
 
     public function dataSupports(): array {
         return [
-            [Role::CAN_VIEW, new Recipient(), true],
-            [Role::CAN_VIEW, ['subject' => new Recipient(), 'section' => 'section_one'], false], // Invalid subject, Recipients don't have sections
+            [Role::CAN_VIEW, new Authority(), true],
+            [Role::CAN_VIEW, ['subject' => new Authority(), 'section' => 'section_one'], false], // Invalid subject, Authorities don't have sections
 
             [Role::CAN_VIEW, new CrstsFundReturn(), true],
             [Role::CAN_VIEW, ['subject' => new CrstsFundReturn(), 'section' => 'section_one'], true],

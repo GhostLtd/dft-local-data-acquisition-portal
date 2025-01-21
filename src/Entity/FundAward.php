@@ -17,7 +17,7 @@ class FundAward
 
     #[ORM\ManyToOne(inversedBy: 'fundAwards')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Recipient $recipient = null;
+    private ?Authority $authority = null;
 
     #[ORM\Column(enumType: Fund::class)]
     private ?Fund $type = null;
@@ -38,14 +38,14 @@ class FundAward
         $this->returns = new ArrayCollection();
     }
 
-    public function getRecipient(): ?Recipient
+    public function getAuthority(): ?Authority
     {
-        return $this->recipient;
+        return $this->authority;
     }
 
-    public function setRecipient(?Recipient $recipient): static
+    public function setAuthority(?Authority $authority): static
     {
-        $this->recipient = $recipient;
+        $this->authority = $authority;
         return $this;
     }
 

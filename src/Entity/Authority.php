@@ -5,20 +5,20 @@ namespace App\Entity;
 use App\Entity\Enum\Fund;
 use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\Traits\IdTrait;
-use App\Repository\RecipientRepository;
+use App\Repository\AuthorityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: RecipientRepository::class)]
-class Recipient
+#[ORM\Entity(repositoryClass: AuthorityRepository::class)]
+class Authority
 {
     use IdTrait;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null; // 1top_info: Local Authority name
 
-    #[ORM\ManyToOne(inversedBy: 'recipientsAdminOf')]
+    #[ORM\ManyToOne(inversedBy: 'authoritiesAdminOf')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $admin = null;
 
@@ -31,7 +31,7 @@ class Recipient
     /**
      * @var Collection<int, FundAward>
      */
-    #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'recipient', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'authority', orphanRemoval: true)]
     private Collection $fundAwards;
 
     public function __construct()
@@ -104,7 +104,7 @@ class Recipient
     {
         if (!$this->fundAwards->contains($fundAward)) {
             $this->fundAwards->add($fundAward);
-            $fundAward->setRecipient($this);
+            $fundAward->setAuthority($this);
         }
 
         return $this;
@@ -114,8 +114,8 @@ class Recipient
     {
         if ($this->fundAwards->removeElement($fundAward)) {
             // set the owning side to null (unless already changed)
-            if ($fundAward->getRecipient() === $this) {
-                $fundAward->setRecipient(null);
+            if ($fundAward->getAuthority() === $this) {
+                $fundAward->setAuthority(null);
             }
         }
 
@@ -125,7 +125,7 @@ class Recipient
     // --------------------------------------------------------------------------------
 
     /**
-     * Returns a collection of the projects that this recipient has, that receive funding from the specified $fund
+     * Returns a collection of the projects that this authority has, that receive funding from the specified $fund
      * @return Collection<Project>
      */
     public function getProjectsForFund(Fund $fund): Collection
@@ -137,7 +137,7 @@ class Recipient
     }
 
     /**
-     * Returns a collection of the projectFunds that this recipient has, that receive funding from the specified $fund
+     * Returns a collection of the projectFunds that this authority has, that receive funding from the specified $fund
      * @return Collection<ProjectFund>
      */
     public function getProjectFundsForFund(Fund $fund): Collection

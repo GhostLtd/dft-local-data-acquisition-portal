@@ -41,15 +41,15 @@ SELECT
     CAST(u.id as {$columnType}) AS id,
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
-    recipient.id    AS recipient_id,
+    authority.id    AS authority_id,
     {$null}         AS project_id,
     {$null}         AS project_return_id,
     {$null}         AS fund_return_id,
     u.fund_types    AS fund_types,
     u.section_types AS section_types
 FROM user_permission u
-    JOIN recipient ON recipient.id = u.entity_id
-WHERE u.entity_class = 'App\Entity\Recipient'
+    JOIN authority ON authority.id = u.entity_id
+WHERE u.entity_class = 'App\Entity\Authority'
 
 UNION
 
@@ -57,7 +57,7 @@ SELECT
     CAST(u.id as {$columnType}) AS id,
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
-    recipient.id    AS recipient_id,
+    authority.id    AS authority_id,
     {$null}         AS project_id,
     {$null}         AS project_return_id,
     fund_return.id  AS fund_return_id,
@@ -66,7 +66,7 @@ SELECT
 FROM user_permission u
     JOIN fund_return ON fund_return.id = u.entity_id
     JOIN fund_award ON fund_return.fund_award_id = fund_award.id
-    JOIN recipient ON fund_award.recipient_id = recipient.id
+    JOIN authority ON fund_award.authority_id = authority.id
 WHERE u.entity_class = 'App\Entity\FundReturn\FundReturn'
 
 UNION
@@ -75,7 +75,7 @@ SELECT
     CAST(u.id as {$columnType}) AS id,
     u.user_id         AS user_id,
     u.entity_class  AS entity_class,
-    recipient.id      AS recipient_id,
+    authority.id      AS authority_id,
     project.id        AS project_id,
     project_return.id AS project_return_id,
     fund_return.id    AS fund_return_id,
@@ -86,7 +86,7 @@ FROM user_permission u
     JOIN fund_return ON project_return.fund_return_id = fund_return.id
     JOIN project_fund ON project_return.project_fund_id = project_fund.id
     JOIN project ON project_fund.project_id = project.id
-    JOIN recipient ON project.owner_id = recipient.id
+    JOIN authority ON project.owner_id = authority.id
 WHERE u.entity_class = 'App\Entity\ProjectReturn\ProjectReturn'
 
 UNION
@@ -95,7 +95,7 @@ SELECT
     CAST(u.id as {$columnType}) AS id,
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
-    recipient.id    AS recipient_id,
+    authority.id    AS authority_id,
     project.id      AS project_id,
     {$null}         AS project_return_id,
     {$null}         AS fund_return_id,
@@ -103,7 +103,7 @@ SELECT
     u.section_types AS section_types
 FROM user_permission u
     JOIN project ON project.id = u.entity_id
-    JOIN recipient ON project.owner_id = recipient.id
+    JOIN authority ON project.owner_id = authority.id
 WHERE u.entity_class = 'App\Entity\Project'
 EOQ);
     }

@@ -6,7 +6,7 @@ use App\DataFixtures\Definition\FundAwardDefinition;
 use App\DataFixtures\Definition\FundReturn\CrstsFundReturnDefinition;
 use App\DataFixtures\Definition\UserDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
-use App\DataFixtures\Definition\RecipientDefinition;
+use App\DataFixtures\Definition\AuthorityDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
 use App\DataFixtures\Definition\ProjectDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
@@ -16,7 +16,7 @@ use App\Entity\ExpenseEntry;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\ProjectFund\BenefitCostRatio;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Entity\Milestone;
 use App\Entity\Project;
 use App\Entity\ProjectFund\CrstsProjectFund;
@@ -52,29 +52,29 @@ class FixtureHelper
 
     // ----------------------------------------------------------------------------------------------------
 
-    public function createFundRecipient(RecipientDefinition $definition): Recipient
+    public function createAuthority(AuthorityDefinition $definition): Authority
     {
-        $recipient = (new Recipient())
+        $authority = (new Authority())
             ->setName($definition->getName());
 
-        $admin = $this->createUser($definition->getAdmin(), $recipient);
+        $admin = $this->createUser($definition->getAdmin(), $authority);
 
-        $recipient->setAdmin($admin);
-        $this->persist([$recipient]);
+        $authority->setAdmin($admin);
+        $this->persist([$authority]);
 
         foreach($definition->getProjects() as $projectDefinition) {
-            $recipient->addProject($this->createProject($projectDefinition));
+            $authority->addProject($this->createProject($projectDefinition));
         }
 
-        $projects = $recipient->getProjects()->toArray();
+        $projects = $authority->getProjects()->toArray();
         foreach($definition->getFundAwards() as $fundAwardDefinition) {
-            $recipient->addFundAward($this->createFundAward($fundAwardDefinition, $projects));
+            $authority->addFundAward($this->createFundAward($fundAwardDefinition, $projects));
         }
 
-        return $recipient;
+        return $authority;
     }
 
-    public function createUser(UserDefinition $definition, ?Recipient $recipient=null): User
+    public function createUser(UserDefinition $definition, ?Authority $authority=null): User
     {
         $email = $definition->getEmail();
 
@@ -98,7 +98,7 @@ class FixtureHelper
             ->setPhone($definition->getPhone())
             ->setEmail($email);
 
-        $recipient?->setAdmin($user);
+        $authority?->setAdmin($user);
 
         $this->users[$email] = $user;
         $this->persist([$user]);

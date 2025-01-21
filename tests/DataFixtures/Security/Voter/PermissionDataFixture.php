@@ -11,7 +11,7 @@ use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\ProjectFund\ProjectFund;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Entity\ProjectReturn\ProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -24,34 +24,34 @@ class PermissionDataFixture extends Fixture
     {
         $this->manager = $manager;
 
-        $admin1 = $this->createUser('Admin of recipient 1 + 2', 'admin1@example.com', 'admin:1');
-        $admin2 = $this->createUser('Admin of recipient 3', 'admin2@example.com', 'admin:2');
+        $admin1 = $this->createUser('Admin of Authority 1 + 2', 'admin1@example.com', 'admin:1');
+        $admin2 = $this->createUser('Admin of Authority 3', 'admin2@example.com', 'admin:2');
 
-        $recipient1 = $this->createRecipient('Recipient 1', 'recipient:1', $admin1);
-        $recipient2 = $this->createRecipient('Recipient 2', 'recipient:2', $admin1);
-        $recipient3 = $this->createRecipient('Recipient 3', 'recipient:3', $admin2);
+        $authority1 = $this->createAuthority('Authority 1', 'authority:1', $admin1);
+        $authority2 = $this->createAuthority('Authority 2', 'authority:2', $admin1);
+        $authority3 = $this->createAuthority('Authority 3', 'authority:3', $admin2);
 
-        $fundAward1 = $this->createFundAward(Fund::CRSTS1, 'recipient:1/fund-award:1', $recipient1);
-        $fundAward2 = $this->createFundAward(Fund::CRSTS1, 'recipient:2/fund-award:1', $recipient2);
-        $fundAward3 = $this->createFundAward(Fund::CRSTS1, 'recipient:3/fund-award:1', $recipient3);
+        $fundAward1 = $this->createFundAward(Fund::CRSTS1, 'authority:1/fund-award:1', $authority1);
+        $fundAward2 = $this->createFundAward(Fund::CRSTS1, 'authority:2/fund-award:1', $authority2);
+        $fundAward3 = $this->createFundAward(Fund::CRSTS1, 'authority:3/fund-award:1', $authority3);
 
-        $return1 = $this->createFundReturn($fundAward1, 'recipient:1/return:1');
-        $return2 = $this->createFundReturn($fundAward1, 'recipient:1/return:2');
-        $return3 = $this->createFundReturn($fundAward2, 'recipient:2/return:1');
-        $return4 = $this->createFundReturn($fundAward3, 'recipient:3/return:1');
+        $return1 = $this->createFundReturn($fundAward1, 'authority:1/return:1');
+        $return2 = $this->createFundReturn($fundAward1, 'authority:1/return:2');
+        $return3 = $this->createFundReturn($fundAward2, 'authority:2/return:1');
+        $return4 = $this->createFundReturn($fundAward3, 'authority:3/return:1');
 
         $user = $this->createUser('User', 'user@example.com', 'user');
 
-        [$project1, $projectFund1] = $this->createProjectAndProjectFund('Recipient 1, project 1', 'recipient:1/project:1', Fund::CRSTS1, $recipient1);
-        [$project2, $projectFund2] = $this->createProjectAndProjectFund('Recipient 1, project 2', 'recipient:1/project:2', Fund::CRSTS1, $recipient1);
-        [$project3, $projectFund3] = $this->createProjectAndProjectFund('Recipient 2, project 1', 'recipient:2/project:1', Fund::CRSTS1, $recipient2);
-        [$project4, $projectFund4] = $this->createProjectAndProjectFund('Recipient 3, project 1', 'recipient:3/project:1', Fund::CRSTS1, $recipient3);
+        [$project1, $projectFund1] = $this->createProjectAndProjectFund('Authority 1, project 1', 'authority:1/project:1', Fund::CRSTS1, $authority1);
+        [$project2, $projectFund2] = $this->createProjectAndProjectFund('Authority 1, project 2', 'authority:1/project:2', Fund::CRSTS1, $authority1);
+        [$project3, $projectFund3] = $this->createProjectAndProjectFund('Authority 2, project 1', 'authority:2/project:1', Fund::CRSTS1, $authority2);
+        [$project4, $projectFund4] = $this->createProjectAndProjectFund('Authority 3, project 1', 'authority:3/project:1', Fund::CRSTS1, $authority3);
 
-        $projectReturn1 = $this->createProjectReturn('recipient:1/return:1/project:1', $projectFund1, $return1);
-        $projectReturn2 = $this->createProjectReturn('recipient:1/return:2/project:1', $projectFund1, $return2);
-        $projectReturn3 = $this->createProjectReturn('recipient:1/return:1/project:2', $projectFund2, $return1);
-        $projectReturn4 = $this->createProjectReturn('recipient:2/return:1/project:1', $projectFund3, $return3);
-        $projectReturn5 = $this->createProjectReturn('recipient:3/return:1/project:1', $projectFund4, $return4);
+        $projectReturn1 = $this->createProjectReturn('authority:1/return:1/project:1', $projectFund1, $return1);
+        $projectReturn2 = $this->createProjectReturn('authority:1/return:2/project:1', $projectFund1, $return2);
+        $projectReturn3 = $this->createProjectReturn('authority:1/return:1/project:2', $projectFund2, $return1);
+        $projectReturn4 = $this->createProjectReturn('authority:2/return:1/project:1', $projectFund3, $return3);
+        $projectReturn5 = $this->createProjectReturn('authority:3/return:1/project:1', $projectFund4, $return4);
 
         $manager->flush();
     }
@@ -80,31 +80,31 @@ class PermissionDataFixture extends Fixture
         return $this->persistAndAddReference($return, $referenceName);
     }
 
-    protected function createFundAward(Fund $type, string $referenceName, Recipient $recipient): FundAward
+    protected function createFundAward(Fund $type, string $referenceName, Authority $authority): FundAward
     {
         $award = (new FundAward())
             ->setType($type)
-            ->setRecipient($recipient);
+            ->setAuthority($authority);
 
         return $this->persistAndAddReference($award, $referenceName);
     }
 
-    protected function createRecipient(string $name, string $referenceName, User $admin): Recipient
+    protected function createAuthority(string $name, string $referenceName, User $admin): Authority
     {
-        $recipient = (new Recipient())
+        $authority = (new Authority())
             ->setName($name)
             ->setAdmin($admin);
 
-        return $this->persistAndAddReference($recipient, $referenceName);
+        return $this->persistAndAddReference($authority, $referenceName);
     }
 
     /**
      * @return array{0: Project, 1:ProjectFund}
      */
-    protected function createProjectAndProjectFund(string $name, string $referenceName, Fund $type, Recipient $recipient): array
+    protected function createProjectAndProjectFund(string $name, string $referenceName, Fund $type, Authority $authority): array
     {
         $project = (new Project())
-            ->setOwner($recipient) // TODO: Change this relation name to recipient (authority)
+            ->setOwner($authority)
             ->setName($name);
 
         if ($type === Fund::CRSTS1) {

@@ -9,43 +9,43 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Entity\ProjectReturn\ProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 
 class ViewPermissionVoterTest extends AbstractPermissionVoterTest
 {
     public function dataOwner(): array
     {
         return [
-            [true,  'admin:1', Recipient::class, 'recipient:1', null],
-            [true,  'admin:1', Recipient::class, 'recipient:2', null],
-            [false, 'admin:1', Recipient::class, 'recipient:3', null],
+            [true,  'admin:1', Authority::class, 'authority:1', null],
+            [true,  'admin:1', Authority::class, 'authority:2', null],
+            [false, 'admin:1', Authority::class, 'authority:3', null],
 
-            // N.B. [<Recipient>, 'whatever'] is not a valid subject, as a recipient doesn't have sections
-            [false, 'admin:1', Recipient::class, 'recipient:1', 'whatever'],
-            [false, 'admin:1', Recipient::class, 'recipient:2', 'whatever'],
-            [false, 'admin:1', Recipient::class, 'recipient:3', 'whatever'],
+            // N.B. [<Authority>, 'whatever'] is not a valid subject, as an authority doesn't have sections
+            [false, 'admin:1', Authority::class, 'authority:1', 'whatever'],
+            [false, 'admin:1', Authority::class, 'authority:2', 'whatever'],
+            [false, 'admin:1', Authority::class, 'authority:3', 'whatever'],
 
-            [true,  'admin:1', CrstsFundReturn::class, 'recipient:1/return:1', null],
-            [true,  'admin:1', CrstsFundReturn::class, 'recipient:1/return:2', null],
-            [true,  'admin:1', CrstsFundReturn::class, 'recipient:2/return:1', null],
-            [false, 'admin:1', CrstsFundReturn::class, 'recipient:3/return:1', null],
+            [true,  'admin:1', CrstsFundReturn::class, 'authority:1/return:1', null],
+            [true,  'admin:1', CrstsFundReturn::class, 'authority:1/return:2', null],
+            [true,  'admin:1', CrstsFundReturn::class, 'authority:2/return:1', null],
+            [false, 'admin:1', CrstsFundReturn::class, 'authority:3/return:1', null],
 
-            [true,  'admin:1', CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'],
-            [true,  'admin:1', CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-            [true,  'admin:1', CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-            [false, 'admin:1', CrstsFundReturn::class, 'recipient:3/return:1', 'whatever'],
+            [true,  'admin:1', CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
+            [true,  'admin:1', CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+            [true,  'admin:1', CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+            [false, 'admin:1', CrstsFundReturn::class, 'authority:3/return:1', 'whatever'],
 
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null],
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null],
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-            [false, 'admin:1', CrstsProjectReturn::class, 'recipient:3/return:1/project:1', null],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:1/return:2/project:1', null],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:1/return:1/project:2', null],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+            [false, 'admin:1', CrstsProjectReturn::class, 'authority:3/return:1/project:1', null],
 
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'],
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-            [true,  'admin:1', CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
-            [false, 'admin:1', CrstsProjectReturn::class, 'recipient:3/return:1/project:1', 'whatever'],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+            [true,  'admin:1', CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+            [false, 'admin:1', CrstsProjectReturn::class, 'authority:3/return:1/project:1', 'whatever'],
         ];
     }
 
@@ -69,167 +69,167 @@ class ViewPermissionVoterTest extends AbstractPermissionVoterTest
             [
                 null,
                 [
-                    [false, Recipient::class, 'recipient:1', null],
-                    [false, Recipient::class, 'recipient:1', 'whatever'], // Invalid subject
-                    [false, CrstsFundReturn::class, 'recipient:1/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', null],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
+                    [false, Authority::class, 'authority:1', null],
+                    [false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
+                    [false, CrstsFundReturn::class, 'authority:1/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', null],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', null],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
                 ]
             ],
             // Any (relevant) permissions on the recipient
             [
-                [$allRelevantPermissions, Recipient::class, Recipient::class, 'recipient:1', null, null],
+                [$allRelevantPermissions, Authority::class, Authority::class, 'authority:1', null, null],
                 [
-                    [true,  Recipient::class, 'recipient:1', null],
-                    [false, Recipient::class, 'recipient:1', 'whatever'], // Invalid subject
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', null],
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:2', null],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', null], // Not recipient 1
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'],
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
+                    [true,  Authority::class, 'authority:1', null],
+                    [false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', null],
+                    [true,  CrstsFundReturn::class, 'authority:1/return:2', null],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', null], // Not recipient 1
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
+                    [true,  CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:2/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:2', null],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
                 ]
             ],
             // Any (relevant) permissions on the fund return
             [
-                [$allRelevantPermissions, CrstsFundReturn::class, FundReturn::class, 'recipient:1/return:1', null, null],
+                [$allRelevantPermissions, CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, null],
                 [
-                    [true,  Recipient::class, 'recipient:1', null],
-                    [false, Recipient::class, 'recipient:1', 'whatever'], // Invalid subject
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', null], // Not the right return
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', null],
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
+                    [true,  Authority::class, 'authority:1', null],
+                    [false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', null], // Not the right return
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', null],
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:2', null],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
                 ]
             ],
             // All relevant permissions (excl. SUBMITTER) on the project return
             [
-                [$allRelevantExceptSubmitter, CrstsProjectReturn::class, ProjectReturn::class, 'recipient:1/return:1/project:1', null, null],
+                [$allRelevantExceptSubmitter, CrstsProjectReturn::class, ProjectReturn::class, 'authority:1/return:1/project:1', null, null],
                 [
-                    [true,  Recipient::class, 'recipient:1', null],
-                    [false, Recipient::class, 'recipient:1', 'whatever'], // Invalid subject
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', null], // Not the right return
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'], // Access to a ProjectReturn doesn't grant access to FundReturn sections
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null], // Wrong project return
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
+                    [true,  Authority::class, 'authority:1', null],
+                    [false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', null], // Not the right return
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'], // Access to a ProjectReturn doesn't grant access to FundReturn sections
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', null], // Wrong project return
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
                 ]
             ],
             // All relevant permissions (excl. SUBMITTER) on the project
             [
-                [$allRelevantExceptSubmitter, Project::class, Project::class, 'recipient:1/project:1', null, null],
+                [$allRelevantExceptSubmitter, Project::class, Project::class, 'authority:1/project:1', null, null],
                 [
-                    [true,  Recipient::class, 'recipient:1', null],
-                    [false, Recipient::class, 'recipient:1', 'whatever'], // Invalid subject
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', null],
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:2', null],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'], // Having access to a project shouldn't allow access to sections
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null], // Wrong project
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
+                    [true,  Authority::class, 'authority:1', null],
+                    [false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', null],
+                    [true,  CrstsFundReturn::class, 'authority:1/return:2', null],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'], // Having access to a project shouldn't allow access to sections
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:2/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', null], // Wrong project
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
                 ]
             ],
             // All relevant permissions except SUBMITTER on the fund return, with sectionTypes specified
             [
-                [$allRelevantExceptSubmitter, CrstsFundReturn::class, FundReturn::class, 'recipient:1/return:1', null, ['section_one', 'section_two']],
+                [$allRelevantExceptSubmitter, CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, ['section_one', 'section_two']],
                 [
-                    [true,  Recipient::class, 'recipient:1', null],
-                    [false, Recipient::class, 'recipient:1', 'whatever'], // Invalid subject
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', null], // Not the right return
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', null],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'], // Not a section specified by the permission
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-                    [true,  CrstsFundReturn::class, 'recipient:1/return:1', 'section_two'],
-                    [false, CrstsFundReturn::class, 'recipient:1/return:2', 'section_two'], // Not the right return
-                    [false, CrstsFundReturn::class, 'recipient:2/return:1', 'section_two'],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null],
-                    [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'], // Permission targets a FundReturn, not a ProjectReturn
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'section_one'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'section_one'],
-                    [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'section_two'],
-                    [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'section_two'],
+                    [true,  Authority::class, 'authority:1', null],
+                    [false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', null], // Not the right return
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', null],
+                    [false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'], // Not a section specified by the permission
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+                    [true,  CrstsFundReturn::class, 'authority:1/return:1', 'section_two'],
+                    [false, CrstsFundReturn::class, 'authority:1/return:2', 'section_two'], // Not the right return
+                    [false, CrstsFundReturn::class, 'authority:2/return:1', 'section_two'],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', null],
+                    [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:2', null],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'], // Permission targets a FundReturn, not a ProjectReturn
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'section_one'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'section_one'],
+                    [false, CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'section_two'],
+                    [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'section_two'],
                 ],
                 // All relevant permissions except SUBMITTER on the project return, with sectionTypes specified
                 [
-                    [$allRelevantExceptSubmitter, CrstsProjectReturn::class, ProjectReturn::class, 'recipient:1/return:1/project:1', null, ['section_one', 'section_two']],
+                    [$allRelevantExceptSubmitter, CrstsProjectReturn::class, ProjectReturn::class, 'authority:1/return:1/project:1', null, ['section_one', 'section_two']],
                     [
-                        [true,  Recipient::class, 'recipient:1', null],
-                        [false, Recipient::class, 'recipient:1', 'whatever'], // Invalid subject
-                        [true,  CrstsFundReturn::class, 'recipient:1/return:1', null],
-                        [false, CrstsFundReturn::class, 'recipient:1/return:2', null], // Not the right return
-                        [false, CrstsFundReturn::class, 'recipient:2/return:1', null],
-                        [false, CrstsFundReturn::class, 'recipient:1/return:1', 'whatever'], // Permission targets a ProjectReturn, not a FundReturn
-                        [false, CrstsFundReturn::class, 'recipient:1/return:2', 'whatever'],
-                        [false, CrstsFundReturn::class, 'recipient:2/return:1', 'whatever'],
-                        [false, CrstsFundReturn::class, 'recipient:1/return:1', 'section_two'],
-                        [false, CrstsFundReturn::class, 'recipient:1/return:2', 'section_two'],
-                        [false, CrstsFundReturn::class, 'recipient:2/return:1', 'section_two'],
-                        [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', null],
-                        [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', null], // Not the specified project return
-                        [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', null],
-                        [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', null],
-                        [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'whatever'], // Not a section specified by the permission
-                        [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'whatever'],
-                        [false, CrstsProjectReturn::class, 'recipient:1/return:1/project:2', 'whatever'],
-                        [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'whatever'],
-                        [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'section_one'],
-                        [false, CrstsProjectReturn::class, 'recipient:1/return:2/project:1', 'section_one'],
-                        [true,  CrstsProjectReturn::class, 'recipient:1/return:1/project:1', 'section_two'],
-                        [false, CrstsProjectReturn::class, 'recipient:2/return:1/project:1', 'section_two'],
+                        [true,  Authority::class, 'authority:1', null],
+                        [false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
+                        [true,  CrstsFundReturn::class, 'authority:1/return:1', null],
+                        [false, CrstsFundReturn::class, 'authority:1/return:2', null], // Not the right return
+                        [false, CrstsFundReturn::class, 'authority:2/return:1', null],
+                        [false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'], // Permission targets a ProjectReturn, not a FundReturn
+                        [false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
+                        [false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
+                        [false, CrstsFundReturn::class, 'authority:1/return:1', 'section_two'],
+                        [false, CrstsFundReturn::class, 'authority:1/return:2', 'section_two'],
+                        [false, CrstsFundReturn::class, 'authority:2/return:1', 'section_two'],
+                        [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', null],
+                        [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', null], // Not the specified project return
+                        [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', null],
+                        [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', null],
+                        [false, CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'whatever'], // Not a section specified by the permission
+                        [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'whatever'],
+                        [false, CrstsProjectReturn::class, 'authority:1/return:1/project:2', 'whatever'],
+                        [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                        [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'section_one'],
+                        [false, CrstsProjectReturn::class, 'authority:1/return:2/project:1', 'section_one'],
+                        [true,  CrstsProjectReturn::class, 'authority:1/return:1/project:1', 'section_two'],
+                        [false, CrstsProjectReturn::class, 'authority:2/return:1/project:1', 'section_two'],
                     ]
                 ],
             ],

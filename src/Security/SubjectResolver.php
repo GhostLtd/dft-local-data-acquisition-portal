@@ -6,7 +6,7 @@ use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\ProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use Psr\Log\LoggerInterface;
 
 class SubjectResolver
@@ -41,11 +41,11 @@ class SubjectResolver
             $idMap[FundReturn::class] = $subject->getId();
             $fundAward = $subject->getFundAward();
             $fundType = $fundAward?->getType();
-            $subject = $fundAward?->getRecipient();
+            $subject = $fundAward?->getAuthority();
         }
 
-        if ($subject instanceof Recipient) {
-            $idMap[Recipient::class] = $subject->getId();
+        if ($subject instanceof Authority) {
+            $idMap[Authority::class] = $subject->getId();
             $owner = $subject->getAdmin();
         }
 
@@ -92,8 +92,8 @@ class SubjectResolver
             return null;
         }
 
-        if ($baseEntityClass === Recipient::class && $section !== null) {
-            $this->logger->error("Failed to parse subject - invalid subject - cannot specify a sectionType for a Recipient");
+        if ($baseEntityClass === Authority::class && $section !== null) {
+            $this->logger->error("Failed to parse subject - invalid subject - cannot specify a sectionType for an Authority");
             return null;
         }
 
@@ -109,7 +109,7 @@ class SubjectResolver
         }
 
         if ($role === Role::CAN_VIEW) {
-            $validBaseClasses[] = Recipient::class;
+            $validBaseClasses[] = Authority::class;
         }
 
         // No, you can't replace this loop with in_array, because ::class is not the same as instanceof (inheritance!)

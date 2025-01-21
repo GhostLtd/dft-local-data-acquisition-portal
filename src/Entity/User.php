@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-// These fields are currently used to represent a Recipient's owner as well as the
+// These fields are currently used to represent an Authority's admin as well as the
 // "Lead contact" fields from 1top_info, but later can be additionally used for
 // storing other contacts
 
@@ -43,15 +43,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $permissions;
 
     /**
-     * @var Collection<int, Recipient>
+     * @var Collection<int, Authority>
      */
-    #[ORM\OneToMany(targetEntity: Recipient::class, mappedBy: 'admin')]
-    private Collection $recipientsAdminOf;
+    #[ORM\OneToMany(targetEntity: Authority::class, mappedBy: 'admin')]
+    private Collection $authoritiesAdminOf;
 
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
-        $this->recipientsAdminOf = new ArrayCollection();
+        $this->authoritiesAdminOf = new ArrayCollection();
     }
 
     public function getUserIdentifier(): string
@@ -159,29 +159,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Recipient>
+     * @return Collection<int, Authority>
      */
-    public function getRecipientsAdminOf(): Collection
+    public function getAuthoritiesAdminOf(): Collection
     {
-        return $this->recipientsAdminOf;
+        return $this->authoritiesAdminOf;
     }
 
-    public function addRecipientAdminOf(Recipient $recipient): static
+    public function addAuthorityAdminOf(Authority $authority): static
     {
-        if (!$this->recipientsAdminOf->contains($recipient)) {
-            $this->recipientsAdminOf->add($recipient);
-            $recipient->setAdmin($this);
+        if (!$this->authoritiesAdminOf->contains($authority)) {
+            $this->authoritiesAdminOf->add($authority);
+            $authority->setAdmin($this);
         }
 
         return $this;
     }
 
-    public function removeRecipientAdminOf(Recipient $recipient): static
+    public function removeAuthorityAdminOf(Authority $authority): static
     {
-        if ($this->recipientsAdminOf->removeElement($recipient)) {
+        if ($this->authoritiesAdminOf->removeElement($authority)) {
             // set the owning side to null (unless already changed)
-            if ($recipient->getAdmin() === $this) {
-                $recipient->setAdmin(null);
+            if ($authority->getAdmin() === $this) {
+                $authority->setAdmin(null);
             }
         }
 

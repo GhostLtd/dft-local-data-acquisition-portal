@@ -6,7 +6,7 @@ use App\DataFixtures\Definition\FundAwardDefinition;
 use App\DataFixtures\Definition\FundReturn\CrstsFundReturnDefinition;
 use App\DataFixtures\Definition\UserDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
-use App\DataFixtures\Definition\RecipientDefinition;
+use App\DataFixtures\Definition\AuthorityDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
 use App\DataFixtures\Definition\ProjectDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
@@ -74,7 +74,7 @@ class RandomFixtureGenerator
         return $data;
     }
 
-    public function createRandomRecipient(): RecipientDefinition
+    public function createAuthority(): AuthorityDefinition
     {
         $this->initialise();
 
@@ -90,7 +90,7 @@ class RandomFixtureGenerator
             }
         }
 
-        return new RecipientDefinition(
+        return new AuthorityDefinition(
             CouncilName::generate(),
             $this->createRandomUser(),
             $projects,

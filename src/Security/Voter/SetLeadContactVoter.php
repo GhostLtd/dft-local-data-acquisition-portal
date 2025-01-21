@@ -27,7 +27,7 @@ class SetLeadContactVoter extends Voter
             }
 
             if ($subject instanceof FundAward) {
-                return $subject->getRecipient()->getAdmin() === $user;
+                return $subject->getAuthority()->getAdmin() === $user;
             }
         }
 

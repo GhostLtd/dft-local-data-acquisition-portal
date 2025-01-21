@@ -7,7 +7,7 @@ use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Security\Voter\PermissionVoter;
 use App\Tests\AbstractFunctionalTest;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
@@ -46,7 +46,7 @@ class PermissionVoterSupportsTest extends AbstractFunctionalTest
             [Role::CAN_VIEW, ['subject' => new CrstsProjectReturn(), 'section' => 'section_one'], false],
         ];
 
-        foreach([new Project(), new Recipient(), new FundAward(), null] as $invalidSubject) {
+        foreach([new Project(), new Authority(), new FundAward(), null] as $invalidSubject) {
             $testCases[] = [Role::CAN_SUBMIT, $invalidSubject, false];
             $testCases[] = [Role::CAN_COMPLETE, $invalidSubject, false];
             $testCases[] = [Role::CAN_EDIT, $invalidSubject, false];

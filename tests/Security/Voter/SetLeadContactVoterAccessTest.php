@@ -37,18 +37,18 @@ class SetLeadContactVoterAccessTest extends AbstractFunctionalTest
 
     public function dataAccess(): array {
         return [
-            ['admin:1', FundAward::class, 'recipient:1/fund-award:1', true],
-            ['admin:1', FundAward::class, 'recipient:2/fund-award:1', true],
-            ['admin:2', FundAward::class, 'recipient:3/fund-award:1', true],
-            ['admin:1', FundAward::class, 'recipient:3/fund-award:1', false],
-            ['admin:2', FundAward::class, 'recipient:1/fund-award:1', false],
+            ['admin:1', FundAward::class, 'authority:1/fund-award:1', true],
+            ['admin:1', FundAward::class, 'authority:2/fund-award:1', true],
+            ['admin:2', FundAward::class, 'authority:3/fund-award:1', true],
+            ['admin:1', FundAward::class, 'authority:3/fund-award:1', false],
+            ['admin:2', FundAward::class, 'authority:1/fund-award:1', false],
 
-            ['admin:1', CrstsFundReturn::class, 'recipient:1/return:1', true],
-            ['admin:1', CrstsFundReturn::class, 'recipient:1/return:2', true],
-            ['admin:1', CrstsFundReturn::class, 'recipient:2/return:1', true],
-            ['admin:2', CrstsFundReturn::class, 'recipient:3/return:1', true],
-            ['admin:1', CrstsFundReturn::class, 'recipient:3/return:1', false],
-            ['admin:2', CrstsFundReturn::class, 'recipient:1/return:1', false],
+            ['admin:1', CrstsFundReturn::class, 'authority:1/return:1', true],
+            ['admin:1', CrstsFundReturn::class, 'authority:1/return:2', true],
+            ['admin:1', CrstsFundReturn::class, 'authority:2/return:1', true],
+            ['admin:2', CrstsFundReturn::class, 'authority:3/return:1', true],
+            ['admin:1', CrstsFundReturn::class, 'authority:3/return:1', false],
+            ['admin:2', CrstsFundReturn::class, 'authority:1/return:1', false],
         ];
     }
 

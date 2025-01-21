@@ -373,7 +373,7 @@ frontend:
     home:
       title: Local data acquisition portal
     fund_return:
-      title: "{recipientName}: {type} return for {year}/{nextYear} Q{quarter}"
+      title: "{authorityName}: {type} return for {year}/{nextYear} Q{quarter}"
       fund_level_details: Fund-level details
       fund_level_expenses: Fund-level expenses
       projects: Projects

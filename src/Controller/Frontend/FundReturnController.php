@@ -38,8 +38,8 @@ class FundReturnController extends AbstractReturnController
 
         // (Fetching via fundReturn->getProjectReturns() direction would only fetch those projects that
         //  do have returns, resulting in an incomplete list)
-        $projectFunds = $projectFundRepository->getProjectFundsForRecipient(
-            $fundReturn->getFundAward()->getRecipient(),
+        $projectFunds = $projectFundRepository->getProjectFundsForAuthority(
+            $fundReturn->getFundAward()->getAuthority(),
             $fund
         );
 

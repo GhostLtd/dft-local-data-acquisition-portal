@@ -19,7 +19,7 @@ class PermissionsView
     private ?string $entityClass = null;
 
     #[ORM\Column(type: UlidType::NAME, nullable: true)]
-    protected ?Ulid $recipientId = null;
+    protected ?Ulid $authorityId = null;
 
     #[ORM\Column(type: UlidType::NAME, nullable: true)]
     protected ?Ulid $projectId = null;
@@ -49,9 +49,9 @@ class PermissionsView
         return $this->entityClass;
     }
 
-    public function getRecipientId(): ?Ulid
+    public function getAuthorityId(): ?Ulid
     {
-        return $this->recipientId;
+        return $this->authorityId;
     }
 
     public function getProjectId(): ?Ulid

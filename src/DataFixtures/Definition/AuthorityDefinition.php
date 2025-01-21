@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures\Definition;
 
-class RecipientDefinition
+class AuthorityDefinition
 {
     /**
      * @param array<ProjectDefinition> $projects

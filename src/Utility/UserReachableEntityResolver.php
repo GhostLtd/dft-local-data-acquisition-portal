@@ -7,7 +7,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\PermissionsView;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\ProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Entity\User;
 use App\Entity\UserPermission;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,9 +24,9 @@ class UserReachableEntityResolver
         $this->cache = [];
     }
 
-    public function getRecipientIdsViewableBy(User $user): array
+    public function getAuthorityIdsViewableBy(User $user): array
     {
-        return $this->getReachableIdsInferredFromUserPermissions($user, Recipient::class);
+        return $this->getReachableIdsInferredFromUserPermissions($user, Authority::class);
     }
 
     /**
@@ -34,11 +34,11 @@ class UserReachableEntityResolver
      *
      * By "downstream" it is meant for example that:
      * - from a permission on a FundReturn, we can infer the ability to view the
-     *   Recipient to which it belongs, but we are not looking at the ProjectReturns
+     *   Authority to which it belongs, but we are not looking at the ProjectReturns
      *   that are owned by the FundReturn
      *
      * - from a permission on a Project, we can infer the ability to view the
-     *   Recipient to which it belongs, but we are not looking at the ProjectReturns
+     *   Authority to which it belongs, but we are not looking at the ProjectReturns
      *   that are owned by that Project
      *
      * @return array<int, Ulid>
@@ -64,13 +64,13 @@ class UserReachableEntityResolver
             }
         };
 
-        if ($entityType === Recipient::class) {
-            foreach($user->getRecipientsAdminOf() as $recipient) {
-                $add($recipient->getId());
+        if ($entityType === Authority::class) {
+            foreach($user->getAuthoritiesAdminOf() as $authority) {
+                $add($authority->getId());
             }
 
             foreach($user->getPermissions() as $userPermission) {
-                if ($userPermission->getEntityClass() === Recipient::class) {
+                if ($userPermission->getEntityClass() === Authority::class) {
                     $add(Ulid::fromString($userPermission->getEntityId()));
                 }
             }
@@ -79,7 +79,7 @@ class UserReachableEntityResolver
         $permissions = $user->getPermissions()->toArray();
         foreach($this->getPermissionsViewsFor($permissions) as $permissionsView) {
             $ids = match ($entityType) {
-                Recipient::class => $permissionsView->getRecipientId(),
+                Authority::class => $permissionsView->getAuthorityId(),
                 FundReturn::class => $permissionsView->getFundReturnId(),
                 Project::class => $permissionsView->getProjectId(),
                 ProjectReturn::class => $permissionsView->getProjectReturnId(),

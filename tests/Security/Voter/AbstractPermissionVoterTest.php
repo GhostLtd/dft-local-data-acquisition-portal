@@ -9,7 +9,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\Project;
 use App\Entity\ProjectReturn\CrstsProjectReturn;
 use App\Entity\ProjectReturn\ProjectReturn;
-use App\Entity\Recipient;
+use App\Entity\Authority;
 use App\Entity\User;
 use App\Entity\UserPermission;
 use App\Tests\AbstractFunctionalTest;

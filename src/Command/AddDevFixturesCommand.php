@@ -53,7 +53,7 @@ class AddDevFixturesCommand extends Command
 
         $numberOfFixtures = $input->getOption('number-of-fixtures');
         for($i=0; $i<$numberOfFixtures; $i++) {
-            $this->fixtureHelper->createFundRecipient($this->fixtureGenerator->createRandomRecipient());
+            $this->fixtureHelper->createAuthority($this->fixtureGenerator->createAuthority());
         }
 
         $this->entityManager->flush();

@@ -36,9 +36,6 @@ class UserProvider implements UserProviderInterface
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        // N.B. This purposely uses a join rather than a leftJoin, so that users with no
-        //      assigned recipientRoles will not be eligible to log in.
-
         $user = $this->userRepository
             ->createQueryBuilder('user')
             ->select('user, permissions')

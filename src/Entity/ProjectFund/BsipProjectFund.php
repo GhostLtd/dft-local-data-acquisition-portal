@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-// N.B. Not currently used - just used to enable testing (e.g. that recipient.getProjectsForFund() works)
+// N.B. Not currently used - just used to enable testing (e.g. that authority.getProjectsForFund() works)
 
 #[ORM\Entity]
 class BsipProjectFund extends ProjectFund

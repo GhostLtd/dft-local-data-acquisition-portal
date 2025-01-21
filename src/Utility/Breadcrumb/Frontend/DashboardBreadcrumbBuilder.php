@@ -31,7 +31,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
             routeParameters: ['fundReturnId' => $fundReturn->getId()],
             translationKey: 'frontend.pages.fund_return.title',
             translationParameters: [
-                'recipientName' => $fundReturn->getFundAward()->getRecipient()->getName(),
+                'authorityName' => $fundReturn->getFundAward()->getAuthority()->getName(),
                 'quarter' => $fundReturn->getQuarter(),
                 'type' => new TranslatableMessage($typeKey),
                 'year' => $fundReturn->getYear(),

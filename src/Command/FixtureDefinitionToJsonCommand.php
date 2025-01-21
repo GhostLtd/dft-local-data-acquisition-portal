@@ -2,9 +2,8 @@
 
 namespace App\Command;
 
-use App\DataFixtures\Definition\FundAwardDefinition;
 use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
-use App\DataFixtures\Definition\RecipientDefinition;
+use App\DataFixtures\Definition\AuthorityDefinition;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,7 +41,7 @@ class FixtureDefinitionToJsonCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $this->forceClassesToLoad();
-        $this->queue = [RecipientDefinition::class];
+        $this->queue = [AuthorityDefinition::class];
         $this->classesSeen = $this->queue;
 
         for(;;) {
