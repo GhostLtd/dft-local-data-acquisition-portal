@@ -50,13 +50,6 @@ abstract class FundReturn
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?User $signoffUser = null; // top_signoff
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    private ?User $leadContact = null; // 1top_info: Lead contact
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $leadContactName = null; // 1top_info: Lead contact
-
     /**
      * @var Collection<int, FundReturnSectionStatus>
      */
@@ -149,28 +142,6 @@ abstract class FundReturn
     public function setSignoffUser(?User $signoffUser): static
     {
         $this->signoffUser = $signoffUser;
-        return $this;
-    }
-
-    public function getLeadContact(): ?User
-    {
-        return $this->leadContact;
-    }
-
-    public function setLeadContact(?User $leadContact): static
-    {
-        $this->leadContact = $leadContact;
-        return $this;
-    }
-
-    public function getLeadContactName(): ?string
-    {
-        return $this->leadContactName;
-    }
-
-    public function setLeadContactName(?string $leadContactName): static
-    {
-        $this->leadContactName = $leadContactName;
         return $this;
     }
 

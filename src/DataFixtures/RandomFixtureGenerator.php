@@ -112,6 +112,8 @@ class RandomFixtureGenerator
         $endingYear = intval($now->format('Y'));
         $endingQuarter = intval(ceil(intval($now->format('m')) / 3));
 
+        $leadContactUser = $this->createRandomUser();
+
         // Add project returns...
         for($year=$startingYear; $year<=$endingYear; $year++) {
             $loopStartingQuarter = ($year === $startingYear) ? $startingQuarter : 1;
@@ -157,8 +159,6 @@ class RandomFixtureGenerator
 
                 $quarterStartDate = $this->getStartDateForFinancialYearAndQuarter($year, $quarter);
 
-                $leadContactUser = $this->createRandomUser();
-
                 // No signoff user for the most recent return...
                 if ($mustBeSignedOff) {
                     $signoffDeadline = (clone $quarterStartDate)->modify('+3 months');
@@ -174,7 +174,6 @@ class RandomFixtureGenerator
                     Fund::CRSTS1 => new CrstsFundReturnDefinition(
                         $signoffUser,
                         $signoffDatetime,
-                        $leadContactUser,
                         $year,
                         $quarter,
                         $this->faker->text(),
@@ -193,7 +192,7 @@ class RandomFixtureGenerator
             }
         }
 
-        return new FundAwardDefinition($fund, $returns);
+        return new FundAwardDefinition($leadContactUser, $fund, $returns);
     }
 
     public function createRandomUser(): UserDefinition

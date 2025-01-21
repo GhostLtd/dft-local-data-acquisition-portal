@@ -98,9 +98,7 @@ class FixtureHelper
             ->setPhone($definition->getPhone())
             ->setEmail($email);
 
-        if ($recipient) {
-            $recipient->setAdmin($user);
-        }
+        $recipient?->setAdmin($user);
 
         $this->users[$email] = $user;
         $this->persist([$user]);
@@ -114,8 +112,15 @@ class FixtureHelper
     {
         $fund = $fundAwardDefinition->getFund();
 
+        $leadContactDefinition = $fundAwardDefinition->getLeadContact();
+        $leadContact = $leadContactDefinition ?
+            $this->createUser($leadContactDefinition) :
+            null;
+
+
         $fundAward = (new FundAward())
-            ->setType($fund);
+            ->setType($fund)
+            ->setLeadContact($leadContact);
 
         $this->persist([$fundAward]);
 
@@ -131,18 +136,11 @@ class FixtureHelper
                 $this->createUser($signoffUserDefinition) :
                 null;
 
-            $leadContactDefinition = $returnDefinition->getLeadContact();
-            $leadContact = $leadContactDefinition ?
-                $this->createUser($leadContactDefinition) :
-                null;
-
             $return
                 ->setSignoffUser($signoffUser)
                 ->setSignoffName($signoffUser?->getName())
                 ->setSignoffEmail($signoffUser?->getEmail())
-                ->setSignoffDate($returnDefinition->getSignoffDate())
-                ->setLeadContact($leadContact)
-                ->setLeadContactName($leadContact?->getName());
+                ->setSignoffDate($returnDefinition->getSignoffDate());
 
             $fundAward->addReturn($return);
         }

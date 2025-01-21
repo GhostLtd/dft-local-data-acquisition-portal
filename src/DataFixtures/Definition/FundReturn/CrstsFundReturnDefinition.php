@@ -18,7 +18,6 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
     public function __construct(
         ?UserDefinition   $signoffUser = null,
         ?\DateTime        $signoffDate = null,
-        ?UserDefinition   $leadContact = null,
         protected ?int    $year = null,
         protected ?int    $quarter = null,
         protected ?string $progressSummary = null,
@@ -33,7 +32,7 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
         protected array   $projectReturns = [],
     )
     {
-        parent::__construct($signoffUser, $signoffDate, $leadContact);
+        parent::__construct($signoffUser, $signoffDate);
 
         foreach($this->projectReturns as $name => $_project) {
             if (!is_string($name)) {

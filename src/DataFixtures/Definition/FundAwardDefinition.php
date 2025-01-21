@@ -12,11 +12,14 @@ class FundAwardDefinition
      * @param array<CrstsFundReturnDefinition> $returns
      */
     public function __construct(
-        protected Fund $fund,
-        protected array $returns = []
-    ) {
+        protected ?UserDefinition $leadContact = null,
+        protected Fund            $fund,
+        protected array           $returns = []
+    )
+    {
         $expectedReturnType = match($fund) {
             Fund::CRSTS1 => CrstsFundReturnDefinition::class,
+            default => throw new \RuntimeException("Unsupported type: {$fund->name}"),
         };
 
         foreach($returns as $return) {
@@ -25,6 +28,11 @@ class FundAwardDefinition
                 throw new \RuntimeException("Invalid FundAward({$fund->name}); expected all returns to be of type {$expectedReturnType}, but found an instance of {$actualReturnType}");
             }
         }
+    }
+
+    public function getLeadContact(): ?UserDefinition
+    {
+        return $this->leadContact;
     }
 
     public function getFund(): Fund
