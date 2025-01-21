@@ -57,9 +57,9 @@ class FixtureHelper
         $recipient = (new Recipient())
             ->setName($definition->getName());
 
-        $owner = $this->createUser($definition->getOwner(), $recipient);
+        $admin = $this->createUser($definition->getAdmin(), $recipient);
 
-        $recipient->setAdmin($owner);
+        $recipient->setAdmin($admin);
         $this->persist([$recipient]);
 
         foreach($definition->getProjects() as $projectDefinition) {

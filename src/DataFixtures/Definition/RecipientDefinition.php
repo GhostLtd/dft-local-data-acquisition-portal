@@ -20,7 +20,7 @@ class RecipientDefinition
         return $this->name;
     }
 
-    public function getOwner(): UserDefinition
+    public function getAdmin(): UserDefinition
     {
         return $this->owner;
     }
