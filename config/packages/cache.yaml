@@ -18,7 +18,14 @@ framework:
         #pools:
             #my.dedicated.cache: null
 
-#        app: cache.adapter.array
+        pools:
+            cache.chained.fs_dbal:
+                adapters:
+                    - cache.adapter.filesystem
+                    - cache.adapter.doctrine_dbal
+
+        app: cache.chained.fs_dbal
+
 
 services:
     # Override the default cache for rate_limiter as per https://symfony.com/doc/current/rate_limiter.html#storing-rate-limiter-state

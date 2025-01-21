@@ -17,7 +17,7 @@ security:
             provider: main
             remember_me:
                 secret:   '%kernel.secret%' # required
-                lifetime: 604800 # 1 week in seconds
+                lifetime: 2592000 # 30 days in seconds
                 always_remember_me: true
             login_link:
                 check_route: app_login_check
