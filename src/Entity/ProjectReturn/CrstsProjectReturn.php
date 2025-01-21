@@ -8,7 +8,6 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
-use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ProjectFund\CrstsProjectFund;
 use App\Entity\ProjectFund\ProjectFund;
@@ -21,18 +20,17 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CrstsProjectReturnRepository::class)]
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsProjectReturn extends ProjectReturn implements ExpensesContainerInterface
 {
-    #[ORM\Column(type: Types::DECIMAL, length: 255, precision: 10, scale: 2, nullable: true)]
-    #[Decimal(precision: 10, scale: 2, groups: ['overall_funding'])]
+    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
+    #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
     private ?string $totalCost = null; // 2proj_exp: Total cost of project (<this fund> plus other expenditure)
 
-    #[ORM\Column(type: Types::DECIMAL, length: 255, precision: 10, scale: 2, nullable: true)]
-    #[Decimal(precision: 10, scale: 2, groups: ['overall_funding'])]
+    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
+    #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
     private ?string $agreedFunding = null; // 2proj_exp: Agreed funding, <this fund>
 
     #[ORM\Column(length: 255, nullable: true)]

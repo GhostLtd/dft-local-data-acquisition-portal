@@ -6,8 +6,10 @@ use App\Entity\Enum\BenefitCostRatioType;
 use Brick\Math\BigDecimal;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validator\Constraint as AppAssert;
 
 #[ORM\Embeddable]
+#[AppAssert\BenefitCostRatio(precision: 10, scale: 2, groups: ['project_details'])]
 class BenefitCostRatio
 {
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]

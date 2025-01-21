@@ -40,7 +40,14 @@ class BenefitCostRatioValidator extends ConstraintValidator
         if ($type === BenefitCostRatioType::VALUE) {
             $validators = [
                 new NotNull(['message' => "common.number.not-null"]),
-                new Decimal(precision: 10, scale: 2),
+                new Decimal(
+                    messageInvalid: $constraint->messageInvalid,
+                    messageTooLargeWholePart: $constraint->messageTooLargeWholePart,
+                    messageTooLargeDecimals: $constraint->messageTooLargeDecimals,
+                    precision: $constraint->precision,
+                    scale: $constraint->scale,
+                    payload: $constraint->payload
+                ),
             ];
             $validator->atPath('value')->validate($val, $validators, ['Default']);
         }
