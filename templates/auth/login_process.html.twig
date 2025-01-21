@@ -4,7 +4,6 @@
 {%- set heading_class = 'govuk-heading-xl' -%}
 
 {% block content %}
-    <p class="govuk-body">Thank you for logging in.</p>
     <p class="govuk-body">Click through to your dashboard to fill in a new return or review completed returns.</p>
 
     <form action="{{ path('app_login_check') }}" method="POST">
@@ -12,6 +11,6 @@
         <input type="hidden" name="user" value="{{ user }}">
         <input type="hidden" name="hash" value="{{ hash }}">
 
-        <button id="login" type="submit" class="govuk-button">Access dashboard</button>
+        <button id="login" type="submit" class="govuk-button">Login and access dashboard</button>
     </form>
 {% endblock %}

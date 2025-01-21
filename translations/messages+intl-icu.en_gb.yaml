@@ -361,7 +361,7 @@ frontend:
   pages:
     auth:
       authenticate:
-        title: Login successful
+        title: Login using email link
       check_email:
         title: Check your email
       sign_in:
