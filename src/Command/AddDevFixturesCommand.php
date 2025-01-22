@@ -3,10 +3,12 @@
 namespace App\Command;
 
 use App\DataFixtures\FixtureHelper;
+use App\DataFixtures\Generator\CouncilName;
 use App\DataFixtures\RandomFixtureGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,7 +38,7 @@ class AddDevFixturesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('number-of-fixtures', null, InputOption::VALUE_REQUIRED, 'Number of fixtures to add', 1)
+            ->addOption('number-of-fixtures', null, InputOption::VALUE_REQUIRED, 'Number of fixtures to add', 3)
             ->addOption('initial-seed', null, InputOption::VALUE_REQUIRED, 'Initial seed', null);
     }
 
@@ -52,8 +54,12 @@ class AddDevFixturesCommand extends Command
         }
 
         $numberOfFixtures = $input->getOption('number-of-fixtures');
-        for($i=0; $i<$numberOfFixtures; $i++) {
-            $this->fixtureHelper->createAuthority($this->fixtureGenerator->createAuthority());
+        if ($numberOfFixtures > ($numberOfCouncils = count(CouncilName::COUNCIL_NAMES))) {
+            throw new InvalidOptionException("cannot have more than {$numberOfCouncils} fixtures");
+        }
+        $authorityDefinitions = $this->fixtureGenerator->createAllAuthorityDefinitions($numberOfFixtures);
+        foreach ($authorityDefinitions as $authorityDefinition) {
+            $this->fixtureHelper->createAuthority($authorityDefinition);
         }
 
         $this->entityManager->flush();

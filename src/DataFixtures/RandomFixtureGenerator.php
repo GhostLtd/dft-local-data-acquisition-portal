@@ -23,6 +23,7 @@ use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
 use App\Entity\Enum\TransportMode;
 use App\Utility\CrstsHelper;
+use App\Utility\FinancialQuarter;
 use Faker;
 
 class RandomFixtureGenerator
@@ -74,10 +75,23 @@ class RandomFixtureGenerator
         return $data;
     }
 
-    public function createAuthority(): AuthorityDefinition
+    public function createAllAuthorityDefinitions(int $numberOfFixtures): array
     {
         $this->initialise();
 
+        $authorities = array_map(
+            fn($name) => new AuthorityDefinition($name, $this->createRandomUser(), [], []),
+            CouncilName::COUNCIL_NAMES
+        );
+        $subset = $this->faker->randomElements($authorities, $numberOfFixtures);
+        foreach ($subset as $authority) {
+            $this->createProjectsAndFundsForAuthority($authority);
+        }
+        return $authorities;
+    }
+
+    protected function createProjectsAndFundsForAuthority(AuthorityDefinition $authority): void
+    {
         /** @var array<ProjectDefinition> $projects */
         $projects = $this->repeat(ProjectDefinition::class, 2, 5, $this->createRandomProject(...));
 
@@ -90,12 +104,8 @@ class RandomFixtureGenerator
             }
         }
 
-        return new AuthorityDefinition(
-            CouncilName::generate(),
-            $this->createRandomUser(),
-            $projects,
-            array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $projects), $funds),
-        );
+        $authority->setProjects($projects);
+        $authority->setFundAwards(array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $projects), $funds));
     }
 
     /**
@@ -105,24 +115,15 @@ class RandomFixtureGenerator
     {
         $returns = [];
 
-        $startingYear = 2022;
-        $startingQuarter = 1;
-
-        $now = new \DateTime();
-        $endingYear = intval($now->format('Y'));
-        $endingQuarter = intval(ceil(intval($now->format('m')) / 3));
+        $finalQuarter = FinancialQuarter::createFromDate(new \DateTime('3 months ago'));
 
         $leadContactUser = $this->createRandomUser();
 
         // Add project returns...
-        for($year=$startingYear; $year<=$endingYear; $year++) {
-            $loopStartingQuarter = ($year === $startingYear) ? $startingQuarter : 1;
-            $loopEndingQuarter = ($year === $endingYear) ? $endingQuarter : 4;
-
-            for($quarter=$loopStartingQuarter; $quarter<=$loopEndingQuarter; $quarter++) {
+        foreach (FinancialQuarter::getRange(new FinancialQuarter(2022, 1), $finalQuarter) as $financialQuarter)
+        {
                 $projectReturns = [];
-
-                $mustBeSignedOff = $year === $endingYear && $quarter === $endingQuarter;
+                $mustBeSignedOff = $financialQuarter < $finalQuarter;
 
                 foreach($projects as $project) {
                     $projectFund = null;
@@ -143,8 +144,8 @@ class RandomFixtureGenerator
                             throw new \RuntimeException('ProjectFundDefinition / type mismatch');
                         }
 
-                        if ($projectFund->isRetained() || $quarter === 1) {
-                            $projectReturns[$project->getName()] = $this->createRandomCrstsProjectReturn($year, $quarter);
+                        if ($projectFund->isRetained() || $finalQuarter->quarter === 4) {
+                            $projectReturns[$project->getName()] = $this->createRandomCrstsProjectReturn($financialQuarter);
                         }
                     } else {
                         throw new \RuntimeException("Unsupported Project Return Type: ".$project::class);
@@ -153,11 +154,10 @@ class RandomFixtureGenerator
 
                 $expenses = $this->createRandomCrstsExpenses(
                     ExpenseType::filterForFund($fund),
-                    $year,
-                    $quarter,
+                    $financialQuarter
                 );
 
-                $quarterStartDate = $this->getStartDateForFinancialYearAndQuarter($year, $quarter);
+                $quarterStartDate = $financialQuarter->getStartDate();
 
                 // No signoff user for the most recent return...
                 if ($mustBeSignedOff) {
@@ -174,8 +174,8 @@ class RandomFixtureGenerator
                     Fund::CRSTS1 => new CrstsFundReturnDefinition(
                         $signoffUser,
                         $signoffDatetime,
-                        $year,
-                        $quarter,
+                        $financialQuarter->initialYear,
+                        $financialQuarter->quarter,
                         $this->faker->text(),
                         $this->faker->text(),
                         $this->faker->randomElement(Rating::cases()),
@@ -189,7 +189,6 @@ class RandomFixtureGenerator
                     ),
                     default => throw new \RuntimeException("Unsupported FundReturnDefinition: {$fund->value}")
                 };
-            }
         }
 
         return new FundAwardDefinition($leadContactUser, $fund, $returns);
@@ -198,7 +197,7 @@ class RandomFixtureGenerator
     public function createRandomUser(): UserDefinition
     {
         // Chance to re-use existing contact...
-        $contact = $this->faker->boolean(95) ?
+        $contact = $this->faker->boolean(20) ?
             $this->faker->randomElement($this->existingContacts) :
             null;
 
@@ -253,7 +252,7 @@ class RandomFixtureGenerator
         );
     }
 
-    public function createRandomCrstsProjectReturn(int $returnYear, int $returnQuarter): CrstsProjectReturnDefinition
+    public function createRandomCrstsProjectReturn(FinancialQuarter $financialQuarter): CrstsProjectReturnDefinition
     {
         $milestones = [];
         $milestoneEarliestDate = new \DateTime('2022-01-01');
@@ -267,7 +266,7 @@ class RandomFixtureGenerator
             $milestones[] = $milestone;
         }
 
-        $expenses = $this->createRandomCrstsExpenses(ExpenseType::filterForProject(Fund::CRSTS1), $returnYear, $returnQuarter);
+        $expenses = $this->createRandomCrstsExpenses(ExpenseType::filterForProject(Fund::CRSTS1), $financialQuarter);
 
         return new CrstsProjectReturnDefinition(
             strval($this->faker->randomFloat(2, 1_000, 99_000_000)),
@@ -292,12 +291,12 @@ class RandomFixtureGenerator
      * @param array<ExpenseType> $expenseTypes
      * @return array<ExpenseDefinition>
      */
-    public function createRandomCrstsExpenses(array $expenseTypes, int $returnYear, int $returnQuarter): array
+    public function createRandomCrstsExpenses(array $expenseTypes, FinancialQuarter $financialQuarter): array
     {
         // N.B. The logic here is also very simple and hence the forecast / actual expenses
         //      are *extremely* unlikely to be coherent from one year to the next :)
 
-        $divisionConfigurations = CrstsHelper::getExpenseDivisionConfigurations($returnYear, $returnQuarter);
+        $divisionConfigurations = CrstsHelper::getExpenseDivisionConfigurations(...$financialQuarter->getAsArray());
 
         $expenses = [];
 
@@ -316,18 +315,5 @@ class RandomFixtureGenerator
         }
 
         return $expenses;
-    }
-
-    protected function getStartDateForFinancialYearAndQuarter(int $year, int $quarter): \DateTime
-    {
-        $quarter += 1;
-        if ($quarter === 5) {
-            $year += 1;
-            $quarter = 1;
-        }
-
-        $month = (($quarter - 1) * 3) + 1;
-
-        return new \DateTime("{$year}/{$month}/1");
     }
 }
