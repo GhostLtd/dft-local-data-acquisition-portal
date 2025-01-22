@@ -67,18 +67,23 @@ function initForForm(form, autoCommas) {
 
         if (!isDisabled) {
             cell.addEventListener('change', _ => cellChanged(cell, true))
-            cell.addEventListener('keyup', e => e.key !== 'Tab' && cellChanged(cell, false))
+            cell.addEventListener('keyup', e => e.key !== 'Tab' && cellChanged(cell, true))
+            cell.addEventListener('focus', _ => autoComma(cell))
+            cell.addEventListener('blur', _ => autoComma(cell))
         }
     }
 
     // Add commas to the given value, if autoCommas is true
-    function autoComma(value) {
+    function autoComma(cell) {
         if (!autoCommas) {
-            return value
+            return
         }
-
+        const value = cell.value
         const parsedValue = getValue(value)
-        return isNaN(parsedValue) ? value : parsedValue.toLocaleString('en-GB')
+
+        cell.value = isNaN(parsedValue)
+            ? value
+            : (document.activeElement === cell ? parsedValue : (parsedValue.toLocaleString('en-GB')))
     }
 
     // Parse a string to retrieve its value (removing commas)
@@ -89,7 +94,7 @@ function initForForm(form, autoCommas) {
     // A cell has been changed. Trigger cellTotal updates for cells that depend upon its value.
     function cellChanged(cell, addCommas) {
         if (addCommas) {
-            cell.value = autoComma(cell.value)
+            autoComma(cell)
         }
 
         const actionColumns = rowColToActionMap[cell.dataset.row]
@@ -110,7 +115,8 @@ function initForForm(form, autoCommas) {
     function updateCellTotal(cell) {
         const updateCell = function(value) {
             const hasChanged = getValue(value) !== getValue(cell.value)
-            cell.value = autoComma(value)
+            cell.value = value
+            autoComma(cell)
 
             if (hasChanged) {
                 cellChanged(cell, true)

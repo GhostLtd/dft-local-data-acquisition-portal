@@ -1,4 +1,5 @@
 @import "@ghost/govuk-frontend-bundle/assets/scss/ghost-frontend";
+@import "govuk-frontend";
 
 section.govuk-service-navigation__wrapper-full-width {
   nav.govuk-service-navigation__wrapper {
@@ -36,6 +37,13 @@ form.expenses table {
 
   input[type="text"] {
     text-align: right;
+    border-color: govuk-colour("mid-grey");
+    border-width: 1px;
+  }
+
+  input[disabled] {
+    border-color: transparent;
+    opacity: 0.75;
   }
 
   .header_row {
