@@ -89,8 +89,8 @@ enum:
     ftp: "3rd-party"
     fot: ""
     fre: ""
-    psp: "Capital (CDEL) spend, {fund}"
-    psa: "Capital (CDEL) spend, all sources"
+    ssp: "Capital (CDEL) spend, {fund}"
+    ssa: "Capital (CDEL) spend, all sources"
   fund:
     CRSTS1: CRSTS
     CRSTS2: CRSTS2
