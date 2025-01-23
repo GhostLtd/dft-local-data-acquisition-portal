@@ -35,16 +35,4 @@ class AuthorityDefinition
     {
         return $this->fundAwards;
     }
-
-    public function setSchemes(array $schemes): static
-    {
-        $this->schemes = $schemes;
-        return $this;
-    }
-
-    public function setFundAwards(array $fundAwards): static
-    {
-        $this->fundAwards = $fundAwards;
-        return $this;
-    }
 }

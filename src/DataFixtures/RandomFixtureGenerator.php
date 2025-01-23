@@ -76,37 +76,37 @@ class RandomFixtureGenerator
         return $data;
     }
 
-    public function createAllAuthorityDefinitions(int $numberOfFixtures): array
+    public function createAuthorityDefinitions(int $numberOfFixtures): array
     {
         $this->initialise();
 
-        $authorities = array_map(
-            fn($name) => new AuthorityDefinition($name, $this->createRandomUser(), [], []),
-            CouncilName::COUNCIL_NAMES
-        );
-        $subset = $this->faker->randomElements($authorities, $numberOfFixtures);
-        foreach ($subset as $authority) {
-            $this->createSchemesAndFundsForAuthority($authority);
-        }
-        return $authorities;
-    }
+        $authorities = [];
 
-    protected function createSchemesAndFundsForAuthority(AuthorityDefinition $authority): void
-    {
-        /** @var array<SchemeDefinition> $schemes */
-        $schemes = $this->repeat(SchemeDefinition::class, 4, 8, $this->createRandomScheme(...));
+        $numberOfFixtures = min($numberOfFixtures, count(CouncilName::COUNCIL_NAMES)); // Can only have as many as we have
 
-        // Find all funds used by all of the schemes
-        $funds = [];
-        foreach($schemes as $schemeDefinition) {
-            foreach($schemeDefinition->getSchemeFunds() as $fundDefinition) {
-                $fund = $fundDefinition->getFund();
-                $funds[$fund->value] = $fund;
+        for($i=0; $i<$numberOfFixtures; $i++) {
+            do {
+                $name = $this->faker->council_name();
+            } while(array_key_exists($name, $authorities));
+
+            /** @var array<SchemeDefinition> $schemes */
+            $schemes = $this->repeat(SchemeDefinition::class, 4, 8, $this->createRandomScheme(...));
+
+            // Find all funds used by all of the schemes
+            $funds = [];
+            foreach($schemes as $schemeDefinition) {
+                foreach($schemeDefinition->getSchemeFunds() as $fundDefinition) {
+                    $fund = $fundDefinition->getFund();
+                    $funds[$fund->value] = $fund;
+                }
             }
+
+            $fundAwards = array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $schemes), $funds);
+
+            $authorities[$name] = new AuthorityDefinition($name, $this->createRandomUser(), $schemes, $fundAwards);
         }
 
-        $authority->setSchemes($schemes);
-        $authority->setFundAwards(array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $schemes), $funds));
+        return $authorities;
     }
 
     /**

@@ -57,7 +57,7 @@ class AddDevFixturesCommand extends Command
         if ($numberOfFixtures > ($numberOfCouncils = count(CouncilName::COUNCIL_NAMES))) {
             throw new InvalidOptionException("cannot have more than {$numberOfCouncils} fixtures");
         }
-        $authorityDefinitions = $this->fixtureGenerator->createAllAuthorityDefinitions($numberOfFixtures);
+        $authorityDefinitions = $this->fixtureGenerator->createAuthorityDefinitions($numberOfFixtures);
         foreach ($authorityDefinitions as $authorityDefinition) {
             $this->fixtureHelper->createAuthority($authorityDefinition);
         }
