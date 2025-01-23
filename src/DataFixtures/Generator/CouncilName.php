@@ -2,11 +2,13 @@
 
 namespace App\DataFixtures\Generator;
 
-class CouncilName
+use Faker\Provider\Base;
+
+class CouncilName extends Base
 {
-    public static function generate(): string
+    public function council_name(): string
     {
-        return self::COUNCIL_NAMES[mt_rand(0, count(self::COUNCIL_NAMES) - 1)];
+        return $this->generator->randomElement(self::COUNCIL_NAMES);
     }
 
     public const array COUNCIL_NAMES = [

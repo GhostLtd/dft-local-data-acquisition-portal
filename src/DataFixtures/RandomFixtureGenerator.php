@@ -12,6 +12,7 @@ use App\DataFixtures\Definition\SchemeDefinition;
 use App\DataFixtures\Definition\SchemeFund\CrstsSchemeFundDefinition;
 use App\DataFixtures\Definition\SchemeReturn\CrstsSchemeReturnDefinition;
 use App\DataFixtures\Generator\CouncilName;
+use App\DataFixtures\Generator\SchemeName;
 use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\BenefitCostRatioType;
 use App\Entity\Enum\BusinessCase;
@@ -41,6 +42,8 @@ class RandomFixtureGenerator
     {
         if (!$this->faker) {
             $this->faker = Faker\Factory::create('en_GB');
+            $this->faker->addProvider(new CouncilName($this->faker));
+            $this->faker->addProvider(new SchemeName($this->faker));
             $this->faker->seed($this->seed);
         }
     }
@@ -56,12 +59,10 @@ class RandomFixtureGenerator
             throw new \RuntimeException("repeat(): \$max must be larger than \$min");
         }
 
-        $range = $max - $min;
-        $random = mt_rand(0, $range);
-
+        $num = $this->faker->numberBetween($min, $max);
         $data = [];
 
-        for($i=$min; $i<=($min + $random); $i++) {
+        for($i=0; $i<$num; $i++) {
             $generated = $callback($i);
 
             $generatedClass = $generated::class;
@@ -93,7 +94,7 @@ class RandomFixtureGenerator
     protected function createSchemesAndFundsForAuthority(AuthorityDefinition $authority): void
     {
         /** @var array<SchemeDefinition> $schemes */
-        $schemes = $this->repeat(SchemeDefinition::class, 2, 5, $this->createRandomScheme(...));
+        $schemes = $this->repeat(SchemeDefinition::class, 4, 8, $this->createRandomScheme(...));
 
         // Find all funds used by all of the schemes
         $funds = [];
@@ -144,7 +145,7 @@ class RandomFixtureGenerator
                             throw new \RuntimeException('SchemeFundDefinition / type mismatch');
                         }
 
-                        if ($schemeFund->isRetained() || $finalQuarter->quarter === 4) {
+                        if ($schemeFund->isRetained() || $financialQuarter->quarter === 4) {
                             $schemeReturns[$scheme->getName()] = $this->createRandomCrstsSchemeReturn($financialQuarter);
                         }
                     } else {
@@ -216,16 +217,14 @@ class RandomFixtureGenerator
     public function createRandomScheme(): SchemeDefinition
     {
         // Since we currently only have CRSTS, we'll be having at most one fund
-        $schemeFunds = [];
-
-        if (mt_rand(0, 100) > 20) {
-            $schemeFunds[] = $this->createRandomCrstsSchemeFund();
-        }
+        $schemeFunds = [
+            $this->createRandomCrstsSchemeFund()
+        ];
 
         $schemeId = $this->faker->currencyCode() . $this->faker->numberBetween(1, 9999);
 
         return new SchemeDefinition(
-            $this->faker->sentence(),
+            $this->faker->scheme_name(),
             $this->faker->text(),
             $this->faker->randomElement(TransportMode::cases()),
             $this->faker->randomElement(ActiveTravelElement::cases()),
