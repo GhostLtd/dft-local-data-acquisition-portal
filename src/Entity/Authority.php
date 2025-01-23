@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Enum\Fund;
-use App\Entity\ProjectFund\ProjectFund;
+use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\Traits\IdTrait;
 use App\Repository\AuthorityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,10 +23,10 @@ class Authority
     private ?User $admin = null;
 
     /**
-     * @var Collection<int, Project>
+     * @var Collection<int, Scheme>
      */
-    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'authority')]
-    private Collection $projects;
+    #[ORM\OneToMany(targetEntity: Scheme::class, mappedBy: 'authority')]
+    private Collection $schemes;
 
     /**
      * @var Collection<int, FundAward>
@@ -36,7 +36,7 @@ class Authority
 
     public function __construct()
     {
-        $this->projects = new ArrayCollection();
+        $this->schemes = new ArrayCollection();
         $this->fundAwards = new ArrayCollection();
     }
 
@@ -63,29 +63,29 @@ class Authority
     }
 
     /**
-     * @return Collection<int, Project>
+     * @return Collection<int, Scheme>
      */
-    public function getProjects(): Collection
+    public function getSchemes(): Collection
     {
-        return $this->projects;
+        return $this->schemes;
     }
 
-    public function addProject(Project $project): static
+    public function addScheme(Scheme $scheme): static
     {
-        if (!$this->projects->contains($project)) {
-            $this->projects->add($project);
-            $project->setAuthority($this);
+        if (!$this->schemes->contains($scheme)) {
+            $this->schemes->add($scheme);
+            $scheme->setAuthority($this);
         }
 
         return $this;
     }
 
-    public function removeProject(Project $project): static
+    public function removeScheme(Scheme $scheme): static
     {
-        if ($this->projects->removeElement($project)) {
+        if ($this->schemes->removeElement($scheme)) {
             // set the owning side to null (unless already changed)
-            if ($project->getAuthority() === $this) {
-                $project->setAuthority(null);
+            if ($scheme->getAuthority() === $this) {
+                $scheme->setAuthority(null);
             }
         }
 
@@ -125,25 +125,25 @@ class Authority
     // --------------------------------------------------------------------------------
 
     /**
-     * Returns a collection of the projects that this authority has, that receive funding from the specified $fund
-     * @return Collection<Project>
+     * Returns a collection of the schemes that this authority has, that receive funding from the specified $fund
+     * @return Collection<Scheme>
      */
-    public function getProjectsForFund(Fund $fund): Collection
+    public function getSchemesForFund(Fund $fund): Collection
     {
-        return $this->projects->filter(fn(Project $p) => $p->getProjectFunds()->reduce(
-            fn(bool $carry, ProjectFund $projectFund) => $carry || $projectFund->getFund() === $fund,
+        return $this->schemes->filter(fn(Scheme $p) => $p->getSchemeFunds()->reduce(
+            fn(bool $carry, SchemeFund $schemeFund) => $carry || $schemeFund->getFund() === $fund,
             false,
         ));
     }
 
     /**
-     * Returns a collection of the projectFunds that this authority has, that receive funding from the specified $fund
-     * @return Collection<ProjectFund>
+     * Returns a collection of the schemeFunds that this authority has, that receive funding from the specified $fund
+     * @return Collection<SchemeFund>
      */
-    public function getProjectFundsForFund(Fund $fund): Collection
+    public function getSchemeFundsForFund(Fund $fund): Collection
     {
-        return $this->projects
-            ->map(fn(Project $p) => $p->getProjectFundForFund($fund))
-            ->filter(fn(?ProjectFund $pf) => $pf !== null);
+        return $this->schemes
+            ->map(fn(Scheme $s) => $s->getSchemeFundForFund($fund))
+            ->filter(fn(?SchemeFund $sf) => $sf !== null);
     }
 }

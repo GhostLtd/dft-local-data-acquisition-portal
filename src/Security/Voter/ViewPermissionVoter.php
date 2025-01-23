@@ -5,8 +5,8 @@ namespace App\Security\Voter;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\PermissionsView;
-use App\Entity\Project;
-use App\Entity\ProjectReturn\ProjectReturn;
+use App\Entity\Scheme;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Authority;
 use App\Entity\User;
 use App\Security\SubjectResolver;
@@ -58,8 +58,8 @@ class ViewPermissionVoter extends Voter
         $permissionClassChain = match ($subjectBaseClass) {
             Authority::class => [Authority::class],
             FundReturn::class => [FundReturn::class, Authority::class],
-            ProjectReturn::class => [ProjectReturn::class, Project::class, FundReturn::class, Authority::class],
-            Project::class => [Project::class, Authority::class],
+            SchemeReturn::class => [SchemeReturn::class, Scheme::class, FundReturn::class, Authority::class],
+            Scheme::class => [Scheme::class, Authority::class],
         };
 
         foreach($permissionViews as $permissionView) {
@@ -81,7 +81,7 @@ class ViewPermissionVoter extends Voter
                 if (
                     $subjectSection !== null &&
                     $permissionEntityClass === FundReturn::class &&
-                    $subjectBaseClass === ProjectReturn::class
+                    $subjectBaseClass === SchemeReturn::class
                 ) {
                     continue;
                 }
@@ -91,8 +91,8 @@ class ViewPermissionVoter extends Voter
                 $permissionEntityId = match ($class) {
                     Authority::class => $permissionView->getAuthorityId(),
                     FundReturn::class => $permissionView->getFundReturnId(),
-                    ProjectReturn::class => $permissionView->getProjectReturnId(),
-                    Project::class => $permissionView->getProjectId(),
+                    SchemeReturn::class => $permissionView->getSchemeReturnId(),
+                    Scheme::class => $permissionView->getSchemeId(),
                 };
 
                 $keyId = $idMap[$class] ?? null;
@@ -103,9 +103,9 @@ class ViewPermissionVoter extends Voter
                 }
 
                 if ($resolvedSubject->getSection() !== null) {
-                    // A Project/ProjectReturn permission does only gives access to Project/ProjectReturn sections
-                    if (in_array($permissionView->getEntityClass(), [Project::class, ProjectReturn::class])) {
-                        if (!in_array($subjectBaseClass, [Project::class, ProjectReturn::class])) {
+                    // A Scheme/SchemeReturn permission only gives access to Scheme/SchemeReturn sections
+                    if (in_array($permissionView->getEntityClass(), [Scheme::class, SchemeReturn::class])) {
+                        if (!in_array($subjectBaseClass, [Scheme::class, SchemeReturn::class])) {
                             $match = false;
                             break;
                         }

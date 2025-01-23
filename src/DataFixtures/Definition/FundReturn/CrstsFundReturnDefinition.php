@@ -3,7 +3,7 @@
 namespace App\DataFixtures\Definition\FundReturn;
 
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
-use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
+use App\DataFixtures\Definition\SchemeReturn\CrstsSchemeReturnDefinition;
 use App\DataFixtures\Definition\UserDefinition;
 use App\Entity\Enum\Rating;
 
@@ -12,8 +12,8 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
     /**
      * @param array<ExpenseDefinition> $expenses
      *
-     * N.B. the string is the project name
-     * @param array<string, CrstsProjectReturnDefinition> $projectReturns
+     * N.B. the string is the scheme name
+     * @param array<string, CrstsSchemeReturnDefinition> $schemeReturns
      */
     public function __construct(
         ?UserDefinition   $signoffUser = null,
@@ -29,14 +29,14 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
         protected ?string $resourceFunding = null,
         protected ?string $comments = null,
         protected array   $expenses = [],
-        protected array   $projectReturns = [],
+        protected array   $schemeReturns = [],
     )
     {
         parent::__construct($signoffUser, $signoffDate);
 
-        foreach($this->projectReturns as $name => $_project) {
+        foreach($this->schemeReturns as $name => $_scheme) {
             if (!is_string($name)) {
-                throw new \RuntimeException('CrstsFundReturnDefinition() - projectReturns must be indexed by project name');
+                throw new \RuntimeException('CrstsFundReturnDefinition() - schemeReturns must be indexed by scheme name');
             }
         }
     }
@@ -96,8 +96,8 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
         return $this->expenses;
     }
 
-    public function getProjectReturns(): array
+    public function getSchemeReturns(): array
     {
-        return $this->projectReturns;
+        return $this->schemeReturns;
     }
 }

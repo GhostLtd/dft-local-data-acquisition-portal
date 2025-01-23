@@ -5,8 +5,8 @@ namespace App\Tests\Security\Voter;
 use App\Entity\Enum\Role;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
-use App\Entity\Project;
-use App\Entity\ProjectReturn\CrstsProjectReturn;
+use App\Entity\Scheme;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\Authority;
 use App\Security\Voter\ViewPermissionVoter;
 use App\Tests\AbstractFunctionalTest;
@@ -31,12 +31,12 @@ class ViewPermissionVoterSupportsTest extends AbstractFunctionalTest
 
             [Role::CAN_VIEW, new CrstsFundReturn(), true],
             [Role::CAN_VIEW, ['subject' => new CrstsFundReturn(), 'section' => 'section_one'], true],
-            [Role::CAN_VIEW, new CrstsProjectReturn(), true],
-            [Role::CAN_VIEW, ['subject' => new CrstsProjectReturn(), 'section' => 'section_one'], true],
+            [Role::CAN_VIEW, new CrstsSchemeReturn(), true],
+            [Role::CAN_VIEW, ['subject' => new CrstsSchemeReturn(), 'section' => 'section_one'], true],
 
             // Invalid subjects - things for which CAN_VIEW is not valid
-            [Role::CAN_VIEW, new Project(), false],
-            [Role::CAN_VIEW, ['subject' => new Project(), 'section' => 'section_one'], false],
+            [Role::CAN_VIEW, new Scheme(), false],
+            [Role::CAN_VIEW, ['subject' => new Scheme(), 'section' => 'section_one'], false],
             [Role::CAN_VIEW, new FundAward(), false],
             [Role::CAN_VIEW, ['subject' => new FundAward(), 'section' => 'section_one'], false],
 

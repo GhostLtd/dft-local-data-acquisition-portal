@@ -15,7 +15,7 @@ framework:
       # The "supports" option is useful only if you are using Twig functions ('workflow_*')
       supports:
         - App\Entity\FundReturn\FundReturnSectionStatus
-        - App\Entity\ProjectReturn\ProjectReturnSectionStatus
+        - App\Entity\SchemeReturn\SchemeReturnSectionStatus
 #      initial_marking: start
       places:
         - '%not_required%'

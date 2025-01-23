@@ -9,7 +9,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\FundReturn\FundReturnSectionStatus;
 use App\Form\FundReturn\Crsts\ExpensesType;
 use App\Utility\CrstsHelper;
-use App\Repository\ProjectFund\ProjectFundRepository;
+use App\Repository\SchemeFund\SchemeFundRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -27,18 +27,18 @@ class FundReturnController extends AbstractReturnController
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn                 $fundReturn,
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        ProjectFundRepository      $projectFundRepository,
+        SchemeFundRepository       $schemeFundRepository,
     ): Response
     {
         $breadcrumbBuilder->setAtFundReturn($fundReturn);
         $fund = $fundReturn->getFund();
 
-        // We get the projectFunds from this direction, so that we can list all of them and explicitly any that
+        // We get the schemeFunds from this direction, so that we can list all of them and explicitly any that
         // do not requiring a return, if that is the case (e.g. CRSTS - if not retained and not quarter 1)
 
-        // (Fetching via fundReturn->getProjectReturns() direction would only fetch those projects that
+        // (Fetching via fundReturn->getSchemeReturns() direction would only fetch those schemes that
         //  do have returns, resulting in an incomplete list)
-        $projectFunds = $projectFundRepository->getProjectFundsForAuthority(
+        $schemeFunds = $schemeFundRepository->getSchemeFundsForAuthority(
             $fundReturn->getFundAward()->getAuthority(),
             $fund
         );
@@ -48,7 +48,7 @@ class FundReturnController extends AbstractReturnController
             'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
             'fundLevelSections' => FundLevelSection::filterForFund($fund),
             'fundReturn' => $fundReturn,
-            'projectFunds' => $projectFunds
+            'schemeFunds' => $schemeFunds
         ]);
     }
 

@@ -17,8 +17,8 @@ enum ExpenseType: string implements LabelProviderInterface
     case FUND_CAPITAL_OTHER = "fot";
     case FUND_RESOURCE_EXPENDITURE = "fre";
 
-    case PROJECT_CAPITAL_SPEND_FUND = "psp";
-    case PROJECT_CAPITAL_SPEND_ALL_SOURCES = "psa";
+    case SCHEME_CAPITAL_SPEND_FUND = "ssp";
+    case SCHEME_CAPITAL_SPEND_ALL_SOURCES = "ssa";
 
     public function isBaseline(): bool
     {
@@ -49,10 +49,10 @@ enum ExpenseType: string implements LabelProviderInterface
     /**
      * @return array<ExpenseType>
      */
-    public static function filterForProject(Fund $fund): array
+    public static function filterForScheme(Fund $fund): array
     {
         return match($fund) {
-            Fund::CRSTS1 => self::filterByPrefix('PROJECT_'),
+            Fund::CRSTS1 => self::filterByPrefix('SCHEME_'),
             Fund::CRSTS2, Fund::BSIP => throw new \RuntimeException('Not yet supported'),
         };
     }

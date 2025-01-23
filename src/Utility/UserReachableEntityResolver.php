@@ -5,8 +5,8 @@ namespace App\Utility;
 use App\Entity\Enum\Permission;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\PermissionsView;
-use App\Entity\Project;
-use App\Entity\ProjectReturn\ProjectReturn;
+use App\Entity\Scheme;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Authority;
 use App\Entity\User;
 use App\Entity\UserPermission;
@@ -34,12 +34,12 @@ class UserReachableEntityResolver
      *
      * By "downstream" it is meant for example that:
      * - from a permission on a FundReturn, we can infer the ability to view the
-     *   Authority to which it belongs, but we are not looking at the ProjectReturns
+     *   Authority to which it belongs, but we are not looking at the SchemeReturns
      *   that are owned by the FundReturn
      *
-     * - from a permission on a Project, we can infer the ability to view the
-     *   Authority to which it belongs, but we are not looking at the ProjectReturns
-     *   that are owned by that Project
+     * - from a permission on a Scheme, we can infer the ability to view the
+     *   Authority to which it belongs, but we are not looking at the SchemeReturns
+     *   that are owned by that Scheme
      *
      * @return array<int, Ulid>
      */
@@ -81,8 +81,8 @@ class UserReachableEntityResolver
             $ids = match ($entityType) {
                 Authority::class => $permissionsView->getAuthorityId(),
                 FundReturn::class => $permissionsView->getFundReturnId(),
-                Project::class => $permissionsView->getProjectId(),
-                ProjectReturn::class => $permissionsView->getProjectReturnId(),
+                Scheme::class => $permissionsView->getSchemeId(),
+                SchemeReturn::class => $permissionsView->getSchemeReturnId(),
                 default => throw new \RuntimeException('Invalid entity type'),
             };
 
@@ -113,8 +113,8 @@ class UserReachableEntityResolver
 
         $idsByColumn = [
             'fundReturnId' => $getFilteredType(FundReturn::class),
-            'projectId' => $getFilteredType(Project::class),
-            'projectReturnId' => $getFilteredType(ProjectReturn::class),
+            'schemeId' => $getFilteredType(Scheme::class),
+            'schemeReturnId' => $getFilteredType(SchemeReturn::class),
         ];
 
         $qb = $this->entityManager

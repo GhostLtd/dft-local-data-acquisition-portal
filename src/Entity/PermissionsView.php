@@ -22,10 +22,10 @@ class PermissionsView
     protected ?Ulid $authorityId = null;
 
     #[ORM\Column(type: UlidType::NAME, nullable: true)]
-    protected ?Ulid $projectId = null;
+    protected ?Ulid $schemeId = null;
 
     #[ORM\Column(type: UlidType::NAME, nullable: true)]
-    protected ?Ulid $projectReturnId = null;
+    protected ?Ulid $schemeReturnId = null;
 
     #[ORM\Column(type: UlidType::NAME, nullable: true)]
     protected ?Ulid $fundReturnId = null;
@@ -54,14 +54,14 @@ class PermissionsView
         return $this->authorityId;
     }
 
-    public function getProjectId(): ?Ulid
+    public function getSchemeId(): ?Ulid
     {
-        return $this->projectId;
+        return $this->schemeId;
     }
 
-    public function getProjectReturnId(): ?Ulid
+    public function getSchemeReturnId(): ?Ulid
     {
-        return $this->projectReturnId;
+        return $this->schemeReturnId;
     }
 
     public function getFundReturnId(): ?Ulid

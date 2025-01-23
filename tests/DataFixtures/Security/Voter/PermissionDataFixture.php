@@ -6,11 +6,11 @@ use App\Entity\Enum\Fund;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\Project;
-use App\Entity\ProjectFund\CrstsProjectFund;
-use App\Entity\ProjectFund\ProjectFund;
-use App\Entity\ProjectReturn\CrstsProjectReturn;
-use App\Entity\ProjectReturn\ProjectReturn;
+use App\Entity\Scheme;
+use App\Entity\SchemeFund\CrstsSchemeFund;
+use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Authority;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -99,17 +99,17 @@ class PermissionDataFixture extends Fixture
     }
 
     /**
-     * @return array{0: Project, 1:ProjectFund}
+     * @return array{0: Scheme, 1:SchemeFund}
      */
     protected function createProjectAndProjectFund(string $name, string $referenceName, Fund $type, Authority $authority): array
     {
-        $project = (new Project())
+        $project = (new Scheme())
             ->setAuthority($authority)
             ->setName($name);
 
         if ($type === Fund::CRSTS1) {
-            $projectFund = (new CrstsProjectFund())
-                ->setProject($project)
+            $projectFund = (new CrstsSchemeFund())
+                ->setScheme($project)
                 ->setRetained(true);
         } else {
             throw new \RuntimeException('Unsupported fund type');
@@ -121,11 +121,11 @@ class PermissionDataFixture extends Fixture
         ];
     }
 
-    public function createProjectReturn(string $referenceName, ProjectFund $projectFund, FundReturn $fundReturn): ProjectReturn
+    public function createProjectReturn(string $referenceName, SchemeFund $projectFund, FundReturn $fundReturn): SchemeReturn
     {
-        if ($projectFund instanceof CrstsProjectFund) {
-            $project = (new CrstsProjectReturn())
-                ->setProjectFund($projectFund)
+        if ($projectFund instanceof CrstsSchemeFund) {
+            $project = (new CrstsSchemeReturn())
+                ->setSchemeFund($projectFund)
                 ->setFundReturn($fundReturn);
         } else {
             throw new \RuntimeException('Unsupported project fund type');

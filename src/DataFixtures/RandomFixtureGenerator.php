@@ -8,9 +8,9 @@ use App\DataFixtures\Definition\UserDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
 use App\DataFixtures\Definition\AuthorityDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
-use App\DataFixtures\Definition\ProjectDefinition;
-use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
-use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
+use App\DataFixtures\Definition\SchemeDefinition;
+use App\DataFixtures\Definition\SchemeFund\CrstsSchemeFundDefinition;
+use App\DataFixtures\Definition\SchemeReturn\CrstsSchemeReturnDefinition;
 use App\DataFixtures\Generator\CouncilName;
 use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\BenefitCostRatioType;
@@ -85,33 +85,33 @@ class RandomFixtureGenerator
         );
         $subset = $this->faker->randomElements($authorities, $numberOfFixtures);
         foreach ($subset as $authority) {
-            $this->createProjectsAndFundsForAuthority($authority);
+            $this->createSchemesAndFundsForAuthority($authority);
         }
         return $authorities;
     }
 
-    protected function createProjectsAndFundsForAuthority(AuthorityDefinition $authority): void
+    protected function createSchemesAndFundsForAuthority(AuthorityDefinition $authority): void
     {
-        /** @var array<ProjectDefinition> $projects */
-        $projects = $this->repeat(ProjectDefinition::class, 2, 5, $this->createRandomProject(...));
+        /** @var array<SchemeDefinition> $schemes */
+        $schemes = $this->repeat(SchemeDefinition::class, 2, 5, $this->createRandomScheme(...));
 
-        // Find all funds used by all of the projects
+        // Find all funds used by all of the schemes
         $funds = [];
-        foreach($projects as $projectDefinition) {
-            foreach($projectDefinition->getProjectFunds() as $fundDefinition) {
+        foreach($schemes as $schemeDefinition) {
+            foreach($schemeDefinition->getSchemeFunds() as $fundDefinition) {
                 $fund = $fundDefinition->getFund();
                 $funds[$fund->value] = $fund;
             }
         }
 
-        $authority->setProjects($projects);
-        $authority->setFundAwards(array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $projects), $funds));
+        $authority->setSchemes($schemes);
+        $authority->setFundAwards(array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $schemes), $funds));
     }
 
     /**
-     * @param array<ProjectDefinition> $projects
+     * @param array<SchemeDefinition> $schemes
      */
-    public function createRandomFundAward(Fund $fund, array $projects): FundAwardDefinition
+    public function createRandomFundAward(Fund $fund, array $schemes): FundAwardDefinition
     {
         $returns = [];
 
@@ -119,36 +119,36 @@ class RandomFixtureGenerator
 
         $leadContactUser = $this->createRandomUser();
 
-        // Add project returns...
+        // Add scheme returns...
         foreach (FinancialQuarter::getRange(new FinancialQuarter(2022, 1), $finalQuarter) as $financialQuarter)
         {
-                $projectReturns = [];
+                $schemeReturns = [];
                 $mustBeSignedOff = $financialQuarter < $finalQuarter;
 
-                foreach($projects as $project) {
-                    $projectFund = null;
-                    foreach($project->getProjectFunds() as $loopProjectFund) {
-                        if ($loopProjectFund->getFund() === $fund) {
-                            $projectFund = $loopProjectFund;
+                foreach($schemes as $scheme) {
+                    $schemeFund = null;
+                    foreach($scheme->getSchemeFunds() as $loopSchemeFund) {
+                        if ($loopSchemeFund->getFund() === $fund) {
+                            $schemeFund = $loopSchemeFund;
                             break;
                         }
                     }
 
-                    // This project isn't a recipient of this fund's funds...
-                    if (!$projectFund) {
+                    // This scheme isn't a recipient of this fund's funds...
+                    if (!$schemeFund) {
                         continue;
                     }
 
                     if ($fund === Fund::CRSTS1) {
-                        if (!$projectFund instanceof CrstsProjectFundDefinition) {
-                            throw new \RuntimeException('ProjectFundDefinition / type mismatch');
+                        if (!$schemeFund instanceof CrstsSchemeFundDefinition) {
+                            throw new \RuntimeException('SchemeFundDefinition / type mismatch');
                         }
 
-                        if ($projectFund->isRetained() || $finalQuarter->quarter === 4) {
-                            $projectReturns[$project->getName()] = $this->createRandomCrstsProjectReturn($financialQuarter);
+                        if ($schemeFund->isRetained() || $finalQuarter->quarter === 4) {
+                            $schemeReturns[$scheme->getName()] = $this->createRandomCrstsSchemeReturn($financialQuarter);
                         }
                     } else {
-                        throw new \RuntimeException("Unsupported Project Return Type: ".$project::class);
+                        throw new \RuntimeException("Unsupported Scheme Return Type: ".$scheme::class);
                     }
                 }
 
@@ -185,7 +185,7 @@ class RandomFixtureGenerator
                         $this->faker->text(),
                         $this->faker->text(),
                         $expenses,
-                        $projectReturns,
+                        $schemeReturns,
                     ),
                     default => throw new \RuntimeException("Unsupported FundReturnDefinition: {$fund->value}")
                 };
@@ -213,37 +213,37 @@ class RandomFixtureGenerator
         return $contact;
     }
 
-    public function createRandomProject(): ProjectDefinition
+    public function createRandomScheme(): SchemeDefinition
     {
         // Since we currently only have CRSTS, we'll be having at most one fund
-        $projectFunds = [];
+        $schemeFunds = [];
 
         if (mt_rand(0, 100) > 20) {
-            $projectFunds[] = $this->createRandomCrstsProjectFund();
+            $schemeFunds[] = $this->createRandomCrstsSchemeFund();
         }
 
-        $projectId = $this->faker->currencyCode() . $this->faker->numberBetween(1, 9999);
+        $schemeId = $this->faker->currencyCode() . $this->faker->numberBetween(1, 9999);
 
-        return new ProjectDefinition(
+        return new SchemeDefinition(
             $this->faker->sentence(),
             $this->faker->text(),
             $this->faker->randomElement(TransportMode::cases()),
             $this->faker->randomElement(ActiveTravelElement::cases()),
             $this->faker->boolean(),
             $this->faker->boolean(),
-            $projectId,
-            $projectFunds,
+            $schemeId,
+            $schemeFunds,
         );
     }
 
-    public function createRandomCrstsProjectFund(): CrstsProjectFundDefinition
+    public function createRandomCrstsSchemeFund(): CrstsSchemeFundDefinition
     {
         $bcrType = $this->faker->randomElement(BenefitCostRatioType::cases());
         $bcrValue = $bcrType === BenefitCostRatioType::VALUE ?
             strval($this->faker->randomFloat(2, 0, 10)) :
             null;
 
-        return new CrstsProjectFundDefinition(
+        return new CrstsSchemeFundDefinition(
             $this->faker->boolean(),
             $this->faker->boolean(),
             $this->faker->randomElement(FundedMostlyAs::class),
@@ -252,7 +252,7 @@ class RandomFixtureGenerator
         );
     }
 
-    public function createRandomCrstsProjectReturn(FinancialQuarter $financialQuarter): CrstsProjectReturnDefinition
+    public function createRandomCrstsSchemeReturn(FinancialQuarter $financialQuarter): CrstsSchemeReturnDefinition
     {
         $milestones = [];
         $milestoneEarliestDate = new \DateTime('2022-01-01');
@@ -266,9 +266,9 @@ class RandomFixtureGenerator
             $milestones[] = $milestone;
         }
 
-        $expenses = $this->createRandomCrstsExpenses(ExpenseType::filterForProject(Fund::CRSTS1), $financialQuarter);
+        $expenses = $this->createRandomCrstsExpenses(ExpenseType::filterForScheme(Fund::CRSTS1), $financialQuarter);
 
-        return new CrstsProjectReturnDefinition(
+        return new CrstsSchemeReturnDefinition(
             strval($this->faker->randomFloat(2, 1_000, 99_000_000)),
             strval($this->faker->numberBetween(1_000, 99_000_000)),
             strval($this->faker->numberBetween(1_000, 99_000_000)),

@@ -109,10 +109,10 @@ enum:
     amber: Amber
     amber_red: Amber / Red
     red: Red
-    project_completed: Project completed
-    project_on_hold: Project on hold
-    project_completed_late: Project completed late
-    project_cancelled: Project cancelled
+    scheme_completed: Scheme completed
+    scheme_on_hold: Scheme on hold
+    scheme_completed_late: Scheme completed late
+    scheme_cancelled: Scheme cancelled
     not_applicable: N/A
   rating:
     green: Green
@@ -222,7 +222,7 @@ forms:
   crsts:
     benefit_cost_ratio:
       type:
-        label: Is the benefit-cost ratio (BCR) for this project known?
+        label: Is the benefit-cost ratio (BCR) for this scheme known?
         help: ''
       value:
         label: What is the benefit-cost ratio (BCR) value?
@@ -283,40 +283,40 @@ forms:
         label: Overall delivery confidence
       overall_confidence:
         label: Overall confidence rating
-    project_details:
+    scheme_details:
       benefit_cost_ratio:
         label: Benefit-cost ratio
       description:
-        label: Project description
+        label: Scheme description
       funded_mostly_as:
         label: Funding type
         help: Select which type of funding is used more
       name:
-        label: Project name
+        label: Scheme name
       previously_tcf:
         label: Was this previously a scheme in Transporting Cities Fund (TCF)?
         help: ''
-      project_identifier:
-        label: Project ID
+      scheme_identifier:
+        label: Scheme ID
     quarterly_progress:
       progress_summary:
         label: Quarterly progress
       progress_rating:
         label: Quarterly rating
-  project:
-    project_elements:
+  scheme:
+    scheme_elements:
       has_active_travel_elements:
-        label: Does the project have active travel elements?
+        label: Does this scheme have active travel elements?
         help: ''
       active_travel_element:
         label: Active travel element
         help: Pick the leading active travel intervention type
         placeholder: Please select an active travel element
       includes_charging_points:
-        label: Does this project include charging points for electric vehicles?
+        label: Does this scheme include charging points for electric vehicles?
         help: ''
       includes_clean_air_elements:
-        label: Does this project include clean air elements?
+        label: Does this scheme include clean air elements?
         help: ''
     transport_mode:
       category:
@@ -376,12 +376,12 @@ frontend:
       title: "{authorityName}: {type} return for {year}/{nextYear} Q{quarter}"
       fund_level_details: Fund-level details
       fund_level_expenses: Fund-level expenses
-      projects: Projects
-    project_return:
-      title: "{projectName}"
+      schemes: Schemes
+    scheme_return:
+      title: "{schemeName}"
       back_to_fund_return: "Back to {fundName} return"
-      project_level_details: Project-level details
-      project_level_expenses: Project-level expenses
+      scheme_level_details: Scheme-level details
+      scheme_level_expenses: Scheme-level expenses
 
 maintenance-warning:
   banner:
@@ -395,10 +395,10 @@ sections:
     quarterly_progress: Progress this quarter
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
-  project:
+  scheme:
     overall_funding: Overall funding totals
-    project_details: Project details
-    project_elements: Project elements
+    scheme_details: Scheme details
+    scheme_elements: Scheme elements
     transport_mode: Transport mode
 
 site.title: Data acquisition portal

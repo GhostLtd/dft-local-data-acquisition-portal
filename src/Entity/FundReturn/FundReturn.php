@@ -7,8 +7,8 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\CompletionStatus;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundAward;
-use App\Entity\ProjectFund\ProjectFund;
-use App\Entity\ProjectReturn\ProjectReturn;
+use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Traits\IdTrait;
 use App\Entity\User;
 use App\Repository\FundReturn\FundReturnRepository;
@@ -57,14 +57,14 @@ abstract class FundReturn
     private Collection $sectionStatuses;
 
     /**
-     * @var Collection<int, ProjectReturn>
+     * @var Collection<int, SchemeReturn>
      */
-    #[ORM\OneToMany(targetEntity: ProjectReturn::class, mappedBy: 'fundReturn', orphanRemoval: true)]
-    private Collection $projectReturns;
+    #[ORM\OneToMany(targetEntity: SchemeReturn::class, mappedBy: 'fundReturn', orphanRemoval: true)]
+    private Collection $schemeReturns;
 
     public function __construct()
     {
-        $this->projectReturns = new ArrayCollection();
+        $this->schemeReturns = new ArrayCollection();
         $this->sectionStatuses = new ArrayCollection();
     }
 
@@ -176,29 +176,29 @@ abstract class FundReturn
     }
 
     /**
-     * @return Collection<int, ProjectReturn>
+     * @return Collection<int, SchemeReturn>
      */
-    public function getProjectReturns(): Collection
+    public function getSchemeReturns(): Collection
     {
-        return $this->projectReturns;
+        return $this->schemeReturns;
     }
 
-    public function addProjectReturn(ProjectReturn $projectReturn): static
+    public function addSchemeReturn(SchemeReturn $schemeReturn): static
     {
-        if (!$this->projectReturns->contains($projectReturn)) {
-            $this->projectReturns->add($projectReturn);
-            $projectReturn->setFundReturn($this);
+        if (!$this->schemeReturns->contains($schemeReturn)) {
+            $this->schemeReturns->add($schemeReturn);
+            $schemeReturn->setFundReturn($this);
         }
 
         return $this;
     }
 
-    public function removeProjectReturn(ProjectReturn $projectReturn): static
+    public function removeSchemeReturn(SchemeReturn $schemeReturn): static
     {
-        if ($this->projectReturns->removeElement($projectReturn)) {
+        if ($this->schemeReturns->removeElement($schemeReturn)) {
             // set the owning side to null (unless already changed)
-            if ($projectReturn->getFundReturn() === $this) {
-                $projectReturn->setFundReturn(null);
+            if ($schemeReturn->getFundReturn() === $this) {
+                $schemeReturn->setFundReturn(null);
             }
         }
 
@@ -251,11 +251,11 @@ abstract class FundReturn
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;
 
-    public function getProjectReturnForProjectFund(ProjectFund $projectFund): ?ProjectReturn
+    public function getSchemeReturnForSchemeFund(SchemeFund $schemeFund): ?SchemeReturn
     {
-        foreach($this->getProjectReturns() as $projectReturn) {
-            if ($projectReturn->getProjectFund() === $projectFund) {
-                return $projectReturn;
+        foreach($this->getSchemeReturns() as $schemeReturn) {
+            if ($schemeReturn->getSchemeFund() === $schemeFund) {
+                return $schemeReturn;
             }
         }
 

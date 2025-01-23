@@ -1,0 +1,69 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title = breadcrumbBuilder.titleFor('scheme_return') -%}
+{%- set page_heading_class = 'govuk-heading-m' -%}
+
+{%- block content -%}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
+
+    {%- set visibleSchemeLevelSections = schemeLevelSectionsConfiguration
+        | filter(c => c.isDisplayedInExpensesList == false)
+        | filter(c => is_granted('CAN_VIEW', {subject: schemeReturn, section: c.section.value}))
+    -%}
+
+    {%- if visibleSchemeLevelSections is not empty -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_details' | trans }}</h2>
+        {{- taskListStart() -}}
+        {{- _self.schemeLevelSectionsList(_context, visibleSchemeLevelSections) -}}
+        {{- taskListEnd() -}}
+    {%- endif -%}
+
+    {%- set visibleSchemeLevelSectionsDisplayInExpensesList = schemeLevelSectionsConfiguration
+        | filter(c => c.isDisplayedInExpensesList == true)
+        | filter(c => is_granted('CAN_VIEW', {subject: schemeReturn, section: c.section.value}))
+    -%}
+
+    {%- set visibleExpenseDivision = expenseDivisions | filter(d => is_granted('CAN_VIEW', {subject: schemeReturn, section: d.key})) %}
+
+    {%- if visibleSchemeLevelSectionsDisplayInExpensesList is not empty
+        or visibleExpenseDivision is not empty
+    -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_expenses' | trans }}</h2>
+        {{- taskListStart() -}}
+        {# We want to show some of the schemeLevelSection items in the expenses area, because although they are not
+           expenses in the entity sense, they ask financial questions that are expense-related.
+        #}
+        {{- _self.schemeLevelSectionsList(_context, visibleSchemeLevelSectionsDisplayInExpensesList) -}}
+
+        {%- for division in visibleExpenseDivision -%}
+            {%- set status = schemeReturn.getStatusForSection(division) -%}
+            {{- taskListItem({
+                title: {text: division.label | trans},
+                href: path('app_scheme_return_expense_edit', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id, divisionKey: division.key}),
+                status: {tag: {
+                    text: "tags.#{status.value}.name" | trans,
+                    classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+                }},
+            }, loop.index0) -}}
+        {%- endfor -%}
+        {{- taskListEnd() -}}
+    {%- endif -%}
+{% endblock %}
+
+{% macro schemeLevelSectionsList(context, configurations) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem -%}
+
+    {%- for configuration in configurations -%}
+        {%- set section = configuration.section -%}
+        {%- set status = context.schemeReturn.getStatusForSection(section) -%}
+
+        {{- taskListItem({
+            title: {text: "sections.scheme.#{section.value}" | trans},
+            href: path('app_scheme_return_edit', {fundReturnId: context.fundReturn.id, schemeFundId: context.schemeReturn.schemeFund.id, section: section.value}),
+            status: {tag: {
+                text: "tags.#{status.value}.name" | trans,
+                classes: "govuk-tag--" ~ ("tags.#{status.value}.colour" | trans),
+            }},
+        }, loop.index0) -}}
+    {%- endfor -%}
+{% endmacro %}

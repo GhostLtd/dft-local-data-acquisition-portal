@@ -7,7 +7,7 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
-use App\Entity\ProjectReturn\CrstsProjectReturn;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Utility\CrstsHelper;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
 use App\Validator\ExpensesValidator;

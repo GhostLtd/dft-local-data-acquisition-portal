@@ -42,8 +42,8 @@ SELECT
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
     authority.id    AS authority_id,
-    {$null}         AS project_id,
-    {$null}         AS project_return_id,
+    {$null}         AS scheme_id,
+    {$null}         AS scheme_return_id,
     {$null}         AS fund_return_id,
     u.fund_types    AS fund_types,
     u.section_types AS section_types
@@ -58,8 +58,8 @@ SELECT
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
     authority.id    AS authority_id,
-    {$null}         AS project_id,
-    {$null}         AS project_return_id,
+    {$null}         AS scheme_id,
+    {$null}         AS scheme_return_id,
     fund_return.id  AS fund_return_id,
     u.fund_types    AS fund_types,
     u.section_types AS section_types
@@ -74,20 +74,20 @@ UNION
 SELECT
     CAST(u.id as {$columnType}) AS id,
     u.user_id         AS user_id,
-    u.entity_class  AS entity_class,
+    u.entity_class    AS entity_class,
     authority.id      AS authority_id,
-    project.id        AS project_id,
-    project_return.id AS project_return_id,
+    scheme.id         AS scheme_id,
+    scheme_return.id  AS scheme_return_id,
     fund_return.id    AS fund_return_id,
     u.fund_types      AS fund_types,
     u.section_types   AS section_types
 FROM user_permission u
-    JOIN project_return ON project_return.id = u.entity_id
-    JOIN fund_return ON project_return.fund_return_id = fund_return.id
-    JOIN project_fund ON project_return.project_fund_id = project_fund.id
-    JOIN project ON project_fund.project_id = project.id
-    JOIN authority ON project.authority_id = authority.id
-WHERE u.entity_class = 'App\Entity\ProjectReturn\ProjectReturn'
+    JOIN scheme_return ON scheme_return.id = u.entity_id
+    JOIN fund_return ON scheme_return.fund_return_id = fund_return.id
+    JOIN scheme_fund ON scheme_return.scheme_fund_id = scheme_fund.id
+    JOIN scheme ON scheme_fund.scheme_id = scheme.id
+    JOIN authority ON scheme.authority_id = authority.id
+WHERE u.entity_class = 'App\Entity\SchemeReturn\SchemeReturn'
 
 UNION
 
@@ -96,15 +96,15 @@ SELECT
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
     authority.id    AS authority_id,
-    project.id      AS project_id,
-    {$null}         AS project_return_id,
+    scheme.id       AS scheme_id,
+    {$null}         AS scheme_return_id,
     {$null}         AS fund_return_id,
     u.fund_types    AS fund_types,
     u.section_types AS section_types
 FROM user_permission u
-    JOIN project ON project.id = u.entity_id
-    JOIN authority ON project.authority_id = authority.id
-WHERE u.entity_class = 'App\Entity\Project'
+    JOIN scheme ON scheme.id = u.entity_id
+    JOIN authority ON scheme.authority_id = authority.id
+WHERE u.entity_class = 'App\Entity\Scheme'
 EOQ);
     }
 

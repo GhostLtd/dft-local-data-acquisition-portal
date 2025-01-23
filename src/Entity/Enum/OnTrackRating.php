@@ -9,9 +9,9 @@ enum OnTrackRating: string
     case AMBER = "amber";
     case AMBER_RED = "amber_red";
     case RED = "red";
-    case PROJECT_COMPLETED = "project_completed";
-    case PROJECT_ON_HOLD = "project_on_hold";
-    case PROJECT_COMPLETED_LATE = "project_completed_late";
-    case PROJECT_CANCELLED = "project_cancelled";
-    case PROJECT_NA = "not_applicable";
+    case SCHEME_COMPLETED = "scheme_completed";
+    case SCHEME_ON_HOLD = "scheme_on_hold";
+    case SCHEME_COMPLETED_LATE = "scheme_completed_late";
+    case SCHEME_CANCELLED = "scheme_cancelled";
+    case SCHEME_NA = "not_applicable";
 }

@@ -3,7 +3,7 @@
 namespace App\Validator\Constraint;
 
 use App\Entity\Enum\BenefitCostRatioType;
-use App\Entity\ProjectFund\BenefitCostRatio as BenefitCostRatioEntity;
+use App\Entity\SchemeFund\BenefitCostRatio as BenefitCostRatioEntity;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotNull;

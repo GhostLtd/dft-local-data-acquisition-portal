@@ -4,8 +4,8 @@ namespace App\Security;
 
 use App\Entity\Enum\Permission;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\Project;
-use App\Entity\ProjectReturn\ProjectReturn;
+use App\Entity\Scheme;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Authority;
 use App\Entity\UserPermission;
 
@@ -31,7 +31,7 @@ class UserPermissionValidator
                 return false;
             }
         } else if (in_array($permission, [Permission::CHECKER, Permission::EDITOR, Permission::VIEWER])) {
-            if (!in_array($entityClass, [Authority::class, FundReturn::class, Project::class, ProjectReturn::class])) {
+            if (!in_array($entityClass, [Authority::class, FundReturn::class, Scheme::class, SchemeReturn::class])) {
                 return false;
             }
 
@@ -40,7 +40,7 @@ class UserPermissionValidator
                     return false;
                 }
 
-                if ($entityClass === Project::class && $fundTypes === null) {
+                if ($entityClass === Scheme::class && $fundTypes === null) {
                     return false;
                 }
             }

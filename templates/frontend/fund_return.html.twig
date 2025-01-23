@@ -42,18 +42,18 @@
         {{- taskListEnd() -}}
     {%- endif -%}
 
-    {%- set visibleProjectFunds = projectFunds | filter(f => is_granted('CAN_VIEW', fundReturn.getProjectReturnForProjectFund(f))) -%}
-    {%- if visibleProjectFunds is not empty -%}
-        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.projects' | trans }}</h2>
+    {%- set visibleSchemeFunds = schemeFunds | filter(f => is_granted('CAN_VIEW', fundReturn.getSchemeReturnForSchemeFund(f))) -%}
+    {%- if visibleSchemeFunds is not empty -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.schemes' | trans }}</h2>
         {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
 
         {{- taskListStart() -}}
-        {%- for projectFund in visibleProjectFunds -%}
-            {%- set isRequired = projectFund.isReturnRequiredFor(fundReturn.quarter) -%}
+        {%- for schemeFund in visibleSchemeFunds -%}
+            {%- set isRequired = schemeFund.isReturnRequiredFor(fundReturn.quarter) -%}
             {%- set tag = isRequired ? fundTag : 'not_required' -%}
-            {%- set url = path('app_project_return', {fundReturnId: fundReturn.id, projectFundId: projectFund.id}) -%}
+            {%- set url = path('app_scheme_return', {fundReturnId: fundReturn.id, schemeFundId: schemeFund.id}) -%}
             {{- taskListItem({
-                title: {text: projectFund.project.name},
+                title: {text: schemeFund.scheme.name},
                 href: isRequired ? url : null,
                 status: {tag: {
                     text: "tags.#{tag}.name" | trans,

@@ -17,12 +17,12 @@ class CrstsHelper
     /**
      * @return array<int, RowGroupInterface>
      */
-    public static function getProjectExpenseRowsConfiguration(): array
+    public static function getSchemeExpenseRowsConfiguration(): array
     {
         return [
             new UngroupedConfiguration([
-                ExpenseType::PROJECT_CAPITAL_SPEND_FUND,
-                ExpenseType::PROJECT_CAPITAL_SPEND_ALL_SOURCES,
+                ExpenseType::SCHEME_CAPITAL_SPEND_FUND,
+                ExpenseType::SCHEME_CAPITAL_SPEND_ALL_SOURCES,
             ]),
         ];
     }

@@ -4,8 +4,8 @@ namespace App\Security;
 
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\Project;
-use App\Entity\ProjectReturn\ProjectReturn;
+use App\Entity\Scheme;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Authority;
 use Psr\Log\LoggerInterface;
 
@@ -31,9 +31,9 @@ class SubjectResolver
         $fundType = null;
         $idMap = [];
 
-        if ($subject instanceof ProjectReturn) {
-            $idMap[ProjectReturn::class] = $subject->getId();
-            $idMap[Project::class] = $subject?->getProjectFund()?->getProject()?->getId();
+        if ($subject instanceof SchemeReturn) {
+            $idMap[SchemeReturn::class] = $subject->getId();
+            $idMap[Scheme::class] = $subject?->getSchemeFund()?->getScheme()?->getId();
             $subject = $subject?->getFundReturn();
         }
 
@@ -105,7 +105,7 @@ class SubjectResolver
         $validBaseClasses = [FundReturn::class];
 
         if ($role !== Role::CAN_SUBMIT) {
-            $validBaseClasses[] = ProjectReturn::class;
+            $validBaseClasses[] = SchemeReturn::class;
         }
 
         if ($role === Role::CAN_VIEW) {

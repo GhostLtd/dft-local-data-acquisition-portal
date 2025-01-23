@@ -8,21 +8,20 @@ use App\DataFixtures\Definition\UserDefinition;
 use App\DataFixtures\Definition\Expense\ExpenseDefinition;
 use App\DataFixtures\Definition\AuthorityDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
-use App\DataFixtures\Definition\ProjectDefinition;
-use App\DataFixtures\Definition\ProjectFund\CrstsProjectFundDefinition;
-use App\DataFixtures\Definition\ProjectReturn\CrstsProjectReturnDefinition;
+use App\DataFixtures\Definition\SchemeDefinition;
+use App\DataFixtures\Definition\SchemeFund\CrstsSchemeFundDefinition;
+use App\DataFixtures\Definition\SchemeReturn\CrstsSchemeReturnDefinition;
 use App\Entity\Enum\Fund;
 use App\Entity\ExpenseEntry;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
-use App\Entity\ProjectFund\BenefitCostRatio;
+use App\Entity\SchemeFund\BenefitCostRatio;
 use App\Entity\Authority;
 use App\Entity\Milestone;
-use App\Entity\Project;
-use App\Entity\ProjectFund\CrstsProjectFund;
-use App\Entity\ProjectReturn\CrstsProjectReturn;
+use App\Entity\Scheme;
+use App\Entity\SchemeFund\CrstsSchemeFund;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\User;
-use App\Entity\UserPermission;
 use Doctrine\ORM\EntityManagerInterface;
 
 class FixtureHelper
@@ -62,13 +61,13 @@ class FixtureHelper
         $authority->setAdmin($admin);
         $this->persist([$authority]);
 
-        foreach($definition->getProjects() as $projectDefinition) {
-            $authority->addProject($this->createProject($projectDefinition));
+        foreach($definition->getSchemes() as $schemeDefinition) {
+            $authority->addScheme($this->createScheme($schemeDefinition));
         }
 
-        $projects = $authority->getProjects()->toArray();
+        $schemes = $authority->getSchemes()->toArray();
         foreach($definition->getFundAwards() as $fundAwardDefinition) {
-            $authority->addFundAward($this->createFundAward($fundAwardDefinition, $projects));
+            $authority->addFundAward($this->createFundAward($fundAwardDefinition, $schemes));
         }
 
         return $authority;
@@ -106,9 +105,9 @@ class FixtureHelper
     }
 
     /**
-     * @param array<Project> $projects
+     * @param array<Scheme> $schemes
      */
-    public function createFundAward(FundAwardDefinition $fundAwardDefinition, array $projects=[]): FundAward
+    public function createFundAward(FundAwardDefinition $fundAwardDefinition, array $schemes=[]): FundAward
     {
         $fund = $fundAwardDefinition->getFund();
 
@@ -126,7 +125,7 @@ class FixtureHelper
 
         foreach($fundAwardDefinition->getReturns() as $returnDefinition) {
             if ($fund === Fund::CRSTS1 && $returnDefinition instanceof CrstsFundReturnDefinition) {
-                $return = $this->createCrstsFundReturn($returnDefinition, $projects);
+                $return = $this->createCrstsFundReturn($returnDefinition, $schemes);
             } else {
                 throw new \RuntimeException("Unsupported returnDefinition type for fund {$fund->value}: ".$returnDefinition::class);
             }
@@ -148,54 +147,54 @@ class FixtureHelper
         return $fundAward;
     }
 
-    public function createProject(ProjectDefinition $definition): Project
+    public function createScheme(SchemeDefinition $definition): Scheme
     {
-        $project = (new Project())
+        $scheme = (new Scheme())
             ->setName($definition->getName())
             ->setDescription($definition->getDescription())
-            ->setProjectIdentifier($definition->getProjectIdentifier())
+            ->setSchemeIdentifier($definition->getSchemeIdentifier())
             ->setActiveTravelElement($definition->getActiveTravelElement())
             ->setIncludesChargingPoints($definition->getIncludesChargingPoints())
             ->setIncludesCleanAirElements($definition->getIncludesCleanAirElements())
             ->setTransportMode($definition->getTransportMode());
 
-        $this->persist([$project]);
+        $this->persist([$scheme]);
 
-        foreach($definition->getProjectFunds() as $projectFundDefinition) {
-            $class = $projectFundDefinition::class;
+        foreach($definition->getSchemeFunds() as $schemeFundDefinition) {
+            $class = $schemeFundDefinition::class;
 
-            $projectFund = match($class) {
-                CrstsProjectFundDefinition::class => $this->createCrstsProjectFund($projectFundDefinition),
-                default => throw new \RuntimeException("Unsupported ProjectFund definition class - {$class}"),
+            $schemeFund = match($class) {
+                CrstsSchemeFundDefinition::class => $this->createCrstsSchemeFund($schemeFundDefinition),
+                default => throw new \RuntimeException("Unsupported SchemeFund definition class - {$class}"),
             };
 
-            $project->addProjectFund($projectFund);
+            $scheme->addSchemeFund($schemeFund);
         }
 
-        return $project;
+        return $scheme;
     }
 
-    public function createCrstsProjectFund(CrstsProjectFundDefinition $definition): CrstsProjectFund
+    public function createCrstsSchemeFund(CrstsSchemeFundDefinition $definition): CrstsSchemeFund
     {
         $bcr = (new BenefitCostRatio())
             ->setType($definition->getBenefitCostRatioType())
             ->setValue($definition->getBenefitCostRatioValue());
 
-        $projectFund = (new CrstsProjectFund())
+        $schemeFund = (new CrstsSchemeFund())
             ->setRetained($definition->isRetained())
             ->setPreviouslyTcf($definition->getPreviouslyTcf())
             ->setFundedMostlyAs($definition->getFundedMostlyAs())
             ->setBenefitCostRatio($bcr);
 
-        $this->persist([$projectFund]);
+        $this->persist([$schemeFund]);
 
-        return $projectFund;
+        return $schemeFund;
     }
 
     /**
-     * @param array<Project> $projects
+     * @param array<Scheme> $schemes
      */
-    public function createCrstsFundReturn(CrstsFundReturnDefinition $definition, array $projects=[]): CrstsFundReturn
+    public function createCrstsFundReturn(CrstsFundReturnDefinition $definition, array $schemes=[]): CrstsFundReturn
     {
         $return = (new CrstsFundReturn())
             ->setComments($definition->getComments())
@@ -214,36 +213,36 @@ class FixtureHelper
             $return->addExpense($this->createExpense($expenseDefinition));
         }
 
-        foreach($definition->getProjectReturns() as $projectName => $projectReturnDefinition) {
-            $project = null;
-            foreach($projects as $loopProject) {
-                if ($projectName === $loopProject->getName()) {
-                    $project = $loopProject;
+        foreach($definition->getSchemeReturns() as $schemeName => $schemeReturnDefinition) {
+            $scheme = null;
+            foreach($schemes as $loopScheme) {
+                if ($schemeName === $loopScheme->getName()) {
+                    $scheme = $loopScheme;
                     break;
                 }
             }
 
-            if (!$project) {
-                throw new \RuntimeException("Project referenced by return not found: {$projectName}");
+            if (!$scheme) {
+                throw new \RuntimeException("Scheme referenced by return not found: {$schemeName}");
             }
 
-            $projectFund = null;
-            foreach($project->getProjectFunds() as $loopFund) {
-                $projectFund = match(true) {
-                    $loopFund instanceof CrstsProjectFund => $loopFund,
+            $schemeFund = null;
+            foreach($scheme->getSchemeFunds() as $loopFund) {
+                $schemeFund = match(true) {
+                    $loopFund instanceof CrstsSchemeFund => $loopFund,
                     default => null,
                 };
 
-                if ($projectFund) {
+                if ($schemeFund) {
                     break;
                 }
             }
 
-            if (!$projectFund) {
-                throw new \RuntimeException("Project referenced by return is not funded by CRSTS: {$projectName}");
+            if (!$schemeFund) {
+                throw new \RuntimeException("Scheme referenced by return is not funded by CRSTS: {$schemeName}");
             }
 
-            $return->addProjectReturn($this->createCrstsProjectReturn($projectReturnDefinition, $projectFund));
+            $return->addSchemeReturn($this->createCrstsSchemeReturn($schemeReturnDefinition, $schemeFund));
         }
 
         $this->persist([$return]);
@@ -251,10 +250,10 @@ class FixtureHelper
         return $return;
     }
 
-    public function createCrstsProjectReturn(CrstsProjectReturnDefinition $definition, CrstsProjectFund $projectFund): CrstsProjectReturn
+    public function createCrstsSchemeReturn(CrstsSchemeReturnDefinition $definition, CrstsSchemeFund $schemeFund): CrstsSchemeReturn
     {
-        $return = (new CrstsProjectReturn())
-            ->setProjectFund($projectFund)
+        $return = (new CrstsSchemeReturn())
+            ->setSchemeFund($schemeFund)
             ->setTotalCost($definition->getTotalCost())
             ->setAgreedFunding($definition->getAgreeFunding())
             ->setSpendToDate($definition->getSpendToDate())

@@ -4,9 +4,9 @@ namespace App\Utility\Breadcrumb\Frontend;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\FundLevelSection;
-use App\Entity\Enum\ProjectLevelSection;
+use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\ProjectFund\ProjectFund;
+use App\Entity\SchemeFund\SchemeFund;
 use App\Utility\Breadcrumb\AbstractBreadcrumbBuilder;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -40,47 +40,47 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
         );
     }
 
-    public function setAtProjectFund(FundReturn $fundReturn, ProjectFund $projectFund): void
+    public function setAtSchemeFund(FundReturn $fundReturn, SchemeFund $schemeFund): void
     {
         $this->setAtFundReturn($fundReturn);
         $this->addItem(
-            'project_return',
-            'app_project_return',
+            'scheme_return',
+            'app_scheme_return',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'projectFundId' => $projectFund->getId()
+                'schemeFundId' => $schemeFund->getId()
             ],
-            translationKey: 'frontend.pages.project_return.title',
+            translationKey: 'frontend.pages.scheme_return.title',
             translationParameters: [
-                'projectName' => $projectFund->getProject()->getName(),
+                'schemeName' => $schemeFund->getScheme()->getName(),
             ]
         );
     }
 
-    public function setAtProjectFundEdit(FundReturn $fundReturn, ProjectFund $projectFund, ProjectLevelSection $section): void
+    public function setAtSchemeFundEdit(FundReturn $fundReturn, SchemeFund $schemeFund, SchemeLevelSection $section): void
     {
-        $this->setAtProjectFund($fundReturn, $projectFund);
+        $this->setAtSchemeFund($fundReturn, $schemeFund);
         $this->addItem(
-            'project_return_edit',
-            'app_project_return_edit',
+            'scheme_return_edit',
+            'app_scheme_return_edit',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'projectFundId' => $projectFund->getId(),
+                'schemeFundId' => $schemeFund->getId(),
                 'section' => $section->value,
             ],
-            translationKey: "sections.project.{$section->value}",
+            translationKey: "sections.scheme.{$section->value}",
         );
     }
 
-    public function setAtProjectExpenseEdit(FundReturn $fundReturn, ProjectFund $projectFund, DivisionConfiguration $division): void
+    public function setAtSchemeExpenseEdit(FundReturn $fundReturn, SchemeFund $scheme, DivisionConfiguration $division): void
     {
-        $this->setAtProjectFund($fundReturn, $projectFund);
+        $this->setAtSchemeFund($fundReturn, $scheme);
         $this->addItem(
-            'project_return_expense_edit',
-            'app_project_return_expense_edit',
+            'scheme_return_expense_edit',
+            'app_scheme_return_expense_edit',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'projectFundId' => $projectFund->getId(),
+                'schemeFundId' => $scheme->getId(),
                 'divisionKey' => $division->getKey(),
             ],
             text: $division->getLabel(),

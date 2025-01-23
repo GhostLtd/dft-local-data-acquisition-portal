@@ -5,13 +5,13 @@ namespace App\DataFixtures\Definition;
 class AuthorityDefinition
 {
     /**
-     * @param array<ProjectDefinition> $projects
+     * @param array<SchemeDefinition> $schemes
      * @param array<FundAwardDefinition> $fundAwards
      */
     public function __construct(
         protected string         $name,
         protected UserDefinition $admin,
-        protected array          $projects,
+        protected array          $schemes,
         protected array          $fundAwards,
     ) {}
 
@@ -25,10 +25,10 @@ class AuthorityDefinition
         return $this->admin;
     }
 
-    /** @return array<ProjectDefinition> */
-    public function getProjects(): array
+    /** @return array<SchemeDefinition> */
+    public function getSchemes(): array
     {
-        return $this->projects;
+        return $this->schemes;
     }
 
     public function getFundAwards(): array
@@ -36,9 +36,9 @@ class AuthorityDefinition
         return $this->fundAwards;
     }
 
-    public function setProjects(array $projects): static
+    public function setSchemes(array $schemes): static
     {
-        $this->projects = $projects;
+        $this->schemes = $schemes;
         return $this;
     }
 
