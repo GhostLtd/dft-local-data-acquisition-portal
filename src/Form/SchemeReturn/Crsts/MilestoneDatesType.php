@@ -29,7 +29,8 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             ->addEventListener(FormEvents::PRE_SET_DATA, $this->buildMilestoneFormElements(...));
     }
 
-    public function buildMilestoneFormElements(PreSetDataEvent $event) {
+    public function buildMilestoneFormElements(PreSetDataEvent $event): void
+    {
         $data = $event->getData();
         $form = $event->getForm();
 
@@ -43,10 +44,10 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             $fieldKey = $milestoneType->value;
 
             $form->add($milestoneType->value, DateType::class, [
-                'label' => "forms.scheme.milestones.{$fieldKey}.label",
+                'label' => "forms.scheme.milestone_dates.{$fieldKey}.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'label_translation_parameters' => ['mostlyFundedAs' => $fundedMostlyAs->value],
-                'help' => "forms.scheme.milestones.{$fieldKey}.help",
+                'label_translation_parameters' => ['mostly_funded_as' => $fundedMostlyAs->value],
+                'help' => "forms.scheme.milestone_dates.{$fieldKey}.help",
             ]);
         }
     }
@@ -58,7 +59,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', SchemeReturn::class);
+        $resolver->setDefault('data_class', CrstsSchemeReturn::class);
     }
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void

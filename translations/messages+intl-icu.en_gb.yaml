@@ -304,7 +304,7 @@ forms:
       progress_rating:
         label: Quarterly rating
   scheme:
-    milestones:
+    milestone_dates:
       start_development:
         label: Start development
         help: ''
@@ -312,13 +312,32 @@ forms:
         label: End development
         help: ''
       start_construction:
-        label: Start construction
+        label: >-
+          {mostly_funded_as, select,
+            CDEL  {Start construction}
+            other {Start delivery}
+          }
+
         help: ''
       end_construction:
-        label: Complete construction
+        label: >-
+          {mostly_funded_as, select,
+            CDEL  {End construction}
+            other {End delivery}
+          }
         help: ''
       final_delivery:
         label: Final delivery
+        help: ''
+    milestone_details:
+      business_case:
+        label: Current business case
+        help: ''
+      expected_business_case_approval:
+        label: Expected date of approval for current business case
+        help: ''
+      progress_update:
+        label: Progress update
         help: ''
 
     scheme_elements:
@@ -414,8 +433,8 @@ sections:
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
   scheme:
-    milestone_dates: Milestones dates
-    milestone_details: Milestones details
+    milestone_dates: Milestone dates
+    milestone_details: Milestone details
     overall_funding: Overall funding totals
     scheme_details: Scheme details
     scheme_elements: Scheme elements
