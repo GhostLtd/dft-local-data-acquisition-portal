@@ -3,6 +3,7 @@
 namespace App\Config;
 
 use App\Entity\Enum\SchemeLevelSection;
+use App\Entity\Enum\SectionDisplayGroup;
 use Symfony\Component\Form\FormInterface;
 
 class SchemeLevelSectionConfiguration
@@ -11,9 +12,9 @@ class SchemeLevelSectionConfiguration
      * @param class-string<FormInterface> $formClass
      */
     public function __construct(
-        protected SchemeLevelSection $section,
-        protected string             $formClass,
-        protected bool               $isDisplayedInExpensesList=false,
+        protected SchemeLevelSection  $section,
+        protected string              $formClass,
+        protected SectionDisplayGroup $displayGroup = SectionDisplayGroup::DETAILS,
     ) {}
 
     public function getSection(): SchemeLevelSection
@@ -26,8 +27,8 @@ class SchemeLevelSectionConfiguration
         return $this->formClass;
     }
 
-    public function isDisplayedInExpensesList(): bool
+    public function getDisplayGroup(): SectionDisplayGroup
     {
-        return $this->isDisplayedInExpensesList;
+        return $this->displayGroup;
     }
 }

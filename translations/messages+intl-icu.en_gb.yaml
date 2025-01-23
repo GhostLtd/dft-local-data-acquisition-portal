@@ -304,6 +304,23 @@ forms:
       progress_rating:
         label: Quarterly rating
   scheme:
+    milestones:
+      start_development:
+        label: Start development
+        help: ''
+      end_development:
+        label: End development
+        help: ''
+      start_construction:
+        label: Start construction
+        help: ''
+      end_construction:
+        label: Complete construction
+        help: ''
+      final_delivery:
+        label: Final delivery
+        help: ''
+
     scheme_elements:
       has_active_travel_elements:
         label: Does this scheme have active travel elements?
@@ -380,8 +397,9 @@ frontend:
     scheme_return:
       title: "{schemeName}"
       back_to_fund_return: "Back to {fundName} return"
-      scheme_level_details: Scheme-level details
-      scheme_level_expenses: Scheme-level expenses
+      scheme_level_details: Scheme details
+      scheme_level_expenses: Scheme expenses
+      scheme_level_milestones: Scheme milestones
 
 maintenance-warning:
   banner:
@@ -396,6 +414,8 @@ sections:
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
   scheme:
+    milestone_dates: Milestones dates
+    milestone_details: Milestones details
     overall_funding: Overall funding totals
     scheme_details: Scheme details
     scheme_elements: Scheme elements

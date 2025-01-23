@@ -37,16 +37,16 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     private ?string $spendToDate = null; // 2proj_exp: Spend to date, <this fund>
 
     #[ORM\Column(nullable: true, enumType: OnTrackRating::class)]
-    private ?OnTrackRating $onTrackRating = null; // 4proj_exp: On-track rating (delivery confidence assessment)
+    private ?OnTrackRating $onTrackRating = null; // 4proj_milestones: On-track rating (delivery confidence assessment)
 
     #[ORM\Column(nullable: true, enumType: BusinessCase::class)]
-    private ?BusinessCase $businessCase = null; // 4proj_exp: Current business case
+    private ?BusinessCase $businessCase = null; // 4proj_milestones: Current business case
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_exp: Expected date of approval for current business case
+    private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $progressUpdate = null; // 4proj_exp: Progress update (comment)
+    private ?string $progressUpdate = null; // 4proj_milestones: Progress update (comment)
 
     /**
      * @var Collection<int, ExpenseEntry>
@@ -57,7 +57,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     /**
      * @var Collection<int, Milestone>
      */
-    #[ORM\ManyToMany(targetEntity: Milestone::class)]
+    #[ORM\ManyToMany(targetEntity: Milestone::class, cascade: ['persist'])]
     private Collection $milestones;
 
     public function __construct()

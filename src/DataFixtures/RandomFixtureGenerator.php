@@ -191,7 +191,7 @@ class RandomFixtureGenerator
                 };
         }
 
-        return new FundAwardDefinition($leadContactUser, $fund, $returns);
+        return new FundAwardDefinition($fund, $leadContactUser, $returns);
     }
 
     public function createRandomUser(): UserDefinition

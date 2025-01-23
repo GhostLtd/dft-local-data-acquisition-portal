@@ -6,36 +6,36 @@
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
 
-    {%- set visibleSchemeLevelSections = schemeLevelSectionsConfiguration
-        | filter(c => c.isDisplayedInExpensesList == false)
+    {%- set visibleSectionsInDetails = schemeLevelSectionsConfiguration
+        | filter(c => c.displayGroup.value == 'details')
         | filter(c => is_granted('CAN_VIEW', {subject: schemeReturn, section: c.section.value}))
     -%}
 
-    {%- if visibleSchemeLevelSections is not empty -%}
+    {%- if visibleSectionsInDetails is not empty -%}
         <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_details' | trans }}</h2>
         {{- taskListStart() -}}
-        {{- _self.schemeLevelSectionsList(_context, visibleSchemeLevelSections) -}}
+        {{- _self.sectionsList(_context, visibleSectionsInDetails) -}}
         {{- taskListEnd() -}}
     {%- endif -%}
 
-    {%- set visibleSchemeLevelSectionsDisplayInExpensesList = schemeLevelSectionsConfiguration
-        | filter(c => c.isDisplayedInExpensesList == true)
+    {%- set visibleSectionsInExpenses = schemeLevelSectionsConfiguration
+        | filter(c => c.displayGroup.value == 'expenses')
         | filter(c => is_granted('CAN_VIEW', {subject: schemeReturn, section: c.section.value}))
     -%}
 
-    {%- set visibleExpenseDivision = expenseDivisions | filter(d => is_granted('CAN_VIEW', {subject: schemeReturn, section: d.key})) %}
+    {%- set visibleExpenseDivisions = expenseDivisions | filter(d => is_granted('CAN_VIEW', {subject: schemeReturn, section: d.key})) %}
 
-    {%- if visibleSchemeLevelSectionsDisplayInExpensesList is not empty
-        or visibleExpenseDivision is not empty
+    {%- if visibleSectionsInExpenses is not empty
+        or visibleExpenseDivisions is not empty
     -%}
         <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_expenses' | trans }}</h2>
         {{- taskListStart() -}}
         {# We want to show some of the schemeLevelSection items in the expenses area, because although they are not
            expenses in the entity sense, they ask financial questions that are expense-related.
         #}
-        {{- _self.schemeLevelSectionsList(_context, visibleSchemeLevelSectionsDisplayInExpensesList) -}}
+        {{- _self.sectionsList(_context, visibleSectionsInExpenses) -}}
 
-        {%- for division in visibleExpenseDivision -%}
+        {%- for division in visibleExpenseDivisions -%}
             {%- set status = schemeReturn.getStatusForSection(division) -%}
             {{- taskListItem({
                 title: {text: division.label | trans},
@@ -48,9 +48,21 @@
         {%- endfor -%}
         {{- taskListEnd() -}}
     {%- endif -%}
+
+    {%- set visibleSectionsInMilestones = schemeLevelSectionsConfiguration
+        | filter(c => c.displayGroup.value == 'milestones')
+        | filter(c => is_granted('CAN_VIEW', {subject: schemeReturn, section: c.section.value}))
+    -%}
+
+    {%- if visibleSectionsInMilestones is not empty -%}
+        <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_milestones' | trans }}</h2>
+        {{- taskListStart() -}}
+        {{- _self.sectionsList(_context, visibleSectionsInMilestones) -}}
+        {{- taskListEnd() -}}
+    {%- endif -%}
 {% endblock %}
 
-{% macro schemeLevelSectionsList(context, configurations) %}
+{% macro sectionsList(context, configurations) %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem -%}
 
     {%- for configuration in configurations -%}

@@ -12,8 +12,8 @@ class FundAwardDefinition
      * @param array<CrstsFundReturnDefinition> $returns
      */
     public function __construct(
-        protected ?UserDefinition $leadContact = null,
         protected Fund            $fund,
+        protected ?UserDefinition $leadContact = null,
         protected array           $returns = []
     )
     {

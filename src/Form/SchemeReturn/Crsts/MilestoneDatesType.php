@@ -1,0 +1,126 @@
+<?php
+
+namespace App\Form\SchemeReturn\Crsts;
+
+use App\Entity\Enum\FundedMostlyAs;
+use App\Entity\Enum\MilestoneType;
+use App\Entity\Enum\MilestoneType as MilestoneEnum;
+use App\Entity\Milestone;
+use App\Entity\SchemeFund\CrstsSchemeFund;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
+use App\Entity\SchemeReturn\SchemeReturn;
+use App\Form\ReturnBaseType;
+use Ghost\GovUkFrontendBundle\Form\Type\DateType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Event\PreSetDataEvent;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class MilestoneDatesType extends AbstractType implements DataMapperInterface
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->setDataMapper($this)
+            ->addEventListener(FormEvents::PRE_SET_DATA, $this->buildMilestoneFormElements(...));
+    }
+
+    public function buildMilestoneFormElements(PreSetDataEvent $event) {
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        if (!$data instanceof CrstsSchemeReturn) {
+            throw new UnexpectedTypeException($data, CrstsSchemeReturn::class);
+        }
+
+        $fundedMostlyAs = $data->getSchemeFund()->getFundedMostlyAs();
+
+        foreach($this->getRelevantMilestoneEnums($data) as $milestoneType) {
+            $fieldKey = $milestoneType->value;
+
+            $form->add($milestoneType->value, DateType::class, [
+                'label' => "forms.scheme.milestones.{$fieldKey}.label",
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'label_translation_parameters' => ['mostlyFundedAs' => $fundedMostlyAs->value],
+                'help' => "forms.scheme.milestones.{$fieldKey}.help",
+            ]);
+        }
+    }
+
+    public function getParent(): string
+    {
+        return ReturnBaseType::class;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefault('data_class', SchemeReturn::class);
+    }
+
+    public function mapDataToForms(mixed $viewData, \Traversable $forms): void
+    {
+        if (!$viewData instanceof CrstsSchemeReturn) {
+            throw new UnexpectedTypeException($viewData, CrstsSchemeReturn::class);
+        }
+
+        $forms = iterator_to_array($forms);
+        /** @var FormInterface[] $forms */
+
+        $milestoneEnums = $this->getRelevantMilestoneEnums($viewData);
+
+        foreach($milestoneEnums as $milestoneEnum) {
+            $data = $this->getMilestone($viewData, $milestoneEnum)?->getDate();
+            $forms[$milestoneEnum->value]->setData($data);
+        }
+    }
+
+    public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
+    {
+        if (!$viewData instanceof CrstsSchemeReturn) {
+            throw new UnexpectedTypeException($viewData, CrstsSchemeReturn::class);
+        }
+
+        $forms = iterator_to_array($forms);
+        /** @var FormInterface[] $forms */
+
+        $milestoneEnums = $this->getRelevantMilestoneEnums($viewData);
+
+        foreach($milestoneEnums as $milestoneEnum) {
+            $value = $forms[$milestoneEnum->value]->getData();
+
+            $milestone = $this->getMilestone($viewData, $milestoneEnum);
+
+            if (!$milestone) {
+                $milestone = (new Milestone())->setType($milestoneEnum);
+                $viewData->addMilestone($milestone);
+            }
+
+            $milestone->setDate($value);
+        }
+    }
+
+    protected function getRelevantMilestoneEnums(CrstsSchemeReturn $schemeReturn): array
+    {
+        $isCDEL = $schemeReturn->getSchemeFund()->getFundedMostlyAs() === FundedMostlyAs::CDEL;
+
+        return array_filter(
+            MilestoneEnum::cases(),
+            fn(MilestoneEnum $e) => $isCDEL || $e !== MilestoneType::FINAL_DELIVERY
+        );
+    }
+
+    public function getMilestone(CrstsSchemeReturn $crstsSchemeReturn, MilestoneEnum $milestoneEnum): ?Milestone
+    {
+        foreach($crstsSchemeReturn->getMilestones() as $milestone) {
+            if ($milestone->getType() === $milestoneEnum) {
+                return $milestone;
+            }
+        }
+
+        return null;
+    }
+}

@@ -3,6 +3,7 @@
 namespace App\Entity\Enum;
 
 use App\Config\SchemeLevelSectionConfiguration;
+use App\Form\SchemeReturn\Crsts\MilestoneDatesType;
 use App\Form\SchemeReturn\Crsts\OverallFundingType;
 use App\Form\SchemeReturn\Crsts\SchemeDetailsType;
 use App\Form\SchemeReturn\Crsts\SchemeElementsType;
@@ -16,6 +17,7 @@ enum SchemeLevelSection: string
     case SCHEME_ELEMENTS = 'scheme_elements'; // active travel, charging points, clean air elements
 
     case OVERALL_FUNDING = 'overall_funding'; // total scheme cost, agreed crsts funding
+    case MILESTONE_DATES = 'milestone_dates';
 
     /**
      * @return array<SchemeLevelSectionConfiguration>
@@ -27,7 +29,8 @@ enum SchemeLevelSection: string
                 new SchemeLevelSectionConfiguration(self::SCHEME_DETAILS, SchemeDetailsType::class),
                 new SchemeLevelSectionConfiguration(self::TRANSPORT_MODE, SchemeTransportModeType::class),
                 new SchemeLevelSectionConfiguration(self::SCHEME_ELEMENTS, SchemeElementsType::class),
-                new SchemeLevelSectionConfiguration(self::OVERALL_FUNDING, OverallFundingType::class, isDisplayedInExpensesList: true),
+                new SchemeLevelSectionConfiguration(self::OVERALL_FUNDING, OverallFundingType::class, displayGroup: SectionDisplayGroup::EXPENSES),
+                new SchemeLevelSectionConfiguration(self::MILESTONE_DATES, MilestoneDatesType::class, displayGroup: SectionDisplayGroup::MILESTONES),
             ],
             default => [],
         };
