@@ -43,7 +43,7 @@ class CrstsSchemeFund extends SchemeFund
     public function isReturnRequiredFor(int $quarter): bool
     {
         // If scheme is retained, we require a return every quarter, otherwise only once a year
-        return $this->isRetained() || $quarter === 1;
+        return $this->isRetained() || $quarter === 4;
     }
 
     public function getFundedMostlyAs(): ?FundedMostlyAs
