@@ -329,15 +329,19 @@ forms:
       final_delivery:
         label: Final delivery
         help: ''
-    milestone_details:
+    milestone_business_case:
       business_case:
         label: Current business case
         help: ''
       expected_business_case_approval:
         label: Expected date of approval for current business case
         help: ''
+    milestone_progress:
       progress_update:
         label: Progress update
+        help: ''
+      on_track_rating:
+        label: On-track rating
         help: ''
 
     scheme_elements:
@@ -433,8 +437,9 @@ sections:
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
   scheme:
+    milestone_business_case: Milestone business case
     milestone_dates: Milestone dates
-    milestone_details: Milestone details
+    milestone_progress: Milestone progress
     overall_funding: Overall funding totals
     scheme_details: Scheme details
     scheme_elements: Scheme elements

@@ -4,7 +4,8 @@ namespace App\Entity\Enum;
 
 use App\Config\SchemeLevelSectionConfiguration;
 use App\Form\SchemeReturn\Crsts\MilestoneDatesType;
-use App\Form\SchemeReturn\Crsts\MilestoneDetailsType;
+use App\Form\SchemeReturn\Crsts\MilestoneBusinessCaseType;
+use App\Form\SchemeReturn\Crsts\MilestoneRatingType;
 use App\Form\SchemeReturn\Crsts\OverallFundingType;
 use App\Form\SchemeReturn\Crsts\SchemeDetailsType;
 use App\Form\SchemeReturn\Crsts\SchemeElementsType;
@@ -19,7 +20,8 @@ enum SchemeLevelSection: string
 
     case OVERALL_FUNDING = 'overall_funding'; // total scheme cost, agreed crsts funding
     case MILESTONE_DATES = 'milestone_dates'; // start/end dev/construction, final delivery
-    case MILESTONE_DETAILS = 'milestone_details'; // business case dates, progress update
+    case MILESTONE_BUSINESS = 'milestone_business_case'; // business case state + dates
+    case MILESTONE_PROGRESS = 'milestone_progress'; // rating and progress update
 
     /**
      * @return array<SchemeLevelSectionConfiguration>
@@ -33,7 +35,8 @@ enum SchemeLevelSection: string
                 new SchemeLevelSectionConfiguration(self::SCHEME_ELEMENTS, SchemeElementsType::class),
                 new SchemeLevelSectionConfiguration(self::OVERALL_FUNDING, OverallFundingType::class, displayGroup: SectionDisplayGroup::EXPENSES),
                 new SchemeLevelSectionConfiguration(self::MILESTONE_DATES, MilestoneDatesType::class, displayGroup: SectionDisplayGroup::MILESTONES),
-                new SchemeLevelSectionConfiguration(self::MILESTONE_DETAILS, MilestoneDetailsType::class, displayGroup: SectionDisplayGroup::MILESTONES),
+                new SchemeLevelSectionConfiguration(self::MILESTONE_BUSINESS, MilestoneBusinessCaseType::class, displayGroup: SectionDisplayGroup::MILESTONES),
+                new SchemeLevelSectionConfiguration(self::MILESTONE_PROGRESS, MilestoneRatingType::class, displayGroup: SectionDisplayGroup::MILESTONES),
             ],
             default => [],
         };
