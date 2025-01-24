@@ -4,7 +4,13 @@
 {%- set page_heading_class = 'govuk-heading-m' -%}
 
 {%- block content -%}
-    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem, summaryListStart, summaryListEnd, summaryListRow %}
+
+    {{- summaryListStart() -}}
+    {{- summaryListRow({key: 'Lead contact', value: fundReturn.fundAward.leadContact.name}) -}}
+    {{- _self.crstsFundReturnSummary(fundReturn) -}}
+    {{- summaryListRow({key: 'Sign off', value: _self.signoff(fundReturn.signoffDate, fundReturn.signoffName, fundReturn.signoffUser ?? fundReturn.signoffEmail)}) -}}
+    {{- summaryListEnd() -}}
 
     {%- set visibleFundLevelSections = fundLevelSections | filter(s => is_granted('CAN_VIEW', {subject: fundReturn, section: s.value})) -%}
     {%- if visibleFundLevelSections is not empty -%}
@@ -74,3 +80,23 @@
         {{- taskListEnd() -}}
     {%- endif -%}
 {%- endblock -%}
+
+{% macro signoff(date, name, link) -%}
+    {% if (date ?? false) %}
+        <a href="{{ link.id ?? false ? "/user/#{link.id}" : "mailto:#{link}" }}">{{ name }}</a> ({{ date | date('format.date-time.default' | trans) -}})
+    {%- else -%}
+        -
+    {%- endif -%}
+{%- endmacro %}
+
+{%- macro crstsFundReturnSummary(cfr) -%}
+    {# @var cfr \App\Entity\FundReturn\CrstsFundReturn #}
+    {%- if cfr is instanceof("\\App\\Entity\\FundReturn\\CrstsFundReturn") -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListRow, tag -%}
+        {{- summaryListRow({key: 'forms.crsts.overall_progress.delivery_confidence.label' | trans, value: cfr.deliveryConfidence}) -}}
+        {{- summaryListRow({key: 'forms.crsts.overall_progress.overall_confidence.label' | trans, value: tag({
+            text: "enum.rating.#{cfr.overallConfidence.value}" | trans,
+            classes: cfr.overallConfidence.tagClass,
+        })}) -}}
+    {%- endif -%}
+{%- endmacro -%}

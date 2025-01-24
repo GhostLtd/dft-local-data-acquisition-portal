@@ -4,7 +4,12 @@
 {%- set page_heading_class = 'govuk-heading-m' -%}
 
 {%- block content -%}
-    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem, summaryListStart, summaryListEnd, summaryListRow %}
+
+    {{- summaryListStart() -}}
+    {{- _self.crstsSchemeReturnSummary(schemeReturn) -}}
+    {{- summaryListEnd() -}}
+
 
     {%- set visibleSectionsInDetails = schemeLevelSectionsConfiguration
         | filter(c => c.displayGroup.value == 'details')
@@ -79,3 +84,16 @@
         }, loop.index0) -}}
     {%- endfor -%}
 {% endmacro %}
+
+{%- macro crstsSchemeReturnSummary(csr) -%}
+    {# @var csr \App\Entity\SchemeReturn\CrstsSchemeReturn #}
+    {%- if csr is instanceof("\\App\\Entity\\SchemeReturn\\CrstsSchemeReturn") -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListRow, tag -%}
+        {{- summaryListRow({key: 'forms.crsts.overall_funding.agreed_funding.label' | trans, value: csr.agreedFunding | format_currency('GBP', {fraction_digit: 0})}) -}}
+        {{- summaryListRow({key: 'forms.crsts.scheme_details.benefit_cost_ratio.label' | trans, value: csr.schemeFund.benefitCostRatio.value}) -}}
+        {{- summaryListRow({key: 'forms.scheme.milestone_progress.on_track_rating.label' | trans, value: tag({
+            text: "enum.on_track_rating.#{csr.ontrackRating.value}" | trans,
+            classes: csr.ontrackRating.tagClass,
+        })}) -}}
+    {%- endif -%}
+{%- endmacro -%}
