@@ -15,6 +15,10 @@ function initForForm(form, autoCommas) {
     let cellMap
     let rowToActionMap
     let rowColToActionMap
+    let lastInputWasKeyboard = false
+
+    document.addEventListener('keydown', _ => lastInputWasKeyboard = true)
+    document.addEventListener('mousedown', _ => lastInputWasKeyboard = false)
 
     cellMap = {}
     rowToActionMap = {}
@@ -68,22 +72,34 @@ function initForForm(form, autoCommas) {
         if (!isDisabled) {
             cell.addEventListener('change', _ => cellChanged(cell, true))
             cell.addEventListener('keyup', e => e.key !== 'Tab' && cellChanged(cell, true))
-            cell.addEventListener('focus', _ => autoComma(cell))
+            cell.addEventListener('focus', _ => autoComma(cell, true))
             cell.addEventListener('blur', _ => autoComma(cell))
         }
     }
 
     // Add commas to the given value, if autoCommas is true
-    function autoComma(cell) {
+    function autoComma(cell, setSelectionUponChange= false) {
         if (!autoCommas) {
             return
         }
+
         const value = cell.value
         const parsedValue = getValue(value)
 
         cell.value = isNaN(parsedValue)
             ? value
             : (document.activeElement === cell ? parsedValue : (parsedValue.toLocaleString('en-GB')))
+
+        // Normally when a text input gets focused due to:
+        // a) tabbing, the contents get selected
+        // b) clicking, no selection occurs, but a caret gets put at the click location
+        //
+        // The autoComma routine was breaking this due to the cell value being replaced, removing the selection.
+        // We use mousedown/keydown to track whether the last input event (which was the cause of the focus event)
+        // was a keyboard or mouse event, and if it was a keyboard event, we can restore the selection.
+        if (setSelectionUponChange && lastInputWasKeyboard && cell.value !== value) {
+            cell.select()
+        }
     }
 
     // Parse a string to retrieve its value (removing commas)
