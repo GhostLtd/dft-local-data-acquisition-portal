@@ -1,12 +1,12 @@
 {%- extends 'frontend/base.html.twig' -%}
 
 {%- set page_title = breadcrumbBuilder.titleFor('fund_return') -%}
-{%- set page_heading_class = 'govuk-heading-m' -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem, summaryListStart, summaryListEnd, summaryListRow %}
 
-    {{- summaryListStart() -}}
+    {{- summaryListStart({classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-7'}) -}}
     {{- summaryListRow({key: 'Lead contact', value: fundReturn.fundAward.leadContact.name}) -}}
     {{- _self.crstsFundReturnSummary(fundReturn) -}}
     {{- summaryListRow({key: 'Sign off', value: _self.signoff(fundReturn.signoffDate, fundReturn.signoffName, fundReturn.signoffUser ?? fundReturn.signoffEmail)}) -}}
@@ -14,7 +14,7 @@
 
     {%- set visibleFundLevelSections = fundLevelSections | filter(s => is_granted('CAN_VIEW', {subject: fundReturn, section: s.value})) -%}
     {%- if visibleFundLevelSections is not empty -%}
-        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_details' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.fund_level_details' | trans }}</h2>
         {{- taskListStart() -}}
         {%- for section in visibleFundLevelSections -%}
             {%- set status = fundReturn.getStatusForSection(section) -%}
@@ -32,7 +32,7 @@
 
     {%- set visibleExpenseDivisions = expenseDivisions | filter(e => is_granted('CAN_VIEW', {subject: fundReturn, section: e.key})) -%}
     {%- if visibleExpenseDivisions is not empty -%}
-        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
         {{- taskListStart() -}}
         {%- for division in visibleExpenseDivisions -%}
             {%- set status = fundReturn.getStatusForSection(division) -%}
@@ -51,7 +51,7 @@
     {# Are there any schemes that are visible to us? #}
     {%- set visibleSchemeFunds = schemeFunds | filter(f => is_granted('CAN_VIEW', fundReturn.getSchemeReturnForSchemeFund(f))) -%}
     {%- if visibleSchemeFunds is not empty -%}
-        <h2 class="govuk-heading-s">{{ 'frontend.pages.fund_return.schemes' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.schemes' | trans }}</h2>
         {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
 
         {{- taskListStart() -}}
@@ -93,7 +93,6 @@
     {# @var cfr \App\Entity\FundReturn\CrstsFundReturn #}
     {%- if cfr is instanceof("\\App\\Entity\\FundReturn\\CrstsFundReturn") -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListRow, tag -%}
-        {{- summaryListRow({key: 'forms.crsts.overall_progress.delivery_confidence.label' | trans, value: cfr.deliveryConfidence}) -}}
         {{- summaryListRow({key: 'forms.crsts.overall_progress.overall_confidence.label' | trans, value: tag({
             text: "enum.rating.#{cfr.overallConfidence.value}" | trans,
             classes: cfr.overallConfidence.tagClass,

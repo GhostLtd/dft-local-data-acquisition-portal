@@ -1,12 +1,12 @@
 {%- extends 'frontend/base.html.twig' -%}
 
 {%- set page_title = breadcrumbBuilder.titleFor('scheme_return') -%}
-{%- set page_heading_class = 'govuk-heading-m' -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem, summaryListStart, summaryListEnd, summaryListRow %}
 
-    {{- summaryListStart() -}}
+    {{- summaryListStart({classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-7'}) -}}
     {{- _self.crstsSchemeReturnSummary(schemeReturn) -}}
     {{- summaryListEnd() -}}
 
@@ -17,7 +17,7 @@
     -%}
 
     {%- if visibleSectionsInDetails is not empty -%}
-        <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_details' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.scheme_level_details' | trans }}</h2>
         {{- taskListStart() -}}
         {{- _self.sectionsList(_context, visibleSectionsInDetails) -}}
         {{- taskListEnd() -}}
@@ -33,7 +33,7 @@
     {%- if visibleSectionsInExpenses is not empty
         or visibleExpenseDivisions is not empty
     -%}
-        <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_expenses' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.scheme_level_expenses' | trans }}</h2>
         {{- taskListStart() -}}
         {# We want to show some of the schemeLevelSection items in the expenses area, because although they are not
            expenses in the entity sense, they ask financial questions that are expense-related.
@@ -60,7 +60,7 @@
     -%}
 
     {%- if visibleSectionsInMilestones is not empty -%}
-        <h2 class="govuk-heading-s">{{ 'frontend.pages.scheme_return.scheme_level_milestones' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.scheme_level_milestones' | trans }}</h2>
         {{- taskListStart() -}}
         {{- _self.sectionsList(_context, visibleSectionsInMilestones) -}}
         {{- taskListEnd() -}}
@@ -89,8 +89,9 @@
     {# @var csr \App\Entity\SchemeReturn\CrstsSchemeReturn #}
     {%- if csr is instanceof("\\App\\Entity\\SchemeReturn\\CrstsSchemeReturn") -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListRow, tag -%}
+        {{- summaryListRow({key: 'forms.crsts.scheme_details.description.label' | trans, value: csr.schemeFund.scheme.description}) -}}
+        {{- summaryListRow({key: 'forms.crsts.scheme_details.scheme_identifier.label' | trans, value: csr.schemeFund.scheme.schemeIdentifier}) -}}
         {{- summaryListRow({key: 'forms.crsts.overall_funding.agreed_funding.label' | trans, value: csr.agreedFunding | format_currency('GBP', {fraction_digit: 0})}) -}}
-        {{- summaryListRow({key: 'forms.crsts.scheme_details.benefit_cost_ratio.label' | trans, value: csr.schemeFund.benefitCostRatio.value}) -}}
         {{- summaryListRow({key: 'forms.scheme.milestone_progress.on_track_rating.label' | trans, value: tag({
             text: "enum.on_track_rating.#{csr.ontrackRating.value}" | trans,
             classes: csr.ontrackRating.tagClass,
