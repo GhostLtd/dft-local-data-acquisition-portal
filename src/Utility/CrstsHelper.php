@@ -98,27 +98,15 @@ class CrstsHelper
             foreach([1, 2, 3, 4] as $quarter) {
                 $isFuture = ($year > $returnYear) || ($year === $returnYear && $quarter > $returnQuarter);
 
-                if (!$isFuture) {
-                    $columnConfigurations[] =
-                        new ColumnConfiguration(
-                            "Q{$quarter}",
-                            isForecast: false,
-                            label: new TranslatableMessage("forms.crsts.expenses.Q{$quarter}", [
-                                'actual_or_forecast' => new TranslatableMessage('forms.crsts.expenses.actual_or_forecast', ['is_forecast' => 'false']),
-                            ])
-                        );
-                }
-            }
-
-            if ($returnQuarter === 4 && empty($columnConfigurations)) {
-                // The yearly forecast is only shown if:
-                //   a) The return is for Q4
-                //   b) The year has no active quarters in it
-
                 $columnConfigurations[] =
-                    new ColumnConfiguration('yearly', isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.yearly_forecast'));
+                    new ColumnConfiguration(
+                        "Q{$quarter}",
+                        isForecast: $isFuture,
+                        label: new TranslatableMessage("forms.crsts.expenses.Q{$quarter}", [
+                            'actual_or_forecast' => new TranslatableMessage('forms.crsts.expenses.actual_or_forecast', ['is_forecast' => $isFuture ? 'true' : 'false']),
+                        ])
+                    );
             }
-
 
             if (count($columnConfigurations) > 0) {
                 $divisionConfiguration[] = new DivisionConfiguration(
@@ -129,17 +117,15 @@ class CrstsHelper
             }
         }
 
-        if ($returnQuarter === 4) {
-            // This is a forecast and only added in Q4
-            $nextYear = substr(strval($endYear + 1), 2);
-            $divisionConfiguration[] = new DivisionConfiguration(
-                "post-{$endYear}-{$nextYear}",
-                [
-                    new ColumnConfiguration("forecast", isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.forecast'))
-                ],
-                label: new TranslatableMessage('forms.crsts.expenses.division_post_title', ['startYear' => $endYear, 'endYear' => $nextYear])
-            );
-        }
+        // This is a forecast and only added in Q4
+        $nextYear = substr(strval($endYear + 1), 2);
+        $divisionConfiguration[] = new DivisionConfiguration(
+            "post-{$endYear}-{$nextYear}",
+            [
+                new ColumnConfiguration("forecast", isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.forecast'))
+            ],
+            label: new TranslatableMessage('forms.crsts.expenses.division_post_title', ['startYear' => $endYear, 'endYear' => $nextYear])
+        );
 
         return $divisionConfiguration;
     }
