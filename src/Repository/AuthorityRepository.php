@@ -27,6 +27,10 @@ class AuthorityRepository extends ServiceEntityRepository
      */
     public function getAuthoritiesFundAwardsAndReturns(array $authorityIds): array
     {
+        if (empty($authorityIds)) {
+            return [];
+        }
+
         $qb = $this->createQueryBuilder('authority');
         $whereInSQL = $this->doctrineUlidHelper->getSqlForWhereInAndInjectParams($qb, 'authority', $authorityIds);
 

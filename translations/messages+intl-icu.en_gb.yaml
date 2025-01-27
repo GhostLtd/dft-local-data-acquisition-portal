@@ -410,6 +410,8 @@ frontend:
       breadcrumb: Home
       title: Local Authorities
       fund_title: "{fundName}: {year}/{nextYear} Q{quarter}"
+      no_authorities: No authorities are accessible to you
+      no_fund_awards: No fund_Awards are accessible to you
     home:
       title: Local data acquisition portal
     fund_return:

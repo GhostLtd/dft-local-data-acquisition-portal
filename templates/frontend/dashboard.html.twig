@@ -13,8 +13,10 @@
                  and "completed" return pages, and paginated
         #}
 
+        {%- set visibleFundAwards = authority.fundAwards | filter(f => is_granted('CAN_VIEW', f)) -%}
+
         {{- taskListStart() -}}
-        {%- for fundAward in authority.fundAwards -%}
+        {%- for fundAward in visibleFundAwards -%}
             {%- for fundReturn in fundAward.returns -%}
                 {%- if is_granted('CAN_VIEW', fundReturn) -%}
                     {%- set tag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
@@ -35,7 +37,11 @@
                     }, loop.index) -}}
                 {%- endif -%}
             {%- endfor -%}
+        {%- else -%}
+            <p class="govuk-body">{{ 'frontend.pages.dashboard.no_fund_awards' | trans }}</p>
         {%- endfor -%}
         {{- taskListEnd() -}}
+    {%- else -%}
+        <p class="govuk-body">{{ 'frontend.pages.dashboard.no_authorities' | trans }}</p>
     {%- endfor -%}
 {%- endblock -%}
