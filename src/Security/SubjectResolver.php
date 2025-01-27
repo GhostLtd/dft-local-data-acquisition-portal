@@ -21,7 +21,7 @@ class SubjectResolver
 
     public function resolveSubjectForRole(mixed $subject, string $role): ?ResolvedSubject
     {
-        [$baseEntityClass, $section, $subject] = $this->parseSubjectForRole($subject, $role);
+        [$baseEntityClass, $section, $subject] = $this->parseSubjectForRole($subject, $role, true);
 
         if (!$baseEntityClass) {
             return null;
@@ -52,10 +52,10 @@ class SubjectResolver
         return new ResolvedSubject($baseEntityClass, $subject, $section, $idMap, $admin, $fundType);
     }
 
-    protected function parseSubjectForRole(mixed $subject, string $role): ?array
+    protected function parseSubjectForRole(mixed $subject, string $role, bool $logErrors = false): ?array
     {
         if (!in_array($role, [Role::CAN_SUBMIT, Role::CAN_COMPLETE, Role::CAN_EDIT, Role::CAN_VIEW])) {
-            $this->logger->error("Failed to parse subject - unsupported role {$role}");
+            $logErrors && $this->logger->error("Failed to parse subject - unsupported role {$role}");
             return null;
         }
 
@@ -66,34 +66,34 @@ class SubjectResolver
         }
 
         if (!is_object($subject)) {
-            $this->logger->error("Failed to parse subject - passed a non-object subject");
+            $logErrors && $this->logger->error("Failed to parse subject - passed a non-object subject");
             return null;
         }
 
         if (!is_string($section) && !is_null($section)) {
-            $this->logger->error("Failed to parse subject - passed an invalid section");
+            $logErrors && $this->logger->error("Failed to parse subject - passed an invalid section");
             return null;
         }
 
         if ($role === Role::CAN_SUBMIT && $section !== null) {
-            $this->logger->error("Failed to parse subject - section is not valid for role {$role}");
+            $logErrors && $this->logger->error("Failed to parse subject - section is not valid for role {$role}");
             return null;
         }
 
         if (in_array($role, [Role::CAN_COMPLETE, Role::CAN_EDIT]) && $section === null) {
-            $this->logger->error("Failed to parse subject - section must be specified for role {$role}");
+            $logErrors && $this->logger->error("Failed to parse subject - section must be specified for role {$role}");
             return null;
         }
 
         $baseEntityClass = $this->getBaseEntityClassForRole($subject, $role);
 
         if (!$baseEntityClass) {
-            $this->logger->error("Failed to parse subject - invalid subject type (".$subject::class.") for role {$role}");
+            $logErrors && $this->logger->error("Failed to parse subject - invalid subject type (".$subject::class.") for role {$role}");
             return null;
         }
 
         if ($baseEntityClass === Authority::class && $section !== null) {
-            $this->logger->error("Failed to parse subject - invalid subject - cannot specify a sectionType for an Authority");
+            $logErrors && $this->logger->error("Failed to parse subject - invalid subject - cannot specify a sectionType for an Authority");
             return null;
         }
 
