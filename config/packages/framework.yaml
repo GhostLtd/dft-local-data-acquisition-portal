@@ -5,12 +5,19 @@ framework:
     http_method_override: false
     handle_all_throwables: true
 
+
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
     # Remove or comment this section to explicitly disable session support.
     session:
-        handler_id: null
-        cookie_secure: auto
+        cookie_secure: true
         cookie_samesite: lax
+
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        storage_factory_id: session.storage.factory.native
+
+        gc_maxlifetime: 3600
+        gc_probability: 5
+        gc_divisor: 100
 
     #esi: true
     #fragments: true
