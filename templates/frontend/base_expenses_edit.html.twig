@@ -4,29 +4,10 @@
 
 {%- block content -%}
     {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
-    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tableStart, tableEnd, tableRowStart, tableRowEnd, tableHeader, tableCell -%}
+    {%- from "frontend/macros.html.twig" import renderTable -%}
 
     {# See App\Utility\ExpensesTableHelper #}
     {{- form_start(form) -}}
-    {{- tableStart() -}}
-    {%- for row in expensesTable -%}
-        {{- tableRowStart(row.options) -}}
-        {%- for cell in row.cells -%}
-            {%- if cell.type == 'header' -%}
-                {%- set html -%}
-                    {%- if cell.options.text is instanceof('\\Symfony\\Component\\Translation\\TranslatableMessage') -%}
-                        {{- cell.options.text | trans | nl2br -}}
-                    {%- else -%}
-                        {{- cell.options.text | nl2br -}}
-                    {%- endif -%}
-                {%- endset -%}
-                {{- tableHeader({...cell.options, html}) -}}
-            {%- elseif cell.type == 'cell' -%}
-                {{- tableCell({...cell.options, html: form_row(form[cell.options.key])}) }}
-            {%- endif -%}
-        {%- endfor -%}
-        {{- tableRowEnd() -}}
-    {%- endfor -%}
-    {{- tableEnd() -}}
+    {{- renderTable(expensesTable, form) }}
     {{- form_end(form) -}}
 {%- endblock -%}

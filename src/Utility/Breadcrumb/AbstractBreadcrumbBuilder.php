@@ -14,9 +14,7 @@ abstract class AbstractBreadcrumbBuilder
         protected RouterInterface     $router,
         protected TranslatorInterface $translator,
     )
-    {
-        $this->addInitialItems();
-    }
+    {}
 
     protected function addItem(
         string                            $key,
@@ -50,6 +48,4 @@ abstract class AbstractBreadcrumbBuilder
     {
         return array_values($this->items);
     }
-
-    abstract protected function addInitialItems(): void;
 }

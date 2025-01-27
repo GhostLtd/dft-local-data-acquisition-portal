@@ -1,0 +1,175 @@
+{% macro renderTable(table, form) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tableStart, tableEnd, tableBodyStart, tableBodyEnd, tableHeadStart, tableHeadEnd -%}
+
+    {{- tableStart(table.options) -}}
+    {%- for headOrBody in table.headAndBodies() -%}
+        {%- if headOrBody.type == 'table-head' -%}
+            {{- tableHeadStart(headOrBody.options) -}}
+            {{- _self.renderRows(headOrBody, form) -}}
+            {{- tableHeadEnd() -}}
+        {%- elseif headOrBody.type == 'table-body' %}
+            {{- tableBodyStart(headOrBody.options) -}}
+            {{- _self.renderRows(headOrBody, form) -}}
+            {{- tableBodyEnd() -}}
+        {%- endif -%}
+    {%- endfor -%}
+    {{- tableEnd() -}}
+{% endmacro %}
+
+{% macro renderRows(headOrBody, form) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tableCell, tableHeader, tableRowStart, tableRowEnd -%}
+
+    {%- for row in headOrBody.rows -%}
+        {{- tableRowStart(row.options) -}}
+        {%- for cell in row.cells -%}
+            {%- if cell.type == 'header' -%}
+                {%- set html -%}
+                    {%- if cell.options.text is instanceof('\\Symfony\\Component\\Translation\\TranslatableMessage') -%}
+                        {{- cell.options.text | trans | nl2br -}}
+                    {%- else -%}
+                        {{- cell.options.text | nl2br -}}
+                    {%- endif -%}
+                {%- endset -%}
+                {{- tableHeader({...cell.options, html}) -}}
+            {%- elseif cell.type == 'cell' -%}
+                {%- if form -%}
+                    {{- tableCell({...cell.options, html: form_row(form[cell.options.key])}) }}
+                {%- else -%}
+                    {# If no form passed, just render the cell text #}
+                    {{- tableCell(cell.options) -}}
+                {%- endif -%}
+            {%- endif -%}
+        {%- endfor -%}
+        {{- tableRowEnd() -}}
+    {%- endfor -%}
+{% endmacro %}
+
+{%- macro displayCardsForReturn(section_title, configs, return) -%}
+    {#- Build params structure -#}
+    {%- set sections = [] -%}
+    {%- for config in configs -%}
+        {%- set actions = [] -%}
+
+        {%- if (config.options.add_edit_link ?? true) and is_granted('CAN_EDIT', {subject: return, section: config.section}) -%}
+            {%- set actions = actions|merge([{
+                text: 'common.actions.edit' | trans,
+                visuallyHiddenText: config.title,
+                href: section_edit_path(return, config.section, false),
+            }]) -%}
+        {%- endif -%}
+
+        {%- set sections = sections|merge([
+            {
+                label: config.title,
+                id: config.section,
+                panel: {html: config.contents},
+                actions: {items: actions},
+            }
+        ]) -%}
+    {%- endfor -%}
+
+    {{- _self.displaySectionsAsSummaryCards(sections, section_title) -}}
+{%- endmacro -%}
+
+{% macro displaySectionsAsTabs(items, heading) %}
+    {%- if items is not empty -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tabs -%}
+        <div class="govuk-!-margin-bottom-9">
+            <h2 class="govuk-heading-m">{{ heading }}</h2>
+            {{- tabs({items}) -}}
+        </div>
+    {%- endif -%}
+{% endmacro %}
+
+{% macro displaySectionsAsSummaryCards(items, heading) %}
+    {# N.B. Uses tab data format for items so that we can easily switch from one to the other #}
+    {%- if items is not empty -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryCard -%}
+
+        <div class="govuk-!-margin-bottom-9">
+            <h2 class="govuk-heading-m">{{ heading }}</h2>
+            {%- for item in items -%}
+                {%- set attributes = item.id is defined ? {id: item.id} : null -%}
+                {{- summaryCard({
+                    title: {
+                        text: item.label,
+                    },
+                    actions: item.actions ?? null,
+                    attributes,
+                }, item.panel.html) }}
+            {%- endfor -%}
+        </div>
+    {%- endif -%}
+{% endmacro %}
+
+{% macro displaySectionsInline(items) %}
+    {# N.B. Uses tab data format for items so that we can easily switch from one to the other #}
+    {%- if items is not empty -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tabs -%}
+        {%- for item in items -%}
+            <div class="govuk-!-margin-bottom-9">
+                <h2 class="govuk-heading-m">{{ item.label }}</h2>
+                {{- item.panel.html | raw -}}
+            </div>
+        {%- endfor -%}
+    {%- endif -%}
+{% endmacro %}
+
+{% macro bcr(label, bcr, options) %}
+    {# @var bcr \App\Entity\SchemeFund\BenefitCostRatio|null #}
+    {% if bcr is null %}
+        {% set value = '-' %}
+    {% else %}
+        {%- if bcr.type == constant('App\\Entity\\Enum\\BenefitCostRatioType::NA') -%}
+            {% set value = 'common.text.na' | trans %}
+        {%- elseif bcr.type == constant('App\\Entity\\Enum\\BenefitCostRatioType::TBC') -%}
+            {% set value = 'common.text.tbc' | trans %}
+        {%- elseif bcr.type == constant('App\\Entity\\Enum\\BenefitCostRatioType::VALUE') -%}
+            {% set value = bcr.value %}
+        {%- endif -%}
+    {% endif %}
+    {{- _self.text(label, value, options) -}}
+{% endmacro %}
+
+{% macro enumText(label, enum_prefix, enum, options) %}
+    {%- set enumValue = enum ? enum.value : null -%}
+    {%- set value = enumValue ? ("#{enum_prefix}.#{enumValue}" | trans) : null -%}
+    {{- _self.text(label, value, options) -}}
+{% endmacro %}
+
+{% macro date(label, value, options) %}
+    {%- set value = value ? (value | date('Y/m/d')) : null -%}
+    {{- _self.text(label, value, options) -}}
+{% endmacro %}
+
+{% macro money(label, value, options) %}
+    {%- set value = value ? ('£' ~ (value | number_format)) : null -%}
+    {{- _self.text(label, value, options) -}}
+{% endmacro %}
+
+{% macro yesOrNo(label, value, options) %}
+    {%- set value = (value == true ? 'common.text.yes' : 'common.text.no') | trans -%}
+    {{- _self.text(label, value, options) -}}
+{% endmacro %}
+
+{% macro text(label, value, options) %}
+    {{- _self.displaySummaryListRow(label, (value ?? '-') | nl2br, options) -}}
+{% endmacro %}
+
+{% macro ratingTag(label, ratingEnum, options) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tag -%}
+    {%- set value = ratingEnum is null ? '-' : tag({text: "enum.rating.#{ratingEnum.value}" | trans, classes: ratingEnum.tagClass}) -%}
+    {{- _self.displaySummaryListRow(label, value, options) -}}
+{% endmacro %}
+
+{% macro displaySummaryListRow(label, value, options) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListRow -%}
+
+    {%- set label = (options.translateLabel ?? true) ? (label | trans) : label -%}
+    {%- set anyRowHasActions = false -%}
+
+    {{- summaryListRow({
+        key: label,
+        value,
+    }, anyRowHasActions) -}}
+{% endmacro %}

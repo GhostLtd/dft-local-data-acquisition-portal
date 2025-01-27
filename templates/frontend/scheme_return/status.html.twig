@@ -1,6 +1,6 @@
 {%- extends 'frontend/base.html.twig' -%}
 
-{%- set page_title = breadcrumbBuilder.titleFor('scheme_return') -%}
+{%- set page_title = breadcrumbBuilder.titleFor('scheme_return_status') -%}
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
@@ -17,7 +17,7 @@
     -%}
 
     {%- if visibleSectionsInDetails is not empty -%}
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.scheme_level_details' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return_status.titles.scheme_level_details' | trans }}</h2>
         {{- taskListStart() -}}
         {{- _self.sectionsList(_context, visibleSectionsInDetails) -}}
         {{- taskListEnd() -}}
@@ -33,7 +33,7 @@
     {%- if visibleSectionsInExpenses is not empty
         or visibleExpenseDivisions is not empty
     -%}
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.scheme_level_expenses' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return_status.titles.scheme_level_expenses' | trans }}</h2>
         {{- taskListStart() -}}
         {# We want to show some of the schemeLevelSection items in the expenses area, because although they are not
            expenses in the entity sense, they ask financial questions that are expense-related.
@@ -60,7 +60,7 @@
     -%}
 
     {%- if visibleSectionsInMilestones is not empty -%}
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.scheme_level_milestones' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return_status.titles.scheme_level_milestones' | trans }}</h2>
         {{- taskListStart() -}}
         {{- _self.sectionsList(_context, visibleSectionsInMilestones) -}}
         {{- taskListEnd() -}}

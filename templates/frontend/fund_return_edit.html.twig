@@ -1,6 +1,6 @@
 {%- extends 'frontend/base.html.twig' -%}
 
-{%- set page_heading = breadcrumbBuilder.titleFor('fund_return') -%}
+{%- set page_heading = breadcrumbBuilder.titleFor('fund_return') ~ ': ' ~ breadcrumbBuilder.titleFor('fund_return_edit') -%}
 {%- set page_title = breadcrumbBuilder.titleFor('fund_return_edit') ~ ' | ' ~ breadcrumbBuilder.titleFor('fund_return') -%}
 {%- set page_heading_class = 'govuk-heading-m' -%}
 

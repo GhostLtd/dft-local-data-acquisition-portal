@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller\Frontend;
+namespace App\Controller\Frontend\SchemeReturn;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
+use App\Controller\Frontend\AbstractReturnController;
 use App\Entity\Enum\SchemeLevelSection;
-use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\SchemeReturn\SchemeReturn;
@@ -18,38 +18,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-class SchemeReturnController extends AbstractReturnController
+class EditController extends AbstractReturnController
 {
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}', name: 'app_scheme_return')]
-    public function schemeReturn(
-        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund                 $schemeFund,
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
-    ): Response
-    {
-        $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
-        $this->denyAccessUnlessGranted(Role::CAN_VIEW, $schemeReturn);
-
-        $breadcrumbBuilder->setAtSchemeFund($fundReturn, $schemeFund);
-
-        // TODO: Check schemeFund belongs to fundReturn
-
-        $fund = $fundReturn->getFund();
-
-        return $this->render('frontend/scheme_return.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
-            'fundReturn' => $fundReturn,
-            'schemeReturn' => $schemeReturn,
-            'schemeLevelSectionsConfiguration' => SchemeLevelSection::getConfigurationForFund($fund),
-            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
-        ]);
-    }
-
-
     #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/section/{section}', name: 'app_scheme_return_edit')]
     public function schemeReturnEdit(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
@@ -73,7 +44,7 @@ class SchemeReturnController extends AbstractReturnController
         $cancelUrl = $this->generateUrl('app_scheme_return', [
             'fundReturnId' => $fundReturn->getId(),
             'schemeFundId' => $schemeFund->getId()
-        ]);
+        ])."#{$section->value}";
 
         $schemeReturnSectionStatus = $this->getSectionStatus($schemeReturn, $section);
         $form = $this->createForm($config->getFormClass(), $schemeReturn, [
@@ -114,7 +85,10 @@ class SchemeReturnController extends AbstractReturnController
         }
 
         $breadcrumbBuilder->setAtSchemeExpenseEdit($fundReturn, $schemeFund, $divisionConfiguration);
-        $cancelUrl = $this->generateUrl('app_scheme_return', ['fundReturnId' => $fundReturn->getId(), 'schemeFundId' => $schemeFund->getId()]);
+        $cancelUrl = $this->generateUrl('app_scheme_return', [
+            'fundReturnId' => $fundReturn->getId(),
+            'schemeFundId' => $schemeFund->getId()
+        ])."#expenses-{$divisionKey}";
 
         $expensesTableHelper = $tableHelper
             ->setDivisionConfiguration($divisionConfiguration)
@@ -134,7 +108,7 @@ class SchemeReturnController extends AbstractReturnController
 
         return $this->render('frontend/scheme_return_expenses_edit.html.twig', [
             'breadcrumbBuilder' => $breadcrumbBuilder,
-            'expensesTable' => $expensesTableHelper->getTableRows(),
+            'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,
         ]);
     }

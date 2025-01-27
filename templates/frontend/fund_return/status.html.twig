@@ -1,6 +1,6 @@
 {%- extends 'frontend/base.html.twig' -%}
 
-{%- set page_title = breadcrumbBuilder.titleFor('fund_return') -%}
+{%- set page_title = breadcrumbBuilder.titleFor('fund_return_status') -%}
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
@@ -14,7 +14,7 @@
 
     {%- set visibleFundLevelSections = fundLevelSections | filter(s => is_granted('CAN_VIEW', {subject: fundReturn, section: s.value})) -%}
     {%- if visibleFundLevelSections is not empty -%}
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.fund_level_details' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return_status.fund_level_details' | trans }}</h2>
         {{- taskListStart() -}}
         {%- for section in visibleFundLevelSections -%}
             {%- set status = fundReturn.getStatusForSection(section) -%}
@@ -32,7 +32,7 @@
 
     {%- set visibleExpenseDivisions = expenseDivisions | filter(e => is_granted('CAN_VIEW', {subject: fundReturn, section: e.key})) -%}
     {%- if visibleExpenseDivisions is not empty -%}
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.fund_level_expenses' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return_status.fund_level_expenses' | trans }}</h2>
         {{- taskListStart() -}}
         {%- for division in visibleExpenseDivisions -%}
             {%- set status = fundReturn.getStatusForSection(division) -%}
@@ -51,7 +51,7 @@
     {# Are there any schemes that are visible to us? #}
     {%- set visibleSchemeFunds = schemeFunds | filter(f => is_granted('CAN_VIEW', fundReturn.getSchemeReturnForSchemeFund(f))) -%}
     {%- if visibleSchemeFunds is not empty -%}
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.schemes' | trans }}</h2>
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return_status.schemes' | trans }}</h2>
         {%- set fundTag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
 
         {{- taskListStart() -}}
@@ -66,7 +66,7 @@
             {%- if isVisible -%}
                 {%- set isRequired = schemeFund.isReturnRequiredFor(fundReturn.quarter) -%}
                 {%- set tag = isRequired ? fundTag : 'not_required' -%}
-                {%- set url = path('app_scheme_return', {fundReturnId: fundReturn.id, schemeFundId: schemeFund.id}) -%}
+                {%- set url = path('app_scheme_return_status', {fundReturnId: fundReturn.id, schemeFundId: schemeFund.id}) -%}
                 {{- taskListItem({
                     title: {text: schemeFund.scheme.name},
                     href: isRequired ? url : null,

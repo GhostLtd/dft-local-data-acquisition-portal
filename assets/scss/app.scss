@@ -11,10 +11,30 @@ li.govuk-service-navigation__margin-left-auto {
   margin-left: auto;
 }
 
-form.expenses table {
+table.expenses {
   .actual-or-forecast {
     display: block;
     font-weight: normal;
+  }
+
+  tr:not(:last-child) .spacer {
+    width: 2vw;
+    border-bottom: none;
+  }
+
+  tbody tr:first-child,
+  .group-header {
+    background: #ddd;
+  }
+
+  tbody tr.ungrouped {
+    background: none;
+  }
+
+  tbody tr:first-child th,
+  .group-header,
+  .ungrouped th {
+    padding-left: 10px;
   }
 
   .govuk-form-group {
@@ -31,8 +51,18 @@ form.expenses table {
   }
 
   th,
+  td,
   input[type="text"] {
     @include govuk-font-size($size: 16);
+  }
+
+  th {
+    vertical-align: middle;
+  }
+
+  thead th,
+  td {
+    text-align: right;
   }
 
   input[type="text"] {
@@ -44,10 +74,26 @@ form.expenses table {
     opacity: 0.75;
   }
 
-  .header_row {
+  thead {
     position: sticky;
     top: 0;
-    background: #eee;
+    background: #ccc;
     z-index: 100;
   }
+
+  tbody + body {
+    margin-top: 40px;
+  }
+}
+
+table.calculated-expenses {
+  margin-bottom: govuk-spacing(2);
+
+  .number_column {
+    min-width: 120px;
+  }
+}
+
+.expenses-links {
+  text-align: right;
 }

@@ -2,8 +2,6 @@
 
 namespace App\Config\Table;
 
-use App\Config\Table\AbstractCell;
-
 class Cell extends AbstractCell
 {
     protected function configureOptionsResolver(): void

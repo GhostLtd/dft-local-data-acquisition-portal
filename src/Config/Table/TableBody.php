@@ -2,12 +2,10 @@
 
 namespace App\Config\Table;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
-class Row extends AbstractElementWithClasses
+class TableBody extends AbstractElementWithClasses
 {
     public function __construct(
-        protected array $cells,
+        protected array $rows,
         array           $options = [],
         protected array $attributes = [],
     ) {
@@ -16,11 +14,11 @@ class Row extends AbstractElementWithClasses
 
     public function getType(): string
     {
-        return 'row';
+        return 'table-body';
     }
 
-    public function getCells(): array
+    public function getRows(): array
     {
-        return $this->cells;
+        return $this->rows;
     }
 }

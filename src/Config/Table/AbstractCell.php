@@ -2,15 +2,14 @@
 
 namespace App\Config\Table;
 
-use App\Config\Table\AbstractElement;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatableMessage;
 
-abstract class AbstractCell extends AbstractElement
+abstract class AbstractCell extends AbstractElementWithClasses
 {
     protected function configureOptionsResolver(): void
     {
-        $this->resolver = (new OptionsResolver())
+        parent::configureOptionsResolver();
+        $this->resolver
             ->setDefaults([
                 'colspan' => null,
                 'rowspan' => null,

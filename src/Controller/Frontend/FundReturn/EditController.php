@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Controller\Frontend;
+namespace App\Controller\Frontend\FundReturn;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
+use App\Controller\Frontend\AbstractReturnController;
 use App\Entity\Enum\FundLevelSection;
-use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\FundReturn\FundReturnSectionStatus;
 use App\Form\FundReturn\Crsts\ExpensesType;
 use App\Utility\CrstsHelper;
-use App\Repository\SchemeFund\SchemeFundRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -17,40 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-class FundReturnController extends AbstractReturnController
+class EditController extends AbstractReturnController
 {
-    #[Route('/fund-return/{fundReturnId}', name: 'app_fund_return')]
-    #[IsGranted(Role::CAN_VIEW, 'fundReturn')]
-    public function fundReturn(
-        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        SchemeFundRepository       $schemeFundRepository,
-    ): Response
-    {
-        $breadcrumbBuilder->setAtFundReturn($fundReturn);
-        $fund = $fundReturn->getFund();
 
-        // We get the schemeFunds from this direction, so that we can list all of them and explicitly any that
-        // do not requiring a return, if that is the case (e.g. CRSTS - if not retained and not quarter 1)
-
-        // (Fetching via fundReturn->getSchemeReturns() direction would only fetch those schemes that
-        //  do have returns, resulting in an incomplete list)
-        $schemeFunds = $schemeFundRepository->getSchemeFundsForAuthority(
-            $fundReturn->getFundAward()->getAuthority(),
-            $fund
-        );
-
-        return $this->render('frontend/fund_return.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
-            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
-            'fundLevelSections' => FundLevelSection::filterForFund($fund),
-            'fundReturn' => $fundReturn,
-            'schemeFunds' => $schemeFunds
-        ]);
-    }
 
     #[Route('/fund-return/{fundReturnId}/section/{section}', name: 'app_fund_return_edit')]
     public function fundReturnEdit(
@@ -67,13 +36,14 @@ class FundReturnController extends AbstractReturnController
         }
 
         $breadcrumbBuilder->setAtFundReturnSectionEdit($fundReturn, $section);
-        $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()]);
+        $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()])."#{$section->value}";
 
         $fundReturnSectionStatus = $this->getSectionStatus($fundReturn, $section);
         $form = $this->createForm($formClass, $fundReturn, [
             'cancel_url' => $cancelUrl,
             'completion_status' => $fundReturnSectionStatus,
         ]);
+
         if ($response = $this->processForm($form, $request, $fundReturnSectionStatus, $cancelUrl)) {
             return $response;
         }
@@ -103,7 +73,9 @@ class FundReturnController extends AbstractReturnController
         }
 
         $breadcrumbBuilder->setAtFundReturnExpenseEdit($fundReturn, $divisionConfiguration);
-        $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()]);
+        $cancelUrl = $this->generateUrl('app_fund_return', [
+            'fundReturnId' => $fundReturn->getId()
+        ])."#expenses-{$divisionKey}";
 
         $expensesTableHelper = $tableHelper
             ->setDivisionConfiguration($divisionConfiguration)
@@ -123,7 +95,7 @@ class FundReturnController extends AbstractReturnController
 
         return $this->render('frontend/fund_return_expenses_edit.html.twig', [
             'breadcrumbBuilder' => $breadcrumbBuilder,
-            'expensesTable' => $expensesTableHelper->getTableRows(),
+            'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,
         ]);
     }

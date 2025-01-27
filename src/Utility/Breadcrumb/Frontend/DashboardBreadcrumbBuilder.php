@@ -12,32 +12,53 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
 {
-    protected function addInitialItems(): void
+    protected function addInitialItems(?FundReturn $fundReturn): void
     {
         $this->addItem(
             'dashboard',
             'app_dashboard',
             translationKey: 'frontend.pages.dashboard.breadcrumb',
+            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
         );
     }
 
     public function setAtFundReturn(FundReturn $fundReturn): void
     {
-        $typeKey = "enum.fund.".$fundReturn->getFundAward()->getType()->value;
+        $this->addInitialItems($fundReturn);
 
         $this->addItem(
             'fund_return',
             'app_fund_return',
             routeParameters: ['fundReturnId' => $fundReturn->getId()],
             translationKey: 'frontend.pages.fund_return.title',
-            translationParameters: [
-                'authorityName' => $fundReturn->getFundAward()->getAuthority()->getName(),
-                'quarter' => $fundReturn->getQuarter(),
-                'type' => new TranslatableMessage($typeKey),
-                'year' => $fundReturn->getYear(),
-                'nextYear' => $fundReturn->getNextYearAsTwoDigits(),
-            ]
+            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
         );
+    }
+
+    public function setAtFundReturnStatus(FundReturn $fundReturn): void
+    {
+        $this->setAtFundReturn($fundReturn);
+
+        $this->addItem(
+            'fund_return_status',
+            'app_fund_return_status',
+            routeParameters: ['fundReturnId' => $fundReturn->getId()],
+            translationKey: 'frontend.pages.fund_return_status.title',
+            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
+        );
+    }
+
+    protected function getFundReturnTranslationKeys(FundReturn $fundReturn): array
+    {
+        $typeKey = "enum.fund.".$fundReturn->getFundAward()->getType()->value;
+
+        return [
+            'authorityName' => $fundReturn->getFundAward()->getAuthority()->getName(),
+            'quarter' => $fundReturn->getQuarter(),
+            'type' => new TranslatableMessage($typeKey),
+            'year' => $fundReturn->getYear(),
+            'nextYear' => $fundReturn->getNextYearAsTwoDigits(),
+        ];
     }
 
     public function setAtSchemeFund(FundReturn $fundReturn, SchemeFund $schemeFund): void
@@ -54,6 +75,21 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
             translationParameters: [
                 'schemeName' => $schemeFund->getScheme()->getName(),
             ]
+        );
+    }
+
+    public function setAtSchemeFundStatus(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    {
+        $this->setAtSchemeFund($fundReturn, $schemeFund);
+
+        $this->addItem(
+            'scheme_return_status',
+            'app_scheme_return_status',
+            routeParameters: [
+                'fundReturnId' => $fundReturn->getId(),
+                'schemeFundId' => $schemeFund->getId()
+            ],
+            translationKey: 'frontend.pages.scheme_return_status.title',
         );
     }
 

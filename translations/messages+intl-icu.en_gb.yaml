@@ -46,17 +46,27 @@ auth:
   rate_limit_error: "Rate limit exceeded; try again later"
   sign_out: Sign out
 
+common:
+  actions:
+    edit: edit
+    view: view
+  text:
+    na: Not available
+    no: No
+    tbc: To be confirmed
+    yes: Yes
+
 enum:
   active_travel_element:
     no_active_travel_elements: No active travel elements
     area_wide_traffic_management: Area-wide traffic management (including by TROs, whether permanent or experimental)
     bus_priority_measures: Bus priority measures that also enable Active Travel (e.g. bus gates)
-    route_improvements: Improvements to make an existing walking /cycle route safer
+    route_improvements: Improvements to make an existing walking/cycle route safer
     new_junction_treatment: New junction treatment
     new_permanent_footway: New permanent footway
     new_road_crossings: New road crossings
     new_segregated_cycling: New segregated cycling facility
-    new_shared_use: New shared use (walking /cycling)
+    new_shared_use: New shared use (walking/cycling)
     provision_of_secure_cycle_parking: Provision of secure cycle parking facilities
     restriction_or_reduction_of_parking: Restriction or reduction of car parking availability
     school_streets: School streets
@@ -100,8 +110,16 @@ enum:
   milestone_type:
     start_development: Start development
     end_development: End development
-    start_delivery: Start construction / delivery
-    end_delivery: End construction / delivery
+    start_construction: &milestone_start_construction >-
+      {funded_mostly_as, select,
+        CDEL  {Start construction}
+        other {Start delivery}
+      }
+    end_construction: &milestone_end_construction >-
+      {funded_mostly_as, select,
+        CDEL  {End construction}
+        other {End delivery}
+      }
     final_delivery: Final delivery
   on_track_rating:
     green: Green
@@ -229,7 +247,7 @@ forms:
         help: For example, 1.25
     comments:
       comments:
-        label: Comments
+        label: &fr_comments Comments
     expenses:
       actual_or_forecast: >-
         {is_forecast, select,
@@ -266,43 +284,43 @@ forms:
         (£)
     local_and_rdel:
       local_contribution:
-        label: Local contribution
+        label: &fr_local_contribution Local contribution
         help: Please provide a current breakdown of local contribution achieved, by source.
       resource_funding:
-        label: Resource (RDEL) funding
+        label: &fr_resource_funding Resource (RDEL) funding
         help: Please see Appendix A (?!)
     overall_funding:
       agreed_funding:
-        label: Agreed funding
+        label: &sr_agreed_funding Agreed funding
       total_cost:
-        label: Total cost
+        label: &sr_total_cost Total cost
     overall_progress:
       progress_summary:
-        label: Overall progress summary
+        label: &fr_overall_progress_summary Overall progress summary
       delivery_confidence:
-        label: Overall delivery confidence
+        label: &fr_overall_delivery_confidence Overall delivery confidence
       overall_confidence:
-        label: Overall confidence rating
+        label: &fr_overall_confidence Overall confidence rating
     scheme_details:
       benefit_cost_ratio:
-        label: Benefit-cost ratio
+        label: &sr_benefit_cost_ratio Benefit-cost ratio
       description:
-        label: Scheme description
+        label: &sr_scheme_description Scheme description
       funded_mostly_as:
-        label: Funding type
+        label: &sr_mostly_funded_as Funding type
         help: Select which type of funding is used more
       name:
         label: Scheme name
       previously_tcf:
-        label: Was this previously a scheme in Transporting Cities Fund (TCF)?
+        label: &sr_previously_tcf Was this previously a scheme in Transporting Cities Fund (TCF)?
         help: ''
       scheme_identifier:
-        label: Scheme ID
+        label: &sr_scheme_identifier Scheme ID
     quarterly_progress:
       progress_summary:
-        label: Quarterly progress
+        label: &fr_quarterly_progress Quarterly progress
       progress_rating:
-        label: Quarterly rating
+        label: &fr_quarterly_progress_rating Quarterly rating
   scheme:
     milestone_dates:
       start_development:
@@ -312,55 +330,46 @@ forms:
         label: End development
         help: ''
       start_construction:
-        label: >-
-          {mostly_funded_as, select,
-            CDEL  {Start construction}
-            other {Start delivery}
-          }
-
+        label: *milestone_start_construction
         help: ''
       end_construction:
-        label: >-
-          {mostly_funded_as, select,
-            CDEL  {End construction}
-            other {End delivery}
-          }
+        label: *milestone_end_construction
         help: ''
       final_delivery:
         label: Final delivery
         help: ''
     milestone_business_case:
       business_case:
-        label: Current business case
+        label: &sr_current_business_case Current business case
         help: ''
       expected_business_case_approval:
-        label: Expected date of approval for current business case
+        label: &sr_expected_business_case_approval Expected date of approval for current business case
         help: ''
     milestone_progress:
       progress_update:
-        label: Progress update
+        label: &sr_progress_update Progress update
         help: ''
       on_track_rating:
-        label: On-track rating
+        label: &sr_on_track_rating On-track rating
         help: ''
 
     scheme_elements:
       has_active_travel_elements:
-        label: Does this scheme have active travel elements?
+        label: &sr_has_active_travel_elements Does this scheme have active travel elements?
         help: ''
       active_travel_element:
         label: Active travel element
         help: Pick the leading active travel intervention type
         placeholder: Please select an active travel element
       includes_charging_points:
-        label: Does this scheme include charging points for electric vehicles?
+        label: &sr_includes_charging_points Does this scheme include charging points for electric vehicles?
         help: ''
       includes_clean_air_elements:
-        label: Does this scheme include clean air elements?
+        label: &sr_includes_clean_air_elements Does this scheme include clean air elements?
         help: ''
     transport_mode:
       category:
-        label: Transport mode
+        label: &sr_transport_mode Transport mode
         help: ''
       active_travel:
         label: Choose active travel transport mode
@@ -407,23 +416,74 @@ frontend:
       sign_in:
         title: Sign in
     dashboard:
-      breadcrumb: Home
       title: Local Authorities
+      breadcrumb: "{authorityName}"
       fund_title: "{fundName}: {year}/{nextYear} Q{quarter}"
+      home: Home
       no_authorities: No authorities are accessible to you
     home:
       title: Local data acquisition portal
     fund_return:
-      title: "{authorityName}: {type} return for {year}/{nextYear} Q{quarter}"
+      title: "{type} return for {year}/{nextYear} Q{quarter}"
+      titles:
+        basic_details: Main details
+        comments: Miscellaneous
+        expenses: Expenses
+        fund_details: Fund details
+        local_and_rdel: Funding
+        overall_progress: Overall progress
+        quarterly_progress: Quarterly progress
+        schemes: Schemes
+      comments: *fr_comments
+      lead_contact: Lead contact
+      local_contribution: *fr_local_contribution
+      overall_confidence: Confidence rating
+      overall_delivery_confidence: Delivery confidence
+      overall_progress_summary: Progress summary
+      quarterly_progress: Progress summary
+      quarterly_progress_rating: Confidence rating
+      resource_funding: *fr_resource_funding
+      sign_off: Sign off
+    fund_return_status:
+      title: Completion status
       fund_level_details: Fund-level details
       fund_level_expenses: Fund-level expenses
       schemes: Schemes
     scheme_return:
       title: "{schemeName}"
+      titles:
+        expenses: Expenses
+        main_details: Main details
+        milestones: Milestones
+        milestone_business_case: Business case
+        milestone_dates: Dates
+        milestone_progress: Progress
+        overall_funding: Overall funding
+        scheme_details: Scheme details
+        transport_mode: Transport mode
+        scheme_elements: Scheme elements
+      agreed_funding: *sr_agreed_funding
       back_to_fund_return: "Back to {fundName} return"
-      scheme_level_details: Scheme details
-      scheme_level_expenses: Scheme expenses
-      scheme_level_milestones: Scheme milestones
+      benefit_cost_ratio: *sr_benefit_cost_ratio
+      current_business_case: *sr_current_business_case
+      description: *sr_scheme_description
+      expected_business_case_approval: *sr_expected_business_case_approval
+      funded_mostly_as: *sr_mostly_funded_as
+      has_active_travel_elements: Active travel elements?
+      includes_charging_points: Charging points for EVs?
+      includes_clean_air_elements: Clean air elements?
+      on_track_rating: *sr_on_track_rating
+      previously_tcf: Previously a scheme in TCF?
+      progress_update: *sr_progress_update
+      scheme_id: *sr_scheme_identifier
+      total_cost: *sr_total_cost
+      transport_mode: *sr_transport_mode
+    scheme_return_status:
+      title: Status
+      titles:
+        scheme_level_details: Scheme details
+        scheme_level_expenses: Scheme expenses
+        scheme_level_milestones: Scheme milestones
 
 maintenance-warning:
   banner:
@@ -434,7 +494,7 @@ maintenance-warning:
 sections:
   fund:
     overall_progress: Overall summary and delivery confidence
-    quarterly_progress: Progress this quarter
+    quarterly_progress: Quarterly progress
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
   scheme:
