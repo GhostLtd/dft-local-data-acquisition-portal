@@ -1623,7 +1623,7 @@
                 }
             ],
             "description": "Symfony bundle for core govuk-related classes",
-            "time": "2025-01-30T12:54:11+00:00"
+            "time": "2024-12-02T10:41:01+00:00"
         },
         {
             "name": "ghost/govuk-frontend-bundle",
