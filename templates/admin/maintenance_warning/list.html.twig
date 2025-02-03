@@ -30,7 +30,7 @@
     {%- else -%}
         {{- tableRow([
             {
-                text: 'admin.maintenance.list.no_results' | trans({}, 'messages'),
+                text: 'admin.maintenance.list.no_results' | trans,
                 colspan: data.fields | length + 1,
             }
         ]) -}}
