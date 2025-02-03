@@ -1,0 +1,9 @@
+{% extends 'admin/base.html.twig' %}
+
+{%- set page_title_key = "admin.pages.authority.title" -%}
+{%- set current_menu = 'authority' -%}
+
+{%- block content -%}
+    {% form_theme form '@GhostGovUkFrontend/theme.html.twig' %}
+    {{ form(form) }}
+{%- endblock -%}

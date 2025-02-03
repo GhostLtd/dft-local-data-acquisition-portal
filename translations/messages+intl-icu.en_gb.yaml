@@ -1,4 +1,29 @@
 admin:
+  site-title-suffix: "Admin: "
+  site.title: LDAP
+
+  pages:
+    dashboard:
+      title: Dashboard
+    authority:
+      title: MCAs
+    maintenance:
+      title: Maintenance warnings
+    maintenance_add:
+      title: Add maintenance warning
+    maintenance_delete:
+      title: Delete maintenance warning
+    maintenance_edit:
+      title: Edit maintenance warning
+
+  authority:
+    list:
+      add: Add MCA
+      delete: Delete
+      edit: Edit
+      intro_copy: MCAs
+      no_results: No results
+
   maintenance:
     delete:
       heading: 'Delete Maintenance Warning'
@@ -22,18 +47,6 @@ admin:
     warning_form:
       start: Start date/time
       end: End time
-  pages:
-    dashboard:
-      title: Dashboard
-    maintenance:
-      title: Maintenance warnings
-    maintenance_add:
-      title: Add maintenance warning
-    maintenance_delete:
-      title: Delete maintenance warning
-    maintenance_edit:
-      title: Edit maintenance warning
-  site-title-suffix: "Admin: "
 
 auth:
   error: Error

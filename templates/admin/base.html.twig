@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('admin.site-title-suffix' | trans) ~ ('site.title' | trans)) -%}
+{%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('admin.site-title-suffix' | trans) ~ ('admin.site.title' | trans)) -%}
 
 {% block navigation %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
@@ -9,12 +9,17 @@
 
     {{- serviceNavigation({
         classes: 'govuk-service-navigation__wrapper-full-width',
-        serviceName: 'site.title' | trans,
+        serviceName: 'admin.site.title' | trans,
         navigation: [
             {
                 href: path('admin_dashboard'),
                 text: "admin.pages.dashboard.title" | trans,
                 active: current_menu == 'dashboard'
+            },
+            {
+                href: path('admin_authority'),
+                text: "admin.pages.authority.title" | trans,
+                active: current_menu == 'authority'
             },
             {
                 href: path('admin_maintenance'),

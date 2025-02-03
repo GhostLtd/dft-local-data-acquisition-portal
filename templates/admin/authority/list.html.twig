@@ -1,0 +1,37 @@
+{%- extends 'admin/base.html.twig' -%}
+
+{%- set page_title_key = 'admin.pages.authority.title' -%}
+{%- set current_menu = 'authority' -%}
+
+{%- block content -%}
+    {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
+
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import pagination, tableHead, tableRow, summaryListActionsList, tag -%}
+    {%- from "@GhostGovUkCore/list-page.html.twig" import listTableStart, listTableEnd -%}
+
+    <p class="govuk-body">{{ 'admin.authority.list.intro_copy' | trans }}</p>
+
+    {{- listTableStart(data, form) -}}
+    {%- for authority in data.entities -%}
+        {%- set actions = [
+            {
+                href: path('admin_authority_edit', {id: authority.id}),
+                text: 'admin.authority.list.edit' | trans,
+            },
+        ] -%}
+        {{- tableRow([
+            authority.name,
+            authority.admin.name,
+            {html: summaryListActionsList(actions), classes: 'govuk-table__cell--numeric'},
+        ]) -}}
+    {%- else -%}
+        {{- tableRow([
+            {
+                text: 'admin.authority.list.no_results' | trans,
+                colspan: data.fields | length + 1,
+            }
+        ]) -}}
+    {%- endfor -%}
+    {{- listTableEnd(data, form) -}}
+    <a class="govuk-button" href="{{ path('admin_authority_add') }}">{{ 'admin.authority.list.add' | trans }}</a>
+{%- endblock -%}
