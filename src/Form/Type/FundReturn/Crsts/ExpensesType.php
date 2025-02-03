@@ -4,7 +4,7 @@ namespace App\Form\Type\FundReturn\Crsts;
 
 use App\Entity\Enum\ExpenseType;
 use App\Entity\ExpensesContainerInterface;
-use App\Form\Type\ReturnBaseType;
+use App\Form\Type\BaseButtonsFormType;
 use App\Utility\ExpensesTableHelper;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
 use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
@@ -73,6 +73,6 @@ class ExpensesType extends AbstractType
 
     public function getParent(): string
     {
-        return ReturnBaseType::class;
+        return BaseButtonsFormType::class;
     }
 }

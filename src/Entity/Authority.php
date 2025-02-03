@@ -9,6 +9,7 @@ use App\Repository\AuthorityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AuthorityRepository::class)]
 class Authority
@@ -16,10 +17,13 @@ class Authority
     use IdTrait;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull(message: 'authority.name.not_null', groups: ['authority'])]
     private ?string $name = null; // 1top_info: Local Authority name
 
     #[ORM\ManyToOne(inversedBy: 'authoritiesAdminOf')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\Valid(groups: ['authority.new_admin'])]
+    #[Assert\NotNull(groups: ['authority.existing_admin'])]
     private ?User $admin = null;
 
     /**
@@ -45,7 +49,7 @@ class Authority
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->name = $name;
         return $this;

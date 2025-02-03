@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\WorkflowInterface;
 
-class ReturnBaseType extends AbstractType
+class BaseButtonsFormType extends AbstractType
 {
     const string SAVE = 'save';
 
@@ -25,10 +25,12 @@ class ReturnBaseType extends AbstractType
             ->add(self::SAVE, ButtonType::class, [
                 'type' => 'submit',
                 'label' => 'forms.buttons.save',
+                'translation_domain' => 'messages',
             ])
             ->add('cancel', LinkType::class, [
                 'label' => 'forms.buttons.cancel',
                 'href' => $options['cancel_url'],
+                'translation_domain' => 'messages',
             ]);
     }
 

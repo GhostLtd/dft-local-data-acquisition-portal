@@ -1,6 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('admin.site-title-suffix' | trans) ~ ('site.title' | trans)) -%}
+{% trans_default_domain 'admin' %}
+{%- if page_title is not defined -%}
+    {%- set page_title = page_title_key | trans(page_title_params ?? {}) -%}
+{%- endif -%}
+{%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('site-title-suffix' | trans) ~ ('site.title' | trans)) -%}
 
 {% block navigation %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
@@ -13,12 +17,17 @@
         navigation: [
             {
                 href: path('admin_dashboard'),
-                text: "admin.pages.dashboard.title" | trans,
+                text: "pages.dashboard.title" | trans,
                 active: current_menu == 'dashboard'
             },
             {
+                href: path('admin_authority'),
+                text: "pages.authority.title" | trans,
+                active: current_menu == 'authority'
+            },
+            {
                 href: path('admin_maintenance'),
-                text: "admin.pages.maintenance.title" | trans,
+                text: "pages.maintenance.title" | trans,
                 active: current_menu == 'maintenance'
             }
         ]

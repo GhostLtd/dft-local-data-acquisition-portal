@@ -3,7 +3,7 @@
 namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Form\Type\ReturnBaseType;
+use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -31,7 +31,7 @@ class OverallFundingType extends AbstractType
 
     public function getParent(): string
     {
-        return ReturnBaseType::class;
+        return BaseButtonsFormType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

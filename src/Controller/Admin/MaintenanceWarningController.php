@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route(path: '/maintenance-warning')]
+#[Route(path: '/maintenance-warning', name: 'admin_maintenance')]
 class MaintenanceWarningController extends AbstractController
 {
-    #[Route(path: '', name: 'admin_maintenance')]
+    #[Route(path: '', name: '')]
     public function list(MaintenanceWarningListPage $listPage, Request $request): Response
     {
         $listPage
@@ -36,11 +36,13 @@ class MaintenanceWarningController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/{id}/edit', name: 'admin_maintenance_edit')]
+    #[Route(path: '/{id}/edit', name: '_edit')]
     public function edit(Request $request, EntityManagerInterface $entityManager, Session $session, MaintenanceWarning $maintenanceWarning, string $type='edit'): Response
     {
         /** @var Form $form */
-        $form = $this->createForm(MaintenanceWarningType::class, $maintenanceWarning);
+        $form = $this->createForm(MaintenanceWarningType::class, $maintenanceWarning, [
+            'cancel_url' => $this->generateUrl('admin_maintenance'),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
@@ -67,13 +69,13 @@ class MaintenanceWarningController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/add', name: 'admin_maintenance_add')]
+    #[Route(path: '/add', name: '_add')]
     public function add(Request $request, EntityManagerInterface $entityManager, Session $session): Response
     {
         return $this->edit($request, $entityManager, $session, new MaintenanceWarning(), 'add');
     }
 
-    #[Route(path: '{id}/delete', name: 'admin_maintenance_delete')]
+    #[Route(path: '{id}/delete', name: '_delete')]
     #[Template('admin/maintenance_warning/delete.html.twig')]
     public function delete(Request $request, DeleteMaintenanceWarningConfirmAction $deleteMaintenanceWarningConfirmAction, MaintenanceWarning $maintenanceWarning): RedirectResponse|array
     {

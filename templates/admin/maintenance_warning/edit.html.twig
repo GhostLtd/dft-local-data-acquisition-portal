@@ -1,6 +1,7 @@
 {% extends 'admin/base.html.twig' %}
 
-{%- set page_title_key = "admin.pages.maintenance_#{type}.title" -%}
+{% trans_default_domain 'admin' %}
+{%- set page_title_key = "pages.maintenance_#{type}.title" -%}
 {%- set current_menu = 'maintenance' -%}
 
 {%- block content -%}

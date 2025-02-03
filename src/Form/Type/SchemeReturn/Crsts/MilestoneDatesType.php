@@ -7,7 +7,7 @@ use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\MilestoneType as MilestoneEnum;
 use App\Entity\Milestone;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Form\Type\ReturnBaseType;
+use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\DateType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
@@ -52,7 +52,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
 
     public function getParent(): string
     {
-        return ReturnBaseType::class;
+        return BaseButtonsFormType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

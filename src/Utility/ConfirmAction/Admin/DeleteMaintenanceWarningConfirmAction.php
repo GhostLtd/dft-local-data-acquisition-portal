@@ -41,10 +41,15 @@ class DeleteMaintenanceWarningConfirmAction extends AbstractConfirmAction
         ];
     }
 
+    public function getTranslationDomain(): ?string
+    {
+        return 'admin';
+    }
+
     #[\Override]
     public function getTranslationKeyPrefix(): string
     {
-        return 'admin.maintenance.delete';
+        return 'maintenance.delete';
     }
 
     #[\Override]
