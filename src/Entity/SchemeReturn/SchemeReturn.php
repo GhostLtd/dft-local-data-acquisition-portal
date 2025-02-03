@@ -122,7 +122,6 @@ abstract class SchemeReturn
         return $status;
     }
 
-
     public function getStatusForSection(
         DivisionConfiguration|SchemeLevelSection $section,
         CompletionStatus                         $default = CompletionStatus::NOT_STARTED
@@ -157,5 +156,9 @@ abstract class SchemeReturn
         }
 
         return null;
+    }
+
+    public function getSectionByName(string $sectionName): SchemeLevelSection {
+        return SchemeLevelSection::from($sectionName);
     }
 }

@@ -58,17 +58,21 @@
             }]) -%}
         {%- endif -%}
 
+        {%- set sectionEnum = config.section is defined ? return.getSectionByName(config.section) : null -%}
+        {%- set status = sectionEnum ? return.getStatusForSection(sectionEnum) : null %}
+        {%- set status = null %}{# TODO #}
         {%- set sections = sections|merge([
             {
                 label: config.title,
-                id: config.section,
+                id: config.id ?? sectionEnum.value,
                 panel: {html: config.contents},
                 actions: {items: actions},
+                status,
             }
         ]) -%}
     {%- endfor -%}
 
-    {{- _self.displaySectionsAsSummaryCards(sections, section_title) -}}
+    {{- _self.displaySectionsAsSummaryCards(sections, section_title, return) -}}
 {%- endmacro -%}
 
 {% macro displaySectionsAsTabs(items, heading) %}
@@ -81,19 +85,33 @@
     {%- endif -%}
 {% endmacro %}
 
-{% macro displaySectionsAsSummaryCards(items, heading) %}
+{% macro displaySectionsAsSummaryCards(items, heading, return) %}
     {# N.B. Uses tab data format for items so that we can easily switch from one to the other #}
     {%- if items is not empty -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryCard -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryCard, tag -%}
 
         <div class="govuk-!-margin-bottom-9">
             <h2 class="govuk-heading-m">{{ heading }}</h2>
             {%- for item in items -%}
                 {%- set attributes = item.id is defined ? {id: item.id} : null -%}
+                {%- if item.status -%}
+                    {%- set contents %}
+                        <div class="section-card-title">
+                            {{ item.label }}<br>
+{#                            {{- tag({
+                                  text: "tags.#{item.status.value}.name" | trans,
+                                  classes: "govuk-tag--" ~ ("tags.#{item.status.value}.colour" | trans),
+                              }) -}}
+#}
+                            <p class="govuk-body-s">{{ "tags.#{item.status.value}.name" | trans }}</p>
+                        </div>
+                    {%- endset %}
+                    {%- set title = {html: contents} -%}
+                {%- else -%}
+                    {%- set title = {text: item.label} -%}
+                {%- endif -%}
                 {{- summaryCard({
-                    title: {
-                        text: item.label,
-                    },
+                    title,
                     actions: item.actions ?? null,
                     attributes,
                 }, item.panel.html) }}

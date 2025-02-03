@@ -279,4 +279,8 @@ abstract class FundReturn
             substr(strval($this->year + 1), 2) :
             null;
     }
+
+    public function getSectionByName(string $sectionName): FundLevelSection {
+        return FundLevelSection::from($sectionName);
+    }
 }
