@@ -24,6 +24,7 @@ class MilestoneRatingType extends AbstractType
                 'choice_label' => fn(OnTrackRating $choice) => "enum.on_track_rating.{$choice->value}",
                 'choice_value' => fn(?OnTrackRating $choice) => $choice?->value,
                 'expanded' => false,
+                'placeholder' => 'forms.generic.placeholder',
             ])
             ->add('progressUpdate', TextareaType::class, [
                 'label' => "forms.scheme.milestone_progress.progress_update.label",
@@ -39,6 +40,9 @@ class MilestoneRatingType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', CrstsSchemeReturn::class);
+        $resolver->setDefaults([
+            'data_class' => CrstsSchemeReturn::class,
+            'validation_groups' => 'milestone_rating',
+        ]);
     }
 }

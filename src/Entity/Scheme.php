@@ -12,6 +12,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: SchemeRepository::class)]
 class Scheme
@@ -23,24 +25,31 @@ class Scheme
     private ?Authority $authority = null;
 
     #[ORM\Column(length: 255)]
+    #[NotBlank(message: 'scheme.name.not_blank', groups: ["scheme_details"])]
     private ?string $name = null; // 1proj_info: Scheme name
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank(message: 'scheme.description.not_blank', groups: ["scheme_details"])]
     private ?string $description = null; // 1proj_info: Scheme description
 
     #[ORM\Column(nullable: true, enumType: TransportMode::class)]
+    #[NotNull(message: 'scheme.transport_mode.not_null', groups: ["scheme_transport_mode"])]
     private ?TransportMode $transportMode = null; // 1proj_info: Transport mode
 
     #[ORM\Column(nullable: true, enumType: ActiveTravelElement::class)]
+    #[NotNull(message: 'scheme.active_travel_element.not_null', groups: ["scheme_elements"])]
     private ?ActiveTravelElement $activeTravelElement = null; // 1proj_info: Does this scheme have active travel elements?
 
     #[ORM\Column(nullable: true)]
+    #[NotNull(message: 'scheme.includes_clean_air_elements.not_null', groups: ["scheme_elements"])]
     private ?bool $includesCleanAirElements = null; // 1proj_info: Will this scheme include clean air elements?
 
     #[ORM\Column(nullable: true)]
+    #[NotNull(message: 'scheme.includes_charging_points.not_null', groups: ["scheme_elements"])]
     private ?bool $includesChargingPoints = null; // 1proj_info: Will this scheme include charging points for electric vehicles?
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[NotBlank(message: 'scheme.identifier.not_blank', groups: ["scheme_details"])]
     private ?string $schemeIdentifier = null; // 1proj_info: Scheme ID
 
     /**
@@ -70,7 +79,7 @@ class Scheme
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->name = $name;
         return $this;

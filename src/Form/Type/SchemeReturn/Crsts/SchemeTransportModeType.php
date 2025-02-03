@@ -57,7 +57,12 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', SchemeReturn::class);
+        $resolver
+            ->setDefault('data_class', SchemeReturn::class)
+            ->setDefault('validation_groups', ['scheme_transport_mode'])
+            ->setDefault('error_mapping', [
+                'schemeFund.scheme.transportMode' => 'transportModeCategory',
+            ]);
     }
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void

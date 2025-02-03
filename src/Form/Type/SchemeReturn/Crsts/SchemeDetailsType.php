@@ -49,7 +49,7 @@ class SchemeDetailsType extends AbstractType
                 'help' => 'forms.crsts.scheme_details.funded_mostly_as.help',
                 'choices' => FundedMostlyAs::cases(),
                 'choice_label' => fn(FundedMostlyAs $choice) => "enum.funded_mostly_as.{$choice->value}",
-                'choice_value' => fn(FundedMostlyAs $choice) => $choice->value,
+                'choice_value' => fn(?FundedMostlyAs $choice) => $choice?->value,
                 'property_path' => 'schemeFund.fundedMostlyAs',
             ])
         ;

@@ -22,7 +22,7 @@ class MilestoneBusinessCaseType extends AbstractType
                 'help' => "forms.scheme.milestone_business_case.business_case.help",
                 'choices' => BusinessCase::cases(),
                 'choice_label' => fn(BusinessCase $choice) => "enum.business_case.{$choice->value}",
-                'choice_value' => fn(BusinessCase $choice) => $choice->value,
+                'choice_value' => fn(?BusinessCase $choice) => $choice?->value,
             ])
             ->add('expectedBusinessCaseApproval', DateType::class, [
                 'label' => "forms.scheme.milestone_business_case.expected_business_case_approval.label",
@@ -38,6 +38,9 @@ class MilestoneBusinessCaseType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', CrstsSchemeReturn::class);
+        $resolver->setDefaults([
+            'data_class' => CrstsSchemeReturn::class,
+            'validation_groups' => ['milestone_business_case'],
+        ]);
     }
 }

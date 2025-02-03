@@ -59,7 +59,14 @@ class SchemeElementsType extends AbstractType implements DataMapperInterface
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', SchemeReturn::class);
+        $resolver
+            ->setDefault('data_class', SchemeReturn::class)
+            ->setDefault('validation_groups', ['scheme_elements'])
+            ->setDefault('error_mapping', [
+                'schemeFund.scheme.activeTravelElement' => 'hasActiveTravelElements',
+                'schemeFund.scheme.includesChargingPoints' => 'includesChargingPoints',
+                'schemeFund.scheme.includesCleanAirElements' => 'includesCleanAirElements',
+            ]);
     }
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
@@ -90,9 +97,14 @@ class SchemeElementsType extends AbstractType implements DataMapperInterface
         /** @var FormInterface[] $forms */
 
         $scheme = $viewData->getSchemeFund()->getScheme();
-        $activeTravelElement = $forms['hasActiveTravelElements']->getData() ?
-            $forms['activeTravelElement']->getData() :
-            ActiveTravelElement::NO_ACTIVE_TRAVEL_ELEMENTS;
+
+        $activeTravelElement = $forms['hasActiveTravelElements']->getData();
+
+        if ($activeTravelElement !== null) {
+            $activeTravelElement = $forms['hasActiveTravelElements']->getData() ?
+                $forms['activeTravelElement']->getData() :
+                ActiveTravelElement::NO_ACTIVE_TRAVEL_ELEMENTS;
+        }
 
         $scheme
             ->setActiveTravelElement($activeTravelElement)

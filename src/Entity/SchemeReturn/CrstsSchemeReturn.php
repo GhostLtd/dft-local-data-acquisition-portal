@@ -20,6 +20,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: CrstsSchemeReturnRepository::class)]
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
@@ -27,25 +31,31 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 {
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
     #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
+    #[NotBlank(message: 'crsts_scheme_return.total_cost.not_blank', groups: ["overall_funding"])]
     private ?string $totalCost = null; // 2proj_exp: Total cost of scheme (<this fund> plus other expenditure)
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
     #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
+    #[NotBlank(message: 'crsts_scheme_return.agreed_funding.not_blank', groups: ["overall_funding"])]
     private ?string $agreedFunding = null; // 2proj_exp: Agreed funding, <this fund>
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $spendToDate = null; // 2proj_exp: Spend to date, <this fund>
 
     #[ORM\Column(nullable: true, enumType: OnTrackRating::class)]
+    #[NotNull(message: 'crsts_scheme_return.on_track_rating.not_null', groups: ["milestone_rating"])]
     private ?OnTrackRating $onTrackRating = null; // 4proj_milestones: On-track rating (delivery confidence assessment)
 
     #[ORM\Column(nullable: true, enumType: BusinessCase::class)]
+    #[NotNull(message: 'crsts_scheme_return.business_case.not_null', groups: ["milestone_business_case"])]
     private ?BusinessCase $businessCase = null; // 4proj_milestones: Current business case
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null', groups: ["milestone_business_case"])]
     private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank(message: 'crsts_scheme_return.progress_update.not_blank', groups: ["milestone_rating"])]
     private ?string $progressUpdate = null; // 4proj_milestones: Progress update (comment)
 
     /**
@@ -59,6 +69,19 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
      */
     #[ORM\ManyToMany(targetEntity: Milestone::class, cascade: ['persist'])]
     private Collection $milestones;
+
+    #[Callback(groups: ['milestone_dates'])]
+    public function validateMilestoneDates(ExecutionContextInterface $context): void
+    {
+        foreach($this->milestones as $i => $milestone) {
+            if ($milestone->getDate() === null) {
+                $context
+                    ->buildViolation('common.date.not_null')
+                    ->atPath($milestone->getType()->value)
+                    ->addViolation();
+            }
+        }
+    }
 
     public function __construct()
     {

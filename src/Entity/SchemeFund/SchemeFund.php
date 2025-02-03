@@ -10,6 +10,7 @@ use App\Repository\SchemeFund\SchemeFundRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: SchemeFundRepository::class)]
 #[ORM\InheritanceType('JOINED')]
@@ -24,6 +25,7 @@ abstract class SchemeFund
 
     #[ORM\ManyToOne(inversedBy: 'schemeFunds')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Valid(groups: ['scheme_details', 'scheme_elements', 'scheme_transport_mode'])]
     private ?Scheme $scheme = null;
 
     /**

@@ -2,6 +2,7 @@ common:
   cost:
     invalid: Enter a real cost. For example £3.70
   date:
+    not_null: Enter a date
     invalid: Enter a valid date
   number:
     invalid: Enter a number
@@ -17,3 +18,39 @@ auth:
   login:
     email_blank: Enter an email address
     invalid_email: Enter a valid email address
+
+crsts_scheme_fund:
+  funded_mostly_as:
+    not_null: Choose how this scheme is mostly funded
+  previously_tcf:
+    not_null: Choose whether this scheme was previously in TCF
+
+crsts_scheme_return:
+  agreed_funding:
+    not_blank: Enter the agreed funding
+  total_cost:
+    not_blank: Enter the total cost
+  on_track_rating:
+    not_null: Please choose an on-track rating
+  progress_update:
+    not_blank: Please enter a progress update
+  business_case:
+    not_null: Choose the current business case
+  expected_business_case_approval:
+    not_null: Enter the expected business case approval date
+
+scheme:
+  active_travel_element:
+    not_null: Choose whether this scheme has active travel elements
+  description:
+    not_blank: Enter a scheme description
+  identifier:
+    not_blank: Enter a scheme identifier
+  includes_charging_points:
+    not_null: Choose whether this scheme includes charging points
+  includes_clean_air_elements:
+    not_null: Choose whether this scheme includes clear air elements
+  name:
+    not_blank: Enter a scheme name
+  transport_mode:
+    not_null: Choose a transport mode

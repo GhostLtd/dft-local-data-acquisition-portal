@@ -57,7 +57,11 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', CrstsSchemeReturn::class);
+        $resolver
+            ->setDefaults([
+                'data_class' => CrstsSchemeReturn::class,
+                'validation_groups' => 'milestone_dates',
+            ]);
     }
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void

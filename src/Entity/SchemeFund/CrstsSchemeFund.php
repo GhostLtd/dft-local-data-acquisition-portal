@@ -6,6 +6,8 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\FundedMostlyAs;
 use App\Repository\SchemeFund\CrstsSchemeFundRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: CrstsSchemeFundRepository::class)]
@@ -15,9 +17,11 @@ class CrstsSchemeFund extends SchemeFund
     private ?bool $retained = null; // 1proj_info: Is this a retained scheme?
 
     #[ORM\Column(nullable: true, enumType: FundedMostlyAs::class)]
+    #[NotNull(message: 'crsts_scheme_fund.funded_mostly_as.not_null', groups: ["scheme_details"])]
     private ?FundedMostlyAs $fundedMostlyAs = null; // 1proj_info: CDEL or RDEL
 
     #[ORM\Column(nullable: true)]
+    #[NotNull(message: 'crsts_scheme_fund.previously_tcf.not_null', groups: ["scheme_details"])]
     private ?bool $previouslyTcf = null;
 
     #[ORM\Embedded(class: BenefitCostRatio::class)]
