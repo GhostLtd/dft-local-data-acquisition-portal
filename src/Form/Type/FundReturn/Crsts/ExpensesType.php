@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Form\FundReturn\Crsts;
+namespace App\Form\Type\FundReturn\Crsts;
 
 use App\Entity\Enum\ExpenseType;
 use App\Entity\ExpensesContainerInterface;
-use App\Form\ReturnBaseType;
+use App\Form\Type\ReturnBaseType;
 use App\Utility\ExpensesTableHelper;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
 use Symfony\Component\Form\AbstractType;

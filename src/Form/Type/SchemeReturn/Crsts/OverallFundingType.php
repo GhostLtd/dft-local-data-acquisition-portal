@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Form\SchemeReturn\Crsts;
+namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Form\ReturnBaseType;
+use App\Form\Type\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

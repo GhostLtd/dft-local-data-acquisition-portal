@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\FundReturn\Crsts;
+namespace App\Form\Type\FundReturn\Crsts;
 
 use App\Entity\Enum\ExpenseType;
 use App\Entity\ExpenseEntry;

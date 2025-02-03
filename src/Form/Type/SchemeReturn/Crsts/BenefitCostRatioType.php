@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\SchemeReturn\Crsts;
+namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\Enum\BenefitCostRatioType as BenefitCostRatioTypeEnum;
 use App\Entity\SchemeFund\BenefitCostRatio;

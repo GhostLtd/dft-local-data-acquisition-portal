@@ -4,7 +4,7 @@ namespace App\Controller\Auth;
 
 use App\Entity\User;
 use App\Features;
-use App\Form\LoginType;
+use App\Form\Type\LoginType;
 use App\Messenger\AlphagovNotify\LoginEmail;
 use App\Repository\MaintenanceWarningRepository;
 use App\Security\UserProvider;

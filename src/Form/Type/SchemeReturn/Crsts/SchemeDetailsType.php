@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Form\SchemeReturn\Crsts;
+namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Form\ReturnBaseType;
+use App\Form\Type\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;

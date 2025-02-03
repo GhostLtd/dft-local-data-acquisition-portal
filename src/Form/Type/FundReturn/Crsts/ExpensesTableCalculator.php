@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Form\FundReturn\Crsts;
+namespace App\Form\Type\FundReturn\Crsts;
 
 use App\Config\Table\Cell;
-use App\Config\Table\Header;
-use App\Config\Table\Row;
 use App\Config\Table\Table;
 use App\Config\Table\TableBody;
 use App\Config\Table\TableHead;

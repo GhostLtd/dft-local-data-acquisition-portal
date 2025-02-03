@@ -9,7 +9,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturnSectionStatus;
-use App\Form\FundReturn\Crsts\ExpensesType;
+use App\Form\Type\FundReturn\Crsts\ExpensesType;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;

@@ -2,10 +2,10 @@
 
 namespace App\Entity\Enum;
 
-use App\Form\FundReturn\Crsts\CommentsType;
-use App\Form\FundReturn\Crsts\LocalAndRdelType;
-use App\Form\FundReturn\Crsts\OverallProgressType;
-use App\Form\FundReturn\Crsts\QuarterlyProgressType;
+use App\Form\Type\FundReturn\Crsts\CommentsType;
+use App\Form\Type\FundReturn\Crsts\LocalAndRdelType;
+use App\Form\Type\FundReturn\Crsts\OverallProgressType;
+use App\Form\Type\FundReturn\Crsts\QuarterlyProgressType;
 
 // N.B. Not used in the database, but rather as keys + translation keys for fund-level returns
 enum FundLevelSection: string

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Form\SchemeReturn\Crsts;
+namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\Enum\TransportMode;
 use App\Entity\Enum\TransportModeCategory;
 use App\Entity\SchemeReturn\SchemeReturn;
-use App\Form\ReturnBaseType;
+use App\Form\Type\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;

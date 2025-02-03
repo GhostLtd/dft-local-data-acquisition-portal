@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\MaintenanceWarning;
-use App\Form\Admin\MaintenanceWarningType;
+use App\Form\Type\Admin\MaintenanceWarningType;
 use App\ListPage\MaintenanceWarningListPage;
 use App\Utility\ConfirmAction\DeleteMaintenanceWarningConfirmAction;
 use Doctrine\ORM\EntityManagerInterface;

@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Form\SchemeReturn\Crsts;
+namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\MilestoneType as MilestoneEnum;
 use App\Entity\Milestone;
-use App\Entity\SchemeFund\CrstsSchemeFund;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Entity\SchemeReturn\SchemeReturn;
-use App\Form\ReturnBaseType;
+use App\Form\Type\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\DateType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
@@ -114,7 +112,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
         );
     }
 
-    public function getMilestone(CrstsSchemeReturn $crstsSchemeReturn, MilestoneEnum $milestoneEnum): ?Milestone
+    public function getMilestone(CrstsSchemeReturn $crstsSchemeReturn, MilestoneType $milestoneEnum): ?Milestone
     {
         foreach($crstsSchemeReturn->getMilestones() as $milestone) {
             if ($milestone->getType() === $milestoneEnum) {

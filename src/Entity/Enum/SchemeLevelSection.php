@@ -3,13 +3,13 @@
 namespace App\Entity\Enum;
 
 use App\Config\SchemeLevelSectionConfiguration;
-use App\Form\SchemeReturn\Crsts\MilestoneDatesType;
-use App\Form\SchemeReturn\Crsts\MilestoneBusinessCaseType;
-use App\Form\SchemeReturn\Crsts\MilestoneRatingType;
-use App\Form\SchemeReturn\Crsts\OverallFundingType;
-use App\Form\SchemeReturn\Crsts\SchemeDetailsType;
-use App\Form\SchemeReturn\Crsts\SchemeElementsType;
-use App\Form\SchemeReturn\Crsts\SchemeTransportModeType;
+use App\Form\Type\SchemeReturn\Crsts\MilestoneBusinessCaseType;
+use App\Form\Type\SchemeReturn\Crsts\MilestoneDatesType;
+use App\Form\Type\SchemeReturn\Crsts\MilestoneRatingType;
+use App\Form\Type\SchemeReturn\Crsts\OverallFundingType;
+use App\Form\Type\SchemeReturn\Crsts\SchemeDetailsType;
+use App\Form\Type\SchemeReturn\Crsts\SchemeElementsType;
+use App\Form\Type\SchemeReturn\Crsts\SchemeTransportModeType;
 
 // N.B. Not used in the database, but rather as keys + translation keys for scheme-level returns
 enum SchemeLevelSection: string

@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Form\SchemeReturn\Crsts;
+namespace App\Form\Type\SchemeReturn\Crsts;
 
-use App\Entity\Enum\BenefitCostRatioType as BenefitCostRatioTypeEnum;
-use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Form\ReturnBaseType;
+use App\Form\Type\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
-use Ghost\GovUkFrontendBundle\Form\Type\DateType;
 use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

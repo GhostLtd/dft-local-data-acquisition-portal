@@ -6,7 +6,7 @@ use App\Entity\Enum\Role;
 use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
-use App\Form\FundReturn\Crsts\ExpensesTableCalculator;
+use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;

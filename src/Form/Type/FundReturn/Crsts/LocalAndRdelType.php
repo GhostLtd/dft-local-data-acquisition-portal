@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Form\FundReturn\Crsts;
+namespace App\Form\Type\FundReturn\Crsts;
 
 use App\Entity\FundReturn\CrstsFundReturn;
-use App\Form\ReturnBaseType;
+use App\Form\Type\ReturnBaseType;
 use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
