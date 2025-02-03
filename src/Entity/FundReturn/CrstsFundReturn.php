@@ -16,30 +16,39 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: CrstsFundReturnRepository::class)]
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 {
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank(message: 'crsts_fund_return.progress_summary.not_blank', groups: ["overall_progress"])]
     private ?string $progressSummary = null; // 1top_info: Programme level progress summary
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank(message: 'crsts_fund_return.delivery_confidence.not_blank', groups: ["overall_progress"])]
     private ?string $deliveryConfidence = null; // 1top_info: Programme delivery confidence comment assessment
 
     #[ORM\Column(nullable: true, enumType: Rating::class)]
+    #[NotNull(message: 'crsts_fund_return.overall_confidence.not_null', groups: ["overall_progress"])]
     private ?Rating $overallConfidence = null; // 1top_info: Overall confidence
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotNull(message: 'crsts_fund_return.rag_progress_summary.not_null', groups: ["quarterly_progress"])]
     private ?string $ragProgressSummary = null; // 1top_info: RAG progress this quarter - commentary
 
     #[ORM\Column(nullable: true, enumType: Rating::class)]
+    #[NotNull(message: 'crsts_fund_return.rag_progress_rating.not_null', groups: ["quarterly_progress"])]
     private ?Rating $ragProgressRating = null; // 1top_info: RAG progress this quarter
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank(message: 'crsts_fund_return.local_contribution.not_blank', groups: ["local_and_rdel"])]
     private ?string $localContribution = null; // 2top_exp: Local contribution.  Please provide a current breakdown of local contribution achieved, by source.
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank(message: 'crsts_fund_return.resource_funding.not_blank', groups: ["local_and_rdel"])]
     private ?string $resourceFunding = null; // 2top_exp: Resource (RDEL) funding.  Please see Appendix A.
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

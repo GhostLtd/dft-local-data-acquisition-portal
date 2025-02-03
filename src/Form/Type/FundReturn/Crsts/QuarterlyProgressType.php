@@ -24,7 +24,7 @@ class QuarterlyProgressType extends AbstractType
                 'label' => 'forms.crsts.quarterly_progress.progress_rating.label',
                 'choices' => Rating::cases(),
                 'choice_label' => fn(Rating $choice) => "enum.rating.{$choice->value}",
-                'choice_value' => fn(Rating $choice) => $choice->value,
+                'choice_value' => fn(?Rating $choice) => $choice?->value,
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s']
             ]);
     }
@@ -36,6 +36,9 @@ class QuarterlyProgressType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', CrstsFundReturn::class);
+        $resolver->setDefaults([
+            'data_class' => CrstsFundReturn::class,
+            'validation_groups' => ['quarterly_progress'],
+        ]);
     }
 }

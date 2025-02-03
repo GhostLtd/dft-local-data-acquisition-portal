@@ -19,6 +19,22 @@ auth:
     email_blank: Enter an email address
     invalid_email: Enter a valid email address
 
+crsts_fund_return:
+  delivery_confidence:
+    not_blank: Enter the overall delivery confidence
+  local_contribution:
+    not_blank: Enter the local contribution
+  overall_confidence:
+    not_null: Choose the overall delivery confidence rating
+  progress_summary:
+    not_blank: Enter a progress summary
+  rag_progress_summary:
+    not_null: Enter the quarterly progress summary
+  rag_progress_rating:
+    not_null: Choose the quarterly rating
+  resource_funding:
+    not_blank: Enter the Resource funding
+
 crsts_scheme_fund:
   funded_mostly_as:
     not_null: Choose how this scheme is mostly funded

@@ -34,6 +34,9 @@ class LocalAndRdelType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefault('data_class', CrstsFundReturn::class);
+        $resolver->setDefaults([
+            'data_class' => CrstsFundReturn::class,
+            'validation_groups' => ['local_and_rdel'],
+        ]);
     }
 }
