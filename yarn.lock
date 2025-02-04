@@ -1345,9 +1345,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.6":
+"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.8":
   version: 0.0.0
-  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=f18d731dca718d277e44acc9dab719ec218e0133"
+  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=d2aafc396a589d231c2501943bbde216757eff24"
   dependencies:
     govuk-frontend: "npm:5.6.*"
   checksum: 10c0/d8937fa72ea41d75e71ecf87424c8efa2a621fd4853f1d1d192faf6a427078875089e9211952c636562a9a9d4ff2a3ab3fe809f644fc0699befe29d5099e591f
@@ -5821,7 +5821,7 @@ __metadata:
     "@babel/core": "npm:^7.17.0"
     "@babel/preset-env": "npm:^7.16.0"
     "@ghost/govuk-core-bundle": "git+https://git.tomarq.net/ghost/govuk-core-bundle.git#1.0.4"
-    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.6"
+    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.8"
     "@symfony/webpack-encore": "npm:^4.0.0"
     core-js: "npm:^3.23.0"
     regenerator-runtime: "npm:^0.13.9"

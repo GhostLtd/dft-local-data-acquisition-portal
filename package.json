@@ -3,7 +3,7 @@
         "@babel/core": "^7.17.0",
         "@babel/preset-env": "^7.16.0",
         "@ghost/govuk-core-bundle": "git+https://git.tomarq.net/ghost/govuk-core-bundle.git#1.0.4",
-        "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.6",
+        "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.8",
         "@symfony/webpack-encore": "^4.0.0",
         "core-js": "^3.23.0",
         "regenerator-runtime": "^0.13.9",
@@ -23,5 +23,5 @@
         "deploy-build": "encore production",
         "build-env-subs": "printenv | grep -E '^APP_' > .env.local"
     },
-    "packageManager": "yarn@4.5.3"
+    "packageManager": "yarn@4.6.0"
 }
