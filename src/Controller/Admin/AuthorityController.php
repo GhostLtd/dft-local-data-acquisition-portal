@@ -3,10 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Authority;
+use App\Form\Type\Admin\AuthorityType;
 use App\ListPage\AuthorityListPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkFrontendBundle\Model\NotificationBanner;
-use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -47,8 +47,12 @@ class AuthorityController extends AbstractController
             }
 
             if ($form->isValid()) {
+                $authority = $form->getData();
                 if (!$form->getData()->getId()) {
-                    $entityManager->persist($form->getData());
+                    $entityManager->persist($authority);
+                    if (!$authority?->getAdmin()?->getId()) {
+                        $entityManager->persist($authority->getAdmin());
+                    }
                     $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority added', 'The new authority has been added', ['style' => NotificationBanner::STYLE_SUCCESS]));
                 } else {
                     $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority updated', 'The authority has been updated', ['style' => NotificationBanner::STYLE_SUCCESS]));
@@ -58,7 +62,7 @@ class AuthorityController extends AbstractController
             }
         }
 
-        return $this->render('admin/authority/edit.html.twi', [
+        return $this->render('admin/authority/edit.html.twig', [
             'form' => $form,
             'authority' => $form->getData(),
             'type' => $type,
