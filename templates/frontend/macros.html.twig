@@ -126,6 +126,8 @@
             {% set value = 'common.text.tbc' | trans %}
         {%- elseif bcr.type == constant('App\\Entity\\Enum\\BenefitCostRatioType::VALUE') -%}
             {% set value = bcr.value %}
+        {%- else -%}
+            {% set value = '-' %}
         {%- endif -%}
     {% endif %}
     {{- _self.text(label, value, options) -}}

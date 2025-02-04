@@ -65,6 +65,9 @@ class SchemeDetailsType extends AbstractType
         $resolver->setDefaults([
             'data_class' => CrstsSchemeReturn::class,
             'validation_groups' => ['scheme_details'],
+            'error_mapping' => [
+                'schemeFund.benefitCostRatio' => 'benefitCostRatio',
+            ],
         ]);
     }
 }

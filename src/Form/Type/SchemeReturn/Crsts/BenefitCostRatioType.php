@@ -26,7 +26,6 @@ class BenefitCostRatioType extends AbstractType implements DataMapperInterface
                 'choices' => BenefitCostRatioTypeEnum::cases(),
                 'choice_label' => fn(BenefitCostRatioTypeEnum $choice) => "enum.benefit_cost_ratio_type.{$choice->value}",
                 'choice_value' => fn(?BenefitCostRatioTypeEnum $choice) => $choice?->value,
-                'property_path' => 'type',
                 'choice_options' => function(?BenefitCostRatioTypeEnum $choice) {
                     return $choice === BenefitCostRatioTypeEnum::VALUE ?
                         ['conditional_form_name' => 'value'] :
@@ -39,7 +38,6 @@ class BenefitCostRatioType extends AbstractType implements DataMapperInterface
                 'label' => 'forms.crsts.benefit_cost_ratio.value.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'help' => 'forms.crsts.benefit_cost_ratio.value.help',
-                'property_path' => 'value',
             ]);
     }
 
@@ -47,6 +45,9 @@ class BenefitCostRatioType extends AbstractType implements DataMapperInterface
     {
         $resolver->setDefaults([
             'data_class' => BenefitCostRatio::class,
+            'error_mapping' => [
+                '.' => 'type',
+            ],
         ]);
     }
 

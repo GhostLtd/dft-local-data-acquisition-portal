@@ -19,6 +19,9 @@ auth:
     email_blank: Enter an email address
     invalid_email: Enter a valid email address
 
+benefit_cost_ratio:
+  not_null: Choose whether the benefit-cost ratio is known
+
 crsts_fund_return:
   delivery_confidence:
     not_blank: Enter the overall delivery confidence

@@ -31,6 +31,7 @@ class BenefitCostRatioValidator extends ConstraintValidator
         $type = $value->getType();
 
         if ($val === null && $type === null) {
+            $this->context->addViolation('benefit_cost_ratio.not_null');
             return;
         }
 
