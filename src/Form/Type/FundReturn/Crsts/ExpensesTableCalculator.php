@@ -109,7 +109,10 @@ class ExpensesTableCalculator
                     return false;
                 }
 
-                $total += str_replace(['£', ','], ['', ''], $rowCell->getOption('text'));
+                $value = $rowCell->getOption('text');
+                if ($value !== '') {
+                    $total += intval(str_replace(['£', ','], ['', ''], $value));
+                }
             }
 
             $cellMap[$row][$col] = $this->getCalculatedCell($cell, $total);
@@ -126,7 +129,10 @@ class ExpensesTableCalculator
                     return false;
                 }
 
-                $total += str_replace(['£', ','], ['', ''], $rowCell->getOption('text'));
+                $value = $rowCell->getOption('text');
+                if ($value !== '') {
+                    $total += intval(str_replace(['£', ','], ['', ''], $value));
+                }
             }
 
             $cellMap[$row][$col] = $this->getCalculatedCell($cell, $total);
@@ -137,7 +143,7 @@ class ExpensesTableCalculator
 
     protected function getCalculatedCell(mixed $cell, ?string $value): Cell
     {
-        $formattedValue = $value ? number_format($value) : null;
+        $formattedValue = $value ? number_format($value) : '';
 
         return new Cell(
             array_merge($cell->getOptions(), ['text' => $formattedValue]),
