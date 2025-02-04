@@ -16,7 +16,6 @@ class CrstsSchemeReturnDefinition
     public function __construct(
         protected ?string             $totalCost = null,
         protected ?string             $agreeFunding = null,
-        protected ?string             $spendToDate = null,
         protected ?OnTrackRating      $onTrackRating = null,
         protected ?BusinessCase       $businessCase = null,
         protected ?\DateTimeInterface $expectedBusinessCaseApproval = null,
@@ -33,11 +32,6 @@ class CrstsSchemeReturnDefinition
     public function getAgreeFunding(): ?string
     {
         return $this->agreeFunding;
-    }
-
-    public function getSpendToDate(): ?string
-    {
-        return $this->spendToDate;
     }
 
     public function getOnTrackRating(): ?OnTrackRating

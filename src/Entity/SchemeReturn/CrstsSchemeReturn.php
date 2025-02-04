@@ -39,9 +39,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[NotBlank(message: 'crsts_scheme_return.agreed_funding.not_blank', groups: ["overall_funding"])]
     private ?string $agreedFunding = null; // 2proj_exp: Agreed funding, <this fund>
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $spendToDate = null; // 2proj_exp: Spend to date, <this fund>
-
     #[ORM\Column(nullable: true, enumType: OnTrackRating::class)]
     #[NotNull(message: 'crsts_scheme_return.on_track_rating.not_null', groups: ["milestone_rating"])]
     private ?OnTrackRating $onTrackRating = null; // 4proj_milestones: On-track rating (delivery confidence assessment)
@@ -129,17 +126,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     public function setAgreedFunding(?string $agreedFunding): static
     {
         $this->agreedFunding = $agreedFunding;
-        return $this;
-    }
-
-    public function getSpendToDate(): ?string
-    {
-        return $this->spendToDate;
-    }
-
-    public function setSpendToDate(?string $spendToDate): static
-    {
-        $this->spendToDate = $spendToDate;
         return $this;
     }
 

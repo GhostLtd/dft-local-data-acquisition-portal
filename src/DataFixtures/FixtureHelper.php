@@ -256,7 +256,6 @@ class FixtureHelper
             ->setSchemeFund($schemeFund)
             ->setTotalCost($definition->getTotalCost())
             ->setAgreedFunding($definition->getAgreeFunding())
-            ->setSpendToDate($definition->getSpendToDate())
             ->setOnTrackRating($definition->getOnTrackRating())
             ->setBusinessCase($definition->getBusinessCase())
             ->setExpectedBusinessCaseApproval($definition->getExpectedBusinessCaseApproval())

@@ -270,7 +270,6 @@ class RandomFixtureGenerator
         return new CrstsSchemeReturnDefinition(
             strval($this->faker->randomFloat(2, 1_000, 99_000_000)),
             strval($this->faker->numberBetween(1_000, 99_000_000)),
-            strval($this->faker->numberBetween(1_000, 99_000_000)),
             $this->faker->randomElement(OnTrackRating::cases()),
             $this->faker->randomElement(BusinessCase::cases()),
             $this->faker->dateTime(),
