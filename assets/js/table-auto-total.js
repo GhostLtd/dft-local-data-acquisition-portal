@@ -70,8 +70,8 @@ function initForForm(form, autoCommas) {
         let isDisabled = (cell.attributes.getNamedItem('disabled')?.value === '1');
 
         if (!isDisabled) {
-            cell.addEventListener('change', _ => cellChanged(cell, true))
-            cell.addEventListener('keyup', e => e.key !== 'Tab' && cellChanged(cell, true))
+            cell.addEventListener('change', _ => cellChanged(cell, false))
+            cell.addEventListener('keyup', e => e.key !== 'Tab' && cellChanged(cell, false))
             cell.addEventListener('focus', _ => autoComma(cell, true))
             cell.addEventListener('blur', _ => autoComma(cell))
         }
@@ -79,7 +79,7 @@ function initForForm(form, autoCommas) {
 
     // Add commas to the given value, if autoCommas is true
     function autoComma(cell, setSelectionUponChange= false) {
-        if (!autoCommas) {
+        if (!autoCommas || !valueSensible(cell.value)) {
             return
         }
 
@@ -104,7 +104,11 @@ function initForForm(form, autoCommas) {
 
     // Parse a string to retrieve its value (removing commas)
     function getValue(value) {
-        return parseInt(('' + value).replaceAll(',', ''))
+        if (!valueSensible(value)) {
+            return value
+        }
+
+        return parseInt(('' + value).replaceAll(',', '').replaceAll(' ', ''))
     }
 
     // A cell has been changed. Trigger cellTotal updates for cells that depend upon its value.
@@ -140,11 +144,17 @@ function initForForm(form, autoCommas) {
         }
 
         let total = 0
+        let failure = false
 
         if (cell.dataset.totalSumRowsInColumn !== undefined) {
             const col = cell.dataset.col
             cell.dataset.totalSumRowsInColumn.split(',').forEach(
                 function (row) {
+                    if (failure) {
+                        return
+                    }
+                    failure |= !valueSensible(cellMap[row][col].value)
+
                     const value = getValue(cellMap[row][col].value)
                     if (!isNaN(value)) {
                         total += value
@@ -152,12 +162,22 @@ function initForForm(form, autoCommas) {
                 }
             )
 
-            updateCell(total)
+            if (failure || !valueSensible(total)) {
+                updateCell('Error')
+            } else {
+                updateCell(total)
+            }
         } else if (cell.dataset.totalSumEntireRow !== undefined) {
             const row = cell.dataset.row
             const currentCol = cell.dataset.col
             Object.keys(cellMap[row]).forEach(function(col) {
                 if (col !== currentCol) {
+                    if (failure) {
+                        return
+                    }
+                    failure |= !valueSensible(cellMap[row][col].value)
+                    console.log(cellMap[row][col].value + ':' + (failure ? 'Y': 'N'))
+
                     const value = getValue(cellMap[row][col].value)
                     if (!isNaN(value)) {
                         total += value
@@ -165,10 +185,32 @@ function initForForm(form, autoCommas) {
                 }
             })
 
-            updateCell(total)
+            if (failure || !valueSensible(total)) {
+                updateCell('Error')
+            } else {
+                updateCell(total)
+            }
         } else {
             updateCell(cell.value)
         }
+    }
+
+    // Check whether this value should be eligible for summing and/or the addition of commas
+    function valueSensible(value) {
+        value = '' + value
+
+        // Firstly, the value needs to comprise only have numbers, commas and spaces
+        // (optionally with leading/trailing whitespace)
+        if (!value.match(/^\s*[0-9, ]*\s*$/)) {
+            return false;
+        }
+
+        // Then the number (without all of the commas and spaces) needs to be a maximum of twelve digits long
+
+        // Anything above around 15 or 16 digits, javascript seems to start rounding the numbers, and toLocaleString
+        // used in addComma doesn't seem to be able to handle more than 12 digits
+        const numberValue = value.replaceAll(/\s|,/g, '')
+        return numberValue.length >= 0 && numberValue.length <= 12
     }
 }
 
