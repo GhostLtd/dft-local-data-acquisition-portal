@@ -31,10 +31,6 @@ crsts_fund_return:
     not_null: Choose the overall delivery confidence rating
   progress_summary:
     not_blank: Enter a progress summary
-  rag_progress_summary:
-    not_null: Enter the quarterly progress summary
-  rag_progress_rating:
-    not_null: Choose the quarterly rating
   resource_funding:
     not_blank: Enter the Resource funding
 

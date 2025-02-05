@@ -291,7 +291,7 @@ forms:
         help: Please provide a current breakdown of local contribution achieved, by source.
       resource_funding:
         label: &fr_resource_funding Resource (RDEL) funding
-        help: Please see Appendix A (?!)
+        help: Provide a breakdown of spend
     overall_funding:
       agreed_funding:
         label: &sr_agreed_funding Agreed funding
@@ -321,11 +321,6 @@ forms:
         help: ''
       scheme_identifier:
         label: &sr_scheme_identifier Scheme ID
-    quarterly_progress:
-      progress_summary:
-        label: &fr_quarterly_progress Quarterly progress
-      progress_rating:
-        label: &fr_quarterly_progress_rating Quarterly rating
   scheme:
     milestone_dates:
       start_development:
@@ -437,7 +432,6 @@ frontend:
         fund_details: Fund details
         local_and_rdel: Funding
         overall_progress: Overall progress
-        quarterly_progress: Quarterly progress
         schemes: Schemes
       comments: *fr_comments
       lead_contact: Lead contact
@@ -445,8 +439,6 @@ frontend:
       overall_confidence: Confidence rating
       overall_delivery_confidence: Delivery confidence
       overall_progress_summary: Progress summary
-      quarterly_progress: Progress summary
-      quarterly_progress_rating: Confidence rating
       resource_funding: *fr_resource_funding
       sign_off: Sign off
     fund_return_status:
@@ -501,7 +493,6 @@ maintenance-warning:
 sections:
   fund:
     overall_progress: Overall summary and delivery confidence
-    quarterly_progress: Quarterly progress
     local_and_rdel: Local contribution and RDEL funding
     comments: Comments
   scheme:

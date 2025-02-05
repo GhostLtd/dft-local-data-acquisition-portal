@@ -38,14 +38,6 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     private ?Rating $overallConfidence = null; // 1top_info: Overall confidence
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[NotNull(message: 'crsts_fund_return.rag_progress_summary.not_null', groups: ["quarterly_progress"])]
-    private ?string $ragProgressSummary = null; // 1top_info: RAG progress this quarter - commentary
-
-    #[ORM\Column(nullable: true, enumType: Rating::class)]
-    #[NotNull(message: 'crsts_fund_return.rag_progress_rating.not_null', groups: ["quarterly_progress"])]
-    private ?Rating $ragProgressRating = null; // 1top_info: RAG progress this quarter
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[NotBlank(message: 'crsts_fund_return.local_contribution.not_blank', groups: ["local_and_rdel"])]
     private ?string $localContribution = null; // 2top_exp: Local contribution.  Please provide a current breakdown of local contribution achieved, by source.
 
@@ -98,28 +90,6 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     public function setOverallConfidence(?Rating $overallConfidence): static
     {
         $this->overallConfidence = $overallConfidence;
-        return $this;
-    }
-
-    public function getRagProgressSummary(): ?string
-    {
-        return $this->ragProgressSummary;
-    }
-
-    public function setRagProgressSummary(?string $ragProgressSummary): static
-    {
-        $this->ragProgressSummary = $ragProgressSummary;
-        return $this;
-    }
-
-    public function getRagProgressRating(): ?Rating
-    {
-        return $this->ragProgressRating;
-    }
-
-    public function setRagProgressRating(?Rating $ragProgressRating): static
-    {
-        $this->ragProgressRating = $ragProgressRating;
         return $this;
     }
 

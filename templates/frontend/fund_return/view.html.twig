@@ -44,21 +44,6 @@
         }]) -%}
     {%- endif -%}
 
-    {%- if is_granted('CAN_VIEW', {subject: fundReturn, section: 'quarterly_progress'}) -%}
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- ratingTag('frontend.pages.fund_return.quarterly_progress_rating', fundReturn.ragProgressRating) -}}
-            {{- text('frontend.pages.fund_return.quarterly_progress', fundReturn.ragProgressSummary) -}}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
-
-        {%- set configs = configs|merge([{
-            title: 'frontend.pages.fund_return.titles.quarterly_progress' | trans,
-            section: 'quarterly_progress',
-            contents,
-        }]) -%}
-    {%- endif -%}
-
     {%- if is_granted('CAN_VIEW', {subject: fundReturn, section: 'local_and_rdel'}) -%}
         {%- set contents -%}
             {{- summaryListStart() -}}
