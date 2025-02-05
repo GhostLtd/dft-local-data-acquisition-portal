@@ -245,7 +245,7 @@ class RandomFixtureGenerator
         return new CrstsSchemeFundDefinition(
             $this->faker->boolean(),
             $this->faker->boolean(),
-            $this->faker->randomElement(FundedMostlyAs::class),
+            FundedMostlyAs::CDEL,
             $bcrType,
             $bcrValue,
         );

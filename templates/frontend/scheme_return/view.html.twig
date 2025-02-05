@@ -5,7 +5,7 @@
 
 {%- block content -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-    {%- from "frontend/macros.html.twig" import displayCardsForReturn, displaySectionsAsTabs, bcr, date, enumText, money, ratingTag, text, yesOrNo -%}
+    {%- from "frontend/macros.html.twig" import displayCardsForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo -%}
 
     {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
 
@@ -19,7 +19,6 @@
             {{- summaryListStart() -}}
             {{- text('frontend.pages.scheme_return.scheme_id', schemeReturn.schemeFund.scheme.schemeIdentifier) -}}
             {{- text('frontend.pages.scheme_return.description', schemeReturn.schemeFund.scheme.description) -}}
-            {{- enumText('frontend.pages.scheme_return.funded_mostly_as', "enum.funded_mostly_as", schemeReturn.schemeFund.fundedMostlyAs) -}}
             {{- yesOrNo('frontend.pages.scheme_return.previously_tcf', schemeReturn.schemeFund.previouslyTcf) -}}
             {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.schemeFund.benefitCostRatio) }}
             {{- summaryListEnd() -}}
@@ -90,7 +89,7 @@
     {%- if is_granted('CAN_VIEW', {subject: schemeReturn, section: 'milestone_progress'}) -%}
         {%- set contents -%}
             {{- summaryListStart() -}}
-            {{- ratingTag('frontend.pages.scheme_return.on_track_rating', schemeReturn.onTrackRating) }}
+            {{- onTrackRating('frontend.pages.scheme_return.on_track_rating', schemeReturn.onTrackRating) }}
             {{- text('frontend.pages.scheme_return.progress_update', schemeReturn.progressUpdate) }}
             {{- summaryListEnd() -}}
         {%- endset -%}

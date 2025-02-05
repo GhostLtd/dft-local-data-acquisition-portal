@@ -158,6 +158,12 @@
     {{- _self.displaySummaryListRow(label, (value ?? '-') | nl2br, options) -}}
 {% endmacro %}
 
+{% macro onTrackRating(label, ratingEnum, options) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tag -%}
+    {%- set value = ratingEnum is null ? '-' : tag({text: "enum.on_track_rating.#{ratingEnum.value}" | trans, classes: ratingEnum.tagClass}) -%}
+    {{- _self.displaySummaryListRow(label, value, options) -}}
+{% endmacro %}
+
 {% macro ratingTag(label, ratingEnum, options) %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tag -%}
     {%- set value = ratingEnum is null ? '-' : tag({text: "enum.rating.#{ratingEnum.value}" | trans, classes: ratingEnum.tagClass}) -%}

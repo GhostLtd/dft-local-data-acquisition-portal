@@ -18,7 +18,7 @@ class CrstsSchemeFund extends SchemeFund
 
     #[ORM\Column(nullable: true, enumType: FundedMostlyAs::class)]
     #[NotNull(message: 'crsts_scheme_fund.funded_mostly_as.not_null', groups: ["scheme_details"])]
-    private ?FundedMostlyAs $fundedMostlyAs = null; // 1proj_info: CDEL or RDEL
+    private ?FundedMostlyAs $fundedMostlyAs = FundedMostlyAs::CDEL; // 1proj_info: CDEL or RDEL
 
     #[ORM\Column(nullable: true)]
     #[NotNull(message: 'crsts_scheme_fund.previously_tcf.not_null', groups: ["scheme_details"])]

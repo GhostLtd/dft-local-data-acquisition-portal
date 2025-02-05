@@ -43,15 +43,6 @@ class SchemeDetailsType extends AbstractType
                 'label' => false,
                 'property_path' => 'schemeFund.benefitCostRatio',
             ])
-            ->add('fundedMostlyAs', ChoiceType::class, [
-                'label' => 'forms.crsts.scheme_details.funded_mostly_as.label',
-                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'help' => 'forms.crsts.scheme_details.funded_mostly_as.help',
-                'choices' => FundedMostlyAs::cases(),
-                'choice_label' => fn(FundedMostlyAs $choice) => "enum.funded_mostly_as.{$choice->value}",
-                'choice_value' => fn(?FundedMostlyAs $choice) => $choice?->value,
-                'property_path' => 'schemeFund.fundedMostlyAs',
-            ])
         ;
     }
 

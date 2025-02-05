@@ -306,9 +306,6 @@ forms:
         label: &sr_benefit_cost_ratio Benefit-cost ratio
       description:
         label: &sr_scheme_description Scheme description
-      funded_mostly_as:
-        label: &sr_mostly_funded_as Funding type
-        help: Select which type of funding is used more
       name:
         label: Scheme name
       previously_tcf:
@@ -468,7 +465,6 @@ frontend:
       current_business_case: *sr_current_business_case
       description: *sr_scheme_description
       expected_business_case_approval: *sr_expected_business_case_approval
-      funded_mostly_as: *sr_mostly_funded_as
       has_active_travel_elements: Active travel elements?
       includes_charging_points: Charging points for EVs?
       includes_clean_air_elements: Clean air elements?
