@@ -14,6 +14,7 @@ class SchemeDefinition
     public function __construct(
         protected string               $name,
         protected string               $description,
+        protected string               $risks,
         protected ?TransportMode       $transportMode = null,
         protected ?ActiveTravelElement $activeTravelElement = null,
         protected ?bool                $includesCleanAirElements = null,
@@ -30,6 +31,11 @@ class SchemeDefinition
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    public function getRisks(): string
+    {
+        return $this->risks;
     }
 
     public function getTransportMode(): ?TransportMode

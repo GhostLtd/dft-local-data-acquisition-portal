@@ -305,10 +305,15 @@ forms:
         label: &sr_benefit_cost_ratio Benefit-cost ratio
       description:
         label: &sr_scheme_description Scheme description
+        help: ''
       name:
         label: Scheme name
+        help: ''
       previously_tcf:
         label: &sr_previously_tcf Was this previously a scheme in Transporting Cities Fund (TCF)?
+        help: ''
+      risks:
+        label: &sr_scheme_risks Scheme risks
         help: ''
       scheme_identifier:
         label: &sr_scheme_identifier Scheme ID
@@ -470,6 +475,7 @@ frontend:
       on_track_rating: *sr_on_track_rating
       previously_tcf: Previously a scheme in TCF?
       progress_update: *sr_progress_update
+      risks: *sr_scheme_risks
       scheme_id: *sr_scheme_identifier
       total_cost: *sr_total_cost
       transport_mode: *sr_transport_mode

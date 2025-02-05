@@ -152,6 +152,7 @@ class FixtureHelper
         $scheme = (new Scheme())
             ->setName($definition->getName())
             ->setDescription($definition->getDescription())
+            ->setRisks($definition->getRisks())
             ->setSchemeIdentifier($definition->getSchemeIdentifier())
             ->setActiveTravelElement($definition->getActiveTravelElement())
             ->setIncludesChargingPoints($definition->getIncludesChargingPoints())

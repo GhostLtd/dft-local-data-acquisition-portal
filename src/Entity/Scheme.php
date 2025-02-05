@@ -32,6 +32,10 @@ class Scheme
     #[NotBlank(message: 'scheme.description.not_blank', groups: ["scheme_details"])]
     private ?string $description = null; // 1proj_info: Scheme description
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[NotBlank(message: 'scheme.description.not_blank', groups: ["scheme_details"])]
+    private ?string $risks = null; // josh_4/2: Scheme level risks
+
     #[ORM\Column(nullable: true, enumType: TransportMode::class)]
     #[NotNull(message: 'scheme.transport_mode.not_null', groups: ["scheme_transport_mode"])]
     private ?TransportMode $transportMode = null; // 1proj_info: Transport mode
@@ -93,6 +97,17 @@ class Scheme
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+        return $this;
+    }
+
+    public function getRisks(): ?string
+    {
+        return $this->risks;
+    }
+
+    public function setRisks(?string $risks): static
+    {
+        $this->risks = $risks;
         return $this;
     }
 

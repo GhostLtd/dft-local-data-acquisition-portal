@@ -21,12 +21,20 @@ class SchemeDetailsType extends AbstractType
             ->add('name', InputType::class, [
                 'label' => 'forms.crsts.scheme_details.name.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
+                'help' => 'forms.crsts.scheme_details.name.help',
                 'property_path' => 'schemeFund.scheme.name',
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'forms.crsts.scheme_details.description.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
+                'help' => 'forms.crsts.scheme_details.description.help',
                 'property_path' => 'schemeFund.scheme.description',
+            ])
+            ->add('risks', TextareaType::class, [
+                'label' => 'forms.crsts.scheme_details.risks.label',
+                'label_attr' => ['class' => 'govuk-label--s'],
+                'help' => 'forms.crsts.scheme_details.risks.help',
+                'property_path' => 'schemeFund.scheme.risks',
             ])
             ->add('schemeIdentifier', InputType::class, [
                 'label' => 'forms.crsts.scheme_details.scheme_identifier.label',

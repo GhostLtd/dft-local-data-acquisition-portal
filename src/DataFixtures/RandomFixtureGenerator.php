@@ -226,6 +226,7 @@ class RandomFixtureGenerator
         return new SchemeDefinition(
             $this->faker->scheme_name(),
             $this->faker->text(),
+            $this->faker->text(),
             $this->faker->randomElement(TransportMode::cases()),
             $this->faker->randomElement(ActiveTravelElement::cases()),
             $this->faker->boolean(),

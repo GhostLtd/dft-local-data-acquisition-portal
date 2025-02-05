@@ -19,6 +19,7 @@
             {{- summaryListStart() -}}
             {{- text('frontend.pages.scheme_return.scheme_id', schemeReturn.schemeFund.scheme.schemeIdentifier) -}}
             {{- text('frontend.pages.scheme_return.description', schemeReturn.schemeFund.scheme.description) -}}
+            {{- text('frontend.pages.scheme_return.risks', schemeReturn.schemeFund.scheme.risks) -}}
             {{- yesOrNo('frontend.pages.scheme_return.previously_tcf', schemeReturn.schemeFund.previouslyTcf) -}}
             {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.schemeFund.benefitCostRatio) }}
             {{- summaryListEnd() -}}
