@@ -7,7 +7,7 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
-use App\Entity\SchemeReturn\CrstsSchemeReturn;
+use App\Entity\ReturnExpenseCommentsTrait;
 use App\Utility\CrstsHelper;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
 use App\Validator\ExpensesValidator;
@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 {
+    use ReturnExpenseCommentsTrait;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[NotBlank(message: 'crsts_fund_return.progress_summary.not_blank', groups: ["overall_progress"])]
     private ?string $progressSummary = null; // 1top_info: Programme level progress summary

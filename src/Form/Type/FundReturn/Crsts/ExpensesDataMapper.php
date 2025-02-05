@@ -38,8 +38,8 @@ class ExpensesDataMapper implements DataMapperInterface
 
         $collection = $viewData->getExpenses();
 
+        $divKey = $this->tableHelper->getDivisionConfiguration()->getKey();
         foreach($collection as $expense) {
-            $divKey = $expense->getDivision();
             $expenseValue = $expense->getType()->value;
 
             $key = "expense__{$divKey}__{$expenseValue}__{$expense->getColumn()}";
@@ -48,6 +48,8 @@ class ExpensesDataMapper implements DataMapperInterface
                 $forms[$key]->setData($expense->getValue());
             }
         }
+
+        $forms['comments']->setData($viewData->getExpenseDivisionComment($divKey));
     }
 
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
@@ -117,6 +119,8 @@ class ExpensesDataMapper implements DataMapperInterface
                 $viewData->removeExpense($expense);
             }
         }
+
+        $viewData->setExpenseDivisionComment($divKey, $forms['comments']->getData());
     }
 
     protected function findExpenseEntry(ExpensesContainerInterface $viewData, string $divKey, string $column, ExpenseType $expenseType): ?ExpenseEntry

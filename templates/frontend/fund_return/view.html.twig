@@ -104,14 +104,21 @@
             {%- set divisionConfiguration = fundReturn.findDivisionConfigurationByKey(division.key) -%}
             {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
             {%- set contents -%}
-                {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), fundReturn) -%}
-                {{- renderTable(table) -}}
-                {%- set can_edit = is_granted('CAN_EDIT', {subject: fundReturn, section: division.key}) -%}
-                {%- if can_edit -%}
+                {%- if is_granted('CAN_EDIT', {subject: fundReturn, section: division.key}) -%}
                     {%- set url = section_edit_path(fundReturn, division.key, true) -%}
                     <div class="expenses-links">
                         <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
                     </div>
+                {%- endif -%}
+                {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), fundReturn) -%}
+                {{- renderTable(table) -}}
+                {%- if (fundReturn.expenseDivisionComment(division.key)) ?? false -%}
+                    {{ summaryListStart({classes: 'govuk-summary-list--no-border govuk-!-margin-top-6 expense-comments'}) }}
+                    {{ summaryListRow({
+                        key: 'forms.crsts.expenses.comments.title' | trans,
+                        value: fundReturn.expenseDivisionComment(division.key) | nl2br}
+                    ) }}
+                    {{ summaryListEnd() }}
                 {%- endif -%}
             {%- endset -%}
             {%- set sections = sections|merge([{

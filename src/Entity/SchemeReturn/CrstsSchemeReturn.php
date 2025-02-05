@@ -9,6 +9,7 @@ use App\Entity\Enum\OnTrackRating;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
 use App\Entity\Milestone;
+use App\Entity\ReturnExpenseCommentsTrait;
 use App\Entity\SchemeFund\CrstsSchemeFund;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Repository\Return\CrstsSchemeReturnRepository;
@@ -29,6 +30,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterface
 {
+    use ReturnExpenseCommentsTrait;
+
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
     #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
     #[NotBlank(message: 'crsts_scheme_return.total_cost.not_blank', groups: ["overall_funding"])]

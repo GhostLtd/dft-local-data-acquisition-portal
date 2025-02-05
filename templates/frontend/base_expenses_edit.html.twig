@@ -5,9 +5,13 @@
 {%- block content -%}
     {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
     {%- from "frontend/macros.html.twig" import renderTable -%}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import details %}
 
     {# See App\Utility\ExpensesTableHelper #}
     {{- form_start(form) -}}
     {{- renderTable(expensesTable, form) }}
+    {%- if form.comments ?? false -%}
+        {{ details({summaryText: 'forms.crsts.expenses.comments.title' | trans, html: form_row(form.comments), open: form.comments.vars.value is not empty}) }}
+    {%- endif -%}
     {{- form_end(form) -}}
 {%- endblock -%}

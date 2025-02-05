@@ -7,6 +7,7 @@ use App\Entity\ExpensesContainerInterface;
 use App\Form\Type\ReturnBaseType;
 use App\Utility\ExpensesTableHelper;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
+use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -26,7 +27,7 @@ class ExpensesType extends AbstractType
         $builder->setDataMapper($this->expensesDataMapper);
 
         foreach($tableHelper->getAllCells() as $cell) {
-            $options = $cell->getOptions();
+            $cellOptions = $cell->getOptions();
 
             $rowsToSum = $cell->getAttribute('total_rows_to_sum');
             if (is_array($rowsToSum)) {
@@ -40,13 +41,20 @@ class ExpensesType extends AbstractType
                 'data-total-sum-entire-row' => $cell->getAttribute('is_row_total') ? '1' : null,
             ], fn(mixed $value): bool => $value !== null);
 
-            $builder->add($options['key'], InputType::class, [
-                'label' => $options['text'],
-                'disabled' => $options['disabled'] ?? null,
+            $builder->add($cellOptions['key'], InputType::class, [
+                'label' => $cellOptions['text'],
+                'disabled' => $cellOptions['disabled'] ?? null,
                 'label_attr' => ['class' => 'govuk-visually-hidden'],
                 'attr' => $attributes,
             ]);
         }
+
+        $builder->add('comments', TextareaType::class, [
+            'label' => "forms.crsts.expenses.comments.label",
+            'label_attr' => ['class' => 'govuk-visually-hidden'],
+            'help' => "forms.crsts.expenses.comments.help",
+            'attr' => ['class' => 'govuk-!-margin-bottom-0'],
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

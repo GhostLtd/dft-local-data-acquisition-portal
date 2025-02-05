@@ -254,6 +254,10 @@ forms:
           other {Actual}
         }
       cell_title: "{group} {row} {column}"
+      comments:
+        title: 'Comments'
+        label: 'Comments'
+        help: 'Only provide important information'
       division_post_title: Post-{startYear}/{endYear}
       forecast: |-
         Forecast
