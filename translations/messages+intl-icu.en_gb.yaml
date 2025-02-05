@@ -461,6 +461,7 @@ frontend:
         milestone_progress: Progress
         overall_funding: Overall funding
         scheme_details: Scheme details
+        status: Status
         transport_mode: Transport mode
         scheme_elements: Scheme elements
       agreed_funding: *sr_agreed_funding
@@ -475,6 +476,7 @@ frontend:
       on_track_rating: *sr_on_track_rating
       previously_tcf: Previously a scheme in TCF?
       progress_update: *sr_progress_update
+      retained: Is retained?
       risks: *sr_scheme_risks
       scheme_id: *sr_scheme_identifier
       total_cost: *sr_total_cost

@@ -12,7 +12,21 @@
     {# @var schemeReturn \App\Entity\SchemeReturn\CrstsSchemeReturn #}
 
     {%- set baseOptions = {return: schemeReturn, is_expense: false} -%}
-    {%- set configs = [] -%}
+
+    {%- set contents -%}
+        {{- summaryListStart() -}}
+        {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.schemeFund.retained) }}
+        {{- summaryListEnd() -}}
+    {%- endset %}
+
+    {%- set configs = [
+        {
+            title: 'frontend.pages.scheme_return.titles.status' | trans,
+            section: 'status',
+            contents,
+            options: {add_edit_link: false},
+        }
+    ] -%}
 
     {%- if is_granted('CAN_VIEW', {subject: schemeReturn, section: 'scheme_details'}) -%}
         {%- set contents -%}
