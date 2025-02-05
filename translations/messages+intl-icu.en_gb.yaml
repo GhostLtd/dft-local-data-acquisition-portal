@@ -127,11 +127,10 @@ enum:
     amber: Amber
     amber_red: Amber / Red
     red: Red
-    scheme_completed: Scheme completed
-    scheme_on_hold: Scheme on hold
-    scheme_completed_late: Scheme completed late
     scheme_cancelled: Scheme cancelled
-    not_applicable: N/A
+    scheme_completed: Scheme completed
+    scheme_merged: Scheme merged
+    scheme_split: Scheme split
   rating:
     green: Green
     green_amber: Green / Amber
