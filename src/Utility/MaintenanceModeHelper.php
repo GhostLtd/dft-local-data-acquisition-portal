@@ -13,7 +13,7 @@ use Symfony\Contracts\Cache\ItemInterface;
 class MaintenanceModeHelper
 {
     public const string MAINTENANCE_INFO_CACHE_KEY = 'app.maintenance_mode_info';
-    public const int MAINTENANCE_INFO_CACHE_EXPIRY = 3600;
+    public const int MAINTENANCE_INFO_CACHE_EXPIRY = 300;
 
     /** @var array<string> */
     public const array ROUTE_WHITELIST = [

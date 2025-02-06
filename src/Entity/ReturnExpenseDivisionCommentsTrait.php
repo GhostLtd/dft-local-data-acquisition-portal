@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-trait ReturnExpenseCommentsTrait
+trait ReturnExpenseDivisionCommentsTrait
 {
     /**
      * @var array<string>
@@ -13,7 +13,7 @@ trait ReturnExpenseCommentsTrait
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $expenseDivisionComments = [];
 
-    public function setExpenseDivisionComment(string $divKey, string $comment): static
+    public function setExpenseDivisionComment(string $divKey, ?string $comment): static
     {
         if (empty($comment)) {
             unset($this->expenseDivisionComments[$divKey]);

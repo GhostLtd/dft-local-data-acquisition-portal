@@ -18,13 +18,15 @@ framework:
         #pools:
             #my.dedicated.cache: null
 
-        pools:
-            cache.chained.fs_dbal:
-                adapters:
-                    - cache.adapter.filesystem
-                    - cache.adapter.doctrine_dbal
+#        pools:
+#            cache.chained.fs_dbal:
+#                adapters:
+#                    - cache.adapter.filesystem
+#                    - cache.adapter.doctrine_dbal
 
-        app: cache.chained.fs_dbal
+## This caused issues with maintenance mode. Result was cached in FS and DB. was able to manually
+## invalidate DB cache, but not FS cache on AppEngine instance.
+#        app: cache.chained.fs_dbal
 
 
 services:
