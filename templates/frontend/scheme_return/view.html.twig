@@ -5,7 +5,7 @@
 
 {%- block content -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-    {%- from "frontend/macros.html.twig" import displayCardsForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo -%}
+    {%- from "frontend/macros.html.twig" import displayCardsForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
 
     {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
 
@@ -165,14 +165,14 @@
             {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
             {%- set contents -%}
                 {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
-                {{- renderTable(table) -}}
-                {%- set can_edit = is_granted('CAN_EDIT', {subject: schemeReturn, section: division.key}) -%}
-                {%- if can_edit -%}
+                {%- if is_granted('CAN_EDIT', {subject: schemeReturn, section: division.key}) -%}
                     {%- set url = section_edit_path(schemeReturn, division.key, true) -%}
                     <div class="expenses-links">
                         <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
                     </div>
                 {%- endif -%}
+                {{- renderTable(table) -}}
+                {{- expenseDivisionComments(schemeReturn, division) -}}
             {%- endset -%}
             {%- set sections = sections|merge([{
                 label: division.label | trans,

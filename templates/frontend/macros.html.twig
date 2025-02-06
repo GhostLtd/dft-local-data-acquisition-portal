@@ -181,3 +181,15 @@
         value,
     }, anyRowHasActions) -}}
 {% endmacro %}
+
+{% macro expenseDivisionComments(return, division) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListRow, summaryListEnd -%}
+    {%- if (return.expenseDivisionComment(division.key)) ?? false -%}
+        {{ summaryListStart({classes: 'govuk-summary-list--no-border govuk-!-margin-top-6 expense-comments'}) }}
+        {{ summaryListRow({
+            key: 'forms.crsts.expenses.comments.title' | trans,
+            value: return.expenseDivisionComment(division.key) | nl2br}
+        ) }}
+        {{ summaryListEnd() }}
+    {%- endif -%}
+{% endmacro %}
