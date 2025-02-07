@@ -3,13 +3,6 @@
 namespace App\Tests\Security\Voter;
 
 use App\Entity\Enum\Permission;
-use App\Entity\Enum\Role;
-use App\Entity\FundReturn\CrstsFundReturn;
-use App\Entity\FundReturn\FundReturn;
-use App\Entity\Scheme;
-use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Entity\SchemeReturn\SchemeReturn;
-use App\Entity\Authority;
 use App\Entity\User;
 use App\Entity\UserPermission;
 use App\Tests\AbstractFunctionalTest;
@@ -21,10 +14,10 @@ use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 abstract class AbstractPermissionVoterTest extends AbstractFunctionalTest
 {
-    protected AuthorizationCheckerInterface $authorizationChecker;
     protected AbstractDatabaseTool $databaseTool;
 
     protected EntityManagerInterface $entityManager;
@@ -35,7 +28,6 @@ abstract class AbstractPermissionVoterTest extends AbstractFunctionalTest
     public function setUp(): void
     {
         parent::setUp();
-        $this->authorizationChecker = $this->getFromContainer(AuthorizationCheckerInterface::class, AuthorizationCheckerInterface::class);
         $this->databaseTool = $this->getFromContainer(DatabaseToolCollection::class, DatabaseToolCollection::class)->get();
         $this->tokenStorage = $this->getFromContainer('security.token_storage', TokenStorageInterface::class);
         $this->entityManager = $this->getFromContainer(EntityManagerInterface::class, EntityManagerInterface::class);
@@ -45,21 +37,16 @@ abstract class AbstractPermissionVoterTest extends AbstractFunctionalTest
             ->getReferenceRepository();
     }
 
-    protected function createPermissionAndPerformTest(
-        string      $attribute,
-        ?Permission $permission,
-        ?string     $permissionEntityReferenceClass,
-        ?string     $permissionEntityClass,
-        ?string     $permissionEntityId,
-        ?array      $permissionFundTypes,
-        ?array      $permissionSectionTypes,
-
-        bool        $expectedResult,
-        string      $userRef,
-        string      $subjectClass,
-        string      $subjectRef,
-        ?string $subjectSectionType
-    ): void
+    /**
+     * @param Permission|null $permission
+     * @param string|null $permissionEntityId
+     * @param string|null $permissionEntityReferenceClass
+     * @param string $userRef
+     * @param string|null $permissionEntityClass
+     * @param array|null $permissionFundTypes
+     * @return void
+     */
+    public function createPermission(?Permission $permission, ?string $permissionEntityId, ?string $permissionEntityReferenceClass, string $userRef, ?string $permissionEntityClass, ?array $permissionFundTypes): void
     {
         if ($permission) {
             $permissionEntityUlid = $this->referenceRepository->getReference($permissionEntityId, $permissionEntityReferenceClass)->getId();
@@ -69,37 +56,55 @@ abstract class AbstractPermissionVoterTest extends AbstractFunctionalTest
                 ->setPermission($permission)
                 ->setEntityClass($permissionEntityClass)
                 ->setEntityId($permissionEntityUlid)
-                ->setFundTypes($permissionFundTypes)
-                ->setSectionTypes($permissionSectionTypes);
+                ->setFundTypes($permissionFundTypes);
 
             $this->entityManager->persist($userPermission);
             $this->entityManager->flush();
         }
-
-        $this->performTest($attribute, $expectedResult, $userRef, $subjectClass, $subjectRef, $subjectSectionType);
     }
 
-    protected function performTest(
-        string  $attribute,
-        bool    $expectedResult,
-        string  $userRef,
-        string  $subjectClass,
-        string  $subjectRef,
-        ?string $subjectSectionType
+    protected function createPermissionAndPerformTestOnSpecificVoter(
+        VoterInterface $voter,
+        string         $attribute,
+        ?Permission    $permission,
+        ?string        $permissionEntityReferenceClass,
+        ?string        $permissionEntityClass,
+        ?string        $permissionEntityId,
+        ?array         $permissionFundTypes,
+
+        bool           $expectedResult,
+        string         $userRef,
+        string         $subjectClass,
+        string         $subjectRef,
+    ): void
+    {
+        $this->createPermission($permission, $permissionEntityId, $permissionEntityReferenceClass, $userRef, $permissionEntityClass, $permissionFundTypes);
+        $this->performTestOnSpecificVoter($voter, $attribute, $expectedResult, $userRef, $subjectClass, $subjectRef);
+    }
+
+    protected function performTestOnSpecificVoter(
+        VoterInterface $voter,
+        string         $attribute,
+        bool           $expectedVoterResults,
+        string         $userRef,
+        string         $subjectClass,
+        string         $subjectRef,
     ): void
     {
         $user = $this->referenceRepository->getReference($userRef, User::class);
         $subject = $this->referenceRepository->getReference($subjectRef, $subjectClass);
 
-        if ($subjectSectionType) {
-            $subject = ['subject' => $subject, 'section' => $subjectSectionType];
-        }
-
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUser')->willReturn($user);
         $this->tokenStorage->setToken($token);
 
-        $actualResult = $this->authorizationChecker->isGranted($attribute, $subject);
-        $this->assertEquals($expectedResult, $actualResult);
+        $actualResult = $voter->vote($token, $subject, [$attribute]);
+
+        $expectedVoterResults = match($expectedVoterResults) {
+            false => [VoterInterface::ACCESS_DENIED, VoterInterface::ACCESS_ABSTAIN],
+            true => [VoterInterface::ACCESS_GRANTED],
+        };
+
+        $this->assertContains($actualResult, $expectedVoterResults);
     }
 }

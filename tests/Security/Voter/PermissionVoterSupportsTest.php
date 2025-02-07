@@ -2,7 +2,7 @@
 
 namespace App\Tests\Security\Voter;
 
-use App\Entity\Enum\Role;
+use App\Entity\Enum\InternalRole;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Scheme;
@@ -26,30 +26,26 @@ class PermissionVoterSupportsTest extends AbstractFunctionalTest
 
     public function dataSupports(): array {
         $testCases = [
-            [Role::CAN_SUBMIT, new CrstsFundReturn(), true],
-            [Role::CAN_SUBMIT, ['subject' => new CrstsFundReturn(), 'section' => 'section_one'], false], // Can't submit sections
-            [Role::CAN_SUBMIT, new CrstsSchemeReturn(), false], // Can only submit fund returns
+            [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new CrstsFundReturn(), true],
+            [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new CrstsSchemeReturn(), false], // Can only submit fund returns
+            [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new Authority(), false],
 
-            [Role::CAN_COMPLETE, new CrstsFundReturn(), false],
-            [Role::CAN_COMPLETE, ['subject' => new CrstsFundReturn(), 'section' => 'section_one'], true],
-            [Role::CAN_COMPLETE, new CrstsSchemeReturn(), false],
-            [Role::CAN_COMPLETE, ['subject' => new CrstsSchemeReturn(), 'section' => 'section_one'], true],
+            [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, new CrstsFundReturn(), false],
+            [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, new CrstsSchemeReturn(), true],
+            [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, new Authority(), false],
 
-            [Role::CAN_EDIT, new CrstsFundReturn(), false],
-            [Role::CAN_EDIT, ['subject' => new CrstsFundReturn(), 'section' => 'section_one'], true],
-            [Role::CAN_EDIT, new CrstsSchemeReturn(), false],
-            [Role::CAN_EDIT, ['subject' => new CrstsSchemeReturn(), 'section' => 'section_one'], true],
+            [InternalRole::HAS_VALID_EDIT_PERMISSION, new CrstsFundReturn(), true],
+            [InternalRole::HAS_VALID_EDIT_PERMISSION, new CrstsSchemeReturn(), true],
+            [InternalRole::HAS_VALID_EDIT_PERMISSION, new Authority(), false],
 
-            // This voter doesn't support this attribute!
-            [Role::CAN_VIEW, new CrstsFundReturn(), false],
-            [Role::CAN_VIEW, ['subject' => new CrstsFundReturn(), 'section' => 'section_one'], false],
-            [Role::CAN_VIEW, ['subject' => new CrstsSchemeReturn(), 'section' => 'section_one'], false],
+            // This voter doesn't support this attribute! (Handled by a different voter!)
+            [InternalRole::HAS_VALID_VIEW_PERMISSION, new CrstsFundReturn(), false],
         ];
 
         foreach([new Scheme(), new Authority(), new FundAward(), null] as $invalidSubject) {
-            $testCases[] = [Role::CAN_SUBMIT, $invalidSubject, false];
-            $testCases[] = [Role::CAN_COMPLETE, $invalidSubject, false];
-            $testCases[] = [Role::CAN_EDIT, $invalidSubject, false];
+            $testCases[] = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, $invalidSubject, false];
+            $testCases[] = [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, $invalidSubject, false];
+            $testCases[] = [InternalRole::HAS_VALID_EDIT_PERMISSION, $invalidSubject, false];
         }
 
         return $testCases;

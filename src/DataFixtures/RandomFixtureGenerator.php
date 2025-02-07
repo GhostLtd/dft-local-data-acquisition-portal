@@ -181,8 +181,6 @@ class RandomFixtureGenerator
                         $this->faker->text(),
                         $this->faker->randomElement(Rating::cases()),
                         $this->faker->text(),
-                        $this->faker->randomElement(Rating::cases()),
-                        $this->faker->text(),
                         $this->faker->text(),
                         $this->faker->text(),
                         $expenses,
@@ -275,6 +273,7 @@ class RandomFixtureGenerator
             $this->faker->randomElement(BusinessCase::cases()),
             $this->faker->dateTime(),
             $this->faker->text(),
+            $this->faker->boolean(20),
             $milestones,
             $expenses,
         );

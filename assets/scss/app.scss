@@ -1,4 +1,5 @@
 @import "@ghost/govuk-frontend-bundle/assets/scss/ghost-frontend";
+@import "@ghost/govuk-core-bundle/assets/scss/ghost-core";
 @import "govuk-frontend";
 
 @import 'expenses.scss';
@@ -11,4 +12,14 @@ section.govuk-service-navigation__wrapper-full-width {
 
 li.govuk-service-navigation__margin-left-auto {
   margin-left: auto;
+}
+
+.scheme-list {
+  .list-table--buttons {
+    justify-content: flex-end;
+  }
+
+  .govuk-table__cell:last-child {
+    text-align: right;
+  }
 }

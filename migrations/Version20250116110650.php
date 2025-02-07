@@ -45,8 +45,7 @@ SELECT
     {$null}         AS scheme_id,
     {$null}         AS scheme_return_id,
     {$null}         AS fund_return_id,
-    u.fund_types    AS fund_types,
-    u.section_types AS section_types
+    u.fund_types    AS fund_types
 FROM user_permission u
     JOIN authority ON authority.id = u.entity_id
 WHERE u.entity_class = 'App\Entity\Authority'
@@ -61,8 +60,7 @@ SELECT
     {$null}         AS scheme_id,
     {$null}         AS scheme_return_id,
     fund_return.id  AS fund_return_id,
-    u.fund_types    AS fund_types,
-    u.section_types AS section_types
+    u.fund_types    AS fund_types
 FROM user_permission u
     JOIN fund_return ON fund_return.id = u.entity_id
     JOIN fund_award ON fund_return.fund_award_id = fund_award.id
@@ -79,8 +77,7 @@ SELECT
     scheme.id         AS scheme_id,
     scheme_return.id  AS scheme_return_id,
     fund_return.id    AS fund_return_id,
-    u.fund_types      AS fund_types,
-    u.section_types   AS section_types
+    u.fund_types      AS fund_types
 FROM user_permission u
     JOIN scheme_return ON scheme_return.id = u.entity_id
     JOIN fund_return ON scheme_return.fund_return_id = fund_return.id
@@ -99,8 +96,7 @@ SELECT
     scheme.id       AS scheme_id,
     {$null}         AS scheme_return_id,
     {$null}         AS fund_return_id,
-    u.fund_types    AS fund_types,
-    u.section_types AS section_types
+    u.fund_types    AS fund_types
 FROM user_permission u
     JOIN scheme ON scheme.id = u.entity_id
     JOIN authority ON scheme.authority_id = authority.id

@@ -2,7 +2,7 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Enum\Role;
+use App\Entity\Enum\InternalRole;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\PermissionsView;
 use App\Entity\Scheme;
@@ -27,11 +27,11 @@ class ViewPermissionVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if ($attribute !== Role::CAN_VIEW) {
+        if ($attribute !== InternalRole::HAS_VALID_VIEW_PERMISSION) {
             return false;
         }
 
-        return $this->subjectResolver->isValidSubjectForRole($subject, Role::CAN_VIEW);
+        return $this->subjectResolver->isValidSubjectForInternalRole($subject, InternalRole::HAS_VALID_VIEW_PERMISSION);
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -42,7 +42,7 @@ class ViewPermissionVoter extends Voter
             return false;
         }
 
-        $resolvedSubject = $this->subjectResolver->resolveSubjectForRole($subject, Role::CAN_VIEW);
+        $resolvedSubject = $this->subjectResolver->resolveSubjectForRole($subject, InternalRole::HAS_VALID_VIEW_PERMISSION);
 
         if ($user === $resolvedSubject->getAdmin()) {
             // dump("{$baseEntityClass} {$subject->getId()} - Found a match - is admin");
@@ -53,7 +53,6 @@ class ViewPermissionVoter extends Voter
 
         $idMap = $resolvedSubject->getIdMap();
         $subjectBaseClass = $resolvedSubject->getBaseClass();
-        $subjectSection = $resolvedSubject->getSection();
 
         $permissionClassChain = match ($subjectBaseClass) {
             Authority::class => [Authority::class],
@@ -64,28 +63,6 @@ class ViewPermissionVoter extends Voter
 
         foreach($permissionViews as $permissionView) {
             $match = true;
-
-            $permissionSectionTypes = $permissionView->getSectionTypes();
-            $permissionEntityClass = $permissionView->getEntityClass();
-
-            if (!empty($permissionSectionTypes)) {
-                if (
-                    $permissionEntityClass === $subjectBaseClass &&
-                    $subjectSection !== null &&
-                    !in_array($subjectSection, $permissionSectionTypes)
-                ) {
-                    // Section type doesn't match. Skip
-                    continue;
-                }
-
-                if (
-                    $subjectSection !== null &&
-                    $permissionEntityClass === FundReturn::class &&
-                    $subjectBaseClass === SchemeReturn::class
-                ) {
-                    continue;
-                }
-            }
 
             foreach($permissionClassChain as $class) {
                 $permissionEntityId = match ($class) {
@@ -100,16 +77,6 @@ class ViewPermissionVoter extends Voter
                 if ($permissionEntityId && $keyId && !$keyId->equals($permissionEntityId)) {
                     $match = false;
                     break;
-                }
-
-                if ($resolvedSubject->getSection() !== null) {
-                    // A Scheme/SchemeReturn permission only gives access to Scheme/SchemeReturn sections
-                    if (in_array($permissionView->getEntityClass(), [Scheme::class, SchemeReturn::class])) {
-                        if (!in_array($subjectBaseClass, [Scheme::class, SchemeReturn::class])) {
-                            $match = false;
-                            break;
-                        }
-                    }
                 }
             }
 

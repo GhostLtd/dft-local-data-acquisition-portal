@@ -28,50 +28,44 @@
         options: {add_edit_link: false},
     }]) -%}
 
-    {%- if is_granted('CAN_VIEW', {subject: fundReturn, section: 'overall_progress'}) -%}
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- ratingTag('frontend.pages.fund_return.overall_confidence', fundReturn.overallConfidence) -}}
-            {{- text('frontend.pages.fund_return.overall_progress_summary', fundReturn.progressSummary) -}}
-            {{- text('frontend.pages.fund_return.overall_delivery_confidence', fundReturn.deliveryConfidence) -}}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
+    {%- set contents -%}
+        {{- summaryListStart() -}}
+        {{- ratingTag('frontend.pages.fund_return.overall_confidence', fundReturn.overallConfidence) -}}
+        {{- text('frontend.pages.fund_return.overall_progress_summary', fundReturn.progressSummary) -}}
+        {{- text('frontend.pages.fund_return.overall_delivery_confidence', fundReturn.deliveryConfidence) -}}
+        {{- summaryListEnd() -}}
+    {%- endset -%}
 
-        {%- set configs = configs|merge([{
-            title: 'frontend.pages.fund_return.titles.overall_progress' | trans,
-            section: 'overall_progress',
-            contents,
-        }]) -%}
-    {%- endif -%}
+    {%- set configs = configs|merge([{
+        title: 'frontend.pages.fund_return.titles.overall_progress' | trans,
+        section: 'overall_progress',
+        contents,
+    }]) -%}
 
-    {%- if is_granted('CAN_VIEW', {subject: fundReturn, section: 'local_and_rdel'}) -%}
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- text('frontend.pages.fund_return.local_contribution', fundReturn.localContribution) -}}
-            {{- text('frontend.pages.fund_return.resource_funding', fundReturn.resourceFunding) -}}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
+    {%- set contents -%}
+        {{- summaryListStart() -}}
+        {{- text('frontend.pages.fund_return.local_contribution', fundReturn.localContribution) -}}
+        {{- text('frontend.pages.fund_return.resource_funding', fundReturn.resourceFunding) -}}
+        {{- summaryListEnd() -}}
+    {%- endset -%}
 
-        {%- set configs = configs|merge([{
-            title: 'frontend.pages.fund_return.titles.local_and_rdel' | trans,
-            section: 'local_and_rdel',
-            contents,
-        }]) -%}
-    {%- endif -%}
+    {%- set configs = configs|merge([{
+        title: 'frontend.pages.fund_return.titles.local_and_rdel' | trans,
+        section: 'local_and_rdel',
+        contents,
+    }]) -%}
 
-    {%- if is_granted('CAN_VIEW', {subject: fundReturn, section: 'comments'}) -%}
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- text('frontend.pages.fund_return.comments', fundReturn.comments) -}}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
+    {%- set contents -%}
+        {{- summaryListStart() -}}
+        {{- text('frontend.pages.fund_return.comments', fundReturn.comments) -}}
+        {{- summaryListEnd() -}}
+    {%- endset -%}
 
-        {%- set configs = configs|merge([{
-            title: 'frontend.pages.fund_return.titles.comments' | trans,
-            section: 'comments',
-            contents,
-        }]) -%}
-    {%- endif -%}
+    {%- set configs = configs|merge([{
+        title: 'frontend.pages.fund_return.titles.comments' | trans,
+        section: 'comments',
+        contents,
+    }]) -%}
 
     {{- displayCardsForReturn(
         'frontend.pages.fund_return.titles.fund_details' | trans,
@@ -85,76 +79,82 @@
 
     {%- from "frontend/macros.html.twig" import renderTable -%}
     {%- for division in expenseDivisions -%}
-        {%- if is_granted('CAN_VIEW', {subject: fundReturn, section: division.key}) -%}
-            {%- set divisionConfiguration = fundReturn.findDivisionConfigurationByKey(division.key) -%}
-            {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
-            {%- set contents -%}
-                {%- if is_granted('CAN_EDIT', {subject: fundReturn, section: division.key}) -%}
-                    {%- set url = section_edit_path(fundReturn, division.key, true) -%}
-                    <div class="expenses-links">
-                        <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
-                    </div>
-                {%- endif -%}
-                {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), fundReturn) -%}
-                {{- renderTable(table) -}}
-                {{- expenseDivisionComments(fundReturn, division) -}}
-            {%- endset -%}
-            {%- set sections = sections|merge([{
-                label: division.label | trans,
-                id: 'expenses-' ~ division.key,
-                panel: {html: contents},
-            }]) -%}
-        {%- endif -%}
+        {%- set divisionConfiguration = fundReturn.findDivisionConfigurationByKey(division.key) -%}
+        {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
+        {%- set contents -%}
+            {%- if is_granted('CAN_EDIT', fundReturn) -%}
+                {%- set url = section_edit_path(fundReturn, division.key, true) -%}
+                <div class="expenses-links">
+                    <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
+                </div>
+            {%- endif -%}
+            {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), fundReturn) -%}
+            {{- renderTable(table) -}}
+            {{- expenseDivisionComments(fundReturn, division) -}}
+        {%- endset -%}
+        {%- set sections = sections|merge([{
+            label: division.label | trans,
+            id: 'expenses-' ~ division.key,
+            panel: {html: contents},
+        }]) -%}
     {%- endfor -%}
 
     {{- displaySectionsAsTabs(sections, 'frontend.pages.fund_return.titles.expenses' | trans) -}}
 
     {# -- SCHEMES ---------------------------------------------------------------------------------------------------- #}
 
-    {# Are there any schemes that are visible to us? #}
-    {%- set visibleSchemeFunds = schemeFunds | filter(f => is_granted('CAN_VIEW', fundReturn.getSchemeReturnForSchemeFund(f))) -%}
-    {%- if visibleSchemeFunds is not empty -%}
-        {#
-            Realise that we're not iterating over visibleSchemeFunds. That is intentional, as we
-            want to show any projects that don't have a return this quarter (just not linked)
-        #}
+    <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.titles.schemes' | trans }}</h2>
 
-        {# TODO: Figure out a nice way of showing projects that aren't required #}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import tableRow, tag, summaryListActionsList -%}
+    {%- from "@GhostGovUkCore/list-page.html.twig" import listTableStart, listTableEnd -%}
 
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {%- for schemeFund in schemeFunds -%}
-                {%- set schemeReturn = fundReturn.getSchemeReturnForSchemeFund(schemeFund) -%}
-                {%- set isVisible = schemeReturn is null or is_granted('CAN_VIEW', schemeReturn) -%}
-                {%- set isRequired = schemeFund.isReturnRequiredFor(fundReturn.quarter) -%}
+    {%- set listData = schemeListPage.data -%}
+    {%- set listForm = schemeListPage.filtersForm.createView -%}
 
-                {%- if isRequired and isVisible -%}
-                    {%- set url = path('app_scheme_return', {fundReturnId: fundReturn.id, schemeFundId: schemeFund.id}) -%}
-                    {%- set actions = {
-                        items: [
-                            {
-                                text: 'common.actions.view' | trans,
-                                visuallyHiddenText: schemeFund.scheme.name,
-                                href: url,
-                            }
-                        ]
-                    } -%}
-                    {{- summaryListRow({key: schemeFund.scheme.name, value: null, actions}) }}
-                {%- endif -%}
-            {%- endfor -%}
-            {{- summaryListEnd() -}}
+    {%- form_theme listForm '@GhostGovUkFrontend/theme.html.twig' -%}
+
+    <div class="scheme-list" id="scheme-list">
+    {{- listTableStart(listData, listForm) -}}
+    {%- for result in listData.entities -%}
+        {%- set actions = is_granted('CAN_VIEW', result.schemeReturn) ? [
+            {
+                href: path('app_scheme_return', {fundReturnId: fundReturn.id, schemeFundId: result.schemeFund.id}),
+                text: 'common.actions.view' | trans,
+            },
+        ] : [] -%}
+        {%- set nameHtml %}<div class="govuk-!-font-weight-bold">{{ result.schemeFund.scheme.name }}</div>{% endset -%}
+        {%- set readyForSignoffHtml -%}
+            {%- if result.schemeReturn is not null -%}
+                {{ (result.schemeReturn.readyForSignoff ? 'common.text.yes' : 'common.text.no') | trans }}
+            {%- else -%}
+                {{ '-' }}
+            {%- endif -%}
         {%- endset -%}
-
-        {{- displaySectionsInline([{
-            label: 'frontend.pages.fund_return.titles.schemes' | trans,
-            id: 'schemes',
-            panel: {html: contents}
-        }]) -}}
-    {%- endif -%}
-
-{#    <p class="govuk-body">#}
-{#        <a href="{{ path('app_fund_return_status', {fundReturnId: fundReturn.id}) }}">Status page</a>#}
-{#    </p>#}
+        {%- set onTrackHtml -%}
+            {%- if result.schemeReturn is not null -%}
+                {%- set ratingEnum = result.schemeReturn.onTrackRating -%}
+                {{- ratingEnum is null ? '-' : tag({text: "enum.on_track_rating.#{ratingEnum.value}" | trans, classes: ratingEnum.tagClass}) -}}
+            {%- else -%}
+                {{ '-' }}
+            {%- endif -%}
+        {%- endset -%}
+        {{- tableRow([
+            {html: nameHtml},
+            {html: readyForSignoffHtml},
+            {text: (result.schemeFund.retained ? 'common.scheme.retained' : 'common.scheme.non_retained') | trans},
+            {html: onTrackHtml},
+            {html: summaryListActionsList(actions)},
+        ]) -}}
+    {%- else -%}
+        {{- tableRow([
+            {
+                text: 'common.text.no_results' | trans,
+                colspan: listData.fields | length + 1,
+            }
+        ]) -}}
+    {%- endfor -%}
+    {{- listTableEnd(listData, listForm) -}}
+    </div>
 {%- endblock -%}
 
 {% macro signoff(date, name, link) -%}

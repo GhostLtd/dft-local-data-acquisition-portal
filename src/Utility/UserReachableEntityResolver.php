@@ -99,8 +99,8 @@ class UserReachableEntityResolver
     protected function getPermissionsViewsFor(array $permissions): array
     {
         $interestingPermissions = [
-            Permission::SUBMITTER,
-            Permission::CHECKER,
+            Permission::SIGN_OFF,
+            Permission::MARK_AS_READY,
             Permission::EDITOR,
             Permission::VIEWER,
         ];

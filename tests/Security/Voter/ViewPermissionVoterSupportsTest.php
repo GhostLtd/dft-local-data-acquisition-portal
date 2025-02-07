@@ -2,6 +2,7 @@
 
 namespace App\Tests\Security\Voter;
 
+use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Role;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
@@ -26,24 +27,19 @@ class ViewPermissionVoterSupportsTest extends AbstractFunctionalTest
 
     public function dataSupports(): array {
         return [
-            [Role::CAN_VIEW, new Authority(), true],
-            [Role::CAN_VIEW, ['subject' => new Authority(), 'section' => 'section_one'], false], // Invalid subject, Authorities don't have sections
+            [InternalRole::HAS_VALID_VIEW_PERMISSION, new Authority(), true],
 
-            [Role::CAN_VIEW, new CrstsFundReturn(), true],
-            [Role::CAN_VIEW, ['subject' => new CrstsFundReturn(), 'section' => 'section_one'], true],
-            [Role::CAN_VIEW, new CrstsSchemeReturn(), true],
-            [Role::CAN_VIEW, ['subject' => new CrstsSchemeReturn(), 'section' => 'section_one'], true],
+            [InternalRole::HAS_VALID_VIEW_PERMISSION, new CrstsFundReturn(), true],
+            [InternalRole::HAS_VALID_VIEW_PERMISSION, new CrstsSchemeReturn(), true],
 
-            // Invalid subjects - things for which CAN_VIEW is not valid
-            [Role::CAN_VIEW, new Scheme(), false],
-            [Role::CAN_VIEW, ['subject' => new Scheme(), 'section' => 'section_one'], false],
-            [Role::CAN_VIEW, new FundAward(), false],
-            [Role::CAN_VIEW, ['subject' => new FundAward(), 'section' => 'section_one'], false],
+            // Invalid subjects - things for which HAS_VALID_VIEW_PERMISSION is not valid
+            [InternalRole::HAS_VALID_VIEW_PERMISSION, new Scheme(), false],
+            [InternalRole::HAS_VALID_VIEW_PERMISSION, new FundAward(), false],
 
             // Roles not supported by this voter
-            [Role::CAN_SUBMIT, new CrstsFundReturn(), false],
-            [Role::CAN_COMPLETE, new CrstsFundReturn(), false],
-            [Role::CAN_EDIT, new CrstsFundReturn(), false],
+            [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new CrstsFundReturn(), false],
+            [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, new CrstsFundReturn(), false],
+            [InternalRole::HAS_VALID_EDIT_PERMISSION, new CrstsFundReturn(), false],
             [Role::CAN_SET_LEAD_CONTACT, new CrstsFundReturn(), false],
         ];
     }

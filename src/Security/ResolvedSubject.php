@@ -17,7 +17,6 @@ class ResolvedSubject
     public function __construct(
         protected string  $baseClass,
         protected mixed   $entity,
-        protected ?string $section,
         protected ?array  $idMap,
         protected ?User   $admin,
         protected ?Fund   $fund,
@@ -37,11 +36,6 @@ class ResolvedSubject
     public function getEntity(): mixed
     {
         return $this->entity;
-    }
-
-    public function getSection(): ?string
-    {
-        return $this->section;
     }
 
     public function getIdMap(): ?array

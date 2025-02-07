@@ -35,19 +35,6 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
         );
     }
 
-    public function setAtFundReturnStatus(FundReturn $fundReturn): void
-    {
-        $this->setAtFundReturn($fundReturn);
-
-        $this->addItem(
-            'fund_return_status',
-            'app_fund_return_status',
-            routeParameters: ['fundReturnId' => $fundReturn->getId()],
-            translationKey: 'frontend.pages.fund_return_status.title',
-            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
-        );
-    }
-
     protected function getFundReturnTranslationKeys(FundReturn $fundReturn): array
     {
         $typeKey = "enum.fund.".$fundReturn->getFundAward()->getType()->value;
@@ -78,21 +65,6 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
         );
     }
 
-    public function setAtSchemeFundStatus(FundReturn $fundReturn, SchemeFund $schemeFund): void
-    {
-        $this->setAtSchemeFund($fundReturn, $schemeFund);
-
-        $this->addItem(
-            'scheme_return_status',
-            'app_scheme_return_status',
-            routeParameters: [
-                'fundReturnId' => $fundReturn->getId(),
-                'schemeFundId' => $schemeFund->getId()
-            ],
-            translationKey: 'frontend.pages.scheme_return_status.title',
-        );
-    }
-
     public function setAtSchemeFundEdit(FundReturn $fundReturn, SchemeFund $schemeFund, SchemeLevelSection $section): void
     {
         $this->setAtSchemeFund($fundReturn, $schemeFund);
@@ -105,6 +77,34 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
                 'section' => $section->value,
             ],
             translationKey: "sections.scheme.{$section->value}",
+        );
+    }
+
+    public function setAtSchemeReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    {
+        $this->setAtSchemeFund($fundReturn, $schemeFund);
+        $this->addItem(
+            'scheme_return_mark_as_ready_for_signoff',
+            'app_scheme_return_mark_as_ready_for_signoff',
+            routeParameters: [
+                'fundReturnId' => $fundReturn->getId(),
+                'schemeFundId' => $schemeFund->getId(),
+            ],
+            translationKey: 'frontend.pages.scheme_mark_as_ready_for_signoff.breadcrumb',
+        );
+    }
+
+    public function setAtSchemeNotReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    {
+        $this->setAtSchemeFund($fundReturn, $schemeFund);
+        $this->addItem(
+            'scheme_return_mark_as_not_ready_for_signoff',
+            'app_scheme_return_mark_as_not_ready_for_signoff',
+            routeParameters: [
+                'fundReturnId' => $fundReturn->getId(),
+                'schemeFundId' => $schemeFund->getId(),
+            ],
+            translationKey: 'frontend.pages.scheme_mark_as_not_ready_for_signoff.breadcrumb',
         );
     }
 

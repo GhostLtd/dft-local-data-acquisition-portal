@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Return;
+namespace App\Repository\SchemeReturn;
 
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

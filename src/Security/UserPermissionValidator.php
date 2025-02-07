@@ -15,34 +15,23 @@ class UserPermissionValidator
     {
         $permission = $userPermission->getPermission();
         $entityClass = $userPermission->getEntityClass();
-        $sectionTypes = $userPermission->getSectionTypes();
         $fundTypes = $userPermission->getFundTypes();
 
-        if ($permission === Permission::SUBMITTER) {
+        if ($permission === Permission::SIGN_OFF) {
             if (!in_array($entityClass, [Authority::class, FundReturn::class])) {
-                return false;
-            }
-
-            if ($sectionTypes !== null) {
                 return false;
             }
 
             if ($fundTypes !== null && $entityClass !== Authority::class) {
                 return false;
             }
-        } else if (in_array($permission, [Permission::CHECKER, Permission::EDITOR, Permission::VIEWER])) {
+        } else if (in_array($permission, [Permission::MARK_AS_READY, Permission::EDITOR, Permission::VIEWER])) {
             if (!in_array($entityClass, [Authority::class, FundReturn::class, Scheme::class, SchemeReturn::class])) {
                 return false;
             }
 
-            if ($sectionTypes !== null) {
-                if ($entityClass === Authority::class) {
-                    return false;
-                }
-
-                if ($entityClass === Scheme::class && $fundTypes === null) {
-                    return false;
-                }
+            if ($fundTypes !== null && !in_array($entityClass, [Authority::class, Scheme::class])) {
+                return false;
             }
         } else {
             // Unsupported permission

@@ -2,14 +2,11 @@
 
 namespace App\Controller\Frontend\SchemeReturn;
 
-use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Controller\Frontend\AbstractReturnController;
+use App\Entity\Enum\Role;
 use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
-use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Entity\SchemeReturn\SchemeReturn;
-use App\Entity\SchemeReturn\SchemeReturnSectionStatus;
 use App\Form\Type\FundReturn\Crsts\ExpensesType;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\CrstsHelper;
@@ -23,6 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class EditController extends AbstractReturnController
 {
     #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/section/{section}', name: 'app_scheme_return_edit')]
+
     public function schemeReturnEdit(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
@@ -40,6 +38,7 @@ class EditController extends AbstractReturnController
         }
 
         $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
+        $this->denyAccessUnlessGranted(Role::CAN_EDIT, $schemeReturn);
         $breadcrumbBuilder->setAtSchemeFundEdit($fundReturn, $schemeFund, $section);
 
         $cancelUrl = $this->generateUrl('app_scheme_return', [
@@ -47,13 +46,11 @@ class EditController extends AbstractReturnController
             'schemeFundId' => $schemeFund->getId()
         ])."#{$section->value}";
 
-        $schemeReturnSectionStatus = $this->getSectionStatus($schemeReturn, $section);
         $form = $this->createForm($config->getFormClass(), $schemeReturn, [
             'cancel_url' => $cancelUrl,
-            'completion_status' => $schemeReturnSectionStatus,
         ]);
 
-        if ($response = $this->processForm($form, $request, $schemeReturnSectionStatus, $cancelUrl)) {
+        if ($response = $this->processForm($form, $request, $cancelUrl)) {
             return $response;
         }
 
@@ -79,6 +76,7 @@ class EditController extends AbstractReturnController
     ): Response
     {
         $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
+        $this->denyAccessUnlessGranted(Role::CAN_EDIT, $schemeReturn);
         $divisionConfiguration = $schemeReturn->findDivisionConfigurationByKey($divisionKey);
 
         if (!$divisionConfiguration) {
@@ -96,14 +94,12 @@ class EditController extends AbstractReturnController
             ->setRowGroupConfigurations(CrstsHelper::getSchemeExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
-        $schemeReturnSectionStatus = $this->getSectionStatus($schemeReturn, $divisionConfiguration);
         $form = $this->createForm(ExpensesType::class, $schemeReturn, [
             'cancel_url' => $cancelUrl,
-            'completion_status' => $schemeReturnSectionStatus,
             'expenses_table_helper' => $expensesTableHelper,
         ]);
 
-        if ($response = $this->processForm($form, $request, $schemeReturnSectionStatus, $cancelUrl)) {
+        if ($response = $this->processForm($form, $request, $cancelUrl)) {
             return $response;
         }
 
@@ -112,14 +108,5 @@ class EditController extends AbstractReturnController
             'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,
         ]);
-    }
-
-    protected function getSectionStatus(SchemeReturn $schemeReturn, DivisionConfiguration|SchemeLevelSection $section): SchemeReturnSectionStatus
-    {
-        $schemeReturnSectionStatus = $schemeReturn->getOrCreateSchemeReturnSectionStatus($section);
-        if (!$this->entityManager->contains($schemeReturnSectionStatus)) {
-            $this->entityManager->persist($schemeReturnSectionStatus);
-        }
-        return $schemeReturnSectionStatus;
     }
 }

@@ -31,9 +31,6 @@ class UserPermission
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private ?array $fundTypes = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
-    private ?array $sectionTypes = null;
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -92,23 +89,6 @@ class UserPermission
     public function setFundTypes(?array $fundTypes): static
     {
         $this->fundTypes = $fundTypes;
-        return $this;
-    }
-
-    /**
-     * @return array<int, string>|null
-     */
-    public function getSectionTypes(): ?array
-    {
-        return $this->sectionTypes;
-    }
-
-    /**
-     * @param array<int, string>|null $sectionTypes
-     */
-    public function setSectionTypes(?array $sectionTypes): static
-    {
-        $this->sectionTypes = $sectionTypes;
         return $this;
     }
 }

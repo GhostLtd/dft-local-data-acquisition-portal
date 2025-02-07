@@ -23,8 +23,6 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
         protected ?string $progressSummary = null,
         protected ?string $deliveryConfidence = null,
         protected ?Rating $overallConfidence = null,
-        protected ?string $ragProgressSummary = null,
-        protected ?Rating $ragProgressRating = null,
         protected ?string $localContribution = null,
         protected ?string $resourceFunding = null,
         protected ?string $comments = null,
@@ -64,16 +62,6 @@ class CrstsFundReturnDefinition extends AbstractFundReturnDefinition
     public function getOverallConfidence(): ?Rating
     {
         return $this->overallConfidence;
-    }
-
-    public function getRagProgressSummary(): ?string
-    {
-        return $this->ragProgressSummary;
-    }
-
-    public function getRagProgressRating(): ?Rating
-    {
-        return $this->ragProgressRating;
     }
 
     public function getLocalContribution(): ?string

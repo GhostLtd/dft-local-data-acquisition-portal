@@ -4,8 +4,6 @@ namespace App\Entity\FundReturn;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
-use App\Entity\Enum\CompletionStatus;
-use App\Entity\Enum\FundLevelSection;
 use App\Entity\FundAward;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\SchemeReturn\SchemeReturn;
@@ -51,12 +49,6 @@ abstract class FundReturn
     private ?User $signoffUser = null; // top_signoff
 
     /**
-     * @var Collection<int, FundReturnSectionStatus>
-     */
-    #[ORM\OneToMany(targetEntity: FundReturnSectionStatus::class, mappedBy: 'fundReturn', orphanRemoval: true)]
-    private Collection $sectionStatuses;
-
-    /**
      * @var Collection<int, SchemeReturn>
      */
     #[ORM\OneToMany(targetEntity: SchemeReturn::class, mappedBy: 'fundReturn', orphanRemoval: true)]
@@ -65,7 +57,6 @@ abstract class FundReturn
     public function __construct()
     {
         $this->schemeReturns = new ArrayCollection();
-        $this->sectionStatuses = new ArrayCollection();
     }
 
     public function getYear(): ?int
@@ -146,36 +137,6 @@ abstract class FundReturn
     }
 
     /**
-     * @return Collection<int, FundReturnSectionStatus>
-     */
-    public function getSectionStatuses(): Collection
-    {
-        return $this->sectionStatuses;
-    }
-
-    public function addSectionStatus(FundReturnSectionStatus $sectionStatus): static
-    {
-        if (!$this->sectionStatuses->contains($sectionStatus)) {
-            $this->sectionStatuses->add($sectionStatus);
-            $sectionStatus->setFundReturn($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSectionStatus(FundReturnSectionStatus $sectionStatus): static
-    {
-        if ($this->sectionStatuses->removeElement($sectionStatus)) {
-            // set the owning side to null (unless already changed)
-            if ($sectionStatus->getFundReturn() === $this) {
-                $sectionStatus->setFundReturn(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, SchemeReturn>
      */
     public function getSchemeReturns(): Collection
@@ -206,45 +167,6 @@ abstract class FundReturn
     }
 
     // --------------------------------------------------------------------------------
-
-    public function getFundReturnSectionStatusForName(string $name): ?FundReturnSectionStatus
-    {
-        return $this->sectionStatuses->findFirst(fn(int $idx, FundReturnSectionStatus $status) => $status->getName() === $name);
-    }
-
-    public function getOrCreateFundReturnSectionStatus(DivisionConfiguration|FundLevelSection $section): FundReturnSectionStatus
-    {
-        $name = self::getSectionName($section);
-        $status = $this->getFundReturnSectionStatusForName($name);
-        if (!$status) {
-            $status = (new FundReturnSectionStatus())
-                ->setStatus(CompletionStatus::NOT_STARTED)
-                ->setName($name);
-
-            $this->addSectionStatus($status);
-        }
-        return $status;
-    }
-
-    public function getStatusForSection(
-        DivisionConfiguration|FundLevelSection $section,
-        CompletionStatus                       $default = CompletionStatus::NOT_STARTED
-    ): CompletionStatus
-    {
-        $fundReturnSectionStatus = $this->getFundReturnSectionStatusForName(self::getSectionName($section));
-
-        return $fundReturnSectionStatus ?
-            $fundReturnSectionStatus->getStatus() :
-            $default;
-    }
-
-    static public function getSectionName(DivisionConfiguration|FundLevelSection $section): string
-    {
-        return match($section::class) {
-            DivisionConfiguration::class => $section->getKey(),
-            FundLevelSection::class => $section->name,
-        };
-    }
 
     abstract public function getFund(): Fund;
 

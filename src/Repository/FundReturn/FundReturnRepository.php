@@ -22,8 +22,7 @@ class FundReturnRepository extends ServiceEntityRepository
     {
         return $this
             ->createQueryBuilder('fundReturn')
-            ->select('fundReturn, sectionStatus, fundAward, authority')
-            ->leftJoin('fundReturn.sectionStatuses', 'sectionStatus')
+            ->select('fundReturn, fundAward, authority')
             ->join('fundReturn.fundAward', 'fundAward')
             ->join('fundAward.authority', 'authority')
             ->where('fundReturn.id = :id')

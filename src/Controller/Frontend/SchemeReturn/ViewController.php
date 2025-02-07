@@ -49,31 +49,4 @@ class ViewController extends AbstractController
             'schemeLevelSectionsConfiguration' => SchemeLevelSection::getConfigurationForFund($fund),
         ]);
     }
-
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/status', name: 'app_scheme_return_status')]
-    public function status(
-        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund                 $schemeFund,
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
-    ): Response
-    {
-        $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
-        $this->denyAccessUnlessGranted(Role::CAN_VIEW, $schemeReturn);
-
-        $breadcrumbBuilder->setAtSchemeFundStatus($fundReturn, $schemeFund);
-
-        // TODO: Check schemeFund belongs to fundReturn
-
-        $fund = $fundReturn->getFund();
-
-        return $this->render('frontend/scheme_return/status.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
-            'fundReturn' => $fundReturn,
-            'schemeReturn' => $schemeReturn,
-            'schemeLevelSectionsConfiguration' => SchemeLevelSection::getConfigurationForFund($fund),
-            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
-        ]);
-    }
 }

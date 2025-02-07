@@ -12,7 +12,7 @@ use App\Entity\Milestone;
 use App\Entity\ReturnExpenseDivisionCommentsTrait;
 use App\Entity\SchemeFund\CrstsSchemeFund;
 use App\Entity\SchemeFund\SchemeFund;
-use App\Repository\Return\CrstsSchemeReturnRepository;
+use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
 use App\Utility\CrstsHelper;
 use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -85,10 +85,10 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
     public function __construct()
     {
-        parent::__construct();
         $this->expenses = new ArrayCollection();
         $this->milestones = new ArrayCollection();
     }
+
 
     public function getSchemeFund(): ?CrstsSchemeFund
     {

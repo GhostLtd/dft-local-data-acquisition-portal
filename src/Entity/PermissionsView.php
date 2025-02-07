@@ -36,9 +36,6 @@ class PermissionsView
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
     private ?array $fundTypes = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
-    private ?array $sectionTypes = null;
-
     public function getId(): ?Ulid
     {
         return $this->id;
@@ -77,10 +74,5 @@ class PermissionsView
     public function getFundTypes(): ?array
     {
         return $this->fundTypes;
-    }
-
-    public function getSectionTypes(): ?array
-    {
-        return $this->sectionTypes;
     }
 }

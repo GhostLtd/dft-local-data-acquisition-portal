@@ -3,15 +3,11 @@
 namespace App\Entity\SchemeReturn;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
-use App\Entity\Enum\CompletionStatus;
 use App\Entity\Enum\Fund;
-use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\Traits\IdTrait;
 use App\Repository\SchemeReturn\SchemeReturnRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Valid;
 
@@ -34,16 +30,8 @@ abstract class SchemeReturn
     #[ORM\JoinColumn(nullable: false)]
     private ?FundReturn $fundReturn = null;
 
-    /**
-     * @var Collection<int, SchemeReturnSectionStatus>
-     */
-    #[ORM\OneToMany(targetEntity: SchemeReturnSectionStatus::class, mappedBy: 'schemeReturn', orphanRemoval: true)]
-    private Collection $sectionStatuses;
-
-    public function __construct()
-    {
-        $this->sectionStatuses = new ArrayCollection();
-    }
+    #[ORM\Column]
+    private bool $readyForSignoff = false;
 
     public function getSchemeFund(): ?SchemeFund
     {
@@ -67,81 +55,18 @@ abstract class SchemeReturn
         return $this;
     }
 
-
-    /**
-     * @return Collection<int, SchemeReturnSectionStatus>
-     */
-    public function getSectionStatuses(): Collection
+    public function getReadyForSignoff(): bool
     {
-        return $this->sectionStatuses;
+        return $this->readyForSignoff;
     }
 
-    public function addSectionStatus(SchemeReturnSectionStatus $sectionStatus): static
+    public function setReadyForSignoff(bool $readyForSignoff): static
     {
-        if (!$this->sectionStatuses->contains($sectionStatus)) {
-            $this->sectionStatuses->add($sectionStatus);
-            $sectionStatus->setSchemeReturn($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSectionStatus(SchemeReturnSectionStatus $sectionStatus): static
-    {
-        if ($this->sectionStatuses->removeElement($sectionStatus)) {
-            // set the owning side to null (unless already changed)
-            if ($sectionStatus->getSchemeReturn() === $this) {
-                $sectionStatus->setSchemeReturn(null);
-            }
-        }
-
+        $this->readyForSignoff = $readyForSignoff;
         return $this;
     }
 
     // --------------------------------------------------------------------------------
-
-    public function getSchemeReturnSectionStatusForName(string $name): ?SchemeReturnSectionStatus
-    {
-        return $this->sectionStatuses->findFirst(fn(int $idx, SchemeReturnSectionStatus $status) => $status->getName() === $name);
-    }
-
-    public function getOrCreateSchemeReturnSectionStatus(DivisionConfiguration|SchemeLevelSection $section): SchemeReturnSectionStatus
-    {
-        $name = self::getSectionName($section);
-
-        $status = $this->getSchemeReturnSectionStatusForName($name);
-
-        if (!$status) {
-            $status = (new SchemeReturnSectionStatus())
-                ->setStatus(CompletionStatus::NOT_STARTED)
-                ->setName($name);
-
-            $this->addSectionStatus($status);
-        }
-
-        return $status;
-    }
-
-
-    public function getStatusForSection(
-        DivisionConfiguration|SchemeLevelSection $section,
-        CompletionStatus                         $default = CompletionStatus::NOT_STARTED
-    ): CompletionStatus
-    {
-        $schemeReturnSectionStatus = $this->getSchemeReturnSectionStatusForName(self::getSectionName($section));
-
-        return $schemeReturnSectionStatus ?
-            $schemeReturnSectionStatus->getStatus() :
-            $default;
-    }
-
-    public static function getSectionName(DivisionConfiguration|SchemeLevelSection $section): string
-    {
-        return match($section::class) {
-            DivisionConfiguration::class => $section->getKey(),
-            SchemeLevelSection::class => $section->name,
-        };
-    }
 
     abstract public function getFund(): Fund;
 

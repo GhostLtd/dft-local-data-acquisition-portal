@@ -1256,16 +1256,16 @@
         },
         {
             "name": "doctrine/orm",
-            "version": "3.3.1",
+            "version": "3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/orm.git",
-                "reference": "b1f8253105aa5382c495e5f9f8ef34e297775428"
+                "reference": "c9557c588b3a70ed93caff069d0aa75737f25609"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/orm/zipball/b1f8253105aa5382c495e5f9f8ef34e297775428",
-                "reference": "b1f8253105aa5382c495e5f9f8ef34e297775428",
+                "url": "https://api.github.com/repos/doctrine/orm/zipball/c9557c588b3a70ed93caff069d0aa75737f25609",
+                "reference": "c9557c588b3a70ed93caff069d0aa75737f25609",
                 "shasum": ""
             },
             "require": {
@@ -1340,9 +1340,9 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/orm/issues",
-                "source": "https://github.com/doctrine/orm/tree/3.3.1"
+                "source": "https://github.com/doctrine/orm/tree/3.3.2"
             },
-            "time": "2024-12-19T07:08:14+00:00"
+            "time": "2025-02-04T19:43:15+00:00"
         },
         {
             "name": "doctrine/persistence",
@@ -1560,11 +1560,11 @@
         },
         {
             "name": "ghost/govuk-core-bundle",
-            "version": "1.0.6",
+            "version": "1.0.7",
             "source": {
                 "type": "git",
                 "url": "https://git.tomarq.net/ghost/govuk-core-bundle.git",
-                "reference": "4195ddc31e5784fffc332d9faa8d6c30a62e3834"
+                "reference": "13afeb117efdb34b014f07636e2f56399170b753"
             },
             "require": {
                 "alphagov/notifications-php-client": "^6.2",
@@ -1623,7 +1623,7 @@
                 }
             ],
             "description": "Symfony bundle for core govuk-related classes",
-            "time": "2025-01-30T12:54:11+00:00"
+            "time": "2025-02-07T17:38:45+00:00"
         },
         {
             "name": "ghost/govuk-frontend-bundle",

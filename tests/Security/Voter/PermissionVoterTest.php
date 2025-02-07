@@ -2,66 +2,63 @@
 
 namespace App\Tests\Security\Voter;
 
+use App\Entity\Enum\Fund;
+use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Permission;
-use App\Entity\Enum\Role;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Authority;
+use App\Security\Voter\PermissionVoter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class PermissionVoterTest extends AbstractPermissionVoterTest
 {
-    const array ALL_ROLES = [Role::CAN_SUBMIT, Role::CAN_COMPLETE, Role::CAN_EDIT];
-    const array ALL_BUT_SUBMIT = [Role::CAN_COMPLETE, Role::CAN_EDIT];
-    const array ALL_BUT_EDIT = [Role::CAN_SUBMIT, Role::CAN_COMPLETE];
-    const array SUBMIT_ONLY = [Role::CAN_SUBMIT];
-    const array EDIT_ONLY = [Role::CAN_EDIT];
-    const array ALL_PERMISSIONS = [Permission::SUBMITTER, Permission::CHECKER, Permission::EDITOR, Permission::EDITOR];
+    const array ALL_ROLES = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, InternalRole::HAS_VALID_EDIT_PERMISSION];
+    const array ALL_BUT_SIGN_OFF = [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, InternalRole::HAS_VALID_EDIT_PERMISSION];
+    const array ALL_BUT_MARK_AS_READY = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, InternalRole::HAS_VALID_EDIT_PERMISSION];
+    const array ALL_BUT_EDIT = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION];
+    const array SIGN_OFF_ONLY = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION];
+    const array MARK_AS_READY_ONLY = [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION];
+    const array EDIT_ONLY = [InternalRole::HAS_VALID_EDIT_PERMISSION];
+    const array ALL_PERMISSIONS = [Permission::SIGN_OFF, Permission::MARK_AS_READY, Permission::EDITOR, Permission::EDITOR];
+
+    protected VoterInterface $permissionVoter;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->permissionVoter = $this->getFromContainer(PermissionVoter::class, PermissionVoter::class);
+    }
 
     public function dataAdmin(): \Generator
     {
         $testCases = [
-            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:1', null], // Invalid - can't submit/complete/edit a authority
-            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:2', null],
-            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:3', null],
-            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:1', 'whatever'],
-            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:2', 'whatever'],
-            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:3', 'whatever'],
-            [self::SUBMIT_ONLY, true, 'admin:1', CrstsFundReturn::class, 'authority:1/return:1', null],
-            [self::SUBMIT_ONLY, true, 'admin:1', CrstsFundReturn::class, 'authority:1/return:2', null],
-            [self::SUBMIT_ONLY, true, 'admin:1', CrstsFundReturn::class, 'authority:2/return:1', null],
-            [self::ALL_BUT_SUBMIT, false, 'admin:1', CrstsFundReturn::class, 'authority:1/return:1', null], // Cannot complete/edit a return (need to specify a section)
-            [self::ALL_BUT_SUBMIT, false, 'admin:1', CrstsFundReturn::class, 'authority:1/return:2', null],
-            [self::ALL_BUT_SUBMIT, false, 'admin:1', CrstsFundReturn::class, 'authority:2/return:1', null],
-            [self::ALL_ROLES, false, 'admin:1', CrstsFundReturn::class, 'authority:3/return:1', null], // Not owned by admin:1
-            [self::ALL_BUT_SUBMIT, true, 'admin:1', CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-            [self::ALL_BUT_SUBMIT, true, 'admin:1', CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-            [self::ALL_BUT_SUBMIT, true, 'admin:1', CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-            [self::ALL_BUT_SUBMIT, false, 'admin:1', CrstsFundReturn::class, 'authority:3/return:1', 'whatever'],
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:1/return:1', 'whatever'], // Cannot submit an individual section
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:3/return:1', 'whatever'],
+            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:1'], // Invalid - can't sign_off/mark_as_ready/edit an authority
+            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:2'],
+            [self::ALL_ROLES, false, 'admin:1', Authority::class, 'authority:3'],
 
+            [self::ALL_BUT_MARK_AS_READY, true, 'admin:1', CrstsFundReturn::class, 'authority:1/return:1'],
+            [self::ALL_BUT_MARK_AS_READY, true, 'admin:1', CrstsFundReturn::class, 'authority:1/return:2'],
+            [self::ALL_BUT_MARK_AS_READY, true, 'admin:1', CrstsFundReturn::class, 'authority:2/return:1'],
+            [self::ALL_BUT_MARK_AS_READY, false, 'admin:1', CrstsFundReturn::class, 'authority:3/return:1'], // Not owned by admin:1
+            [self::MARK_AS_READY_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:1/return:1'], // Cannot mark_as_ready on a fund return
+            [self::MARK_AS_READY_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:1/return:2'], // (Only valid for a scheme return)
+            [self::MARK_AS_READY_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:2/return:1'],
+            [self::MARK_AS_READY_ONLY, false, 'admin:1', CrstsFundReturn::class, 'authority:3/return:1'],
 
-            [self::ALL_ROLES, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Cannot submit project returns, and cannot ...
-            [self::ALL_ROLES, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null], // ... complete/edit a project return (need to specify a section)
-            [self::ALL_ROLES, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-            [self::ALL_ROLES, false, 'admin:1', CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-            [self::ALL_ROLES, false, 'admin:1', CrstsSchemeReturn::class, 'authority:3/return:1/project:1', null],
-
-            [self::ALL_BUT_SUBMIT, true, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-            [self::ALL_BUT_SUBMIT, true, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-            [self::ALL_BUT_SUBMIT, true, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-            [self::ALL_BUT_SUBMIT, true, 'admin:1', CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
-            [self::ALL_BUT_SUBMIT, false, 'admin:1', CrstsSchemeReturn::class, 'authority:3/return:1/project:1', 'whatever'], // Not owned by admin:1
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'], // Cannot submit project returns
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
-            [self::SUBMIT_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:3/return:1/project:1', 'whatever'],
+            [self::ALL_BUT_SIGN_OFF, true, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+            [self::ALL_BUT_SIGN_OFF, true, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+            [self::ALL_BUT_SIGN_OFF, true, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+            [self::ALL_BUT_SIGN_OFF, true, 'admin:1', CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
+            [self::ALL_BUT_SIGN_OFF, false, 'admin:1', CrstsSchemeReturn::class, 'authority:3/return:1/project:1'], // Not owned by admin:1
+            [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:1'], // Cannot sign_off a scheme return
+            [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+            [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+            [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
+            [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:3/return:1/project:1'],
         ];
 
         foreach($testCases as $testCase) {
@@ -76,728 +73,445 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
     /**
      * @dataProvider dataAdmin
      */
-    public function testAdmin(string $role, bool $expectedResult, string $userRef, string $subjectClass, string $subjectRef, ?string $sectionType): void
+    public function testAdmin(string $role, ?bool $expectedResult, string $userRef, string $subjectClass, string $subjectRef): void
     {
-        $this->performTest(...func_get_args());
+        $this->performTestOnSpecificVoter($this->permissionVoter, ...func_get_args());
     }
 
-    public function dataPermissions(): \Generator
+    public function getPermissionsAndTests(): array
     {
-        $userRef = 'user';
-
-        $permissionsAndTests = [
-
+        return [
             // ----------------------------------------------------------------------------------------------------
             //  Test cases for "no permissions" (control)
             // ----------------------------------------------------------------------------------------------------
             [
                 null,
                 [
-                    [self::ALL_ROLES, false, Authority::class, 'authority:1', null],
-                    [self::ALL_ROLES, false, Authority::class, 'authority:1', 'whatever'], // Invalid subject
-                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::ALL_ROLES, false, Authority::class, 'authority:1'],
+                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::ALL_ROLES, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
 
             // ----------------------------------------------------------------------------------------------------
-            //  Test cases for SUBMITTER permission
+            //  Test cases for SIGN_OFF permission
             // ----------------------------------------------------------------------------------------------------
 
-            // SUBMITTER permission on authority, CAN_SUBMIT role
+            // SIGN_OFF permission on authority, HAS_VALID_SIGN_OFF_PERMISSION role
             [
-                [[Permission::SUBMITTER], Authority::class, Authority::class, 'authority:1', null, null],
+                [[Permission::SIGN_OFF], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null], // Invalid subject - can't submit a authority
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], true,  CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], true,  CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null], // Not authority 1
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'], // Invalid subject - can't submit an individual section
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't submit a project return
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::SIGN_OFF_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't sign_off an authority
+                    [self::SIGN_OFF_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::SIGN_OFF_ONLY, true, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'], // Invalid subject - can't sign_off a scheme return
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // SUBMITTER permission on authority, CAN_COMPLETE / CAN_EDIT roles
+            // SIGN_OFF permission on authority, HAS_VALID_SIGN_OFF_PERMISSION role
             [
-                [[Permission::SUBMITTER], Authority::class, Authority::class, 'authority:1', null, null],
+                [[Permission::SIGN_OFF], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null], // Invalid subject - can't complete or edit a authority
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't complete or edit a (whole) fund return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'], // Wrong authority
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't complete or edit a (whole) project return
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'], // Wrong authority
+                    [self::MARK_AS_READY_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't sign_off an authority
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject - can't mark_as_ready a fund_return
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
                 ]
             ],
-            // SUBMITTER permission on FundReturn, CAN_SUBMIT role
+            // SIGN_OFF permission on authority, HAS_VALID_EDIT_PERMISSION roles
             [
-                [[Permission::SUBMITTER], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, null],
+                [[Permission::SIGN_OFF], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null], // Invalid subject - can't submit a authority
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], true,  CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', null], // Wrong return
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'], // Invalid subject - can't submit an individual section
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't submit a project return
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
                 ]
             ],
-            // SUBMITTER permission on FundReturn, CAN_COMPLETE / CAN_EDIT roles
+
+
+            // SIGN_OFF permission on FundReturn, HAS_VALID_SIGN_OFF_PERMISSION role
             [
-                [[Permission::SUBMITTER], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, null],
+                [[Permission::SIGN_OFF], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null], // Invalid subject - can't complete or edit a authority
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't complete or edit a (whole) fund return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'], // Wrong return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't complete or edit a (whole) project return
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'], // Wrong return
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'], // Wrong authority
+                    [self::SIGN_OFF_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't sign_off an authority
+                    [self::SIGN_OFF_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'], // Not return 1
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'], // Invalid subject - can't sign_off a scheme return
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // N.B. SUBMITTER permission is not allowed with Project or ProjectReturn entities
+            // SIGN_OFF permission on FundReturn, HAS_VALID_SIGN_OFF_PERMISSION role
+            [
+                [[Permission::SIGN_OFF], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
+                [
+                    [self::MARK_AS_READY_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't sign_off an authority
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject - can't mark_as_ready a fund_return
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return 1
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
+                ]
+            ],
+            // SIGN_OFF permission on FundReturn, HAS_VALID_EDIT_PERMISSION roles
+            [
+                [[Permission::SIGN_OFF], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
+                [
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'], // Not return 1
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return 1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
+                ]
+            ],
+
+            // N.B. SUBMITTER permission is not allowed with Scheme or SchemeReturn entities
 
             // ----------------------------------------------------------------------------------------------------
-            //  Test cases for CHECKER permission
+            //  Test cases for MARK_AS_READY permission
             // ----------------------------------------------------------------------------------------------------
 
-            // CHECKER permission on authority, CAN_SUBMIT role
+            // MARK_AS_READY permission on authority, CAN_SUBMIT role
             [
-                [[Permission::CHECKER], Authority::class, Authority::class, 'authority:1', null, null],
+                [[Permission::MARK_AS_READY], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null],
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::SIGN_OFF_ONLY, false, Authority::class, 'authority:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // CHECKER permission on authority, CAN_COMPLETE / CAN_EDIT roles
+            // MARK_AS_READY permission on authority, HAS_VALID_MARK_AS_READY_PERMISSION role
             [
-                [[Permission::CHECKER], Authority::class, Authority::class, 'authority:1', null, null],
+                [[Permission::MARK_AS_READY], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null], // Invalid subject - can't complete or edit a authority
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't complete or edit a (whole) fund return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'], // Wrong authority
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't complete or edit a (whole) project return
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'], // Wrong authority
+                    [self::MARK_AS_READY_ONLY, false, Authority::class, 'authority:1'], // Invalid subject
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // CHECKER permission on FundReturn, CAN_SUBMIT role
+            // MARK_AS_READY permission on authority, HAS_VALID_EDIT_PERMISSION role
             [
-                [[Permission::CHECKER], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, null],
+                [[Permission::MARK_AS_READY], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null],
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority:1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // CHECKER permission on FundReturn, CAN_COMPLETE / CAN_EDIT roles
+
+
+            // MARK_AS_READY permission on FundReturn, HAS_VALID_SIGN_OFF_PERMISSION role
             [
-                [[Permission::CHECKER], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, null],
+                [[Permission::MARK_AS_READY], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null], // Invalid subject - can't complete or edit a authority
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't complete or edit a (whole) fund return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'], // Wrong return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't complete or edit a (whole) project return
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'], // Wrong return
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'], // Wrong authority
+                    [self::SIGN_OFF_ONLY, false, Authority::class, 'authority:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // CHECKER permission on FundReturn, for specific sections, CAN_SUBMIT role
+            // MARK_AS_READY permission on FundReturn, HAS_VALID_MARK_AS_READY_PERMISSION roles
             [
-                [[Permission::CHECKER], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, ['section_one', 'section_two']],
+                [[Permission::MARK_AS_READY], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null],
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'section_two'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'section_three'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'],
+                    [self::MARK_AS_READY_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't mark_as_ready an authority
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject - can't mark_as_ready a fund return
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // CHECKER permission on FundReturn, for specific sections, CAN_COMPLETE / CAN_EDIT roles
+            // MARK_AS_READY permission on FundReturn, HAS_VALID_EDIT_PERMISSION roles
             [
-                [[Permission::CHECKER], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, ['section_one', 'section_two']],
+                [[Permission::MARK_AS_READY], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null], // Invalid subject - can't complete or edit a authority
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't complete or edit a (whole) fund return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsFundReturn::class, 'authority:1/return:1', 'section_two'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_three'], // Wrong section
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'section_one'], // Wrong return
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't complete or edit a (whole) project return
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'], // Wrong return
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'], // Wrong authority
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'], // Not return:1
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority:1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // CHECKER permission on ProjectReturn, CAN_SUBMIT role
+
+
+            // MARK_AS_READY permission on SchemeReturn, HAS_VALID_SIGN_OFF_PERMISSION role
             [
-                [[Permission::CHECKER], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, null],
+                [[Permission::MARK_AS_READY], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null],
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, Authority::class, 'authority:1'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [[InternalRole::HAS_VALID_SIGN_OFF_PERMISSION], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // CHECKER permission on ProjectReturn, CAN_COMPLETE / CAN_EDIT roles
+            // MARK_AS_READY permission on SchemeReturn, HAS_VALID_MARK_AS_READY_PERMISSION roles
             [
-                [[Permission::CHECKER], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, null],
+                [[Permission::MARK_AS_READY], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::MARK_AS_READY_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't mark_as_ready an authority
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject - can't mark_as_ready a fund return
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // CHECKER permission on ProjectReturn for specific sections, CAN_SUBMIT role
+            // MARK_AS_READY permission on SchemeReturn, HAS_VALID_EDIT_PERMISSION roles
             [
-                [[Permission::CHECKER], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, ['section_one', 'section_two']],
+                [[Permission::MARK_AS_READY], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null],
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_one'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_two'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_two'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'], // Section not mentioned in permission
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Permission targeted at scheme, doesn't allow editing at fund level
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // CHECKER permission on ProjectReturn for specific sections, CAN_COMPLETE / CAN_EDIT roles
+
+
+            // MARK_AS_READY permission on Scheme, HAS_VALID_SIGN_OFF_PERMISSION role
             [
-                [[Permission::CHECKER], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, ['section_one', 'section_two']],
+                [[Permission::MARK_AS_READY], Scheme::class, Scheme::class, 'authority:1/project:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_one'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_two'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_two'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'], // Section not mentioned in permission
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::SIGN_OFF_ONLY, false, Authority::class, 'authority:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::SIGN_OFF_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // CHECKER permission on Project, CAN_SUBMIT role
+            // MARK_AS_READY permission on Scheme, HAS_VALID_MARK_AS_READY_PERMISSION roles
             [
-                [[Permission::CHECKER], Scheme::class, Scheme::class, 'authority:1/project:1', null, null],
+                [[Permission::MARK_AS_READY], Scheme::class, Scheme::class, 'authority:1/project:1'],
                 [
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', null],
-                    [[Role::CAN_SUBMIT], false, Authority::class, 'authority:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [[Role::CAN_SUBMIT], false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::MARK_AS_READY_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't mark_as_ready an authority
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject - can't mark_as_ready a fund return
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // CHECKER permission on Project, CAN_COMPLETE / CAN_EDIT roles
+            // MARK_AS_READY permission on Scheme, HAS_VALID_EDIT_PERMISSION roles
             [
-                [[Permission::CHECKER], Scheme::class, Scheme::class, 'authority:1/project:1', null, null],
+                [[Permission::MARK_AS_READY], Scheme::class, Scheme::class, 'authority:1/project:1'],
                 [
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_SUBMIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, true,  CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_SUBMIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Permission targeted at scheme, doesn't allow editing at fund level
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
 
             // ----------------------------------------------------------------------------------------------------
-            //  Test cases for CHECKER permission
+            //  Test cases for MARK_AS_READY permission
             // ----------------------------------------------------------------------------------------------------
 
-            // EDITOR permission on authority, CAN_COMPLETE / CAN_SUBMIT roles
+            // EDITOR permission on authority, HAS_VALID_MARK_AS_READY_PERMISSION / HAS_VALID_SIGN_OFF_PERMISSION roles
             [
-                [[Permission::EDITOR], Authority::class, Authority::class, 'authority:1', null, null],
+                [[Permission::EDITOR], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // EDITOR permission on authority, CAN_EDIT role
+            // EDITOR permission on authority, HAS_VALID_EDIT_PERMISSION role
             [
-                [[Permission::EDITOR], Authority::class, Authority::class, 'authority:1', null, null],
+                [[Permission::EDITOR], Authority::class, Authority::class, 'authority:1'],
                 [
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', null], // Invalid subject - can't edit a authority
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't edit a (whole) fund return
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::EDIT_ONLY, true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::EDIT_ONLY, true,  CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'], // Wrong authority
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't edit a (whole) project return
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'], // Wrong authority
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority:1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // EDITOR permission on FundReturn, CAN_COMPLETE / CAN_SUBMIT roles
+
+
+            // EDITOR permission on FundReturn, HAS_VALID_MARK_AS_READY_PERMISSION / HAS_VALID_SIGN_OFF_PERMISSION roles
             [
-                [[Permission::EDITOR], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, null],
+                [[Permission::EDITOR], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // EDITOR permission on FundReturn, CAN_EDIT role
+            // EDITOR permission on FundReturn, HAS_VALID_EDIT_PERMISSION role
             [
-                [[Permission::EDITOR], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, null],
+                [[Permission::EDITOR], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', null], // Invalid subject - can't edit a authority
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't edit a (whole) fund return
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::EDIT_ONLY, true,  CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'], // Wrong return
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't edit a (whole) project return
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'], // Wrong return
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'], // Wrong authority
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'], // Not return:1
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority:1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
+                ],
+            ],
+
+
+            // EDITOR permission on SchemeReturn, HAS_VALID_MARK_AS_READY_PERMISSION / HAS_VALID_SIGN_OFF_PERMISSION roles
+            [
+                [[Permission::EDITOR], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1'],
+                [
+                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // EDITOR permission on FundReturn, for specific sections, CAN_COMPLETE / CAN_SUBMIT roles
+            // EDITOR permission on SchemeReturn, HAS_VALID_EDIT_PERMISSION role
             [
-                [[Permission::EDITOR], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, ['section_one', 'section_two']],
+                [[Permission::EDITOR], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1'],
                 [
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_two'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_three'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'],
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Permission targets scheme return, which does not confer editing of fund return
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
-            // EDITOR permission on FundReturn, for specific sections, CAN_EDIT roles
+
+
+            // EDITOR permission on Scheme, HAS_VALID_MARK_AS_READY_PERMISSION / HAS_VALID_SIGN_OFF_PERMISSION roles
             [
-                [[Permission::EDITOR], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1', null, ['section_one', 'section_two']],
+                [[Permission::EDITOR], Scheme::class, Scheme::class, 'authority:1/project:1'],
                 [
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', null], // Invalid subject - can't edit a authority
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', null], // Invalid subject - can't edit a (whole) fund return
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::EDIT_ONLY, true,  CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [self::EDIT_ONLY, true,  CrstsFundReturn::class, 'authority:1/return:1', 'section_two'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_three'], // Wrong section
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', 'section_one'], // Wrong return
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', 'section_one'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - can't edit a (whole) project return
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'], // Wrong return
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'], // Wrong authority
+                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
                 ]
             ],
-            // EDITOR permission on ProjectReturn, CAN_COMPLETE / CAN_SUBMIT roles
+            // EDITOR permission on Scheme, HAS_VALID_EDIT_PERMISSION role
             [
-                [[Permission::EDITOR], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, null],
+                [[Permission::EDITOR], Scheme::class, Scheme::class, 'authority:1/project:1'],
                 [
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
-                ]
-            ],
-            // EDITOR permission on ProjectReturn, CAN_EDIT role
-            [
-                [[Permission::EDITOR], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, null],
-                [
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', null],
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
-                ]
-            ],
-            // EDITOR permission on ProjectReturn for specific sections, CAN_COMPLETE / CAN_SUBMIT roles
-            [
-                [[Permission::EDITOR], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, ['section_one', 'section_two']],
-                [
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_one'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_two'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_two'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'], // Section not mentioned in permission
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
-                ]
-            ],
-            // EDITOR permission on ProjectReturn for specific sections, CAN_EDIT role
-            [
-                [[Permission::EDITOR], CrstsSchemeReturn::class, SchemeReturn::class, 'authority:1/return:1/project:1', null, ['section_one', 'section_two']],
-                [
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', null],
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', 'section_one'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', 'section_one'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_one'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_one'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_one'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_one'],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'section_two'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'section_two'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'section_two'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'section_two'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'], // Section not mentioned in permission
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
-                ]
-            ],
-            // EDITOR permission on Project, CAN_COMPLETE / CAN_SUBMIT roles
-            [
-                [[Permission::EDITOR], Scheme::class, Scheme::class, 'authority:1/project:1', null, null],
-                [
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', null],
-                    [self::ALL_BUT_EDIT, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::ALL_BUT_EDIT, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
-                ]
-            ],
-            // EDITOR permission on Project, CAN_EDIT role
-            [
-                [[Permission::EDITOR], Scheme::class, Scheme::class, 'authority:1/project:1', null, null],
-                [
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', null],
-                    [self::EDIT_ONLY, false, Authority::class, 'authority:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', null],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1', null], // Invalid subject - Can't CHECK / EDIT a ProjectReturn as a whole (only sections thereof)
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', null],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', null],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:1/project:1', 'whatever'],
-                    [self::EDIT_ONLY, true,  CrstsSchemeReturn::class, 'authority:1/return:2/project:1', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2', 'whatever'],
-                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1', 'whatever'],
+                    [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Permission targets scheme, which does not confer editing of fund return
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
         ];
+    }
 
-        foreach($permissionsAndTests as [$permissionSet, $tests]) {
+    public function dataPermissions(): \Generator
+    {
+        $userRef = 'user';
+        foreach($this->getPermissionsAndTests() as [$permissionSet, $tests]) {
             foreach($tests as $test) {
-                $attributes = $test[0];
+                [$attributes, $expectedResult, $subjectClass, $subjectRef] = $test;
+
                 foreach($attributes as $attribute) {
-                    $otherArgs = [$test[1], $userRef, ...array_slice($test, 2)];
+                    $otherArgs = [$expectedResult, $userRef, $subjectClass, $subjectRef];
 
                     if ($permissionSet === null) {
-                        yield array_merge([$attribute, null, null, null, null, null, null], $otherArgs);
+                        yield array_merge([$attribute, null, null, null, null, null], $otherArgs);
                     } else {
-                        [$permissions, $entityRefClass, $entityClass, $entityId, $fundTypes, $sectionTypes] = $permissionSet;
+                        [$permissions, $entityRefClass, $entityClass, $entityId] = $permissionSet;
 
                         foreach($permissions as $permission) {
-                            yield array_merge([$attribute, $permission, $entityRefClass, $entityClass, $entityId, $fundTypes, $sectionTypes], $otherArgs);
+                            yield array_merge([$attribute, $permission, $entityRefClass, $entityClass, $entityId, null], $otherArgs);
                         }
                     }
                 }
@@ -816,16 +530,84 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
         ?string     $permissionEntityClass,
         ?string     $permissionEntityId,
         ?array      $permissionFundTypes,
-        ?array      $permissionSectionTypes,
 
-        bool        $expectedResult,
+        ?bool       $expectedResult,
         string      $userRef,
 
         string      $subjectClass,
         string      $subjectRef,
-        ?string     $subjectSectionType
     ): void
     {
-        $this->createPermissionAndPerformTest(...func_get_args());
+        $this->createPermissionAndPerformTestOnSpecificVoter($this->permissionVoter, ...func_get_args());
+    }
+
+    public function dataPermissionsWithFunds(): \Generator
+    {
+        $userRef = 'user';
+
+        // With this test we look at how adding fundTypes to the permissions affects the resulting voter response.
+
+        // With CRSTS1, everything should be the same as previously, as all of the fixtures use CRSTS1 funds.
+        // Whereas with BSIP specified, the voters should always return false.
+        $fundsAndHowExpectedResultsAreModified = [
+            [[Fund::CRSTS1], null],
+            [[Fund::BSIP], false],
+        ];
+
+        foreach($this->getPermissionsAndTests() as [$permissionSet, $tests]) {
+            foreach($tests as $test) {
+                [$attributes, $expectedResult, $subjectClass, $subjectRef] = $test;
+
+                if ($permissionSet === null) {
+                    // Not needed - tested in testPermissionsForView
+                    continue;
+                }
+
+                [$permissions, $entityRefClass, $entityClass, $entityId] = $permissionSet;
+
+                if (!in_array($entityClass, [Authority::class, Scheme::class])) {
+                    // FundTypes only valid in permissions targeting Authority or Scheme
+                    continue;
+                }
+
+                foreach($fundsAndHowExpectedResultsAreModified as [$funds, $expectedResultModifier]) {
+                    $funds = array_map(fn(Fund $f) => $f->value, $funds);
+                    $calculatedExpectedResult = match ($expectedResultModifier) {
+                        null => $expectedResult,
+                        default => $expectedResultModifier,
+                    };
+
+                    foreach($attributes as $attribute) {
+                        $otherArgs = [$calculatedExpectedResult, $userRef, $subjectClass, $subjectRef];
+
+                        foreach($permissions as $permission) {
+                            yield array_merge([$attribute, $permission, $entityRefClass, $entityClass, $entityId, $funds], $otherArgs);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @dataProvider dataPermissionsWithFunds
+     */
+    public function testPermissionsWithFundsForView(
+        string         $attribute,
+
+        ?Permission    $permission,
+        ?string        $permissionEntityReferenceClass,
+        ?string        $permissionEntityClass,
+        ?string        $permissionEntityId,
+        ?array         $permissionFundTypes,
+
+        bool           $expectedResult,
+        string         $userRef,
+
+        string         $subjectClass,
+        string         $subjectRef,
+    ): void
+    {
+        $this->createPermissionAndPerformTestOnSpecificVoter($this->permissionVoter, ...func_get_args());
     }
 }

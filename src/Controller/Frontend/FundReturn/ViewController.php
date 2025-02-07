@@ -7,12 +7,15 @@ use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
+use App\ListPage\SchemeListPage;
 use App\Repository\SchemeFund\SchemeFundRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -31,11 +34,21 @@ class ViewController extends AbstractController
         FundReturn              $fundReturn,
         ExpensesTableHelper     $expensesTableHelper,
         ExpensesTableCalculator $expensesTableCalculator,
+        Request                 $request,
+        SchemeListPage          $schemeListPage,
     ): Response
     {
         $this->breadcrumbBuilder->setAtFundReturn($fundReturn);
         $fund = $fundReturn->getFund();
         $schemeFunds = $this->getSchemasForFund($fundReturn, $fund);
+
+        $schemeListPage
+            ->setFundReturn($fundReturn)
+            ->handleRequest($request);
+
+        if ($schemeListPage->isClearClicked()) {
+            return new RedirectResponse($schemeListPage->getClearUrl());
+        }
 
         $expensesTableHelper
             ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
@@ -49,26 +62,7 @@ class ViewController extends AbstractController
             'expensesTableHelper' => $expensesTableHelper,
             'expensesTableCalculator' => $expensesTableCalculator,
             'schemeFunds' => $schemeFunds,
-        ]);
-    }
-
-    #[Route('/fund-return/{fundReturnId}/status', name: 'app_fund_return_status')]
-    #[IsGranted(Role::CAN_VIEW, 'fundReturn')]
-    public function status(
-        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn $fundReturn,
-    ): Response
-    {
-        $this->breadcrumbBuilder->setAtFundReturnStatus($fundReturn);
-        $fund = $fundReturn->getFund();
-        $schemeFunds = $this->getSchemasForFund($fundReturn, $fund);
-
-        return $this->render('frontend/fund_return/status.html.twig', [
-            'breadcrumbBuilder' => $this->breadcrumbBuilder,
-            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
-            'fundLevelSections' => FundLevelSection::filterForFund($fund),
-            'fundReturn' => $fundReturn,
-            'schemeFunds' => $schemeFunds,
+            'schemeListPage' => $schemeListPage,
         ]);
     }
 

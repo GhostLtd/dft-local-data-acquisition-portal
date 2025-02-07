@@ -2,11 +2,10 @@
 
 namespace App\Controller\Frontend\FundReturn;
 
-use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Controller\Frontend\AbstractReturnController;
 use App\Entity\Enum\FundLevelSection;
+use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\FundReturn\FundReturnSectionStatus;
 use App\Form\Type\FundReturn\Crsts\ExpensesType;
 use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
 use App\Utility\CrstsHelper;
@@ -16,12 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class EditController extends AbstractReturnController
 {
-
-
     #[Route('/fund-return/{fundReturnId}/section/{section}', name: 'app_fund_return_edit')]
+    #[IsGranted(Role::CAN_EDIT, 'fundReturn')]
     public function fundReturnEdit(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
         FundLevelSection           $section,
@@ -38,13 +37,11 @@ class EditController extends AbstractReturnController
         $breadcrumbBuilder->setAtFundReturnSectionEdit($fundReturn, $section);
         $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()])."#{$section->value}";
 
-        $fundReturnSectionStatus = $this->getSectionStatus($fundReturn, $section);
         $form = $this->createForm($formClass, $fundReturn, [
             'cancel_url' => $cancelUrl,
-            'completion_status' => $fundReturnSectionStatus,
         ]);
 
-        if ($response = $this->processForm($form, $request, $fundReturnSectionStatus, $cancelUrl)) {
+        if ($response = $this->processForm($form, $request, $cancelUrl)) {
             return $response;
         }
 
@@ -57,6 +54,7 @@ class EditController extends AbstractReturnController
     }
 
     #[Route('/fund-return/{fundReturnId}/expense/{divisionKey}', name: 'app_fund_return_expense_edit')]
+    #[IsGranted(Role::CAN_EDIT, 'fundReturn')]
     public function fundReturnExpense(
         DashboardBreadcrumbBuilder $breadcrumbBuilder,
         string                     $divisionKey,
@@ -82,14 +80,12 @@ class EditController extends AbstractReturnController
             ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
-        $fundReturnSectionStatus = $this->getSectionStatus($fundReturn, $divisionConfiguration);
         $form = $this->createForm(ExpensesType::class, $fundReturn, [
             'cancel_url' => $cancelUrl,
-            'completion_status' => $fundReturnSectionStatus,
             'expenses_table_helper' => $expensesTableHelper,
         ]);
 
-        if ($response = $this->processForm($form, $request, $fundReturnSectionStatus, $cancelUrl)) {
+        if ($response = $this->processForm($form, $request, $cancelUrl)) {
             return $response;
         }
 
@@ -98,14 +94,5 @@ class EditController extends AbstractReturnController
             'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,
         ]);
-    }
-
-    protected function getSectionStatus(FundReturn $fundReturn, DivisionConfiguration|FundLevelSection $section): FundReturnSectionStatus
-    {
-        $fundReturnSectionStatus = $fundReturn->getOrCreateFundReturnSectionStatus($section);
-        if (!$this->entityManager->contains($fundReturnSectionStatus)) {
-            $this->entityManager->persist($fundReturnSectionStatus);
-        }
-        return $fundReturnSectionStatus;
     }
 }
