@@ -210,7 +210,7 @@
     {{- displaySectionsAsTabs(sections, 'frontend.pages.scheme_return.titles.expenses' | trans) -}}
 
     <p class="govuk-body">
-        <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}" class="govuk-link">{{-
+        <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">{{-
             'frontend.pages.scheme_return.back_to_fund_return' | trans({fundName: "enum.fund.#{fundReturn.fundAward.type.name}" | trans})
         -}}</a>
     </p>

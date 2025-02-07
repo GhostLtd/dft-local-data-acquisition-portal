@@ -2,10 +2,8 @@
 
 namespace App\ListPage;
 
-use App\Entity\Enum\Fund;
 use App\Entity\FundReturn\FundReturn;
 use App\Repository\SchemeFund\SchemeFundRepository;
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\QueryBuilder;
 use Ghost\GovUkCoreBundle\ListPage\AbstractListPage;
 use Ghost\GovUkCoreBundle\ListPage\Field\ChoiceFilter;
@@ -39,8 +37,10 @@ class SchemeListPage extends AbstractListPage
     {
         return [
             (new TextFilter('Name', 'scheme.name'))->sortable(),
-            (new Simple('Ready for signoff?', '')),
-            (new Simple('Retained?', 'schemeFund.retained')),
+            (new ChoiceFilter('Ready for signoff?', 'schemeReturn.readyForSignoff', ['No' => 0, 'Yes' => 1])),
+            (new ChoiceFilter('Retained?', 'schemeFund.retained', ['No' => 0, 'Yes' => 1])),
+            // Don't see a way to filter this without using sub-queries and rewriting ListPage.
+            // There's a possibility a view might help
             (new Simple('On-track rating', '')),
         ];
     }
@@ -48,15 +48,7 @@ class SchemeListPage extends AbstractListPage
     #[\Override]
     protected function getQueryBuilder(): QueryBuilder
     {
-        // We get the schemeFunds from this direction, so that we can list all of them and explicitly any that
-        // do not requiring a return, if that is the case (e.g. CRSTS - if not retained and not quarter 1)
-
-        // (Fetching via fundReturn->getSchemeReturns() direction would only fetch those schemes that
-        //  do have returns, resulting in an incomplete list)
-        return $this->schemeFundRepository->getQueryBuilderForSchemeFundsForAuthority(
-            $this->fundReturn->getFundAward()->getAuthority(),
-            $this->fundReturn->getFund(),
-        );
+        return $this->schemeFundRepository->getQueryBuilderForSchemeReturnsForFundReturn($this->fundReturn);
     }
 
     #[\Override]
