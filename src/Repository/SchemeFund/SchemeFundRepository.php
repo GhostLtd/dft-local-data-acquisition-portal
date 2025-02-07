@@ -8,6 +8,7 @@ use App\Entity\SchemeFund\CrstsSchemeFund;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\Authority;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
@@ -37,6 +38,13 @@ class SchemeFundRepository extends ServiceEntityRepository
 
     public function getSchemeFundsForAuthority(Authority $authority, Fund $fund=null): array
     {
+        return $this->getQueryBuilderForSchemeFundsForAuthority($authority, $fund)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getQueryBuilderForSchemeFundsForAuthority(Authority $authority, Fund $fund=null): QueryBuilder
+    {
         $schemeFundClass = $this->getSchemeFundClassForFund($fund);
 
         return $this->getEntityManager()
@@ -47,9 +55,7 @@ class SchemeFundRepository extends ServiceEntityRepository
             ->join('scheme.authority', 'authority')
             ->where('authority.id = :authority_id')
             ->orderBy('scheme.name', 'ASC')
-            ->getQuery()
-            ->setParameter('authority_id', $authority->getId(), UlidType::NAME)
-            ->getResult();
+            ->setParameter('authority_id', $authority->getId(), UlidType::NAME);
     }
 
     public function findForDashboard(string $id): ?SchemeFund

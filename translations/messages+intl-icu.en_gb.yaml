@@ -50,9 +50,13 @@ common:
   actions:
     edit: edit
     view: view
+  scheme:
+    retained: Retained
+    non_retained: Non-retained
   text:
     na: Not available
     no: No
+    no_results: No results
     tbc: To be confirmed
     yes: Yes
 
