@@ -10,7 +10,9 @@ use Ghost\GovUkCoreBundle\ListPage\Field\ChoiceFilter;
 use Ghost\GovUkCoreBundle\ListPage\Field\Simple;
 use Ghost\GovUkCoreBundle\ListPage\Field\TextFilter;
 use Ghost\GovUkCoreBundle\ListPage\ListPageData;
+use Ghost\GovUkCoreBundle\ListPage\ListPageForm;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class SchemeListPage extends AbstractListPage
@@ -43,6 +45,23 @@ class SchemeListPage extends AbstractListPage
             // There's a possibility a view might help
             (new Simple('On-track rating', '')),
         ];
+    }
+
+    #[\Override]
+    public function getFiltersForm(): FormInterface
+    {
+        static $form;
+
+        $url = $this->getPageUrl($this->page, true, true);
+
+        if (!$form) {
+            $form = $this->formFactory->create(ListPageForm::class, null, [
+                'fields' => $this->getFields(),
+                'action' => $url,
+            ]);
+        }
+
+        return $form;
     }
 
     #[\Override]
