@@ -295,11 +295,11 @@ forms:
         label: &sr_total_cost Total cost
     overall_progress:
       progress_summary:
-        label: &fr_overall_progress_summary Overall progress summary
+        label: Overall progress summary
       delivery_confidence:
-        label: &fr_overall_delivery_confidence Overall delivery confidence
+        label: Overall delivery confidence
       overall_confidence:
-        label: &fr_overall_confidence Overall confidence rating
+        label: Overall confidence rating
     scheme_details:
       benefit_cost_ratio:
         label: &sr_benefit_cost_ratio Benefit-cost ratio
@@ -310,7 +310,7 @@ forms:
         label: Scheme name
         help: ''
       previously_tcf:
-        label: &sr_previously_tcf Was this previously a scheme in Transporting Cities Fund (TCF)?
+        label: Was this previously a scheme in Transporting Cities Fund (TCF)?
         help: ''
       risks:
         label: &sr_scheme_risks Scheme risks
@@ -319,10 +319,14 @@ forms:
         label: &sr_scheme_identifier Scheme ID
     quarterly_progress:
       progress_summary:
-        label: &fr_quarterly_progress Quarterly progress
+        label: Quarterly progress
       progress_rating:
-        label: &fr_quarterly_progress_rating Quarterly rating
+        label: Quarterly rating
   scheme:
+    mark_as_ready_for_signoff:
+      confirm: Mark as ready for signoff
+    mark_as_not_ready_for_signoff:
+      confirm: Mark as not ready for signoff
     milestone_dates:
       start_development:
         label: Start development
@@ -356,17 +360,17 @@ forms:
 
     scheme_elements:
       has_active_travel_elements:
-        label: &sr_has_active_travel_elements Does this scheme have active travel elements?
+        label: Does this scheme have active travel elements?
         help: ''
       active_travel_element:
         label: Active travel element
         help: Pick the leading active travel intervention type
         placeholder: Please select an active travel element
       includes_charging_points:
-        label: &sr_includes_charging_points Does this scheme include charging points for electric vehicles?
+        label: Does this scheme include charging points for electric vehicles?
         help: ''
       includes_clean_air_elements:
-        label: &sr_includes_clean_air_elements Does this scheme include clean air elements?
+        label: Does this scheme include clean air elements?
         help: ''
     transport_mode:
       category:
@@ -473,14 +477,27 @@ frontend:
       has_active_travel_elements: Active travel elements?
       includes_charging_points: Charging points for EVs?
       includes_clean_air_elements: Clean air elements?
+      mark_as_ready_for_signoff: Mark scheme as ready for sign-off
       on_track_rating: *sr_on_track_rating
       previously_tcf: Previously a scheme in TCF?
       progress_update: *sr_progress_update
+      ready_for_signoff: Is ready for signoff?
       retained: Is retained?
       risks: *sr_scheme_risks
       scheme_id: *sr_scheme_identifier
       total_cost: *sr_total_cost
       transport_mode: *sr_transport_mode
+      unmark_as_ready_for_signoff: Unmark scheme as ready for sign-off
+    scheme_mark_as_not_ready_for_signoff:
+      breadcrumb: Mark as not ready for signoff
+      help: |-
+        This will mark the scheme as not yet being ready for signoff and will re-allow editing.
+    scheme_mark_as_ready_for_signoff:
+      breadcrumb: Mark as ready for signoff
+      help: |-
+        This will lock the scheme for editing and will mark it as being ready for signoff.
+        
+        You will be able to change this back if you need to make further changes.
     scheme_return_status:
       title: Status
       titles:

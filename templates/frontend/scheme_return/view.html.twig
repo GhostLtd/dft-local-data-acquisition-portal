@@ -16,15 +16,40 @@
     {%- set contents -%}
         {{- summaryListStart() -}}
         {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.schemeFund.retained) }}
+        {{- yesOrNo('frontend.pages.scheme_return.ready_for_signoff', schemeReturn.readyForSignoff) }}
         {{- summaryListEnd() -}}
     {%- endset %}
+
+    {%- set statusActions = [] -%}
+
+    {%- if is_granted('CAN_SIGN_OFF_SCHEME', schemeReturn) -%}
+        {%- set statusActions = statusActions|merge([
+            {
+                text: 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans,
+                visuallyHiddenText: ': ' ~ breadcrumbBuilder.titleFor('scheme_return'),
+                href: path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id}),
+            }
+        ]) -%}
+    {%- endif -%}
+    {%- if is_granted('CAN_REOPEN_SCHEME', schemeReturn) -%}
+        {%- set statusActions = statusActions|merge([
+            {
+                text: 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans,
+                visuallyHiddenText: ': ' ~ breadcrumbBuilder.titleFor('scheme_return'),
+                href: path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id}),
+            }
+        ]) -%}
+    {%- endif -%}
 
     {%- set configs = [
         {
             title: 'frontend.pages.scheme_return.titles.status' | trans,
             section: 'status',
             contents,
-            options: {add_edit_link: false},
+            options: {
+                add_edit_link: false,
+                actions: statusActions,
+            },
         }
     ] -%}
 
@@ -184,7 +209,9 @@
 
     {{- displaySectionsAsTabs(sections, 'frontend.pages.scheme_return.titles.expenses' | trans) -}}
 
-{#    <p class="govuk-body">#}
-{#    <a href="{{ path('app_scheme_return_status', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id}) }}" class="govuk-link">Status page</a>#}
-{#    </p>#}
+    <p class="govuk-body">
+        <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}" class="govuk-link">{{-
+            'frontend.pages.scheme_return.back_to_fund_return' | trans({fundName: "enum.fund.#{fundReturn.fundAward.type.name}" | trans})
+        -}}</a>
+    </p>
 {%- endblock -%}

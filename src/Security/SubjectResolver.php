@@ -31,6 +31,8 @@ class SubjectResolver
         $fundType = null;
         $idMap = [];
 
+        $originalSubject = $subject;
+
         if ($subject instanceof SchemeReturn) {
             $idMap[SchemeReturn::class] = $subject->getId();
             $idMap[Scheme::class] = $subject?->getSchemeFund()?->getScheme()?->getId();
@@ -49,7 +51,7 @@ class SubjectResolver
             $admin = $subject->getAdmin();
         }
 
-        return new ResolvedSubject($baseEntityClass, $subject, $section, $idMap, $admin, $fundType);
+        return new ResolvedSubject($baseEntityClass, $originalSubject, $section, $idMap, $admin, $fundType);
     }
 
     protected function parseSubjectForRole(mixed $subject, string $role, bool $logErrors = false): ?array
@@ -80,12 +82,26 @@ class SubjectResolver
             return null;
         }
 
-        if (in_array($role, [Role::CAN_COMPLETE, Role::CAN_EDIT]) && $section === null) {
+        if ($role == Role::CAN_EDIT && $section === null) {
             $logErrors && $this->logger->error("Failed to parse subject - section must be specified for role {$role}");
             return null;
         }
 
         $baseEntityClass = $this->getBaseEntityClassForRole($subject, $role);
+
+        if ($role === Role::CAN_COMPLETE) {
+            if ($baseEntityClass === SchemeReturn::class) {
+                if ($section !== null) {
+                    $logErrors && $this->logger->error("Failed to parse subject - when targeting a SchemeReturn using role {$role}, section must not be specified");
+                    return null;
+                }
+            } else {
+                if ($section === null) {
+                    $logErrors && $this->logger->error("Failed to parse subject - section must be specified for role {$role}");
+                    return null;
+                }
+            }
+        }
 
         if (!$baseEntityClass) {
             $logErrors && $this->logger->error("Failed to parse subject - invalid subject type (".$subject::class.") for role {$role}");

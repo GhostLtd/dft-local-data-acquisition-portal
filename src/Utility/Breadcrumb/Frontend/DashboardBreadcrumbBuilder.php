@@ -108,6 +108,34 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
         );
     }
 
+    public function setAtSchemeReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    {
+        $this->setAtSchemeFund($fundReturn, $schemeFund);
+        $this->addItem(
+            'scheme_return_mark_as_ready_for_signoff',
+            'app_scheme_return_mark_as_ready_for_signoff',
+            routeParameters: [
+                'fundReturnId' => $fundReturn->getId(),
+                'schemeFundId' => $schemeFund->getId(),
+            ],
+            translationKey: 'frontend.pages.scheme_mark_as_ready_for_signoff.breadcrumb',
+        );
+    }
+
+    public function setAtSchemeNotReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    {
+        $this->setAtSchemeFund($fundReturn, $schemeFund);
+        $this->addItem(
+            'scheme_return_mark_as_not_ready_for_signoff',
+            'app_scheme_return_mark_as_not_ready_for_signoff',
+            routeParameters: [
+                'fundReturnId' => $fundReturn->getId(),
+                'schemeFundId' => $schemeFund->getId(),
+            ],
+            translationKey: 'frontend.pages.scheme_mark_as_not_ready_for_signoff.breadcrumb',
+        );
+    }
+
     public function setAtSchemeExpenseEdit(FundReturn $fundReturn, SchemeFund $scheme, DivisionConfiguration $division): void
     {
         $this->setAtSchemeFund($fundReturn, $scheme);

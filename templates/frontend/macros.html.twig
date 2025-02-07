@@ -48,7 +48,7 @@
     {#- Build params structure -#}
     {%- set sections = [] -%}
     {%- for config in configs -%}
-        {%- set actions = [] -%}
+        {%- set actions = config.options.actions ?? [] -%}
 
         {%- if (config.options.add_edit_link ?? true) and is_granted('CAN_EDIT', {subject: return, section: config.section}) -%}
             {%- set actions = actions|merge([{

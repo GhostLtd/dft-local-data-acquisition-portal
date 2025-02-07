@@ -20,6 +20,7 @@ class CrstsSchemeReturnDefinition
         protected ?BusinessCase       $businessCase = null,
         protected ?\DateTimeInterface $expectedBusinessCaseApproval = null,
         protected ?string             $progressUpdate = null,
+        protected ?bool               $readyForSignoff = null,
         protected array               $milestones = [],
         protected array               $expenses = [],
     ) {}
@@ -52,6 +53,11 @@ class CrstsSchemeReturnDefinition
     public function getProgressUpdate(): ?string
     {
         return $this->progressUpdate;
+    }
+
+    public function getReadyForSignoff(): ?bool
+    {
+        return $this->readyForSignoff;
     }
 
     /** @return array<MilestoneDefinition> */

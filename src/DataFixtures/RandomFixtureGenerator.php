@@ -275,6 +275,7 @@ class RandomFixtureGenerator
             $this->faker->randomElement(BusinessCase::cases()),
             $this->faker->dateTime(),
             $this->faker->text(),
+            $this->faker->boolean(20),
             $milestones,
             $expenses,
         );

@@ -11,4 +11,7 @@ class Role
     const string CAN_COMPLETE = 'CAN_COMPLETE';
     const string CAN_EDIT = 'CAN_EDIT';
     const string CAN_VIEW = 'CAN_VIEW';
+
+    const string CAN_SIGN_OFF_SCHEME = 'CAN_SIGN_OFF_SCHEME';
+    const string CAN_REOPEN_SCHEME = 'CAN_REOPEN_SCHEME';
 }

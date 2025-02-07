@@ -40,6 +40,9 @@ abstract class SchemeReturn
     #[ORM\OneToMany(targetEntity: SchemeReturnSectionStatus::class, mappedBy: 'schemeReturn', orphanRemoval: true)]
     private Collection $sectionStatuses;
 
+    #[ORM\Column]
+    private bool $readyForSignoff = false;
+
     public function __construct()
     {
         $this->sectionStatuses = new ArrayCollection();
@@ -74,6 +77,17 @@ abstract class SchemeReturn
     public function getSectionStatuses(): Collection
     {
         return $this->sectionStatuses;
+    }
+
+    public function getReadyForSignoff(): bool
+    {
+        return $this->readyForSignoff;
+    }
+
+    public function setReadyForSignoff(bool $readyForSignoff): static
+    {
+        $this->readyForSignoff = $readyForSignoff;
+        return $this;
     }
 
     public function addSectionStatus(SchemeReturnSectionStatus $sectionStatus): static

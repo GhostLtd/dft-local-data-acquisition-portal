@@ -260,7 +260,8 @@ class FixtureHelper
             ->setOnTrackRating($definition->getOnTrackRating())
             ->setBusinessCase($definition->getBusinessCase())
             ->setExpectedBusinessCaseApproval($definition->getExpectedBusinessCaseApproval())
-            ->setProgressUpdate($definition->getProgressUpdate());
+            ->setProgressUpdate($definition->getProgressUpdate())
+            ->setReadyForSignoff($definition->getReadyForSignoff());
 
         foreach($definition->getMilestones() as $milestoneDefinition) {
             $return->addMilestone($this->createMilestone($milestoneDefinition));

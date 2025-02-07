@@ -5,6 +5,7 @@ namespace App\Security\Voter;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\Permission;
 use App\Entity\Enum\Role;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\User;
 use App\Security\SubjectResolver;
 use App\Security\UserPermissionValidator;
@@ -38,6 +39,18 @@ class PermissionVoter extends Voter
 
         if (!$user instanceof User) {
             return false;
+        }
+
+        if (
+            $attribute === Role::CAN_EDIT &&
+            $resolvedSubject->getBaseClass() === SchemeReturn::class
+        ) {
+            /** @var $entity SchemeReturn */
+            $entity = $resolvedSubject->getEntity();
+            if ($entity->getReadyForSignoff() === true) {
+                // No editing if the scheme's been marked as ready for sign-off
+                return false;
+            }
         }
 
         if ($resolvedSubject->getAdmin() === $user) {
