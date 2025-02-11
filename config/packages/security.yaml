@@ -1,6 +1,7 @@
 security:
     access_decision_manager:
         strategy: unanimous
+        allow_if_all_abstain: false
 
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:

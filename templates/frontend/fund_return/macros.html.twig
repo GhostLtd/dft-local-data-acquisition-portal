@@ -1,0 +1,9 @@
+{%- macro overallProgressContent(fundReturn) -%}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import summaryListStart, summaryListEnd, summaryListRow -%}
+    {%- from 'frontend/macros.html.twig' import ratingTag, text -%}
+    {{- summaryListStart() -}}
+    {{- ratingTag('frontend.pages.fund_return.overall_confidence', fundReturn.overallConfidence) -}}
+    {{- text('frontend.pages.fund_return.overall_progress_summary', fundReturn.progressSummary) -}}
+    {{- text('frontend.pages.fund_return.overall_delivery_confidence', fundReturn.deliveryConfidence) -}}
+    {{- summaryListEnd() -}}
+{%- endmacro -%}

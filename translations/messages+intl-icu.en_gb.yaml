@@ -449,6 +449,11 @@ frontend:
       overall_progress_summary: Progress summary
       resource_funding: *fr_resource_funding
       sign_off: Sign off
+    fund_return_signoff:
+      title: Sign-off and submit
+      confirmed-notification:
+        heading: "{fund} return submitted"
+        content: "The {fund} return for {year}/{nextYear} Q{quarter} has been signed-off and submitted"
     scheme_return:
       title: "{schemeName}"
       titles:

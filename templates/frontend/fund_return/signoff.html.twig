@@ -1,0 +1,20 @@
+{% extends 'frontend/base.html.twig' %}
+
+{%- set page_title = breadcrumbBuilder.titleFor('fund_return_signoff') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{% block content %}
+    {% from 'frontend/fund_return/macros.html.twig' import overallProgressContent %}
+    {% from '@GhostGovUkFrontend/components/macros.html.twig' import summaryCard %}
+
+    {{- summaryCard({
+        title: {text: 'frontend.pages.fund_return.titles.overall_progress' | trans},
+        attributes: {id: 'overall_progress'},
+    }, overallProgressContent(fundReturn)) }}
+
+    <p class="govuk-body">This will sign off the return and submit it to DfT. Once signed off, you will no longer be able to edit it. Are you sure you wish to proceed?</p>
+
+    {{- form(form) -}}
+
+{% endblock %}
+

@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\MaintenanceWarning;
 use App\Form\Type\Admin\MaintenanceWarningType;
 use App\ListPage\MaintenanceWarningListPage;
-use App\Utility\ConfirmAction\DeleteMaintenanceWarningConfirmAction;
+use App\Utility\ConfirmAction\Admin\DeleteMaintenanceWarningConfirmAction;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkFrontendBundle\Model\NotificationBanner;
 use Symfony\Bridge\Twig\Attribute\Template;

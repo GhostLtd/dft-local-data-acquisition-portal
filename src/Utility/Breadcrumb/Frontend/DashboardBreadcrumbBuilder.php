@@ -35,6 +35,18 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
         );
     }
 
+    public function setAtFundReturnSignoff(FundReturn $fundReturn): void
+    {
+        $this->setAtFundReturn($fundReturn);
+        $this->addItem(
+            'fund_return_signoff',
+            'app_fund_return_signoff',
+            routeParameters: ['fundReturnId' => $fundReturn->getId()],
+            translationKey: 'frontend.pages.fund_return_signoff.title',
+            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
+        );
+    }
+
     protected function getFundReturnTranslationKeys(FundReturn $fundReturn): array
     {
         $typeKey = "enum.fund.".$fundReturn->getFundAward()->getType()->value;

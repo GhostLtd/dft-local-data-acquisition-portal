@@ -1,24 +1,27 @@
 <?php
 
-namespace App\Utility\ConfirmAction;
+namespace App\Utility\ConfirmAction\Frontend;
 
-use App\Entity\MaintenanceWarning;
+use App\Entity\FundReturn\FundReturn;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkCoreBundle\Utility\ConfirmAction\AbstractConfirmAction;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class DeleteMaintenanceWarningConfirmAction extends AbstractConfirmAction
+
+class SignoffFundReturnConfirmAction extends AbstractConfirmAction
 {
-    /** @var MaintenanceWarning */
+    /** @var FundReturn */
     protected mixed $subject;
 
     public function __construct(
         FormFactoryInterface             $formFactory,
         RequestStack                     $requestStack,
-        protected EntityManagerInterface $entityManager
-    )
-    {
+        protected EntityManagerInterface $entityManager,
+        protected Security               $security
+    ) {
         parent::__construct($formFactory, $requestStack);
     }
 
@@ -36,21 +39,31 @@ class DeleteMaintenanceWarningConfirmAction extends AbstractConfirmAction
     public function getTranslationParameters(): array
     {
         return [
-            'start' => $this->subject->getStartDatetime()->getTimestamp(),
-            'end' => $this->subject->getEndTime()->getTimestamp(),
+            'fund' => $this->subject->getFund()->name,
+            'year' => $this->subject->getYear(),
+            'nextYear' => $this->subject->getYear() + 1,
+            'quarter' => $this->subject->getQuarter(),
         ];
     }
 
     #[\Override]
     public function getTranslationKeyPrefix(): string
     {
-        return 'admin.maintenance.delete';
+        return 'frontend.pages.fund_return_signoff';
     }
 
     #[\Override]
     public function doConfirmedAction($formData): void
     {
-        $this->entityManager->remove($this->subject);
+        /** @var User $user */
+        $user = $this->security->getUser();
+        $this->subject
+            ->setSignoffUser($user)
+            ->setSignoffDate(new \DateTime())
+            ->setSignoffEmail($user->getEmail())
+            ->setSignoffName($user->getName())
+            ;
+
         $this->entityManager->flush();
     }
 }
