@@ -47,7 +47,7 @@ class UserPermission
         return $this->permission;
     }
 
-    public function setPermission(Permission $permission): static
+    public function setPermission(?Permission $permission): static
     {
         $this->permission = $permission;
         return $this;

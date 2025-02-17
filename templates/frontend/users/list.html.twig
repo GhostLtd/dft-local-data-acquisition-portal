@@ -1,0 +1,44 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title = 'frontend.pages.users.title' | trans({authorityName: authority.name}) -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+{%- set current_menu = 'users' -%}
+
+{% block content %}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import tableRow, tag, summaryListActionsList -%}
+    {%- from "@GhostGovUkCore/list-page.html.twig" import listTableStart, listTableEnd -%}
+
+    {%- set listData = listPage.data -%}
+    {%- set listForm = listPage.filtersForm.createView -%}
+
+    {%- form_theme listForm '@GhostGovUkFrontend/theme.html.twig' -%}
+
+    <div class="scheme-list" id="scheme-list">
+        {{- listTableStart(listData, listForm) -}}
+        {%- for user in listData.entities -%}
+            {%- set actions = [
+                {
+                    href: path('app_user', {authorityId: authority.id, userId: user.id}),
+                    text: 'common.actions.view' | trans,
+                }
+            ] -%}
+            {{- tableRow([
+                {text: user.name},
+                {text: user.email},
+                {html: summaryListActionsList(actions)},
+            ]) -}}
+        {%- else -%}
+            {{- tableRow([
+                {
+                    text: 'common.text.no_results' | trans,
+                    colspan: listData.fields | length + 1,
+                }
+            ]) -}}
+        {%- endfor -%}
+        {{- listTableEnd(listData, listForm) -}}
+    </div>
+
+    <div class="govuk-button-group">
+        <a class="govuk-button" href="{{ path('app_user_add', {authorityId: authority.id}) }}">{{ 'frontend.pages.user.add_user' | trans }}</a>
+    </div>
+{% endblock %}

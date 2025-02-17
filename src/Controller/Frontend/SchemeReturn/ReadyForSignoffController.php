@@ -6,7 +6,7 @@ use App\Controller\Frontend\AbstractReturnController;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
-use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkCoreBundle\Form\ConfirmActionType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -23,8 +23,8 @@ class ReadyForSignoffController extends AbstractReturnController
     protected const string MARK_AS_NOT_READY = 'mark_as_not_ready';
 
     public function __construct(
-        EntityManagerInterface               $entityManager,
-        protected DashboardBreadcrumbBuilder $breadcrumbBuilder,
+        EntityManagerInterface          $entityManager,
+        protected DashboardLinksBuilder $linksBuilder,
     )
     {
         parent::__construct($entityManager);
@@ -65,12 +65,12 @@ class ReadyForSignoffController extends AbstractReturnController
 
         if ($type === self::MARK_AS_READY) {
             $this->denyAccessUnlessGranted(Role::CAN_MARK_AS_READY, $schemeReturn);
-            $this->breadcrumbBuilder->setAtSchemeReadyForSignoff($fundReturn, $schemeFund);
+            $this->linksBuilder->setAtSchemeReadyForSignoff($fundReturn, $schemeFund);
             $label = "forms.scheme.mark_as_ready_for_signoff.confirm";
             $template = "frontend/scheme_return/ready_for_signoff.html.twig";
         } else if ($type === self::MARK_AS_NOT_READY) {
             $this->denyAccessUnlessGranted(Role::CAN_MARK_AS_NOT_READY, $schemeReturn);
-            $this->breadcrumbBuilder->setAtSchemeNotReadyForSignoff($fundReturn, $schemeFund);
+            $this->linksBuilder->setAtSchemeNotReadyForSignoff($fundReturn, $schemeFund);
             $label = "forms.scheme.mark_as_not_ready_for_signoff.confirm";
             $template = "frontend/scheme_return/not_ready_for_signoff.html.twig";
         } else {
@@ -108,7 +108,7 @@ class ReadyForSignoffController extends AbstractReturnController
         }
 
         return $this->render($template, [
-            'breadcrumbBuilder' => $this->breadcrumbBuilder,
+            'linksBuilder' => $this->linksBuilder,
             'form' => $form,
             'fundReturn' => $fundReturn,
             'schemeReturn' => $schemeReturn,

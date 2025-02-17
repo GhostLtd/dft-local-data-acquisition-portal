@@ -1,9 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% trans_default_domain 'admin' %}
-{%- if page_title is not defined -%}
-    {%- set page_title = page_title_key | trans(page_title_params ?? {}) -%}
-{%- endif -%}
+{%- trans_default_domain 'admin' -%}
+{%- set page_title_domain = 'admin' -%}
 {%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('site-title-suffix' | trans) ~ ('site.title' | trans)) -%}
 
 {% block navigation %}

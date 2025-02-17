@@ -24,7 +24,6 @@ authority:
     add: Add MCA
     delete: Delete
     edit: Edit
-    intro_copy: MCAs
     no_results: No results
   form:
     name: Authority name

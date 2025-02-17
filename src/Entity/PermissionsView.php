@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\Permission;
 use App\Repository\PermissionsViewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +15,9 @@ class PermissionsView
     #[ORM\Id]
     #[ORM\Column(type: UlidType::NAME)]
     protected ?Ulid $id = null;
+
+    #[ORM\Column(enumType: Permission::class)]
+    private ?Permission $permission = null;
 
     #[ORM\Column(length: 255)]
     private ?string $entityClass = null;
@@ -39,6 +43,11 @@ class PermissionsView
     public function getId(): ?Ulid
     {
         return $this->id;
+    }
+
+    public function getPermission(): ?Permission
+    {
+        return $this->permission;
     }
 
     public function getEntityClass(): ?string

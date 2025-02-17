@@ -3,30 +3,33 @@
 namespace App\Utility\Breadcrumb\Frontend;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
+use App\Entity\Authority;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
-use App\Utility\Breadcrumb\AbstractBreadcrumbBuilder;
 use Symfony\Component\Translation\TranslatableMessage;
 
-class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
+class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
 {
-    protected function addInitialItems(?FundReturn $fundReturn): void
+    public function setAtAuthority(Authority $authority): void
     {
-        $this->addItem(
+        $this->addBreadcrumb(
             'dashboard',
-            'app_dashboard',
+            'app_dashboard_authority',
+            routeParameters: ['authorityId' => $authority->getId()],
             translationKey: 'frontend.pages.dashboard.breadcrumb',
-            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
+            translationParameters: ['authorityName' => $authority->getName()],
         );
+
+        $this->setNavLinks($authority);
     }
 
     public function setAtFundReturn(FundReturn $fundReturn): void
     {
-        $this->addInitialItems($fundReturn);
+        $this->setAtAuthority($fundReturn->getFundAward()->getAuthority());
 
-        $this->addItem(
+        $this->addBreadcrumb(
             'fund_return',
             'app_fund_return',
             routeParameters: ['fundReturnId' => $fundReturn->getId()],
@@ -38,7 +41,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtFundReturnSignoff(FundReturn $fundReturn): void
     {
         $this->setAtFundReturn($fundReturn);
-        $this->addItem(
+        $this->addBreadcrumb(
             'fund_return_signoff',
             'app_fund_return_signoff',
             routeParameters: ['fundReturnId' => $fundReturn->getId()],
@@ -63,7 +66,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtSchemeFund(FundReturn $fundReturn, SchemeFund $schemeFund): void
     {
         $this->setAtFundReturn($fundReturn);
-        $this->addItem(
+        $this->addBreadcrumb(
             'scheme_return',
             'app_scheme_return',
             routeParameters: [
@@ -80,7 +83,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtSchemeFundEdit(FundReturn $fundReturn, SchemeFund $schemeFund, SchemeLevelSection $section): void
     {
         $this->setAtSchemeFund($fundReturn, $schemeFund);
-        $this->addItem(
+        $this->addBreadcrumb(
             'scheme_return_edit',
             'app_scheme_return_edit',
             routeParameters: [
@@ -95,7 +98,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtSchemeReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
     {
         $this->setAtSchemeFund($fundReturn, $schemeFund);
-        $this->addItem(
+        $this->addBreadcrumb(
             'scheme_return_mark_as_ready_for_signoff',
             'app_scheme_return_mark_as_ready_for_signoff',
             routeParameters: [
@@ -109,7 +112,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtSchemeNotReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
     {
         $this->setAtSchemeFund($fundReturn, $schemeFund);
-        $this->addItem(
+        $this->addBreadcrumb(
             'scheme_return_mark_as_not_ready_for_signoff',
             'app_scheme_return_mark_as_not_ready_for_signoff',
             routeParameters: [
@@ -123,7 +126,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtSchemeExpenseEdit(FundReturn $fundReturn, SchemeFund $scheme, DivisionConfiguration $division): void
     {
         $this->setAtSchemeFund($fundReturn, $scheme);
-        $this->addItem(
+        $this->addBreadcrumb(
             'scheme_return_expense_edit',
             'app_scheme_return_expense_edit',
             routeParameters: [
@@ -138,7 +141,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtFundReturnSectionEdit(FundReturn $fundReturn, FundLevelSection $section): void
     {
         $this->setAtFundReturn($fundReturn);
-        $this->addItem(
+        $this->addBreadcrumb(
             'fund_return_edit',
             'app_fund_return_edit',
             routeParameters: ['fundReturnId' => $fundReturn->getId(), 'section' => $section->value],
@@ -149,7 +152,7 @@ class DashboardBreadcrumbBuilder extends AbstractBreadcrumbBuilder
     public function setAtFundReturnExpenseEdit(FundReturn $fundReturn, DivisionConfiguration $division): void
     {
         $this->setAtFundReturn($fundReturn);
-        $this->addItem(
+        $this->addBreadcrumb(
             'fund_return_expense_edit',
             'app_fund_return_expense_edit',
             routeParameters: ['fundReturnId' => $fundReturn->getId(), 'divisionKey' => $division->getKey()],

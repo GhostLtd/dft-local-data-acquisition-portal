@@ -1,0 +1,21 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('user') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{%- block content -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
+
+    {{- summaryListStart() -}}
+    {{- summaryListRow({key: 'frontend.pages.user.name' | trans, value: user.name ?? '-'}) -}}
+    {{- summaryListRow({key: 'frontend.pages.user.email' | trans, value: user.email ?? '-'}) -}}
+    {{- summaryListRow({key: 'frontend.pages.user.position' | trans, value: user.position ?? '-'}) -}}
+    {{- summaryListRow({key: 'frontend.pages.user.phone' | trans, value: user.phone ?? '-'}) -}}
+    {{- summaryListRow({key: 'frontend.pages.user.permission' | trans, value: simplifiedPermission ? ("frontend.pages.user.permissions.#{simplifiedPermission}" | trans) : '-'}) -}}
+    {{- summaryListEnd() -}}
+
+    <p class="govuk-button-group">
+        <a class="govuk-button" href="{{ path('app_user_edit', {authorityId: authority.id, userId: user.id}) }}">{{ 'frontend.pages.user.edit_user' | trans }}</a>
+        <a class="govuk-link" href="{{ path('app_users', {authorityId: authority.id}) }}">{{ 'frontend.pages.user.back_to_users' | trans }}</a>
+    </p>
+{%- endblock -%}

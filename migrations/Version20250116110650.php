@@ -39,6 +39,7 @@ CREATE VIEW permissions_view AS
 
 SELECT
     CAST(u.id as {$columnType}) AS id,
+    u.permission    AS permission,
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
     authority.id    AS authority_id,
@@ -54,6 +55,7 @@ UNION
 
 SELECT
     CAST(u.id as {$columnType}) AS id,
+    u.permission    AS permission,
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
     authority.id    AS authority_id,
@@ -71,6 +73,7 @@ UNION
 
 SELECT
     CAST(u.id as {$columnType}) AS id,
+    u.permission      AS permission,
     u.user_id         AS user_id,
     u.entity_class    AS entity_class,
     authority.id      AS authority_id,
@@ -90,6 +93,7 @@ UNION
 
 SELECT
     CAST(u.id as {$columnType}) AS id,
+    u.permission    AS permission,
     u.user_id       AS user_id,
     u.entity_class  AS entity_class,
     authority.id    AS authority_id,

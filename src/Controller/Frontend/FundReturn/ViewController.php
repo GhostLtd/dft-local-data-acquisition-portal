@@ -9,7 +9,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
 use App\ListPage\SchemeListPage;
 use App\Repository\SchemeFund\SchemeFundRepository;
-use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -23,8 +23,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ViewController extends AbstractController
 {
     public function __construct(
-        protected DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        protected SchemeFundRepository       $schemeFundRepository,
+        protected DashboardLinksBuilder $linksBuilder,
+        protected SchemeFundRepository  $schemeFundRepository,
     ) {}
 
     #[Route('/fund-return/{fundReturnId}', name: 'app_fund_return')]
@@ -38,7 +38,7 @@ class ViewController extends AbstractController
         SchemeListPage          $schemeListPage,
     ): Response
     {
-        $this->breadcrumbBuilder->setAtFundReturn($fundReturn);
+        $this->linksBuilder->setAtFundReturn($fundReturn);
         $fund = $fundReturn->getFund();
         $schemeFunds = $this->getSchemasForFund($fundReturn, $fund);
 
@@ -55,7 +55,7 @@ class ViewController extends AbstractController
             ->setFund($fundReturn->getFund());
 
         return $this->render('frontend/fund_return/view.html.twig', [
-            'breadcrumbBuilder' => $this->breadcrumbBuilder,
+            'linksBuilder' => $this->linksBuilder,
             'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
             'fundLevelSections' => FundLevelSection::filterForFund($fund),
             'fundReturn' => $fundReturn,

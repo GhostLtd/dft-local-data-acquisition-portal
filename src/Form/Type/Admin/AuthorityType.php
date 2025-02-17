@@ -5,6 +5,7 @@ namespace App\Form\Type\Admin;
 use App\Entity\Authority;
 use App\Entity\User;
 use App\Form\Type\BaseButtonsFormType;
+use App\Form\Type\BaseUserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityRepository;
 use Ghost\GovUkFrontendBundle\Form\Type as Gds;
@@ -65,13 +66,13 @@ class AuthorityType extends AbstractType
                             'label' => 'authority.form.admin',
                             'label_attr' => ['class' => 'govuk-visually-hidden'],
                         ])
-                        ->add('admin', UserType::class, [
+                        ->add('admin', BaseUserType::class, [
                             'label' => 'authority.form.admin',
                             'label_attr' => ['class' => 'govuk-visually-hidden'],
                         ])
                     ;
                 } else {
-                    $form->add('admin', UserType::class, [
+                    $form->add('admin', BaseUserType::class, [
                         'label' => 'authority.form.admin',
                         'label_attr' => ['class' => 'govuk-label--m'],
                     ]);

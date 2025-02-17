@@ -75,12 +75,14 @@ authority:
     not_null: Enter a name for the authority
 
 user:
-  name:
-    not_null: Enter a name for the user
   email:
     not_null: Enter an email address for the user
     unique: A user with this email address already exists. Enter a unique email address
-  position:
-    not_null: Enter a position for the user
+  name:
+    not_null: Enter a name for the user
+  permission:
+    not_null: Choose a user permission level
   phone:
     not_null: Enter a phone number for the user
+  position:
+    not_null: Enter a position for the user

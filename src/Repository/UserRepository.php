@@ -9,6 +9,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -36,8 +37,8 @@ class UserRepository extends ServiceEntityRepository
                 $em->getExpressionBuilder()->in('user.id', $userIdsQuery),
                 $em->getExpressionBuilder()->eq('user.id', ':userId')
             ]))
-            ->setParameter('userId', $authority->getAdmin()->getId()->toRfc4122())
-            ->setParameter('authorityId', $authority->getId()->toRfc4122())
+            ->setParameter('userId', $authority->getAdmin()->getId(), UlidType::NAME)
+            ->setParameter('authorityId', $authority->getId(), UlidType::NAME)
         ;
     }
 

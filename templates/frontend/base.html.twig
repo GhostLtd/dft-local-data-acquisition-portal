@@ -4,26 +4,24 @@
     {%- if is_granted('ROLE_USER') -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
 
-        {%- set signOutLink -%}
-            <li class="govuk-service-navigation__item govuk-service-navigation__margin-left-auto">
-                <a class="govuk-service-navigation__link" href="{{ path('app_logout') }}">{{ 'auth.sign_out' | trans }}</a>
-            </li>
+        {%- set rightLinks -%}
+            {%- for link in linksBuilder.rightNavLinks -%}
+                <li class="govuk-service-navigation__item{% if loop.first %} govuk-service-navigation__margin-left-auto{% endif %}">
+                    <a class="govuk-service-navigation__link" href="{{ link.href }}">{{ link.text }}</a>
+                </li>
+            {%- endfor -%}
         {%- endset -%}
 
         {%- set current_menu = current_menu ?? null -%}
 
+        {% set pathParts = app.request.pathInfo | split('/') | filter(p => not p is empty) %}
+
         {{- serviceNavigation({
             classes: 'govuk-service-navigation__wrapper-full-width',
             serviceName: 'site.title' | trans,
-            navigation: [
-                {
-                    href: path('app_dashboard'),
-                    text: "frontend.pages.dashboard.home" | trans,
-                    active: current_menu == 'dashboard',
-                }
-            ],
+            navigation: linksBuilder.navLinks(current_menu),
             slots: {
-                navigationEnd: signOutLink
+                navigationEnd: rightLinks
             }
         }) -}}
     {%- endif -%}

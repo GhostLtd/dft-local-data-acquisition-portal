@@ -7,7 +7,7 @@ use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Form\Type\FundReturn\Crsts\ExpensesType;
-use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -22,11 +22,11 @@ class EditController extends AbstractReturnController
     #[Route('/fund-return/{fundReturnId}/section/{section}', name: 'app_fund_return_edit')]
     #[IsGranted(Role::CAN_EDIT, 'fundReturn')]
     public function fundReturnEdit(
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        FundLevelSection           $section,
+        DashboardLinksBuilder $linksBuilder,
+        FundLevelSection      $section,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
-        Request                    $request,
+        FundReturn            $fundReturn,
+        Request               $request,
     ): Response
     {
         $formClass = $section::getFormClassForFundAndSection($fundReturn->getFund(), $section);
@@ -34,7 +34,7 @@ class EditController extends AbstractReturnController
             throw new NotFoundHttpException();
         }
 
-        $breadcrumbBuilder->setAtFundReturnSectionEdit($fundReturn, $section);
+        $linksBuilder->setAtFundReturnSectionEdit($fundReturn, $section);
         $cancelUrl = $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()])."#{$section->value}";
 
         $form = $this->createForm($formClass, $fundReturn, [
@@ -46,7 +46,7 @@ class EditController extends AbstractReturnController
         }
 
         return $this->render('frontend/fund_return_edit.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'linksBuilder' => $linksBuilder,
             'form' => $form,
             'fundReturn' => $fundReturn,
             'section' => $section,
@@ -56,12 +56,12 @@ class EditController extends AbstractReturnController
     #[Route('/fund-return/{fundReturnId}/expense/{divisionKey}', name: 'app_fund_return_expense_edit')]
     #[IsGranted(Role::CAN_EDIT, 'fundReturn')]
     public function fundReturnExpense(
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        string                     $divisionKey,
+        DashboardLinksBuilder $linksBuilder,
+        string                $divisionKey,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
-        Request                    $request,
-        ExpensesTableHelper        $tableHelper,
+        FundReturn            $fundReturn,
+        Request               $request,
+        ExpensesTableHelper   $tableHelper,
     ): Response
     {
         $divisionConfiguration = $fundReturn->findDivisionConfigurationByKey($divisionKey);
@@ -70,7 +70,7 @@ class EditController extends AbstractReturnController
             throw new NotFoundHttpException();
         }
 
-        $breadcrumbBuilder->setAtFundReturnExpenseEdit($fundReturn, $divisionConfiguration);
+        $linksBuilder->setAtFundReturnExpenseEdit($fundReturn, $divisionConfiguration);
         $cancelUrl = $this->generateUrl('app_fund_return', [
             'fundReturnId' => $fundReturn->getId()
         ])."#expenses-{$divisionKey}";
@@ -90,7 +90,7 @@ class EditController extends AbstractReturnController
         }
 
         return $this->render('frontend/fund_return_expenses_edit.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'linksBuilder' => $linksBuilder,
             'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,
         ]);

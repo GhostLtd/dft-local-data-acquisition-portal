@@ -1,7 +1,8 @@
 {%- extends "@GhostGovUkCore/base.html.twig" -%}
 
+{%- set page_title_domain = page_title_domain ?? 'messages' -%}
 {%- if page_title is not defined -%}
-    {%- set page_title = page_title_key | trans(page_title_params ?? {}) -%}
+    {%- set page_title = page_title_key | trans(page_title_params ?? {}, page_title_domain) -%}
 {%- endif -%}
 
 {%- set page_title_suffix = page_title_suffix ?? (' | ' ~ ('site.title' | trans)) -%}
@@ -32,8 +33,8 @@
 
     {{- parent() -}}
 
-    {%- if breadcrumbs is not defined and breadcrumbBuilder is defined -%}
-        {%- set breadcrumbs = breadcrumbBuilder.breadcrumbs -%}
+    {%- if breadcrumbs is not defined and linksBuilder is defined -%}
+        {%- set breadcrumbs = linksBuilder.breadcrumbs -%}
     {%- endif -%}
 
     {%- if (breadcrumbs ?? []) | length > 1 -%}
@@ -51,7 +52,7 @@
 
     {%- if page_heading is not defined -%}
         {%- set page_heading = page_heading_key is defined ?
-            page_heading_key | trans(page_heading_params ?? {}) :
+            page_heading_key | trans(page_heading_params ?? {}, page_heading_domain ?? page_title_domain) :
             page_title
         -%}
     {%- endif -%}

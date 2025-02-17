@@ -24,6 +24,17 @@ class UserReachableEntityResolver
         $this->cache = [];
     }
 
+    public function isAuthorityReachableBy(Authority $authority, User $user): bool
+    {
+        foreach($this->getAuthorityIdsViewableBy($user) as $authorityId) {
+            if ($authorityId->equals($authority->getId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getAuthorityIdsViewableBy(User $user): array
     {
         return $this->getReachableIdsInferredFromUserPermissions($user, Authority::class);

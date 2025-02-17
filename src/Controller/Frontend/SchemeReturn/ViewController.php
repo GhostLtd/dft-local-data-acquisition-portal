@@ -7,7 +7,7 @@ use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
-use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -20,18 +20,18 @@ class ViewController extends AbstractController
     #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}', name: 'app_scheme_return')]
     public function view(
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
+        FundReturn              $fundReturn,
         #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund                 $schemeFund,
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        ExpensesTableHelper        $expensesTableHelper,
-        ExpensesTableCalculator    $expensesTableCalculator,
+        SchemeFund              $schemeFund,
+        DashboardLinksBuilder   $linksBuilder,
+        ExpensesTableHelper     $expensesTableHelper,
+        ExpensesTableCalculator $expensesTableCalculator,
     ): Response
     {
         $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
         $this->denyAccessUnlessGranted(Role::CAN_VIEW, $schemeReturn);
 
-        $breadcrumbBuilder->setAtSchemeFund($fundReturn, $schemeFund);
+        $linksBuilder->setAtSchemeFund($fundReturn, $schemeFund);
 
         $fund = $fundReturn->getFund();
 
@@ -40,7 +40,7 @@ class ViewController extends AbstractController
             ->setFund($fundReturn->getFund());
 
         return $this->render('frontend/scheme_return/view.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'linksBuilder' => $linksBuilder,
             'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
             'expensesTableHelper' => $expensesTableHelper,
             'expensesTableCalculator' => $expensesTableCalculator,

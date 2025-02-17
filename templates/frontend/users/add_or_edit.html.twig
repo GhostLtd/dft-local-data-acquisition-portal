@@ -1,0 +1,9 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title_key = "frontend.pages.user_#{form.vars.data.id ? 'edit' : 'add'}.title" -%}
+{%- set page_title_params = {userName: user.name} %}
+
+{%- block content -%}
+    {% form_theme form '@GhostGovUkFrontend/theme.html.twig' %}
+    {{ form(form) }}
+{%- endblock -%}

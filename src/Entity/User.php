@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: 'email', message: 'user.email.unique', groups: ['authority.new_admin'])]
+#[UniqueEntity(fields: 'email', message: 'user.email.unique', groups: ['authority.new_admin', 'user.edit'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use IdTrait;
@@ -27,19 +27,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeInterface $lastLogin = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotNull(message: 'user.name.not_null', groups: ['authority.new_admin'])]
+    #[Assert\NotNull(message: 'user.name.not_null', groups: ['authority.new_admin', 'user.edit'])]
     private ?string $name = null; #1top_info
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\NotNull(message: 'user.position.not_null', groups: ['authority.new_admin'])]
+    #[Assert\NotNull(message: 'user.position.not_null', groups: ['authority.new_admin', 'user.edit'])]
     private ?string $position = null; #1top_info
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\NotNull(message: 'user.phone.not_null', groups: ['authority.new_admin'])]
+    #[Assert\NotNull(message: 'user.phone.not_null', groups: ['authority.new_admin', 'user.edit'])]
     private ?string $phone = null; #1top_info
 
     #[ORM\Column(length: 255, unique: true)]
-    #[Assert\NotNull(message: 'user.email.not_null', groups: ['authority.new_admin'])]
+    #[Assert\NotNull(message: 'user.email.not_null', groups: ['authority.new_admin', 'user.edit'])]
     private ?string $email = null; #1top_info
 
     /**

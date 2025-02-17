@@ -1,6 +1,6 @@
 {%- extends 'frontend/base.html.twig' -%}
 
-{%- set page_title = breadcrumbBuilder.titleFor('scheme_return') ~ ': ' ~ breadcrumbBuilder.titleFor('scheme_return_mark_as_not_ready_for_signoff') -%}
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') ~ ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return_mark_as_not_ready_for_signoff') -%}
 {%- set page_heading_class = 'govuk-heading-m' -%}
 
 {%- block content -%}

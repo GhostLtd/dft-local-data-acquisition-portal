@@ -1,4 +1,5 @@
 auth:
+  change_authority: Change MCA
   error: Error
   login:
     email.label: Email address
@@ -104,6 +105,11 @@ enum:
     scheme_completed: Completed
     scheme_merged: Merged
     scheme_split: Split
+  permission:
+    SIGN_OFF: &perm_sign_off Sign-off/Edit/View all returns + mark schemes as ready for sign-off
+    MARK_AS_READY: &perm_mark_as_ready Edit/View all returns + mark schemes as ready for sign-off
+    EDITOR: &perm_editor Edit/View all returns
+    VIEWER: &perm_viewer View all returns
   rating:
     green: Green
     green_amber: Green / Amber
@@ -294,6 +300,7 @@ forms:
         help: ''
       scheme_identifier:
         label: &sr_scheme_identifier Scheme ID
+
   scheme:
     mark_as_ready_for_signoff:
       confirm: Mark as ready for signoff
@@ -329,7 +336,6 @@ forms:
       on_track_rating:
         label: &sr_on_track_rating On-track rating
         help: ''
-
     scheme_elements:
       has_active_travel_elements:
         label: Does this scheme have active travel elements?
@@ -369,6 +375,10 @@ forms:
       tram:
         label: Choose tram / metro / light rail transport mode
         help: ''
+  user:
+    permission:
+      label: User permissions
+      help: ''
 
 format:
   date:
@@ -392,11 +402,15 @@ frontend:
         title: Check your email
       sign_in:
         title: Sign in
+    authority:
+      title: "{authorityName}"
+      breadcrumb: "{authorityName}"
     dashboard:
       title: Local Authorities
       breadcrumb: "{authorityName}"
       fund_title: "{fundName}: {year}/{nextYear} Q{quarter}"
       home: Home
+      users: Users
       no_authorities: No authorities are accessible to you
     home:
       title: Local data acquisition portal
@@ -466,7 +480,32 @@ frontend:
         This will lock the scheme for editing and will mark it as being ready for signoff.
         
         You will be able to change this back if you need to make further changes.
-
+    user:
+      add_user: Add user
+      back_to_users: Back to users
+      breadcrumb: &user_title "{userName}"
+      title: *user_title
+      email: Email
+      name: Name
+      phone: Phone
+      position: Position
+      edit_user: Edit user
+      permission: Permission
+      permissions:
+        admin: Admin
+        sign_off: *perm_sign_off
+        mark_as_ready: *perm_mark_as_ready
+        editor: *perm_editor
+        viewer: *perm_viewer
+    user_add:
+      breadcrumb: Add user
+      title: Add user
+    user_edit:
+      breadcrumb: Edit
+      title: "Edit user: {userName}"
+    users:
+      title: &users_title "Users for {authorityName}"
+      breadcrumb: *users_title
 maintenance-warning:
   banner:
     title: Important

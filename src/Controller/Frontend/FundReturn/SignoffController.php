@@ -4,7 +4,7 @@ namespace App\Controller\Frontend\FundReturn;
 
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
-use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\ConfirmAction\Frontend\SignoffFundReturnConfirmAction;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bridge\Twig\Attribute\Template;
@@ -20,18 +20,18 @@ class SignoffController extends AbstractController
     #[Route('/fund-return/{fundReturnId}/signoff', name: 'app_fund_return_signoff')]
     #[Template('frontend/fund_return/signoff.html.twig')]
     public function delete(
-        Request $request,
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
+        Request                        $request,
+        DashboardLinksBuilder          $linksBuilder,
         SignoffFundReturnConfirmAction $signoffFundReturnConfirmAction,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn $fundReturn,
+        FundReturn                     $fundReturn,
     ): RedirectResponse|array {
-        $breadcrumbBuilder->setAtFundReturnSignoff($fundReturn);
+        $linksBuilder->setAtFundReturnSignoff($fundReturn);
 
         return $signoffFundReturnConfirmAction
             ->setSubject($fundReturn)
             ->setExtraViewData([
-                'breadcrumbBuilder' => $breadcrumbBuilder,
+                'linksBuilder' => $linksBuilder,
                 'fundReturn' => $fundReturn,
             ])
             ->controller(

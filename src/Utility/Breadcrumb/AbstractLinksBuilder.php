@@ -6,9 +6,9 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class AbstractBreadcrumbBuilder
+abstract class AbstractLinksBuilder
 {
-    protected array $items = [];
+    protected array $links = [];
 
     public function __construct(
         protected RouterInterface     $router,
@@ -16,7 +16,8 @@ abstract class AbstractBreadcrumbBuilder
     )
     {}
 
-    protected function addItem(
+    protected function addLink(
+        string                            $set,
         string                            $key,
         string                            $routeName,
         array                             $routeParameters = [],
@@ -33,19 +34,24 @@ abstract class AbstractBreadcrumbBuilder
             $text = $text->trans($this->translator);
         }
 
-        $this->items[$key] = [
+        $this->links[$set][$key] = [
             'text' => $text ?? $this->translator->trans($translationKey, $translationParameters),
             'href' => $this->router->generate($routeName, $routeParameters),
         ];
     }
 
-    public function getTitleFor(string $key): string
+    public function getTitleFor(string $set, string $key): string
     {
-        return $this->items[$key]['text'];
+        return $this->links[$set][$key]['text'];
     }
 
-    public function getBreadcrumbs(): array
+    public function getLinks(string $set): array
     {
-        return array_values($this->items);
+        return array_values($this->getLinksWithOriginalKeys($set));
+    }
+
+    public function getLinksWithOriginalKeys(string $set): array
+    {
+        return $this->links[$set] ?? [];
     }
 }

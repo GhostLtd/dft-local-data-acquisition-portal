@@ -4,40 +4,24 @@
 {%- set current_menu = 'dashboard' -%}
 
 {%- block content -%}
-    {% from "@GhostGovUkFrontend/components/macros.html.twig" import taskListStart, taskListEnd, taskListItem %}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow %}
 
-    {%- for authority in authorities -%}
-        <h2 class="govuk-heading-m">{{ authority.name }}</h2>
-
-        {# TODO: At a later date, this can be split into separate "outstanding"
-                 and "completed" return pages, and paginated
-        #}
-
-        {{- taskListStart() -}}
-        {%- for fundAward in authority.fundAwards -%}
-            {%- for fundReturn in fundAward.returns -%}
-                {%- if is_granted('CAN_VIEW', fundReturn) -%}
-                    {%- set tag = fundReturn.signoffUser is null ? 'in_progress' : 'completed' -%}
-                    {{- taskListItem({
-                        title: {
-                            text: "frontend.pages.dashboard.fund_title" | trans({
-                                fundName: "enum.fund.#{fundAward.type.name}" | trans,
-                                quarter: fundReturn.quarter,
-                                year: fundReturn.year,
-                                nextYear: fundReturn.nextYearAsTwoDigits,
-                            })
-                        },
-                        href: path('app_fund_return', {fundReturnId: fundReturn.id}),
-                        status: {tag: {
-                            text: "tags.#{tag}.name" | trans,
-                            classes: "govuk-tag--" ~ ("tags.#{tag}.colour" | trans),
-                        }},
-                    }, loop.index) -}}
-                {%- endif -%}
-            {%- endfor -%}
-        {%- endfor -%}
-        {{- taskListEnd() -}}
-    {%- else -%}
+    {%- if authorities is empty -%}
         <p class="govuk-body">{{ 'frontend.pages.dashboard.no_authorities' | trans }}</p>
-    {%- endfor -%}
+    {%- else -%}
+        {{- summaryListStart() -}}
+        {%- for authority in authorities -%}
+            {{ summaryListRow({
+                key: authority.name,
+                value: '',
+                actions: [
+                    {
+                        text: 'common.actions.view' | trans,
+                        href: path('app_dashboard_authority', {authorityId: authority.id}),
+                    },
+                ]
+            }) }}
+        {%- endfor -%}
+        {{ summaryListEnd() }}
+    {%- endif -%}
 {%- endblock -%}

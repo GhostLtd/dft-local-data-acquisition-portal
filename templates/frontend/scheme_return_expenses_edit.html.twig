@@ -1,4 +1,4 @@
 {%- extends 'frontend/base_expenses_edit.html.twig' -%}
 
-{%- set page_heading = breadcrumbBuilder.titleFor('scheme_return_expense_edit') -%}
-{%- set page_title = breadcrumbBuilder.titleFor('scheme_return_expense_edit') ~ ' | ' ~ breadcrumbBuilder.titleFor('scheme_return') -%}
+{%- set page_heading = linksBuilder.breadcrumbTitleFor('scheme_return_expense_edit') -%}
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return_expense_edit') ~ ' | ' ~ linksBuilder.breadcrumbTitleFor('scheme_return') -%}

@@ -1,6 +1,6 @@
 {%- extends 'frontend/base.html.twig' -%}
 
-{%- set page_title = breadcrumbBuilder.titleFor('scheme_return') -%}
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') -%}
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
@@ -27,7 +27,7 @@
             {%- set statusActions = statusActions|merge([
                 {
                     text: 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans,
-                    visuallyHiddenText: ': ' ~ breadcrumbBuilder.titleFor('scheme_return'),
+                    visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
                     href: path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id}),
                 }
             ]) -%}
@@ -36,7 +36,7 @@
             {%- set statusActions = statusActions|merge([
                 {
                     text: 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans,
-                    visuallyHiddenText: ': ' ~ breadcrumbBuilder.titleFor('scheme_return'),
+                    visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
                     href: path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id}),
                 }
             ]) -%}

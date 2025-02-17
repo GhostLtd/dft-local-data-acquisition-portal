@@ -8,7 +8,7 @@ use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Form\Type\FundReturn\Crsts\ExpensesType;
-use App\Utility\Breadcrumb\Frontend\DashboardBreadcrumbBuilder;
+use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -22,13 +22,13 @@ class EditController extends AbstractReturnController
     #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/section/{section}', name: 'app_scheme_return_edit')]
 
     public function schemeReturnEdit(
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
+        DashboardLinksBuilder $linksBuilder,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
+        FundReturn            $fundReturn,
         #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund                 $schemeFund,
-        SchemeLevelSection         $section,
-        Request                    $request,
+        SchemeFund            $schemeFund,
+        SchemeLevelSection    $section,
+        Request               $request,
     ): Response
     {
         $config = $section->getConfiguration($fundReturn->getFund());
@@ -39,7 +39,7 @@ class EditController extends AbstractReturnController
 
         $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
         $this->denyAccessUnlessGranted(Role::CAN_EDIT, $schemeReturn);
-        $breadcrumbBuilder->setAtSchemeFundEdit($fundReturn, $schemeFund, $section);
+        $linksBuilder->setAtSchemeFundEdit($fundReturn, $schemeFund, $section);
 
         $cancelUrl = $this->generateUrl('app_scheme_return', [
             'fundReturnId' => $fundReturn->getId(),
@@ -55,7 +55,7 @@ class EditController extends AbstractReturnController
         }
 
         return $this->render('frontend/scheme_return_edit.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'linksBuilder' => $linksBuilder,
             'form' => $form,
             'fundReturn' => $fundReturn,
             'schemeReturn' => $schemeReturn,
@@ -65,14 +65,14 @@ class EditController extends AbstractReturnController
 
     #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/expense/{divisionKey}', name: 'app_scheme_return_expense_edit')]
     public function schemeReturnExpense(
-        DashboardBreadcrumbBuilder $breadcrumbBuilder,
-        string                     $divisionKey,
+        DashboardLinksBuilder $linksBuilder,
+        string                $divisionKey,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn                 $fundReturn,
+        FundReturn            $fundReturn,
         #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund                 $schemeFund,
-        Request                    $request,
-        ExpensesTableHelper        $tableHelper,
+        SchemeFund            $schemeFund,
+        Request               $request,
+        ExpensesTableHelper   $tableHelper,
     ): Response
     {
         $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
@@ -83,7 +83,7 @@ class EditController extends AbstractReturnController
             throw new NotFoundHttpException();
         }
 
-        $breadcrumbBuilder->setAtSchemeExpenseEdit($fundReturn, $schemeFund, $divisionConfiguration);
+        $linksBuilder->setAtSchemeExpenseEdit($fundReturn, $schemeFund, $divisionConfiguration);
         $cancelUrl = $this->generateUrl('app_scheme_return', [
             'fundReturnId' => $fundReturn->getId(),
             'schemeFundId' => $schemeFund->getId()
@@ -104,7 +104,7 @@ class EditController extends AbstractReturnController
         }
 
         return $this->render('frontend/scheme_return_expenses_edit.html.twig', [
-            'breadcrumbBuilder' => $breadcrumbBuilder,
+            'linksBuilder' => $linksBuilder,
             'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,
         ]);
