@@ -127,14 +127,20 @@ enum:
     final_delivery: Final delivery
   on_track_rating:
     green: Green
-    green_amber: Green / Amber
     amber: Amber
-    amber_red: Amber / Red
     red: Red
     scheme_cancelled: Scheme cancelled
     scheme_completed: Scheme completed
     scheme_merged: Scheme merged
     scheme_split: Scheme split
+  on_track_rating_shortened:
+    green: Green
+    amber: Amber
+    red: Red
+    scheme_cancelled: Cancelled
+    scheme_completed: Completed
+    scheme_merged: Merged
+    scheme_split: Split
   rating:
     green: Green
     green_amber: Green / Amber
