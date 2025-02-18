@@ -5,7 +5,7 @@
 
 {%- block content -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-    {%- from "frontend/macros.html.twig" import displayCardsForReturn, displaySectionsInline, displaySectionsAsTabs, ratingTag, text, expenseDivisionComments -%}
+    {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, ratingTag, text, expenseDivisionComments -%}
     {%- from "frontend/fund_return/macros.html.twig" import overallProgressContent %}
 
     {# -- DETAILS ---------------------------------------------------------------------------------------------------- #}
@@ -15,56 +15,59 @@
     {%- set baseOptions = {return: fundReturn, is_expense: false} -%}
     {%- set configs = [] -%}
 
-    {%- set contents -%}
-        {{- summaryListStart() -}}
-        {{- text('frontend.pages.fund_return.lead_contact', fundReturn.fundAward.leadContact.name) -}}
-        {{- summaryListRow({key: 'frontend.pages.fund_return.sign_off' | trans, value: _self.signoff(fundReturn.signoffDate, fundReturn.signoffName, fundReturn.signoffUser ?? fundReturn.signoffEmail)}) -}}
-        {{- summaryListEnd() -}}
-    {%- endset -%}
+    <div class="govuk-!-margin-bottom-9">
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.titles.fund_details' | trans }}</h2>
+        {%- set contents -%}
+            {{- summaryListStart() -}}
+            {{- text('frontend.pages.fund_return.lead_contact', fundReturn.fundAward.leadContact.name) -}}
+            {{- summaryListRow({key: 'frontend.pages.fund_return.sign_off' | trans, value: _self.signoff(fundReturn.signoffDate, fundReturn.signoffName, fundReturn.signoffUser ?? fundReturn.signoffEmail)}) -}}
+            {{- summaryListEnd() -}}
+        {%- endset -%}
 
-    {%- set configs = configs|merge([{
-        title: 'frontend.pages.fund_return.titles.basic_details' | trans,
-        section: 'basic_details',
-        contents,
-        options: {add_edit_link: false},
-    }]) -%}
+        {{- displayCardForReturn(
+            fundReturn,
+            'frontend.pages.fund_return.titles.basic_details' | trans,
+            'basic_details',
+            contents,
+            {
+                add_edit_link: false
+            }
+        ) -}}
 
-    {%- set configs = configs|merge([{
-        title: 'frontend.pages.fund_return.titles.overall_progress' | trans,
-        section: 'overall_progress',
-        contents: overallProgressContent(fundReturn),
-    }]) -%}
+        {{- displayCardForReturn(
+            fundReturn,
+            'frontend.pages.fund_return.titles.overall_progress' | trans,
+            'overall_progress',
+            overallProgressContent(fundReturn)
+        ) -}}
 
-    {%- set contents -%}
-        {{- summaryListStart() -}}
-        {{- text('frontend.pages.fund_return.local_contribution', fundReturn.localContribution) -}}
-        {{- text('frontend.pages.fund_return.resource_funding', fundReturn.resourceFunding) -}}
-        {{- summaryListEnd() -}}
-    {%- endset -%}
+        {%- set contents -%}
+            {{- summaryListStart() -}}
+            {{- text('frontend.pages.fund_return.local_contribution', fundReturn.localContribution) -}}
+            {{- text('frontend.pages.fund_return.resource_funding', fundReturn.resourceFunding) -}}
+            {{- summaryListEnd() -}}
+        {%- endset -%}
 
-    {%- set configs = configs|merge([{
-        title: 'frontend.pages.fund_return.titles.local_and_rdel' | trans,
-        section: 'local_and_rdel',
-        contents,
-    }]) -%}
+        {{- displayCardForReturn(
+            fundReturn,
+            'frontend.pages.fund_return.titles.local_and_rdel' | trans,
+            'local_and_rdel',
+            contents
+        ) -}}
 
-    {%- set contents -%}
-        {{- summaryListStart() -}}
-        {{- text('frontend.pages.fund_return.comments', fundReturn.comments) -}}
-        {{- summaryListEnd() -}}
-    {%- endset -%}
+        {%- set contents -%}
+            {{- summaryListStart() -}}
+            {{- text('frontend.pages.fund_return.comments', fundReturn.comments) -}}
+            {{- summaryListEnd() -}}
+        {%- endset -%}
 
-    {%- set configs = configs|merge([{
-        title: 'frontend.pages.fund_return.titles.comments' | trans,
-        section: 'comments',
-        contents,
-    }]) -%}
-
-    {{- displayCardsForReturn(
-        'frontend.pages.fund_return.titles.fund_details' | trans,
-        configs,
-        fundReturn
-    ) -}}
+        {{- displayCardForReturn(
+            fundReturn,
+            'frontend.pages.fund_return.titles.comments' | trans,
+            'comments',
+            contents
+        ) -}}
+    </div>
 
     {# -- EXPENSES --------------------------------------------------------------------------------------------------- #}
 

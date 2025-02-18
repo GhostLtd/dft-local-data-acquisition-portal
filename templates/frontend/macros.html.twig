@@ -44,31 +44,26 @@
     {%- endfor -%}
 {% endmacro %}
 
-{%- macro displayCardsForReturn(section_title, configs, return) -%}
-    {#- Build params structure -#}
-    {%- set sections = [] -%}
-    {%- for config in configs -%}
-        {%- set actions = config.options.actions ?? [] -%}
+{%- macro displayCardForReturn(return, title, section, contents, options) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryCard -%}
 
-        {%- if (config.options.add_edit_link ?? true) and is_granted('CAN_EDIT', return) -%}
-            {%- set actions = actions|merge([{
-                text: 'common.actions.edit' | trans,
-                visuallyHiddenText: config.title,
-                href: section_edit_path(return, config.section, false),
-            }]) -%}
-        {%- endif -%}
+    {%- set actions = options.actions ?? [] -%}
 
-        {%- set sections = sections|merge([
-            {
-                label: config.title,
-                id: config.section,
-                panel: {html: config.contents},
-                actions: {items: actions},
-            }
-        ]) -%}
-    {%- endfor -%}
+    {%- if (options.add_edit_link ?? true) and is_granted('CAN_EDIT', return) -%}
+        {%- set actions = actions|merge([{
+            text: 'common.actions.edit' | trans,
+            visuallyHiddenText: title,
+            href: section_edit_path(return, section, false),
+        }]) -%}
+    {%- endif -%}
 
-    {{- _self.displaySectionsAsSummaryCards(sections, section_title) -}}
+    {{- summaryCard({
+        title: {
+            text: title,
+        },
+        actions: actions is not empty ? {items: actions} : null,
+        attributes: section is defined ? {id: section} : null,
+    }, contents) }}
 {%- endmacro -%}
 
 {% macro displaySectionsAsTabs(items, heading) %}
@@ -78,40 +73,6 @@
             <h2 class="govuk-heading-m">{{ heading }}</h2>
             {{- tabs({items}) -}}
         </div>
-    {%- endif -%}
-{% endmacro %}
-
-{% macro displaySectionsAsSummaryCards(items, heading) %}
-    {# N.B. Uses tab data format for items so that we can easily switch from one to the other #}
-    {%- if items is not empty -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryCard -%}
-
-        <div class="govuk-!-margin-bottom-9">
-            <h2 class="govuk-heading-m">{{ heading }}</h2>
-            {%- for item in items -%}
-                {%- set attributes = item.id is defined ? {id: item.id} : null -%}
-                {{- summaryCard({
-                    title: {
-                        text: item.label,
-                    },
-                    actions: item.actions ?? null,
-                    attributes,
-                }, item.panel.html) }}
-            {%- endfor -%}
-        </div>
-    {%- endif -%}
-{% endmacro %}
-
-{% macro displaySectionsInline(items) %}
-    {# N.B. Uses tab data format for items so that we can easily switch from one to the other #}
-    {%- if items is not empty -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tabs -%}
-        {%- for item in items -%}
-            <div class="govuk-!-margin-bottom-9">
-                <h2 class="govuk-heading-m">{{ item.label }}</h2>
-                {{- item.panel.html | raw -}}
-            </div>
-        {%- endfor -%}
     {%- endif -%}
 {% endmacro %}
 
