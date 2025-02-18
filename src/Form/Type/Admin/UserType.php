@@ -10,17 +10,28 @@ use Ghost\GovUkFrontendBundle\Form\Type as Gds;
 
 class UserType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', Gds\InputType::class, [])
-            ->add('email', Gds\EmailType::class, [])
-            ->add('position', Gds\InputType::class, [])
-            ->add('phone', Gds\InputType::class, [])
+            ->add('name', Gds\InputType::class, [
+                'label_attr' => ['class' => 'govuk-label--s'],
+                'attr' => ['class' => 'govuk-input--width-20'],
+            ])
+            ->add('email', Gds\EmailType::class, [
+                'label_attr' => ['class' => 'govuk-label--s'],
+            ])
+            ->add('position', Gds\InputType::class, [
+                'label_attr' => ['class' => 'govuk-label--s'],
+                'attr' => ['class' => 'govuk-input--width-20'],
+            ])
+            ->add('phone', Gds\InputType::class, [
+                'label_attr' => ['class' => 'govuk-label--s'],
+                'attr' => ['class' => 'govuk-input--width-20'],
+            ])
             ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,

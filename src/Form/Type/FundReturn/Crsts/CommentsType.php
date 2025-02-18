@@ -3,7 +3,7 @@
 namespace App\Form\Type\FundReturn\Crsts;
 
 use App\Entity\FundReturn\CrstsFundReturn;
-use App\Form\Type\ReturnBaseType;
+use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,7 +21,7 @@ class CommentsType extends AbstractType
 
     public function getParent(): string
     {
-        return ReturnBaseType::class;
+        return BaseButtonsFormType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

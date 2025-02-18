@@ -4,7 +4,7 @@ namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Form\Type\ReturnBaseType;
+use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
@@ -35,7 +35,7 @@ class MilestoneRatingType extends AbstractType
 
     public function getParent(): string
     {
-        return ReturnBaseType::class;
+        return BaseButtonsFormType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -38,7 +38,9 @@ class AuthorityController extends AbstractController
     public function edit(Request $request, EntityManagerInterface $entityManager, Session $session, Authority $authority, string $type='edit'): Response
     {
         /** @var Form $form */
-        $form = $this->createForm(AuthorityType::class, $authority);
+        $form = $this->createForm(AuthorityType::class, $authority, [
+            'cancel_url' => $this->generateUrl('admin_authority'),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {

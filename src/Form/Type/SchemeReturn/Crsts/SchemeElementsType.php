@@ -4,7 +4,7 @@ namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\SchemeReturn\SchemeReturn;
-use App\Form\Type\ReturnBaseType;
+use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
@@ -54,7 +54,7 @@ class SchemeElementsType extends AbstractType implements DataMapperInterface
 
     public function getParent(): string
     {
-        return ReturnBaseType::class;
+        return BaseButtonsFormType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

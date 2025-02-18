@@ -5,7 +5,7 @@ namespace App\Form\Type\SchemeReturn\Crsts;
 use App\Entity\Enum\TransportMode;
 use App\Entity\Enum\TransportModeCategory;
 use App\Entity\SchemeReturn\SchemeReturn;
-use App\Form\Type\ReturnBaseType;
+use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
@@ -52,7 +52,7 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
 
     public function getParent(): string
     {
-        return ReturnBaseType::class;
+        return BaseButtonsFormType::class;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

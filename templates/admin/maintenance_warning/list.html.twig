@@ -1,40 +1,41 @@
 {%- extends 'admin/base.html.twig' -%}
 
-{%- set page_title_key = 'admin.pages.maintenance.title' -%}
+{% trans_default_domain 'admin' %}
+{%- set page_title_key = 'pages.maintenance.title' -%}
 {%- set current_menu = 'maintenance' -%}
 
 {%- block content -%}
     {%- from '@GhostGovUkFrontend/components/macros.html.twig' import pagination, tableHead, tableRow, summaryListActionsList, tag -%}
     {%- from "@GhostGovUkCore/list-page.html.twig" import listTableStart, listTableEnd -%}
 
-    <p class="govuk-body">{{ 'admin.maintenance.list.intro_copy' | trans }}</p>
+    <p class="govuk-body">{{ 'maintenance.list.intro_copy' | trans }}</p>
 
     {{- listTableStart(data, form) -}}
     {%- for warning in data.entities -%}
         {%- set actions = [
             {
                 href: path('admin_maintenance_delete', {id: warning.id}),
-                text: 'admin.maintenance.list.delete' | trans,
+                text: 'maintenance.list.delete' | trans,
             },
             {
                 href: path('admin_maintenance_edit', {id: warning.id}),
-                text: 'admin.maintenance.list.edit' | trans,
+                text: 'maintenance.list.edit' | trans,
             },
         ] -%}
         {{- tableRow([
-            warning.startDatetime | date('format.date.default' | trans),
-            warning.startDatetime | date('format.time.default' | trans),
-            warning.endTime | date('format.time.default' | trans),
+            warning.startDatetime | date('format.date.default' | trans({}, 'messages')),
+            warning.startDatetime | date('format.time.default' | trans({}, 'messages')),
+            warning.endTime | date('format.time.default' | trans({}, 'messages')),
             {html: summaryListActionsList(actions)},
         ]) -}}
     {%- else -%}
         {{- tableRow([
             {
-                text: 'admin.maintenance.list.no_results' | trans,
+                text: 'maintenance.list.no_results' | trans,
                 colspan: data.fields | length + 1,
             }
         ]) -}}
     {%- endfor -%}
     {{- listTableEnd(data, form) -}}
-    <a class="govuk-button" href="{{ path('admin_maintenance_add') }}">{{ 'admin.maintenance.list.add' | trans }}</a>
+    <a class="govuk-button" href="{{ path('admin_maintenance_add') }}">{{ 'maintenance.list.add' | trans }}</a>
 {%- endblock -%}

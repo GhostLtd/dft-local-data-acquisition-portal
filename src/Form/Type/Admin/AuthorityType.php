@@ -3,6 +3,7 @@
 namespace App\Form\Type\Admin;
 
 use App\Entity\Authority;
+use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type as Gds;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,14 +15,13 @@ class AuthorityType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', Gds\InputType::class, [])
-            ->add('admin', UserType::class, [])
-            ->add('submit', Gds\ButtonType::class, [
-                'label' => 'forms.buttons.submit',
+            ->add('name', Gds\InputType::class, [
+                'label' => 'authority.form.name',
+                'label_attr' => ['class' => 'govuk-label--m'],
             ])
-            ->add('cancel', Gds\ButtonType::class, [
-                'label' => 'forms.buttons.cancel',
-                'attr' => ['class' => 'govuk-button--secondary'],
+            ->add('admin', UserType::class, [
+                'label' => 'authority.form.admin',
+                'label_attr' => ['class' => 'govuk-label--m'],
             ])
             ;
     }
@@ -30,6 +30,12 @@ class AuthorityType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Authority::class,
+            'translation_domain' => 'admin',
         ]);
+    }
+
+    public function getParent(): string
+    {
+        return BaseButtonsFormType::class;
     }
 }
