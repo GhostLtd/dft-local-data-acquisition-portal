@@ -19,7 +19,6 @@
         <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.titles.fund_details' | trans }}</h2>
         {%- set contents -%}
             {{- summaryListStart() -}}
-            {{- text('frontend.pages.fund_return.lead_contact', fundReturn.fundAward.leadContact.name) -}}
             {{- summaryListRow({key: 'frontend.pages.fund_return.sign_off' | trans, value: _self.signoff(fundReturn.signoffDate, fundReturn.signoffName, fundReturn.signoffUser ?? fundReturn.signoffEmail)}) -}}
             {{- summaryListEnd() -}}
         {%- endset -%}

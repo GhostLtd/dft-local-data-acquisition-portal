@@ -448,7 +448,6 @@ frontend:
         overall_progress: Overall progress
         schemes: Schemes
       comments: *fr_comments
-      lead_contact: Lead contact
       local_contribution: *fr_local_contribution
       overall_confidence: Confidence rating
       overall_delivery_confidence: Delivery confidence

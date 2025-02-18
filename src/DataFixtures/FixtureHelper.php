@@ -111,15 +111,8 @@ class FixtureHelper
     {
         $fund = $fundAwardDefinition->getFund();
 
-        $leadContactDefinition = $fundAwardDefinition->getLeadContact();
-        $leadContact = $leadContactDefinition ?
-            $this->createUser($leadContactDefinition) :
-            null;
-
-
         $fundAward = (new FundAward())
-            ->setType($fund)
-            ->setLeadContact($leadContact);
+            ->setType($fund);
 
         $this->persist([$fundAward]);
 

@@ -118,8 +118,6 @@ class RandomFixtureGenerator
 
         $finalQuarter = FinancialQuarter::createFromDate(new \DateTime('3 months ago'));
 
-        $leadContactUser = $this->createRandomUser();
-
         // Add scheme returns...
         foreach (FinancialQuarter::getRange(new FinancialQuarter(2022, 1), $finalQuarter) as $financialQuarter)
         {
@@ -164,7 +162,7 @@ class RandomFixtureGenerator
                 if ($mustBeSignedOff) {
                     $signoffDeadline = (clone $quarterStartDate)->modify('+3 months');
 
-                    $signoffUser = $this->faker->boolean(90) ? $leadContactUser : $this->createRandomUser();
+                    $signoffUser = $this->createRandomUser();
                     $signoffDatetime = $this->faker->dateTimeBetween($quarterStartDate, $signoffDeadline);
                 } else {
                     $signoffUser = null;
@@ -190,7 +188,7 @@ class RandomFixtureGenerator
                 };
         }
 
-        return new FundAwardDefinition($fund, $leadContactUser, $returns);
+        return new FundAwardDefinition($fund, $returns);
     }
 
     public function createRandomUser(): UserDefinition

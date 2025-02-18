@@ -9,7 +9,6 @@ class Role
     const string CAN_EDIT = 'CAN_EDIT';
     const string CAN_MARK_AS_READY = 'CAN_MARK_AS_READY';
     const string CAN_MARK_AS_NOT_READY = 'CAN_MARK_AS_NOT_READY';
-    const string CAN_SET_LEAD_CONTACT = 'CAN_SET_LEAD_CONTACT';
     const string CAN_SIGN_OFF_RETURN = 'CAN_SIGN_OFF_RETURN';
     const string CAN_VIEW = 'CAN_VIEW';
 }

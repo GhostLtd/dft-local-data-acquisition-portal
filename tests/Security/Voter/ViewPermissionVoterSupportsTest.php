@@ -40,7 +40,6 @@ class ViewPermissionVoterSupportsTest extends AbstractFunctionalTest
             [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new CrstsFundReturn(), false],
             [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, new CrstsFundReturn(), false],
             [InternalRole::HAS_VALID_EDIT_PERMISSION, new CrstsFundReturn(), false],
-            [Role::CAN_SET_LEAD_CONTACT, new CrstsFundReturn(), false],
         ];
     }
 

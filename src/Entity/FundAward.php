@@ -22,10 +22,6 @@ class FundAward
     #[ORM\Column(enumType: Fund::class)]
     private ?Fund $type = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    private ?User $leadContact = null; // 1top_info: Lead contact
-
     /**
      * @var Collection<int, FundReturn>
      */
@@ -57,17 +53,6 @@ class FundAward
     public function setType(Fund $type): static
     {
         $this->type = $type;
-        return $this;
-    }
-
-    public function getLeadContact(): ?User
-    {
-        return $this->leadContact;
-    }
-
-    public function setLeadContact(?User $leadContact): static
-    {
-        $this->leadContact = $leadContact;
         return $this;
     }
 
