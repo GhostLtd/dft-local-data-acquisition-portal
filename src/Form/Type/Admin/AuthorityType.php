@@ -5,6 +5,8 @@ namespace App\Form\Type\Admin;
 use App\Entity\Authority;
 use App\Entity\User;
 use App\Form\Type\BaseButtonsFormType;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityRepository;
 use Ghost\GovUkFrontendBundle\Form\Type as Gds;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -30,6 +32,7 @@ class AuthorityType extends AbstractType
                 if ($data->getId()) {
                     $form->add('admin', Gds\EntityType::class, [
                         'class' => User::class,
+                        'query_builder' => function (UserRepository $er) use ($data) {return $er->getAllForAuthorityQueryBuilder($data);},
                         'choice_label' => 'name',
                         'label' => 'authority.form.admin',
                         'label_attr' => ['class' => 'govuk-label--m'],
