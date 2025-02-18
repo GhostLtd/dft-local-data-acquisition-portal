@@ -1,7 +1,7 @@
 {% extends 'admin/base.html.twig' %}
 
 {% trans_default_domain 'admin' %}
-{%- set page_title_key = "pages.authority.title" -%}
+{%- set page_title_key = "pages.authority_#{form.vars.data.id ? 'edit' : 'add'}.title" -%}
 {%- set current_menu = 'authority' -%}
 
 {%- block content -%}

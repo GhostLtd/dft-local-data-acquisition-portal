@@ -52,13 +52,14 @@ class AuthorityController extends AbstractController
                 $authority = $form->getData();
                 if (!$form->getData()->getId()) {
                     $entityManager->persist($authority);
-                    if (!$authority?->getAdmin()?->getId()) {
-                        $entityManager->persist($authority->getAdmin());
-                    }
                     $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority added', 'The new authority has been added', ['style' => NotificationBanner::STYLE_SUCCESS]));
                 } else {
                     $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority updated', 'The authority has been updated', ['style' => NotificationBanner::STYLE_SUCCESS]));
                 }
+                if (!$authority?->getAdmin()?->getId()) {
+                    $entityManager->persist($authority->getAdmin());
+                }
+
                 $entityManager->flush();
                 return $this->redirectToRoute('admin_authority');
             }

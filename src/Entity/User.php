@@ -8,14 +8,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 // These fields are currently used to represent an Authority's admin, but
 // later can be additionally used for storing other contacts as well.
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[UniqueEntity(fields: 'email', message: 'The username is already taken.', groups: ['authority.new_admin'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use IdTrait;
@@ -24,15 +27,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeInterface $lastLogin = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull(groups: ['authority.new_admin'])]
     private ?string $name = null; #1top_info
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotNull(groups: ['authority.new_admin'])]
     private ?string $position = null; #1top_info
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotNull(groups: ['authority.new_admin'])]
     private ?string $phone = null; #1top_info
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotNull(groups: ['authority.new_admin'])]
     private ?string $email = null; #1top_info
 
     /**

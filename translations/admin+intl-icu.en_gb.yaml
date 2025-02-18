@@ -6,6 +6,10 @@ pages:
     title: Dashboard
   authority:
     title: MCAs
+  authority_add:
+    title: Add MCA
+  authority_edit:
+    title: Edit MCA
   maintenance:
     title: Maintenance warnings
   maintenance_add:
@@ -25,6 +29,9 @@ authority:
   form:
     name: Authority name
     admin: Admin user
+    admin-edit:
+      existing: Existing authority user
+      new: New user
 
 maintenance:
   delete:
