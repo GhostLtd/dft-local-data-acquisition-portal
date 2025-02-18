@@ -42,9 +42,9 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             $fieldKey = $milestoneType->value;
 
             $form->add($milestoneType->value, DateType::class, [
-                'label' => "forms.scheme.milestone_dates.{$fieldKey}.label",
+                'label' => dump("forms.scheme.milestone_dates.{$fieldKey}.label"),
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'label_translation_parameters' => ['mostly_funded_as' => $fundedMostlyAs->value],
+                'label_translation_parameters' => ['funded_mostly_as' => $fundedMostlyAs->value],
                 'help' => "forms.scheme.milestone_dates.{$fieldKey}.help",
             ]);
         }
