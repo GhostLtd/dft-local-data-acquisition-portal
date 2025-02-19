@@ -17,7 +17,7 @@ class Authority
     use IdTrait;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotNull(groups: ['authority'])]
+    #[Assert\NotNull(message: 'authority.name.not_null', groups: ['authority'])]
     private ?string $name = null; // 1top_info: Local Authority name
 
     #[ORM\ManyToOne(inversedBy: 'authoritiesAdminOf')]
@@ -49,7 +49,7 @@ class Authority
         return $this->name;
     }
 
-    public function setName(string $name): static
+    public function setName(?string $name): static
     {
         $this->name = $name;
         return $this;
