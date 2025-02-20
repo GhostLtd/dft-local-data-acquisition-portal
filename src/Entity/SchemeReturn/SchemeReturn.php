@@ -69,6 +69,7 @@ abstract class SchemeReturn
     // --------------------------------------------------------------------------------
 
     abstract public function getFund(): Fund;
+    abstract public function createSchemeReturnForNextQuarter(): static;
 
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;

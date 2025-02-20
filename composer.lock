@@ -1560,11 +1560,11 @@
         },
         {
             "name": "ghost/govuk-core-bundle",
-            "version": "1.0.7",
+            "version": "1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://git.tomarq.net/ghost/govuk-core-bundle.git",
-                "reference": "13afeb117efdb34b014f07636e2f56399170b753"
+                "reference": "94b1f6e2b6708f4520e994e9e86977bd975da845"
             },
             "require": {
                 "alphagov/notifications-php-client": "^6.2",
@@ -1623,7 +1623,7 @@
                 }
             ],
             "description": "Symfony bundle for core govuk-related classes",
-            "time": "2025-02-07T17:38:45+00:00"
+            "time": "2025-02-20T11:48:18+00:00"
         },
         {
             "name": "ghost/govuk-frontend-bundle",
@@ -9955,7 +9955,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -9966,6 +9966,6 @@
         "ext-openssl": "*",
         "ext-pdo": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

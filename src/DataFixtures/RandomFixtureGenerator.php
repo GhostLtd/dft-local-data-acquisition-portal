@@ -89,19 +89,7 @@ class RandomFixtureGenerator
                 $name = $this->faker->council_name();
             } while(array_key_exists($name, $authorities));
 
-            /** @var array<SchemeDefinition> $schemes */
-            $schemes = $this->repeat(SchemeDefinition::class, 4, 8, $this->createRandomScheme(...));
-
-            // Find all funds used by all of the schemes
-            $funds = [];
-            foreach($schemes as $schemeDefinition) {
-                foreach($schemeDefinition->getSchemeFunds() as $fundDefinition) {
-                    $fund = $fundDefinition->getFund();
-                    $funds[$fund->value] = $fund;
-                }
-            }
-
-            $fundAwards = array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $schemes), $funds);
+            [$schemes, $fundAwards] = $this->createSchemeAndFundAwardDefinitions();
 
             $authorities[$name] = new AuthorityDefinition($name, $this->createRandomUser(), $schemes, $fundAwards);
         }
@@ -109,83 +97,108 @@ class RandomFixtureGenerator
         return $authorities;
     }
 
+    public function createSchemeAndFundAwardDefinitions(FinancialQuarter $initialQuarter = null, FinancialQuarter $finalQuarter = null): array
+    {
+        $this->initialise();
+
+        /** @var array<SchemeDefinition> $schemes */
+        $schemes = $this->repeat(SchemeDefinition::class, 4, 8, $this->createRandomScheme(...));
+
+        // Find all funds used by all schemes
+        $funds = [];
+        foreach($schemes as $schemeDefinition) {
+            foreach($schemeDefinition->getSchemeFunds() as $fundDefinition) {
+                $fund = $fundDefinition->getFund();
+                $funds[$fund->value] = $fund;
+            }
+        }
+
+        $fundAwards = array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $schemes, $initialQuarter, $finalQuarter), $funds);
+        return [$schemes, $fundAwards];
+    }
+
     /**
      * @param array<SchemeDefinition> $schemes
      */
-    public function createRandomFundAward(Fund $fund, array $schemes): FundAwardDefinition
+    public function createRandomFundAward(Fund $fund, array $schemes, FinancialQuarter $initialQuarter = null, FinancialQuarter $finalQuarter = null): FundAwardDefinition
     {
         $returns = [];
 
-        $finalQuarter = FinancialQuarter::createFromDate(new \DateTime('3 months ago'));
+        $initialQuarter = $initialQuarter ?? new FinancialQuarter(2022, 1);
+        $finalQuarter = $finalQuarter ?? FinancialQuarter::createFromDate(new \DateTime('3 months ago'));
 
         // Add scheme returns...
-        foreach (FinancialQuarter::getRange(new FinancialQuarter(2022, 1), $finalQuarter) as $financialQuarter)
-        {
-                $schemeReturns = [];
-                $mustBeSignedOff = $financialQuarter < $finalQuarter;
+        foreach (
+            FinancialQuarter::getRange(
+                $initialQuarter,
+                $finalQuarter
+            ) as $financialQuarter
+        ) {
+            $schemeReturns = [];
+            $mustBeSignedOff = $financialQuarter < $finalQuarter;
 
-                foreach($schemes as $scheme) {
-                    $schemeFund = null;
-                    foreach($scheme->getSchemeFunds() as $loopSchemeFund) {
-                        if ($loopSchemeFund->getFund() === $fund) {
-                            $schemeFund = $loopSchemeFund;
-                            break;
-                        }
-                    }
-
-                    // This scheme isn't a recipient of this fund's funds...
-                    if (!$schemeFund) {
-                        continue;
-                    }
-
-                    if ($fund === Fund::CRSTS1) {
-                        if (!$schemeFund instanceof CrstsSchemeFundDefinition) {
-                            throw new \RuntimeException('SchemeFundDefinition / type mismatch');
-                        }
-
-                        if ($schemeFund->isRetained() || $financialQuarter->quarter === 4) {
-                            $schemeReturns[$scheme->getName()] = $this->createRandomCrstsSchemeReturn($financialQuarter);
-                        }
-                    } else {
-                        throw new \RuntimeException("Unsupported Scheme Return Type: ".$scheme::class);
+            foreach($schemes as $scheme) {
+                $schemeFund = null;
+                foreach($scheme->getSchemeFunds() as $loopSchemeFund) {
+                    if ($loopSchemeFund->getFund() === $fund) {
+                        $schemeFund = $loopSchemeFund;
+                        break;
                     }
                 }
 
-                $expenses = $this->createRandomCrstsExpenses(
-                    ExpenseType::filterForFund($fund),
-                    $financialQuarter
-                );
+                // This scheme isn't a recipient of this fund's funds...
+                if (!$schemeFund) {
+                    continue;
+                }
 
-                $quarterStartDate = $financialQuarter->getStartDate();
+                if ($fund === Fund::CRSTS1) {
+                    if (!$schemeFund instanceof CrstsSchemeFundDefinition) {
+                        throw new \RuntimeException('SchemeFundDefinition / type mismatch');
+                    }
 
-                // No signoff user for the most recent return...
-                if ($mustBeSignedOff) {
-                    $signoffDeadline = (clone $quarterStartDate)->modify('+3 months');
-
-                    $signoffUser = $this->createRandomUser();
-                    $signoffDatetime = $this->faker->dateTimeBetween($quarterStartDate, $signoffDeadline);
+                    if ($schemeFund->isRetained() || $financialQuarter->quarter === 4) {
+                        $schemeReturns[$scheme->getName()] = $this->createRandomCrstsSchemeReturn($financialQuarter);
+                    }
                 } else {
-                    $signoffUser = null;
-                    $signoffDatetime = null;
+                    throw new \RuntimeException("Unsupported Scheme Return Type: ".$scheme::class);
                 }
+            }
 
-                $returns[] = match($fund) {
-                    Fund::CRSTS1 => new CrstsFundReturnDefinition(
-                        $signoffUser,
-                        $signoffDatetime,
-                        $financialQuarter->initialYear,
-                        $financialQuarter->quarter,
-                        $this->faker->text(),
-                        $this->faker->text(),
-                        $this->faker->randomElement(Rating::cases()),
-                        $this->faker->text(),
-                        $this->faker->text(),
-                        $this->faker->text(),
-                        $expenses,
-                        $schemeReturns,
-                    ),
-                    default => throw new \RuntimeException("Unsupported FundReturnDefinition: {$fund->value}")
-                };
+            $expenses = $this->createRandomCrstsExpenses(
+                ExpenseType::filterForFund($fund),
+                $financialQuarter
+            );
+
+            $quarterStartDate = $financialQuarter->getStartDate();
+
+            // No signoff user for the most recent return...
+            if ($mustBeSignedOff) {
+                $signoffDeadline = (clone $quarterStartDate)->modify('+3 months');
+
+                $signoffUser = $this->createRandomUser();
+                $signoffDatetime = $this->faker->dateTimeBetween($quarterStartDate, $signoffDeadline);
+            } else {
+                $signoffUser = null;
+                $signoffDatetime = null;
+            }
+
+            $returns[] = match($fund) {
+                Fund::CRSTS1 => new CrstsFundReturnDefinition(
+                    $signoffUser,
+                    $signoffDatetime,
+                    $financialQuarter->initialYear,
+                    $financialQuarter->quarter,
+                    $this->faker->text(),
+                    $this->faker->text(),
+                    $this->faker->randomElement(Rating::cases()),
+                    $this->faker->text(),
+                    $this->faker->text(),
+                    $this->faker->text(),
+                    $expenses,
+                    $schemeReturns,
+                ),
+                default => throw new \RuntimeException("Unsupported FundReturnDefinition: {$fund->value}")
+            };
         }
 
         return new FundAwardDefinition($fund, $returns);

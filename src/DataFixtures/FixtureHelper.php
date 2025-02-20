@@ -61,16 +61,21 @@ class FixtureHelper
         $authority->setAdmin($admin);
         $this->persist([$authority]);
 
-        foreach($definition->getSchemes() as $schemeDefinition) {
+        $this->processSchemeAndFundDefinitions($authority, $definition->getSchemes(), $definition->getFundAwards());
+
+        return $authority;
+    }
+
+    public function processSchemeAndFundDefinitions(Authority $authority, array $schemeDefinitions, array $fundAwardDefinitions): void
+    {
+        foreach($schemeDefinitions as $schemeDefinition) {
             $authority->addScheme($this->createScheme($schemeDefinition));
         }
 
         $schemes = $authority->getSchemes()->toArray();
-        foreach($definition->getFundAwards() as $fundAwardDefinition) {
+        foreach($fundAwardDefinitions as $fundAwardDefinition) {
             $authority->addFundAward($this->createFundAward($fundAwardDefinition, $schemes));
         }
-
-        return $authority;
     }
 
     public function createUser(UserDefinition $definition, ?Authority $authority=null): User

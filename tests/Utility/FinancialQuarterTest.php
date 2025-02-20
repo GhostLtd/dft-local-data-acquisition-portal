@@ -50,4 +50,109 @@ class FinancialQuarterTest extends TestCase
         $fq = new FinancialQuarter($year, $quarter);
         $this->assertEquals($expectedDate, $fq->getStartDate()->format('Y-m-d'));
     }
+
+    public function quarterComparisonDataProvider(): array
+    {
+        return [
+            [2024, 1, 'lt'],
+            [2024, 1, 'lte'],
+            [2024, 2, 'lte'],
+            [2024, 2, 'eq'],
+            [2024, 2, 'gte'],
+            [2024, 3, 'gt'],
+            [2024, 3, 'gte'],
+
+            [2024, 1, 'eq', false],
+            [2024, 1, 'gt', false],
+            [2024, 1, 'gte', false],
+
+            [2024, 2, 'lt', false],
+            [2024, 2, 'gt', false],
+
+            [2024, 3, 'lt', false],
+            [2024, 3, 'lte', false],
+            [2024, 3, 'eq', false],
+
+            [2023, 1, 'lt'],
+            [2023, 1, 'lte'],
+            [2023, 1, 'eq', false],
+            [2023, 1, 'gt', false],
+            [2023, 1, 'gte', false],
+            [2023, 4, 'lt'],
+            [2023, 4, 'lte'],
+            [2023, 4, 'eq', false],
+            [2023, 4, 'gt', false],
+            [2023, 4, 'gte', false],
+
+            [2025, 1, 'gt'],
+            [2025, 1, 'gte'],
+            [2025, 1, 'eq', false],
+            [2025, 1, 'lt', false],
+            [2025, 1, 'lte', false],
+            [2025, 4, 'gt'],
+            [2025, 4, 'gte'],
+            [2025, 4, 'eq', false],
+            [2025, 4, 'lt', false],
+            [2025, 4, 'lte', false],
+
+        ];
+    }
+
+    /**
+     * @dataProvider quarterComparisonDataProvider
+     */
+    public function testQuarterComparison($year, $quarter, $comparison, $expectedResult = true): void
+    {
+        $fq = new FinancialQuarter($year, $quarter);
+        $compareTo = new FinancialQuarter(2024, 2);
+        switch ($comparison) {
+            case 'eq' :
+                $this->assertEquals($expectedResult, $fq == $compareTo);
+                break;
+            case 'gt' :
+                $this->assertEquals($expectedResult, $fq > $compareTo);
+                break;
+            case 'gte' :
+                $this->assertEquals($expectedResult, $fq >= $compareTo);
+                break;
+            case 'lt' :
+                $this->assertEquals($expectedResult, $fq < $compareTo);
+                break;
+            case 'lte' :
+                $this->assertEquals($expectedResult, $fq <= $compareTo);
+                break;
+
+            default:
+                throw new \RuntimeException("Comparison not supported");
+        }
+    }
+
+    public function divisionAndColumnDataProvider(): array
+    {
+        return [
+            ['2023-24', 'Q1', 2023, 1],
+            ['2023-24', 'Q2', 2023, 2],
+            ['2023-24', 'Q3', 2023, 3],
+            ['2023-24', 'Q4', 2023, 4],
+
+            ['2023-2', 'Q1', null, null],
+            ['2023-2', 'Q5', null, null],
+            ['2023-2', 'Q0', null, null],
+            ['2023-24', '1', null, null],
+            ['2023-24', 'A1', null, null],
+        ];
+    }
+
+    /**
+     * @dataProvider divisionAndColumnDataProvider
+     */
+    public function testFromDivisionAndColumn(string $division, string $column, ?int $expectedYear, ?int $expectedQuarter): void
+    {
+        if ($expectedYear === null && $expectedQuarter === null) {
+            $this->expectException(\RuntimeException::class);
+        }
+        $fq = FinancialQuarter::createFromDivisionAndColumn($division, $column);
+        $this->assertEquals($expectedYear, $fq->initialYear);
+        $this->assertEquals($expectedQuarter, $fq->quarter);
+    }
 }

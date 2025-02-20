@@ -7,9 +7,11 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
-use App\Entity\ReturnExpenseDivisionCommentsTrait;
+use App\Entity\ReturnExpenseTrait;
+use App\Entity\SchemeReturn\SchemeReturn;
 use App\Utility\CrstsHelper;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
+use App\Utility\FinancialQuarter;
 use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,7 +25,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 {
-    use ReturnExpenseDivisionCommentsTrait;
+    use ReturnExpenseTrait;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[NotBlank(message: 'crsts_fund_return.progress_summary.not_blank', groups: ["overall_progress"])]
@@ -48,16 +50,10 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comments = null; // 2top_exp: Comment box.  Please provide some commentary on the programme expenditure table above.  Any expenditure post 26/27 MUST be explained.
 
-    /**
-     * @var Collection<int, ExpenseEntry>
-     */
-    #[ORM\ManyToMany(targetEntity: ExpenseEntry::class)] // N.B. Validator is at class level
-    private Collection $expenses;
-
     public function __construct()
     {
         parent::__construct();
-        $this->expenses = new ArrayCollection();
+        $this->__expenseConstruct();
     }
 
     public function getProgressSummary(): ?string
@@ -126,29 +122,6 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, ExpenseEntry>
-     */
-    public function getExpenses(): Collection
-    {
-        return $this->expenses;
-    }
-
-    public function addExpense(ExpenseEntry $expense): static
-    {
-        if (!$this->expenses->contains($expense)) {
-            $this->expenses->add($expense);
-        }
-
-        return $this;
-    }
-
-    public function removeExpense(ExpenseEntry $expense): static
-    {
-        $this->expenses->removeElement($expense);
-        return $this;
-    }
-
     public function getFund(): Fund
     {
         return Fund::CRSTS1;
@@ -160,5 +133,26 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     public function getDivisionConfigurations(): array
     {
         return CrstsHelper::getExpenseDivisionConfigurations($this->getYear(), $this->getQuarter());
+    }
+
+    public function createFundReturnForNextQuarter(): static
+    {
+        $nextReturn = new self();
+        $this->getFundAward()->addReturn($nextReturn);
+
+        $nextReturn
+            ->setQuarter($this->getQuarter() === 4 ? 1 : $this->getQuarter() + 1)
+            ->setYear($this->getQuarter() === 4 ? $this->getYear() + 1 : $this->getYear())
+            ->setLocalContribution($this->getLocalContribution())
+            ->setResourceFunding($this->getResourceFunding())
+            ;
+        $this->createExpensesForNextQuarter($this->getYear(), $this->getQuarter())->map(
+            fn($e) => $nextReturn->addExpense($e)
+        );
+//        dump($nextReturn->getExpenses()); exit;
+        $this->getSchemeReturns()->map(
+            fn(SchemeReturn $sr) => $nextReturn->addSchemeReturn($sr->createSchemeReturnForNextQuarter())
+        );
+        return $nextReturn;
     }
 }

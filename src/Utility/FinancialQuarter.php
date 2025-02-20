@@ -7,7 +7,11 @@ use Generator;
 class FinancialQuarter
 {
 
-    public function __construct(public int $initialYear, public int $quarter) {}
+    public function __construct(public int $initialYear, public int $quarter) {
+        if ($quarter < 1 || $quarter > 4) {
+            throw new \RuntimeException("Quarter must be between 1 and 4");
+        }
+    }
 
     public function getStartDate(): \DateTime
     {
@@ -28,6 +32,17 @@ class FinancialQuarter
         return new static($date->format('Y'), ceil($date->format('m') / 3));
     }
 
+    public static function createFromDivisionAndColumn(string $division, string $column): static
+    {
+        if (!preg_match('/^(?<year>\d{4})-\d{2}$/', $division, $divisionMatches)) {
+            throw new \RuntimeException('unexpected division format: ' . $division);
+        }
+        if (!preg_match('/^Q(?<quarter>\d)$/', $column, $columnMatches)) {
+            throw new \RuntimeException('unexpected column format: ' . $column);
+        }
+        return new static(intval($divisionMatches['year']), intval($columnMatches['quarter']));
+    }
+
     public function getNextQuarter(): static
     {
         return match($this->quarter) {
@@ -36,6 +51,9 @@ class FinancialQuarter
         };
     }
 
+    /**
+     * Needed for comparisons
+     */
     public function __toString(): string
     {
         return $this->getStartDate()->format("Y-m-d");
