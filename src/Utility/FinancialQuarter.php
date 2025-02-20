@@ -47,6 +47,7 @@ class FinancialQuarter
     public static function getRange(FinancialQuarter $start, FinancialQuarter $end): Generator
     {
         if ($start > $end) {
+            dump($start, $end);
             throw new \RuntimeException('start must be before end');
         }
 
