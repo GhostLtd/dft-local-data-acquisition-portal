@@ -36,13 +36,10 @@ class ExpensesDataMapper implements DataMapperInterface
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
 
-        $collection = $viewData->getExpenses();
-
         $divKey = $this->tableHelper->getDivisionConfiguration()->getKey();
+        $collection = $viewData->getExpenses()->filter(fn(ExpenseEntry $e) => $e->getDivision() === $divKey);
         foreach($collection as $expense) {
-            $expenseValue = $expense->getType()->value;
-
-            $key = "expense__{$divKey}__{$expenseValue}__{$expense->getColumn()}";
+            $key = "expense__{$expense->getDivision()}__{$expense->getType()->value}__{$expense->getColumn()}";
 
             if (isset($forms[$key])) {
                 $forms[$key]->setData($expense->getValue());
