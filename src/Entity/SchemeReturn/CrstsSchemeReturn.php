@@ -9,7 +9,7 @@ use App\Entity\Enum\OnTrackRating;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
 use App\Entity\Milestone;
-use App\Entity\ReturnExpenseDivisionCommentsTrait;
+use App\Entity\ReturnExpenseTrait;
 use App\Entity\SchemeFund\CrstsSchemeFund;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[Callback([ExpensesValidator::class, 'validate'], groups: ['expenses'])]
 class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterface
 {
-    use ReturnExpenseDivisionCommentsTrait;
+    use ReturnExpenseTrait;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
     #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
@@ -59,12 +59,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     private ?string $progressUpdate = null; // 4proj_milestones: Progress update (comment)
 
     /**
-     * @var Collection<int, ExpenseEntry>
-     */
-    #[ORM\ManyToMany(targetEntity: ExpenseEntry::class)]
-    private Collection $expenses;
-
-    /**
      * @var Collection<int, Milestone>
      */
     #[ORM\ManyToMany(targetEntity: Milestone::class, cascade: ['persist'])]
@@ -85,7 +79,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
     public function __construct()
     {
-        $this->expenses = new ArrayCollection();
+        $this->__expenseConstruct();
         $this->milestones = new ArrayCollection();
     }
 
@@ -177,29 +171,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     }
 
     /**
-     * @return Collection<int, ExpenseEntry>
-     */
-    public function getExpenses(): Collection
-    {
-        return $this->expenses;
-    }
-
-    public function addExpense(ExpenseEntry $expense): static
-    {
-        if (!$this->expenses->contains($expense)) {
-            $this->expenses->add($expense);
-        }
-
-        return $this;
-    }
-
-    public function removeExpense(ExpenseEntry $expense): static
-    {
-        $this->expenses->removeElement($expense);
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Milestone>
      */
     public function getMilestones(): Collection
@@ -234,5 +205,29 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     {
         $fundReturn = $this->getFundReturn();
         return CrstsHelper::getExpenseDivisionConfigurations($fundReturn->getYear(), $fundReturn->getQuarter());
+    }
+
+    public function createSchemeReturnForNextQuarter(): static
+    {
+        $nextSchemeReturn = new self();
+        $nextSchemeReturn
+            ->setSchemeFund($this->getSchemeFund())
+
+            ->setBusinessCase($this->getBusinessCase())
+            ->setExpectedBusinessCaseApproval($this->getExpectedBusinessCaseApproval())
+            ->setProgressUpdate($this->getProgressUpdate())
+            ->setOnTrackRating($this->getOnTrackRating())
+            ->setTotalCost($this->getTotalCost())
+            ->setAgreedFunding($this->getAgreedFunding())
+        ;
+        $this->createExpensesForNextQuarter($this->getFundReturn()->getYear(), $this->getFundReturn()->getQuarter())
+            ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
+
+        $this->milestones->map(fn($m) => $nextSchemeReturn->addMilestone((new Milestone())
+            ->setType($m->getType())
+            ->setDate($m->getDate())
+        ));
+
+        return $nextSchemeReturn;
     }
 }

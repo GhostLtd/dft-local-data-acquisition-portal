@@ -51,12 +51,22 @@ abstract class FundReturn
     /**
      * @var Collection<int, SchemeReturn>
      */
-    #[ORM\OneToMany(targetEntity: SchemeReturn::class, mappedBy: 'fundReturn', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: SchemeReturn::class, mappedBy: 'fundReturn', cascade: ['persist'], orphanRemoval: true)]
     private Collection $schemeReturns;
 
     public function __construct()
     {
         $this->schemeReturns = new ArrayCollection();
+    }
+
+    public function signoff(User $user): static
+    {
+        $this
+            ->setSignoffUser($user)
+            ->setSignoffDate(new \DateTime())
+            ->setSignoffEmail($user->getEmail())
+            ->setSignoffName($user->getName());
+        return $this;
     }
 
     public function getYear(): ?int
@@ -169,6 +179,7 @@ abstract class FundReturn
     // --------------------------------------------------------------------------------
 
     abstract public function getFund(): Fund;
+    abstract public function createFundReturnForNextQuarter(): static;
 
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;

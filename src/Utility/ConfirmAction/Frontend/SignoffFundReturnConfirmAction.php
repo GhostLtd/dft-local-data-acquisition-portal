@@ -57,13 +57,7 @@ class SignoffFundReturnConfirmAction extends AbstractConfirmAction
     {
         /** @var User $user */
         $user = $this->security->getUser();
-        $this->subject
-            ->setSignoffUser($user)
-            ->setSignoffDate(new \DateTime())
-            ->setSignoffEmail($user->getEmail())
-            ->setSignoffName($user->getName())
-            ;
-
+        $this->subject->signoff($user);
         $this->entityManager->flush();
     }
 }

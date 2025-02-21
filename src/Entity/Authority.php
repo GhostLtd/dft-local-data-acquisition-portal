@@ -35,7 +35,7 @@ class Authority
     /**
      * @var Collection<int, FundAward>
      */
-    #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'authority', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'authority', orphanRemoval: true, indexBy: 'type')]
     private Collection $fundAwards;
 
     public function __construct()
@@ -97,7 +97,7 @@ class Authority
     }
 
     /**
-     * @return Collection<int, FundAward>
+     * @return Collection<string, FundAward>
      */
     public function getFundAwards(): Collection
     {
