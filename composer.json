@@ -32,11 +32,11 @@
         "symfony/validator": "6.4.*",
         "symfony/webpack-encore-bundle": "^2.1",
         "symfony/yaml": "6.4.*",
-        "twig/intl-extra": "^3.13"
+        "twig/intl-extra": "^3.13",
+        "fakerphp/faker": "^1.23"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
-        "fakerphp/faker": "^1.23",
         "liip/test-fixtures-bundle": "^3.2",
         "symfony/debug-bundle": "6.4.*",
         "symfony/maker-bundle": "^1.61",

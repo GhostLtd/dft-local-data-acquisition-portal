@@ -2,6 +2,7 @@
 .yarn
 /local/
 /public/.htaccess
+keys.json
 
 ###> symfony/framework-bundle ###
 /.env.local
