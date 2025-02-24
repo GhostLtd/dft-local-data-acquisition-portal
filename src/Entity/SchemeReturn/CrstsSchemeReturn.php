@@ -215,11 +215,20 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
             ->setBusinessCase($this->getBusinessCase())
             ->setExpectedBusinessCaseApproval($this->getExpectedBusinessCaseApproval())
-            ->setProgressUpdate($this->getProgressUpdate())
             ->setOnTrackRating($this->getOnTrackRating())
             ->setTotalCost($this->getTotalCost())
             ->setAgreedFunding($this->getAgreedFunding())
         ;
+
+        if (in_array($this->onTrackRating, [
+            OnTrackRating::SCHEME_CANCELLED,
+            OnTrackRating::SCHEME_COMPLETED,
+        ])) {
+            // Normally we don't want to copy the textual progress update, but if the scheme's won't receive further
+            // updates, then do
+            $nextSchemeReturn->setProgressUpdate($this->getProgressUpdate());
+        }
+
         $this->createExpensesForNextQuarter($this->getFundReturn()->getYear(), $this->getFundReturn()->getQuarter())
             ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
 
