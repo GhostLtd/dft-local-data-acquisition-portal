@@ -22,6 +22,7 @@ class LocalAndRdelType extends AbstractType
             ->add('resourceFunding', TextareaType::class, [
                 'label' => 'forms.crsts.local_and_rdel.resource_funding.label',
                 'help' => 'forms.crsts.local_and_rdel.resource_funding.help',
+                'help_html' => 'markdown',
                 'label_attr' => ['class' => 'govuk-label--s']
             ])
         ;

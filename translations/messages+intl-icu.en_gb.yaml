@@ -226,6 +226,7 @@ forms:
     comments:
       comments:
         label: &fr_comments Comments
+        help: Use this field to give any additional context you would like to add to this return
     expenses:
       actual_or_forecast: >-
         {is_forecast, select,
@@ -236,7 +237,7 @@ forms:
       comments:
         title: 'Comments'
         label: 'Comments'
-        help: 'Only provide important information'
+        help: 'Use this box only if any of the values above require additional explanation.'
       division_post_title: Post-{startYear}/{endYear}
       forecast: |-
         Forecast
@@ -270,7 +271,7 @@ forms:
         help: Please provide a current breakdown of local contribution achieved, by source.
       resource_funding:
         label: &fr_resource_funding Resource (RDEL) funding
-        help: Provide a breakdown of spend
+        help: Provide any commentary on your programme expenditure table (any expenditure post-2027 **must** be explained)
     overall_funding:
       agreed_funding:
         label: &sr_agreed_funding Agreed funding

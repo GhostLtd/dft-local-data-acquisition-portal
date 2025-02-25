@@ -15,6 +15,7 @@ class CommentsType extends AbstractType
     {
         $builder->add('comments', TextareaType::class, [
             'label' => 'forms.crsts.comments.comments.label',
+            'help' => 'forms.crsts.comments.comments.help',
             'label_attr' => ['class' => 'govuk-label--s']
         ]);
     }
