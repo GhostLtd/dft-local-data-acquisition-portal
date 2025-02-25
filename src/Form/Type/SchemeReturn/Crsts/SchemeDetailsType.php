@@ -40,6 +40,7 @@ class SchemeDetailsType extends AbstractType
                 'label' => 'forms.crsts.scheme_details.scheme_identifier.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'property_path' => 'schemeFund.scheme.schemeIdentifier',
+                'disabled' => 'disabled',
             ])
             ->add('previouslyTcf', BooleanChoiceType::class, [
                 'label' => 'forms.crsts.scheme_details.previously_tcf.label',
