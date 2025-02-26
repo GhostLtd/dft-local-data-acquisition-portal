@@ -1336,21 +1336,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.11":
+  version: 0.0.0
+  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=e9dda269291743cd0099bcd7095e7ad1efee3a1e"
+  dependencies:
+    govuk-frontend: "npm:5.6.*"
+  checksum: 10c0/103bec0536c220660ecf67fc86aacd92140cd2bf014ff0bb6a6505e6f967c329e732b7b7bd16ddc853e7b52414797f3f5831edb7243826edc93a078e42212cb1
+  languageName: node
+  linkType: hard
+
 "@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.2":
   version: 0.0.0
   resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=57122f818ae5402d7b15edf8ba05bee4ebaae3ac"
   dependencies:
     govuk-frontend: "npm:5.6.*"
   checksum: 10c0/85c92b43cb268fcade46f0ee627dd6d970eb287bd4a5242c976088e7fb798d038c119472d11c890d046a9305291f5a422a8c99e66e770253a080a885165c3720
-  languageName: node
-  linkType: hard
-
-"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.8":
-  version: 0.0.0
-  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=d2aafc396a589d231c2501943bbde216757eff24"
-  dependencies:
-    govuk-frontend: "npm:5.6.*"
-  checksum: 10c0/d8937fa72ea41d75e71ecf87424c8efa2a621fd4853f1d1d192faf6a427078875089e9211952c636562a9a9d4ff2a3ab3fe809f644fc0699befe29d5099e591f
   languageName: node
   linkType: hard
 
@@ -5821,7 +5821,7 @@ __metadata:
     "@babel/core": "npm:^7.17.0"
     "@babel/preset-env": "npm:^7.16.0"
     "@ghost/govuk-core-bundle": "git+https://git.tomarq.net/ghost/govuk-core-bundle.git#1.0.8"
-    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.8"
+    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.11"
     "@symfony/webpack-encore": "npm:^4.0.0"
     core-js: "npm:^3.23.0"
     regenerator-runtime: "npm:^0.13.9"

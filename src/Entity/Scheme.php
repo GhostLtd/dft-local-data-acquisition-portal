@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
+use App\Entity\Enum\TransportModeCategory;
 use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\Traits\IdTrait;
 use App\Repository\SchemeRepository;
@@ -12,8 +13,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: SchemeRepository::class)]
 class Scheme
@@ -41,15 +44,14 @@ class Scheme
     private ?TransportMode $transportMode = null; // 1proj_info: Transport mode
 
     #[ORM\Column(nullable: true, enumType: ActiveTravelElement::class)]
-    #[NotNull(message: 'scheme.active_travel_element.not_null', groups: ["scheme_elements"])]
     private ?ActiveTravelElement $activeTravelElement = null; // 1proj_info: Does this scheme have active travel elements?
 
     #[ORM\Column(nullable: true)]
-    #[NotNull(message: 'scheme.includes_clean_air_elements.not_null', groups: ["scheme_elements"])]
+    #[NotNull(message: 'scheme.includes_clean_air_elements.not_null', groups: ["scheme_transport_mode"])]
     private ?bool $includesCleanAirElements = null; // 1proj_info: Will this scheme include clean air elements?
 
     #[ORM\Column(nullable: true)]
-    #[NotNull(message: 'scheme.includes_charging_points.not_null', groups: ["scheme_elements"])]
+    #[NotNull(message: 'scheme.includes_charging_points.not_null', groups: ["scheme_transport_mode"])]
     private ?bool $includesChargingPoints = null; // 1proj_info: Will this scheme include charging points for electric vehicles?
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -61,6 +63,21 @@ class Scheme
      */
     #[ORM\OneToMany(targetEntity: SchemeFund::class, mappedBy: 'scheme')]
     private Collection $schemeFunds;
+
+    #[Callback(groups: ['scheme_transport_mode'])]
+    public function validateActiveTravel(ExecutionContextInterface $context): void
+    {
+        if (!$this->transportMode ||
+            $this->transportMode->category() !== TransportModeCategory::ACTIVE_TRAVEL
+        ) {
+            if ($this->activeTravelElement === null) {
+                $context
+                    ->buildViolation('scheme.active_travel_element.not_null')
+                    ->atPath('hasActiveTravelElements')
+                    ->addViolation();
+            }
+        }
+    }
 
     public function __construct()
     {

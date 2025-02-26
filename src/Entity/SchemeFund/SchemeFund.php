@@ -25,7 +25,7 @@ abstract class SchemeFund
 
     #[ORM\ManyToOne(inversedBy: 'schemeFunds')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Valid(groups: ['scheme_details', 'scheme_elements', 'scheme_transport_mode'])]
+    #[Valid(groups: ['scheme_details', 'scheme_transport_mode'])]
     private ?Scheme $scheme = null;
 
     /**

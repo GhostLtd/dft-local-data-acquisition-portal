@@ -336,7 +336,32 @@ forms:
       on_track_rating:
         label: &sr_on_track_rating On-track rating
         help: ''
-    scheme_elements:
+    transport_mode:
+      category:
+        label: &sr_transport_mode Transport mode
+        help: ''
+      categories:
+        active_travel:
+          label: Choose active travel transport mode
+          help: ''
+        bus:
+          label: Choose bus transport mode
+          help: ''
+        multi_modal:
+          label: Choose multi-modal transport mode
+          help: ''
+        other:
+          label: Choose other transport mode
+          help: ''
+        rail:
+          label: Choose rail transport mode
+          help: ''
+        road:
+          label: Choose road / highways maintenance transport mode
+          help: ''
+        tram:
+          label: Choose tram / metro / light rail transport mode
+          help: ''
       has_active_travel_elements:
         label: Does this scheme have active travel elements?
         help: ''
@@ -349,31 +374,6 @@ forms:
         help: ''
       includes_clean_air_elements:
         label: Does this scheme include clean air elements?
-        help: ''
-    transport_mode:
-      category:
-        label: &sr_transport_mode Transport mode
-        help: ''
-      active_travel:
-        label: Choose active travel transport mode
-        help: ''
-      bus:
-        label: Choose bus transport mode
-        help: ''
-      multi_modal:
-        label: Choose multi-modal transport mode
-        help: ''
-      other:
-        label: Choose other transport mode
-        help: ''
-      rail:
-        label: Choose rail transport mode
-        help: ''
-      road:
-        label: Choose road / highways maintenance transport mode
-        help: ''
-      tram:
-        label: Choose tram / metro / light rail transport mode
         help: ''
   user:
     permission:
@@ -449,7 +449,6 @@ frontend:
         scheme_details: Scheme details
         status: Status
         transport_mode: Transport mode
-        scheme_elements: Scheme elements
       agreed_funding: *sr_agreed_funding
       back_to_fund_return: "Back to {fundName} return"
       benefit_cost_ratio: *sr_benefit_cost_ratio
@@ -523,7 +522,6 @@ sections:
     milestone_progress: Milestone progress
     overall_funding: Overall funding totals
     scheme_details: Scheme details
-    scheme_elements: Scheme elements
     transport_mode: Transport mode
 
 site.title: Data acquisition portal

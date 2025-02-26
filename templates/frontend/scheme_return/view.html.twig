@@ -86,7 +86,26 @@
 
         {%- set contents -%}
             {{- summaryListStart() -}}
-            {{- enumText('frontend.pages.scheme_return.transport_mode', 'enum.transport_mode', schemeReturn.schemeFund.scheme.transportMode) -}}
+
+            {%- set transportCategory = schemeReturn.schemeFund.scheme.transportMode ? schemeReturn.schemeFund.scheme.transportMode.category.value : null -%}
+            {%- set transportMode = schemeReturn.schemeFund.scheme.transportMode ? schemeReturn.schemeFund.scheme.transportMode.value : null -%}
+            {%- set transportCategoryValue = transportCategory ? ("enum.transport_mode.categories.#{transportCategory}" | trans) : null -%}
+            {%- set transportModeValue = transportMode ? ("enum.transport_mode.#{transportMode}" | trans) : null -%}
+            {%- set html -%}
+                {%- if transportModeValue -%}
+                    {{ transportCategoryValue }}: {{ transportModeValue }}
+                {%- else -%}
+                    {{ '-' }}
+                {%- endif -%}
+            {%- endset -%}
+
+            {{- text('frontend.pages.scheme_return.transport_mode', html) -}}
+
+            {%- if transportCategory != 'active_travel' -%}
+                {{- enumText('frontend.pages.scheme_return.has_active_travel_elements', 'enum.active_travel_element', schemeReturn.schemeFund.scheme.activeTravelElement) -}}
+            {%- endif -%}
+            {{- yesOrNo('frontend.pages.scheme_return.includes_charging_points', schemeReturn.schemeFund.scheme.includesChargingPoints) -}}
+            {{- yesOrNo('frontend.pages.scheme_return.includes_clean_air_elements', schemeReturn.schemeFund.scheme.includesCleanAirElements) -}}
             {{- summaryListEnd() -}}
         {%- endset %}
 
@@ -96,22 +115,6 @@
             'transport_mode',
             contents
         ) -}}
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- enumText('frontend.pages.scheme_return.has_active_travel_elements', 'enum.active_travel_element', schemeReturn.schemeFund.scheme.activeTravelElement) -}}
-            {{- yesOrNo('frontend.pages.scheme_return.includes_charging_points', schemeReturn.schemeFund.scheme.includesChargingPoints) -}}
-            {{- yesOrNo('frontend.pages.scheme_return.includes_clean_air_elements', schemeReturn.schemeFund.scheme.includesCleanAirElements) -}}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.scheme_elements' | trans,
-            'scheme_elements',
-            contents
-        ) -}}
-    </div>
 
     {#- MILESTONES ------------------------------------------------------------------------------------------------ -#}
 

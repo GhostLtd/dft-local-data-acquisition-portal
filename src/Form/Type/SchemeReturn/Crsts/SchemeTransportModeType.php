@@ -2,11 +2,14 @@
 
 namespace App\Form\Type\SchemeReturn\Crsts;
 
+use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\TransportMode;
 use App\Entity\Enum\TransportModeCategory;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Form\Type\BaseButtonsFormType;
+use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
+use PhpParser\Builder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -28,9 +31,17 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
                 'help' => 'forms.scheme.transport_mode.category.help',
                 'choices' => $categories,
                 'choice_label' => fn(TransportModeCategory $choice) => "enum.transport_mode.categories.{$choice->value}",
-                'choice_options' => fn(TransportModeCategory $choice) => [
-                    'conditional_form_name' => 'transportMode'.ucfirst($choice->value),
-                ],
+                'choice_options' => function(TransportModeCategory $choice) {
+                    $options = [
+                        'conditional_form_name' => 'transportMode'.ucfirst($choice->value),
+                    ];
+
+                    if ($choice === TransportModeCategory::ACTIVE_TRAVEL) {
+                        $options['conditional_hide_form_names'] = ['hasActiveTravelElements'];
+                    }
+
+                    return $options;
+                },
                 'choice_value' => fn(?TransportModeCategory $choice) => $choice->value ?? null,
             ]);
 
@@ -38,9 +49,9 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
             $choices = TransportMode::filterByCategory($category);
 
             $builder->add('transportMode'.ucfirst($category->value), ChoiceType::class, [
-                'label' => "forms.scheme.transport_mode.{$category->value}.label",
+                'label' => "forms.scheme.transport_mode.categories.{$category->value}.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'help' => "forms.scheme.transport_mode.{$category->value}.help",
+                'help' => "forms.scheme.transport_mode.categories.{$category->value}.help",
                 'choices' => $choices,
                 'choice_label' => fn(TransportMode $choice) => "enum.transport_mode.{$choice->value}",
                 'choice_value' => fn(?TransportMode $choice) => $choice->value ?? null,
@@ -48,6 +59,38 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
                 'placeholder' => 'forms.generic.placeholder',
             ]);
         }
+
+        $builder
+            ->add('hasActiveTravelElements', BooleanChoiceType::class, [
+                'label' => 'forms.scheme.transport_mode.has_active_travel_elements.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => 'forms.scheme.transport_mode.has_active_travel_elements.help',
+                'choice_options' => [
+                    'boolean.true' => [
+                        'conditional_form_name' => 'activeTravelElement',
+                    ]
+                ],
+            ])
+            ->add('activeTravelElement', ChoiceType::class, [
+                'label' => 'forms.scheme.transport_mode.active_travel_element.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => 'forms.scheme.transport_mode.active_travel_element.help',
+                'choices' => ActiveTravelElement::casesExcludingNoElements(),
+                'choice_label' => fn(ActiveTravelElement $choice) => "enum.active_travel_element.{$choice->value}",
+                'choice_value' => fn(?ActiveTravelElement $choice) => $choice?->value,
+                'expanded' => false,
+                'placeholder' => 'forms.generic.placeholder',
+            ])
+            ->add('includesChargingPoints', BooleanChoiceType::class, [
+                'label' => 'forms.scheme.transport_mode.includes_charging_points.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => 'forms.scheme.transport_mode.includes_charging_points.help',
+            ])
+            ->add('includesCleanAirElements', BooleanChoiceType::class, [
+                'label' => 'forms.scheme.transport_mode.includes_clean_air_elements.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => 'forms.scheme.transport_mode.includes_clean_air_elements.help',
+            ]);
     }
 
     public function getParent(): string
@@ -62,6 +105,7 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
             ->setDefault('validation_groups', ['scheme_transport_mode'])
             ->setDefault('error_mapping', [
                 'schemeFund.scheme.transportMode' => 'transportModeCategory',
+                'schemeFund.scheme.hasActiveTravelElements' => 'hasActiveTravelElements',
             ]);
     }
 
@@ -84,6 +128,13 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
         $category = $transportMode->category();
         $forms['transportModeCategory']->setData($category);
         $forms['transportMode'.ucfirst($category->value)]->setData($transportMode);
+
+        $activeTravelElement = $scheme->getActiveTravelElement();
+
+        $forms['hasActiveTravelElements']->setData($activeTravelElement?->isNoActiveElement());
+        $forms['activeTravelElement']->setData($activeTravelElement);
+        $forms['includesChargingPoints']->setData($scheme->includesChargingPoints());
+        $forms['includesCleanAirElements']->setData($scheme->includesCleanAirElements());
     }
 
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
@@ -98,6 +149,24 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
         $category = $forms['transportModeCategory']->getData();
         $transportMode = $category ? $forms['transportMode'.ucfirst($category->value)]->getData() : null;
 
-        $viewData->getSchemeFund()->getScheme()->setTransportMode($transportMode);
+        $scheme = $viewData->getSchemeFund()->getScheme();
+
+        if ($category === TransportModeCategory::ACTIVE_TRAVEL) {
+            $activeTravelElement = null;
+        } else {
+            $activeTravelElement = $forms['hasActiveTravelElements']->getData();
+
+            if ($activeTravelElement !== null) {
+                $activeTravelElement = $forms['hasActiveTravelElements']->getData() ?
+                    $forms['activeTravelElement']->getData() :
+                    ActiveTravelElement::NO_ACTIVE_TRAVEL_ELEMENTS;
+            }
+        }
+
+        $scheme
+            ->setTransportMode($transportMode)
+            ->setActiveTravelElement($activeTravelElement)
+            ->setIncludesChargingPoints($forms['includesChargingPoints']->getData())
+            ->setIncludesCleanAirElements($forms['includesCleanAirElements']->getData());
     }
 }
