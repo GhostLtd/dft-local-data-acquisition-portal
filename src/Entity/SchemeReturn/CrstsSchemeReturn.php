@@ -21,9 +21,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: CrstsSchemeReturnRepository::class)]
@@ -51,7 +51,8 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     private ?BusinessCase $businessCase = null; // 4proj_milestones: Current business case
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null', groups: ["milestone_business_case"])]
+    #[NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null', groups: ["milestone_business_case_date"])]
+    #[GreaterThan(value: 'now', message: 'crsts_scheme_return.expected_business_case_approval.future', groups: ["milestone_business_case_date"])]
     private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -63,6 +64,20 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
      */
     #[ORM\ManyToMany(targetEntity: Milestone::class, cascade: ['persist'])]
     private Collection $milestones;
+
+    #[Callback(groups: ['milestone_business_case'])]
+    public function validateExpectedBusinessCaseApproval(ExecutionContextInterface $context): void
+    {
+        if ($this->businessCase !== BusinessCase::NOT_APPLICABLE) {
+            $violations = $context->getValidator()->validateProperty($this, 'expectedBusinessCaseApproval', ['milestone_business_case_date']);
+            foreach($violations as $violation) {
+                $context
+                    ->buildViolation($violation->getMessage(), $violation->getParameters())
+                    ->atPath($violation->getPropertyPath())
+                    ->addViolation();
+            }
+        }
+    }
 
     #[Callback(groups: ['milestone_dates'])]
     public function validateMilestoneDates(ExecutionContextInterface $context): void

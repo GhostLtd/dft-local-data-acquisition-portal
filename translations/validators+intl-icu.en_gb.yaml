@@ -52,6 +52,7 @@ crsts_scheme_return:
   business_case:
     not_null: Choose the current business case
   expected_business_case_approval:
+    future: Enter a date in the future
     not_null: Enter the expected business case approval date
 
 scheme:

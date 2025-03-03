@@ -156,7 +156,9 @@
         {%- set contents -%}
             {{- summaryListStart() -}}
             {{- enumText('frontend.pages.scheme_return.current_business_case', 'enum.business_case', schemeReturn.businessCase) -}}
-            {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval) -}}
+            {%- if schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable' -%}
+                {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval) -}}
+            {%- endif -%}
             {{- summaryListEnd() -}}
         {%- endset -%}
 
