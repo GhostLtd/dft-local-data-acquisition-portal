@@ -23,3 +23,10 @@ li.govuk-service-navigation__margin-left-auto {
     text-align: right;
   }
 }
+
+.govuk-warning-header {
+  background: govuk-colour("white");
+  color: govuk-colour("black");
+  padding: govuk-spacing(2);
+  @include govuk-font(16);
+}

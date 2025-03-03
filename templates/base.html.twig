@@ -9,9 +9,12 @@
 
 {%- block pageTitle %}{{ page_title }}{{ page_title_suffix ?? '' }}{% endblock -%}
 
-{%- block stylesheets -%}
-    {{- encore_entry_link_tags('app') -}}
-{%- endblock -%}
+{% block head %}
+    {%- block stylesheets -%}
+        {{- encore_entry_link_tags('app') -}}
+    {%- endblock -%}
+    {% if env_google_site_verification ?? false %}<meta name="google-site-verification" content="{{ env_google_site_verification }}" />{% endif %}
+{% endblock %}
 
 {%- block javascripts -%}
     {{- encore_entry_script_tags('app') -}}
@@ -19,6 +22,18 @@
 
 {%- block headerBar -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import header -%}
+    {%- if env_label_frontend ?? false -%}
+        <style nonce="{{ csp_nonce('style') }}">
+            #envLabel {
+                {% if env_label_colour ?? false %}color: {{ env_label_colour }};{% endif %}
+                {% if env_label_background ?? false %}background: {{ env_label_background }};{% endif %}
+            }
+            #session-reminder {display:none;}
+        </style>
+        <div class="govuk-warning-header" id="envLabel">
+            {{ env_label_frontend | raw }}
+        </div>
+    {%- endif -%}
     {{- header({
         classes: 'govuk-header--full-width-border'
     }) -}}

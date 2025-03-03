@@ -1,6 +1,11 @@
 twig:
     file_name_pattern: '*.twig'
     form_themes: ['@GhostGovUkFrontend/theme.html.twig']
+    globals:
+        env_label_frontend: '%env(string:APP_ENV_LABEL_FRONTEND)%'
+        env_label_colour: '%env(string:APP_ENV_LABEL_COLOUR)%'
+        env_label_background: '%env(string:APP_ENV_LABEL_BACKGROUND)%'
+        env_google_site_verification: '%env(default::APP_GOOGLE_SITE_VERIFICATION)%'
 
 when@test:
     twig:
