@@ -223,11 +223,11 @@ class RandomFixtureGenerator
         return $contact;
     }
 
-    public function createRandomScheme(): SchemeDefinition
+    public function createRandomScheme(int $num): SchemeDefinition
     {
         // Since we currently only have CRSTS, we'll be having at most one fund
         $schemeFunds = [
-            $this->createRandomCrstsSchemeFund()
+            $this->createRandomCrstsSchemeFund($num)
         ];
 
         $schemeId = $this->faker->currencyCode() . $this->faker->numberBetween(1, 9999);
@@ -245,7 +245,7 @@ class RandomFixtureGenerator
         );
     }
 
-    public function createRandomCrstsSchemeFund(): CrstsSchemeFundDefinition
+    public function createRandomCrstsSchemeFund(int $num): CrstsSchemeFundDefinition
     {
         $bcrType = $this->faker->randomElement(BenefitCostRatioType::cases());
         $bcrValue = $bcrType === BenefitCostRatioType::VALUE ?
@@ -253,7 +253,7 @@ class RandomFixtureGenerator
             null;
 
         return new CrstsSchemeFundDefinition(
-            $this->faker->boolean(),
+            $num < 2 || $this->faker->boolean(), // Guarantee that at least two schemes are retained
             $this->faker->boolean(),
             FundedMostlyAs::CDEL,
             $bcrType,
