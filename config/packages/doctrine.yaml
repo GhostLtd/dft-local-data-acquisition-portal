@@ -1,11 +1,12 @@
 doctrine:
     dbal:
-        driver: '%env(APP_DATABASE_DRIVER)%'
-        host: '%env(APP_DATABASE_HOST)%'
-        dbname: '%env(APP_DATABASE_NAME)%'
-        user: '%env(APP_DATABASE_USER)%'
-        password: '%env(APP_DATABASE_PASSWORD)%'
-        server_version: '%env(APP_DATABASE_SERVER_VERSION)%'
+        driver: '%env(default::APP_DATABASE_DRIVER)%'
+        host: '%env(default::APP_DATABASE_HOST)%'
+        dbname: '%env(default::APP_DATABASE_NAME)%'
+        user: '%env(default::APP_DATABASE_USER)%'
+        password: '%env(default::APP_DATABASE_PASSWORD)%'
+        server_version: '%env(default::APP_DATABASE_SERVER_VERSION)%'
+        url: '%env(default::APP_DATABASE_URL)%'
         charset: utf8
 
         profiling_collect_backtrace: '%kernel.debug%'
