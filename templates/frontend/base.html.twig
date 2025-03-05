@@ -1,5 +1,10 @@
 {%- extends 'base.html.twig' -%}
 
+{%- block javascripts -%}
+    {{- parent() -}}
+    {{- include('includes/smartlook-session-recording.html.twig') -}}
+{%- endblock -%}
+
 {%- block navigation -%}
     {%- if is_granted('ROLE_USER') -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
