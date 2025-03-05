@@ -23,5 +23,5 @@
         "deploy-build": "encore production",
         "build-env-subs": "printenv | grep -E '^APP_' > .env.local"
     },
-    "packageManager": "yarn@4.6.0"
+    "packageManager": "yarn@4.7.0"
 }
