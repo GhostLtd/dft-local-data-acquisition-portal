@@ -11,14 +11,21 @@
 
 {% block head %}
     {%- block stylesheets -%}
-        {{- encore_entry_link_tags('app') -}}
+        {{- encore_entry_link_tags('app', attributes={
+            nonce: csp_nonce('style')
+        }) -}}
     {%- endblock -%}
     {% if env_google_site_verification ?? false %}<meta name="google-site-verification" content="{{ env_google_site_verification }}" />{% endif %}
 {% endblock %}
 
-{%- block javascripts -%}
-    {{- encore_entry_script_tags('app') -}}
-{%- endblock -%}
+{% block bodyEnd %}
+    {%- block javascripts -%}
+        {{- encore_entry_script_tags('app', attributes={
+            nonce: csp_nonce('script')
+        }) -}}
+        {{- include('includes/smartlook-session-recording.html.twig') -}}
+    {%- endblock -%}
+{% endblock %}
 
 {%- block headerBar -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import header -%}

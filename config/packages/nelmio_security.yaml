@@ -13,6 +13,12 @@ nelmio_security:
                 enabled: false
             # report-uri: '%router.request_context.base_url%/csp/report'
             default-src:
+                - 'none'
+            connect-src:
+                - 'self'
+            font-src:
+                - 'self'
+            img-src:
                 - 'self'
             block-all-mixed-content: true # defaults to false, blocks HTTP content over HTTPS transport
             # upgrade-insecure-requests: true # defaults to false, upgrades HTTP requests to HTTPS transport
