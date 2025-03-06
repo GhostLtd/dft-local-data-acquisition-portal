@@ -4,14 +4,33 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 final class Version20250116110650 extends AbstractMigration
 {
+    private string $originalMysqlMode;
+
     public function getDescription(): string
     {
         return 'Create permissions view';
+    }
+
+    public function preUp(Schema $schema): void
+    {
+        if ($this->platform instanceof MySQLPlatform) {
+            $this->originalMysqlMode = $this->connection->executeQuery('SELECT @@sql_mode;')->fetchOne();
+            $this->connection->executeQuery("SET SESSION sql_mode = '{$this->originalMysqlMode},NO_BACKSLASH_ESCAPES';");
+        }
+    }
+
+    public function postUp(Schema $schema): void
+    {
+        if ($this->platform instanceof MySQLPlatform) {
+            $this->connection->executeQuery("SET SESSION sql_mode = '{$this->originalMysqlMode}';");
+        }
     }
 
     public function up(Schema $schema): void
@@ -25,7 +44,8 @@ final class Version20250116110650 extends AbstractMigration
 
         // Retrieve the column type that will be used for the ULID-holding columns
         // (see AbstractUidType::hasNativeGuidType for a thread into related code)
-        $columnType = $this->platform->getGuidTypeDeclarationSQL([]);
+
+        $columnType = (new UuidType())->getSQLDeclaration([], $this->platform);
         $bracketPos = strpos($columnType, '(');
 
         if ($bracketPos !== false) {
