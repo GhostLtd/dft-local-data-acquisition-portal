@@ -21,8 +21,8 @@ $bootstrapCommands = [
     ['bin/console', '--env=test', 'd:d:d', '-f'],
     ['bin/console', '--env=test', 'd:s:c'],
 
-    // N.B. View creation needs to be the first migration, otherwise this won't work as d:s:c will clash with the migrations
-    ['bin/console', '--env=test', 'd:m:m', 'DoctrineMigrations\Version20250116110650'],
+    // Execute *just* the view creation migration
+    ['bin/console', '--env=test', 'd:m:e', 'DoctrineMigrations\Version20250116110650', '--up'],
 
     ['bin/console', '--env=test', 'messenger:setup'],
 ];
