@@ -216,7 +216,8 @@ class FixtureHelper
             ->setBusinessCase($definition->getBusinessCase())
             ->setExpectedBusinessCaseApproval($definition->getExpectedBusinessCaseApproval())
             ->setProgressUpdate($definition->getProgressUpdate())
-            ->setReadyForSignoff($definition->getReadyForSignoff());
+            ->setReadyForSignoff($definition->getReadyForSignoff())
+            ->setDevelopmentOnly($definition->getDevelopmentOnly());
 
         foreach($definition->getMilestones() as $milestoneDefinition) {
             $return->addMilestone($this->createMilestone($milestoneDefinition));

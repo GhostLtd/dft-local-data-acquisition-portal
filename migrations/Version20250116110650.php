@@ -12,7 +12,6 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 final class Version20250116110650 extends AbstractMigration
 {
     private string $originalMysqlMode;
-
     public function getDescription(): string
     {
         return 'Create permissions view';

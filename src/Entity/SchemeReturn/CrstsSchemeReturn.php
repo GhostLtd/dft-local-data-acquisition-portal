@@ -5,6 +5,7 @@ namespace App\Entity\SchemeReturn;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\Fund;
+use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\ExpensesContainerInterface;
 use App\Entity\FundReturn\CrstsFundReturn;
@@ -18,6 +19,7 @@ use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\Common\Collections\ReadableCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
@@ -67,6 +69,10 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[Valid(groups: ['overall_funding'])]
     private ?BenefitCostRatio $benefitCostRatio = null;
 
+    #[ORM\Column(nullable: true)]
+    #[NotNull(message: 'crsts_scheme_return.development_only.not_null', groups: ["milestone_dates"])]
+    private ?bool $developmentOnly = null;
+
     /**
      * @var Collection<int, Milestone>
      */
@@ -90,10 +96,20 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[Callback(groups: ['milestone_dates'])]
     public function validateMilestoneDates(ExecutionContextInterface $context): void
     {
+        $root = $context->getRoot()->getData();
+
+        $fundedMostlyAs = null;
+        if ($root instanceof CrstsSchemeReturn) {
+            $fundedMostlyAs = $root->getScheme()->getCrstsData()->getFundedMostlyAs();
+        }
+
         foreach($this->milestones as $i => $milestone) {
             if ($milestone->getDate() === null) {
                 $context
-                    ->buildViolation('common.date.not_null')
+                    ->buildViolation('milestone.date.not_null', [
+                        'milestone_type' => $milestone->getType()->value,
+                        'funded_mostly_as' => $fundedMostlyAs?->value,
+                    ])
                     ->atPath($milestone->getType()->value)
                     ->addViolation();
             }
@@ -188,12 +204,39 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         return $this;
     }
 
+    public function getDevelopmentOnly(): ?bool
+    {
+        return $this->developmentOnly;
+    }
+
+    public function setDevelopmentOnly(?bool $developmentOnly): static
+    {
+        $this->developmentOnly = $developmentOnly;
+        return $this;
+    }
+
     /**
      * @return Collection<int, Milestone>
      */
     public function getMilestones(): Collection
     {
         return $this->milestones;
+    }
+
+    /**
+     * @return ReadableCollection<int, Milestone>
+     *
+     * Fetches the milestones, but sorted in the order that their types appear in the MilestoneType enum
+     */
+    public function getMilestonesSorted(): ReadableCollection
+    {
+        $iterator = $this->milestones->getIterator();
+        $iterator->uasort(function(Milestone $a, Milestone $b) {
+            $cases = MilestoneType::cases();
+            return array_search($a->getType(), $cases) <=> array_search($b->getType(), $cases);
+        });
+
+        return new ArrayCollection(iterator_to_array($iterator));
     }
 
     public function addMilestone(Milestone $milestone): static

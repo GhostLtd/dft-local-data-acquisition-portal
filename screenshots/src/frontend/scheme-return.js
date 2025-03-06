@@ -38,6 +38,11 @@ module.exports.schemeReturnFlow = async function(page, frontendUrl, screenshot) 
     }, 'Save')
 
     await clickElementContainingText(page, 'a/span', 'Dates', 0, true, '/..')
+    await fillForm(page, {
+        'Does this scheme only comprise development elements': {
+            'No': true,
+        },
+    })
     await screenshot('scheme-return/4a-milestone-dates.png')
 
     await clickButtonWithText(page,'Save')
@@ -53,6 +58,9 @@ module.exports.schemeReturnFlow = async function(page, frontendUrl, screenshot) 
             'Day': '10',
             'Month': '10',
             'Year': '2025',
+        },
+        'Does this scheme only comprise development elements': {
+            'No': true,
         },
         'Start construction': {
             'Day': '1',

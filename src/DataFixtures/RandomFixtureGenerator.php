@@ -229,7 +229,13 @@ class RandomFixtureGenerator
         // N.B. This logic is very simple, and might not generate logically coherent dates
         //      for milestones or expense date ranges.
 
+        $isDevelopmentOnly = $this->faker->boolean(20);
+
         foreach(MilestoneType::cases() as $milestoneType) {
+            if ($isDevelopmentOnly && !$milestoneType->isDevelopmentMilestone()) {
+                continue;
+            }
+
             $milestone = $this->createRandomMilestone($milestoneType, $milestoneEarliestDate, new \DateTime("2028-01-01"));
             $milestoneEarliestDate = $milestone->getDate();
             $milestones[] = $milestone;
@@ -254,6 +260,7 @@ class RandomFixtureGenerator
             $this->faker->dateTime(),
             $this->faker->text(),
             $this->faker->boolean(20),
+            $isDevelopmentOnly,
             $milestones,
             $expenses,
         );

@@ -30,6 +30,7 @@ class CrstsSchemeReturnDefinition extends AbstractSchemeReturnDefinition
         protected ?\DateTimeInterface   $expectedBusinessCaseApproval = null,
         protected ?string               $progressUpdate = null,
         protected ?bool                 $readyForSignoff = null,
+        protected ?bool                 $developmentOnly = null,
         protected array                 $milestones = [],
         protected array                 $expenses = [],
     ) {
@@ -84,6 +85,11 @@ class CrstsSchemeReturnDefinition extends AbstractSchemeReturnDefinition
     public function getReadyForSignoff(): ?bool
     {
         return $this->readyForSignoff;
+    }
+
+    public function getDevelopmentOnly(): ?bool
+    {
+        return $this->developmentOnly;
     }
 
     public function getScheme(): SchemeDefinition
