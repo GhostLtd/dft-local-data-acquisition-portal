@@ -8,6 +8,7 @@ use App\Entity\Enum\MilestoneType as MilestoneEnum;
 use App\Entity\Milestone;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Form\Type\BaseButtonsFormType;
+use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\DateType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
@@ -38,14 +39,26 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
 
         $fundedMostlyAs = $data->getSchemeFund()->getFundedMostlyAs();
 
+        $form
+            ->add('isDevelopmentOnly', BooleanChoiceType::class, [
+                'label' => 'forms.scheme.milestone_dates.is_development_only.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => 'forms.scheme.milestone_dates.is_development_only.help',
+                'choice_options' => [
+                    'boolean.true' => [
+                        'conditional_form_name' => 'activeTravelElement',
+                    ]
+                ],
+            ]);
+
         foreach($this->getRelevantMilestoneEnums($data) as $milestoneType) {
             $fieldKey = $milestoneType->value;
 
             $form->add($milestoneType->value, DateType::class, [
-                'label' => "forms.scheme.milestone_dates.{$fieldKey}.label",
+                'label' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
                 'label_translation_parameters' => ['funded_mostly_as' => $fundedMostlyAs->value],
-                'help' => "forms.scheme.milestone_dates.{$fieldKey}.help",
+                'help' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.help",
             ]);
         }
     }

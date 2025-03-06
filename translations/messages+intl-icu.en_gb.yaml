@@ -308,21 +308,25 @@ forms:
     mark_as_not_ready_for_signoff:
       confirm: Mark as not ready for signoff
     milestone_dates:
-      start_development:
-        label: Start development
+      is_development_only:
+        label: Development only?
         help: ''
-      end_development:
-        label: End development
-        help: ''
-      start_construction:
-        label: *milestone_start_construction
-        help: ''
-      end_construction:
-        label: *milestone_end_construction
-        help: ''
-      final_delivery:
-        label: Final delivery
-        help: ''
+      milestones:
+        start_development:
+          label: Start development
+          help: ''
+        end_development:
+          label: End development
+          help: ''
+        start_construction:
+          label: *milestone_start_construction
+          help: ''
+        end_construction:
+          label: *milestone_end_construction
+          help: ''
+        final_delivery:
+          label: Final delivery
+          help: ''
     milestone_business_case:
       business_case:
         label: &sr_current_business_case Current business case
