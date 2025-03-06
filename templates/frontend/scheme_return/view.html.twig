@@ -139,7 +139,7 @@
 
         {%- set contents -%}
             {{- summaryListStart() -}}
-            {%- for milestone in schemeReturn.milestones -%}
+            {%- for milestone in schemeReturn.milestonesSorted -%}
                 {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.schemeFund.fundedMostlyAs.value})) -%}
                 {{- date(label, milestone.date, {translateLabel: false}) -}}
             {%- endfor -%}

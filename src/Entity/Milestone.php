@@ -18,7 +18,7 @@ class Milestone
     private ?MilestoneType $type = null; // 4proj_milestones (one of "Start development", "End development" etc - see enum)
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[NotNull(message: 'common.date.not_null', groups: ["milestone_dates"])]
+    // N.B. Validator in CrstsSchemeReturn
     private ?\DateTimeInterface $date = null; // 4proj_milestone (the value for the chosen field)
 
     public function getType(): ?MilestoneType

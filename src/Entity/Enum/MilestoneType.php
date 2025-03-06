@@ -9,4 +9,12 @@ enum MilestoneType: string
     case START_CONSTRUCTION = "start_construction"; // Text varies - (scheme is CDEL: Start construction, RDEL: Start delivery)
     case END_CONSTRUCTION = "end_construction"; // Ditto
     case FINAL_DELIVERY = "final_delivery"; // Omitted if scheme is RDEL
+
+    public function isDevelopmentMilestone(): bool
+    {
+        return match ($this) {
+            self::START_DEVELOPMENT, self::END_DEVELOPMENT => true,
+            default => false,
+        };
+    }
 }

@@ -43,6 +43,8 @@ crsts_scheme_fund:
 crsts_scheme_return:
   agreed_funding:
     not_blank: Enter the agreed funding
+  development_only:
+    not_null: Choose whether this scheme comprises only development elements
   total_cost:
     not_blank: Enter the total cost
   on_track_rating:
@@ -87,3 +89,21 @@ user:
     not_null: Enter a phone number for the user
   position:
     not_null: Enter a position for the user
+
+milestone:
+  date:
+    not_null: >-
+      Enter a date{milestone_type, select,
+        start_development { for the start of development}
+        end_development { for the end of development}
+        start_construction { for the start of {funded_mostly_as, select,
+                                                CDEL  {construction}
+                                                other {delivery}
+                                              }}
+        end_construction { for the end of {funded_mostly_as, select,
+                                                CDEL  {construction}
+                                                other {delivery}
+                                              }}
+        final_delivery { for the final delivery}
+        other {}
+      }

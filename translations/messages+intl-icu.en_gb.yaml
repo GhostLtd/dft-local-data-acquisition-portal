@@ -309,7 +309,7 @@ forms:
       confirm: Mark as not ready for signoff
     milestone_dates:
       is_development_only:
-        label: Development only?
+        label: Does this scheme only comprise development elements?
         help: ''
       milestones:
         start_development:
