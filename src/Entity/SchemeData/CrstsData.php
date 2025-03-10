@@ -1,17 +1,13 @@
 <?php
 
-namespace App\Entity\SchemeFund;
+namespace App\Entity\SchemeData;
 
-use App\Entity\Enum\Fund;
 use App\Entity\Enum\FundedMostlyAs;
-use App\Repository\SchemeFund\CrstsSchemeFundRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\Valid;
 
-#[ORM\Entity(repositoryClass: CrstsSchemeFundRepository::class)]
-class CrstsSchemeFund extends SchemeFund
+#[ORM\Embeddable]
+class CrstsData
 {
     #[ORM\Column]
     private ?bool $retained = null; // 1proj_info: Is this a retained scheme?
@@ -22,11 +18,7 @@ class CrstsSchemeFund extends SchemeFund
 
     #[ORM\Column(nullable: true)]
     #[NotNull(message: 'crsts_scheme_fund.previously_tcf.not_null', groups: ["scheme_details"])]
-    private ?bool $previouslyTcf = null;
-
-    #[ORM\Embedded(class: BenefitCostRatio::class)]
-    #[Valid(groups: ['scheme_details'])]
-    private ?BenefitCostRatio $benefitCostRatio = null;
+    private ?bool $previouslyTcf = null; // 1proj_info: Was this previously a scheme in the Transporting Cities Fund (TCF)?
 
     public function isRetained(): ?bool
     {
@@ -37,11 +29,6 @@ class CrstsSchemeFund extends SchemeFund
     {
         $this->retained = $retained;
         return $this;
-    }
-
-    public function getFund(): Fund
-    {
-        return Fund::CRSTS1;
     }
 
     public function isReturnRequiredFor(int $quarter): bool
@@ -69,17 +56,6 @@ class CrstsSchemeFund extends SchemeFund
     public function setPreviouslyTcf(?bool $previouslyTcf): static
     {
         $this->previouslyTcf = $previouslyTcf;
-        return $this;
-    }
-
-    public function getBenefitCostRatio(): ?BenefitCostRatio
-    {
-        return $this->benefitCostRatio;
-    }
-
-    public function setBenefitCostRatio(?BenefitCostRatio $benefitCostRatio): static
-    {
-        $this->benefitCostRatio = $benefitCostRatio;
         return $this;
     }
 }

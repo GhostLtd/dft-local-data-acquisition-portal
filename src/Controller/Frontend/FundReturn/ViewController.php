@@ -8,7 +8,7 @@ use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
 use App\ListPage\SchemeListPage;
-use App\Repository\SchemeFund\SchemeFundRepository;
+use App\Repository\SchemeRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
@@ -24,7 +24,7 @@ class ViewController extends AbstractController
 {
     public function __construct(
         protected DashboardLinksBuilder $linksBuilder,
-        protected SchemeFundRepository  $schemeFundRepository,
+        protected SchemeRepository      $schemeRepository,
     ) {}
 
     #[Route('/fund-return/{fundReturnId}', name: 'app_fund_return')]
@@ -40,7 +40,7 @@ class ViewController extends AbstractController
     {
         $this->linksBuilder->setAtFundReturn($fundReturn);
         $fund = $fundReturn->getFund();
-        $schemeFunds = $this->getSchemasForFund($fundReturn, $fund);
+        $schemeFunds = $this->getSchemesForFund($fundReturn, $fund);
 
         $schemeListPage
             ->setFundReturn($fundReturn)
@@ -66,16 +66,13 @@ class ViewController extends AbstractController
         ]);
     }
 
-    protected function getSchemasForFund(FundReturn $fundReturn, Fund $fund): array
+    protected function getSchemesForFund(FundReturn $fundReturn, Fund $fund): array
     {
         // We get the schemeFunds from this direction, so that we can list all of them and explicitly any that
         // do not requiring a return, if that is the case (e.g. CRSTS - if not retained and not quarter 1)
 
         // (Fetching via fundReturn->getSchemeReturns() direction would only fetch those schemes that
         //  do have returns, resulting in an incomplete list)
-        return $this->schemeFundRepository->getSchemeFundsForAuthority(
-            $fundReturn->getFundAward()->getAuthority(),
-            $fund
-        );
+        return $this->schemeRepository->getSchemesForAuthority($fundReturn->getFundAward()->getAuthority());
     }
 }

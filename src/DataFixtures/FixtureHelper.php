@@ -9,7 +9,6 @@ use App\DataFixtures\Definition\Expense\ExpenseDefinition;
 use App\DataFixtures\Definition\AuthorityDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
 use App\DataFixtures\Definition\SchemeDefinition;
-use App\DataFixtures\Definition\SchemeFund\CrstsSchemeFundDefinition;
 use App\DataFixtures\Definition\SchemeReturn\CrstsSchemeReturnDefinition;
 use App\Entity\Enum\Fund;
 use App\Entity\ExpenseEntry;
@@ -19,7 +18,6 @@ use App\Entity\SchemeFund\BenefitCostRatio;
 use App\Entity\Authority;
 use App\Entity\Milestone;
 use App\Entity\Scheme;
-use App\Entity\SchemeFund\CrstsSchemeFund;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -155,39 +153,12 @@ class FixtureHelper
             ->setActiveTravelElement($definition->getActiveTravelElement())
             ->setIncludesChargingPoints($definition->getIncludesChargingPoints())
             ->setIncludesCleanAirElements($definition->getIncludesCleanAirElements())
-            ->setTransportMode($definition->getTransportMode());
+            ->setTransportMode($definition->getTransportMode())
+            ->setCrstsData($definition->getCrstsData());
 
         $this->persist([$scheme]);
 
-        foreach($definition->getSchemeFunds() as $schemeFundDefinition) {
-            $class = $schemeFundDefinition::class;
-
-            $schemeFund = match($class) {
-                CrstsSchemeFundDefinition::class => $this->createCrstsSchemeFund($schemeFundDefinition),
-                default => throw new \RuntimeException("Unsupported SchemeFund definition class - {$class}"),
-            };
-
-            $scheme->addSchemeFund($schemeFund);
-        }
-
         return $scheme;
-    }
-
-    public function createCrstsSchemeFund(CrstsSchemeFundDefinition $definition): CrstsSchemeFund
-    {
-        $bcr = (new BenefitCostRatio())
-            ->setType($definition->getBenefitCostRatioType())
-            ->setValue($definition->getBenefitCostRatioValue());
-
-        $schemeFund = (new CrstsSchemeFund())
-            ->setRetained($definition->isRetained())
-            ->setPreviouslyTcf($definition->getPreviouslyTcf())
-            ->setFundedMostlyAs($definition->getFundedMostlyAs())
-            ->setBenefitCostRatio($bcr);
-
-        $this->persist([$schemeFund]);
-
-        return $schemeFund;
     }
 
     /**
@@ -223,23 +194,7 @@ class FixtureHelper
                 throw new \RuntimeException("Scheme referenced by return not found: {$schemeName}");
             }
 
-            $schemeFund = null;
-            foreach($scheme->getSchemeFunds() as $loopFund) {
-                $schemeFund = match(true) {
-                    $loopFund instanceof CrstsSchemeFund => $loopFund,
-                    default => null,
-                };
-
-                if ($schemeFund) {
-                    break;
-                }
-            }
-
-            if (!$schemeFund) {
-                throw new \RuntimeException("Scheme referenced by return is not funded by CRSTS: {$schemeName}");
-            }
-
-            $return->addSchemeReturn($this->createCrstsSchemeReturn($schemeReturnDefinition, $schemeFund));
+            $return->addSchemeReturn($this->createCrstsSchemeReturn($schemeReturnDefinition, $scheme));
         }
 
         $this->persist([$return]);
@@ -247,10 +202,16 @@ class FixtureHelper
         return $return;
     }
 
-    public function createCrstsSchemeReturn(CrstsSchemeReturnDefinition $definition, CrstsSchemeFund $schemeFund): CrstsSchemeReturn
+    public function createCrstsSchemeReturn(CrstsSchemeReturnDefinition $definition, Scheme $scheme): CrstsSchemeReturn
     {
+        $bcr = (new BenefitCostRatio())
+            ->setType($definition->getBenefitCostRatioType())
+            ->setValue($definition->getBenefitCostRatioValue());
+
         $return = (new CrstsSchemeReturn())
-            ->setSchemeFund($schemeFund)
+            ->setScheme($scheme)
+            ->setBenefitCostRatio($bcr)
+
             ->setTotalCost($definition->getTotalCost())
             ->setAgreedFunding($definition->getAgreeFunding())
             ->setOnTrackRating($definition->getOnTrackRating())

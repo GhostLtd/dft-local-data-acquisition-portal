@@ -6,7 +6,7 @@ use App\Controller\Frontend\AbstractReturnController;
 use App\Entity\Enum\Role;
 use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\Scheme;
 use App\Form\Type\FundReturn\Crsts\ExpensesType;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
@@ -19,14 +19,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class EditController extends AbstractReturnController
 {
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/section/{section}', name: 'app_scheme_return_edit')]
+    #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}/section/{section}', name: 'app_scheme_return_edit')]
 
     public function schemeReturnEdit(
         DashboardLinksBuilder $linksBuilder,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn            $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund            $schemeFund,
+        #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
+        Scheme                $scheme,
         SchemeLevelSection    $section,
         Request               $request,
     ): Response
@@ -37,13 +37,13 @@ class EditController extends AbstractReturnController
             throw new NotFoundHttpException();
         }
 
-        $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
+        $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
         $this->denyAccessUnlessGranted(Role::CAN_EDIT, $schemeReturn);
-        $linksBuilder->setAtSchemeFundEdit($fundReturn, $schemeFund, $section);
+        $linksBuilder->setAtSchemeEdit($fundReturn, $scheme, $section);
 
         $cancelUrl = $this->generateUrl('app_scheme_return', [
             'fundReturnId' => $fundReturn->getId(),
-            'schemeFundId' => $schemeFund->getId()
+            'schemeId' => $scheme->getId()
         ])."#{$section->value}";
 
         $form = $this->createForm($config->getFormClass(), $schemeReturn, [
@@ -63,19 +63,19 @@ class EditController extends AbstractReturnController
         ]);
     }
 
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/expense/{divisionKey}', name: 'app_scheme_return_expense_edit')]
+    #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}/expense/{divisionKey}', name: 'app_scheme_return_expense_edit')]
     public function schemeReturnExpense(
         DashboardLinksBuilder $linksBuilder,
         string                $divisionKey,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn            $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund            $schemeFund,
+        #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
+        Scheme                $scheme,
         Request               $request,
         ExpensesTableHelper   $tableHelper,
     ): Response
     {
-        $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
+        $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
         $this->denyAccessUnlessGranted(Role::CAN_EDIT, $schemeReturn);
         $divisionConfiguration = $schemeReturn->findDivisionConfigurationByKey($divisionKey);
 
@@ -83,10 +83,10 @@ class EditController extends AbstractReturnController
             throw new NotFoundHttpException();
         }
 
-        $linksBuilder->setAtSchemeExpenseEdit($fundReturn, $schemeFund, $divisionConfiguration);
+        $linksBuilder->setAtSchemeExpenseEdit($fundReturn, $scheme, $divisionConfiguration);
         $cancelUrl = $this->generateUrl('app_scheme_return', [
             'fundReturnId' => $fundReturn->getId(),
-            'schemeFundId' => $schemeFund->getId()
+            'schemeId' => $scheme->getId()
         ])."#expenses-{$divisionKey}";
 
         $expensesTableHelper = $tableHelper

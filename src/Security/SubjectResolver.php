@@ -50,7 +50,7 @@ class SubjectResolver
 
             if ($subject instanceof SchemeReturn) {
                 $idMap[SchemeReturn::class] = $subject->getId();
-                $idMap[Scheme::class] = $subject?->getSchemeFund()?->getScheme()?->getId();
+                $idMap[Scheme::class] = $subject?->getScheme()?->getId();
                 $subject = $subject?->getFundReturn();
             }
 

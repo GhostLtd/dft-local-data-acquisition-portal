@@ -3,19 +3,17 @@
 namespace App\Entity;
 
 use App\Entity\Enum\ActiveTravelElement;
-use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
 use App\Entity\Enum\TransportModeCategory;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\SchemeData\CrstsData;
 use App\Entity\Traits\IdTrait;
 use App\Repository\SchemeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: SchemeRepository::class)]
@@ -58,11 +56,9 @@ class Scheme
     #[NotBlank(message: 'scheme.identifier.not_blank', groups: ["scheme_details"])]
     private ?string $schemeIdentifier = null; // 1proj_info: Scheme ID
 
-    /**
-     * @var Collection<int, SchemeFund>
-     */
-    #[ORM\OneToMany(targetEntity: SchemeFund::class, mappedBy: 'scheme')]
-    private Collection $schemeFunds;
+    #[ORM\Embedded]
+    #[Valid(groups: ["scheme_details"])]
+    private CrstsData $crstsData; // 1proj_info
 
     #[Callback(groups: ['scheme_transport_mode'])]
     public function validateActiveTravel(ExecutionContextInterface $context): void
@@ -81,7 +77,6 @@ class Scheme
 
     public function __construct()
     {
-        $this->schemeFunds = new ArrayCollection();
     }
 
     public function getAuthority(): ?Authority
@@ -183,46 +178,16 @@ class Scheme
         return $this;
     }
 
-    /**
-     * @return Collection<int, SchemeFund>
-     */
-    public function getSchemeFunds(): Collection
+    public function getCrstsData(): CrstsData
     {
-        return $this->schemeFunds;
+        return $this->crstsData;
     }
 
-    public function addSchemeFund(SchemeFund $schemeFund): static
+    public function setCrstsData(CrstsData $crstsData): Scheme
     {
-        if (!$this->schemeFunds->contains($schemeFund)) {
-            $this->schemeFunds->add($schemeFund);
-            $schemeFund->setScheme($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSchemeFund(SchemeFund $schemeFund): static
-    {
-        if ($this->schemeFunds->removeElement($schemeFund)) {
-            // set the owning side to null (unless already changed)
-            if ($schemeFund->getScheme() === $this) {
-                $schemeFund->setScheme(null);
-            }
-        }
-
+        $this->crstsData = $crstsData;
         return $this;
     }
 
     // --------------------------------------------------------------------------------
-
-    public function getSchemeFundForFund(Fund $fund): ?SchemeFund
-    {
-        $matchingSchemeFunds = $this->getSchemeFunds()->filter(
-            fn(SchemeFund $pf) => $pf->getFund() === $fund
-        );
-
-        return $matchingSchemeFunds->isEmpty() ?
-            null :
-            $matchingSchemeFunds->first();
-    }
 }

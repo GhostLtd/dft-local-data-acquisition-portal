@@ -9,7 +9,6 @@ use App\Entity\SchemeReturn\SchemeReturn;
 use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
-use PhpParser\Builder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -104,8 +103,10 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
             ->setDefault('data_class', SchemeReturn::class)
             ->setDefault('validation_groups', ['scheme_transport_mode'])
             ->setDefault('error_mapping', [
-                'schemeFund.scheme.transportMode' => 'transportModeCategory',
-                'schemeFund.scheme.hasActiveTravelElements' => 'hasActiveTravelElements',
+                'scheme.includesCleanAirElements' => 'includesCleanAirElements',
+                'scheme.hasActiveTravelElements' => 'hasActiveTravelElements',
+                'scheme.includesChargingPoints' => 'includesChargingPoints',
+                'scheme.transportMode' => 'transportModeCategory',
             ]);
     }
 
@@ -118,7 +119,7 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
 
-        $scheme = $viewData->getSchemeFund()->getScheme();
+        $scheme = $viewData->getScheme();
         $transportMode = $scheme?->getTransportMode();
 
         if (!$transportMode) {
@@ -149,7 +150,7 @@ class SchemeTransportModeType extends AbstractType implements DataMapperInterfac
         $category = $forms['transportModeCategory']->getData();
         $transportMode = $category ? $forms['transportMode'.ucfirst($category->value)]->getData() : null;
 
-        $scheme = $viewData->getSchemeFund()->getScheme();
+        $scheme = $viewData->getScheme();
 
         if ($category === TransportModeCategory::ACTIVE_TRAVEL) {
             $activeTravelElement = null;

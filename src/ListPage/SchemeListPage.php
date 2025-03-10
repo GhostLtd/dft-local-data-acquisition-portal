@@ -3,7 +3,7 @@
 namespace App\ListPage;
 
 use App\Entity\FundReturn\FundReturn;
-use App\Repository\SchemeFund\SchemeFundRepository;
+use App\Repository\SchemeRepository;
 use Doctrine\ORM\QueryBuilder;
 use Ghost\GovUkCoreBundle\ListPage\AbstractListPage;
 use Ghost\GovUkCoreBundle\ListPage\Field\ChoiceFilter;
@@ -19,7 +19,7 @@ class SchemeListPage extends AbstractListPage
 {
     protected FundReturn $fundReturn;
 
-    public function __construct(protected SchemeFundRepository $schemeFundRepository, FormFactoryInterface $formFactory, RouterInterface $router)
+    public function __construct(protected SchemeRepository $schemeRepository, FormFactoryInterface $formFactory, RouterInterface $router)
     {
         parent::__construct($formFactory, $router);
     }
@@ -40,7 +40,7 @@ class SchemeListPage extends AbstractListPage
         return [
             (new TextFilter('Name', 'scheme.name'))->sortable(),
             (new ChoiceFilter('Ready for signoff?', 'schemeReturn.readyForSignoff', ['No' => 0, 'Yes' => 1])),
-            (new ChoiceFilter('Retained?', 'schemeFund.retained', ['No' => 0, 'Yes' => 1])),
+            (new ChoiceFilter('Retained?', 'scheme.retained', ['No' => 0, 'Yes' => 1])),
             // Don't see a way to filter this without using sub-queries and rewriting ListPage.
             // There's a possibility a view might help
             (new Simple('On-track rating', '')),
@@ -67,7 +67,7 @@ class SchemeListPage extends AbstractListPage
     #[\Override]
     protected function getQueryBuilder(): QueryBuilder
     {
-        return $this->schemeFundRepository->getQueryBuilderForSchemeReturnsForFundReturn($this->fundReturn);
+        return $this->schemeRepository->getQueryBuilderForSchemesForFundReturn($this->fundReturn);
     }
 
     #[\Override]
@@ -75,12 +75,12 @@ class SchemeListPage extends AbstractListPage
     {
         $data = parent::getData();
 
-        $schemeFunds = $data->getEntities();
+        $schemes = $data->getEntities();
 
-        $entityGenerator = function() use ($schemeFunds) : \Generator {
-            foreach($schemeFunds as $schemeFund) {
-                $schemeReturn = $this->fundReturn->getSchemeReturnForSchemeFund($schemeFund);
-                yield new SchemeListPageDataEntry($schemeFund, $schemeReturn);
+        $entityGenerator = function() use ($schemes) : \Generator {
+            foreach($schemes as $scheme) {
+                $schemeReturn = $this->fundReturn->getSchemeReturnForScheme($scheme);
+                yield new SchemeListPageDataEntry($scheme, $schemeReturn);
             }
         };
 

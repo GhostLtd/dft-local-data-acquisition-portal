@@ -5,7 +5,7 @@ namespace App\Entity\SchemeReturn;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\Scheme;
 use App\Entity\Traits\IdTrait;
 use App\Repository\SchemeReturn\SchemeReturnRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,7 +24,7 @@ abstract class SchemeReturn
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
     #[Valid(groups: ['scheme_details', 'scheme_transport_mode'])]
-    private ?SchemeFund $schemeFund = null;
+    private ?Scheme $scheme = null;
 
     #[ORM\ManyToOne(inversedBy: 'schemeReturns')]
     #[ORM\JoinColumn(nullable: false)]
@@ -33,14 +33,14 @@ abstract class SchemeReturn
     #[ORM\Column]
     private bool $readyForSignoff = false;
 
-    public function getSchemeFund(): ?SchemeFund
+    public function getScheme(): ?Scheme
     {
-        return $this->schemeFund;
+        return $this->scheme;
     }
 
-    public function setSchemeFund(?SchemeFund $schemeFund): static
+    public function setScheme(?Scheme $scheme): static
     {
-        $this->schemeFund = $schemeFund;
+        $this->scheme = $scheme;
         return $this;
     }
 

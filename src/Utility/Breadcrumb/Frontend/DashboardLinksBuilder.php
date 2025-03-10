@@ -7,7 +7,7 @@ use App\Entity\Authority;
 use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\Scheme;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
@@ -63,7 +63,7 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
         ];
     }
 
-    public function setAtSchemeFund(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    public function setAtScheme(FundReturn $fundReturn, Scheme $scheme): void
     {
         $this->setAtFundReturn($fundReturn);
         $this->addBreadcrumb(
@@ -71,67 +71,67 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
             'app_scheme_return',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'schemeFundId' => $schemeFund->getId()
+                'schemeId' => $scheme->getId()
             ],
             translationKey: 'frontend.pages.scheme_return.title',
             translationParameters: [
-                'schemeName' => $schemeFund->getScheme()->getName(),
+                'schemeName' => $scheme->getName(),
             ]
         );
     }
 
-    public function setAtSchemeFundEdit(FundReturn $fundReturn, SchemeFund $schemeFund, SchemeLevelSection $section): void
+    public function setAtSchemeEdit(FundReturn $fundReturn, Scheme $scheme, SchemeLevelSection $section): void
     {
-        $this->setAtSchemeFund($fundReturn, $schemeFund);
+        $this->setAtScheme($fundReturn, $scheme);
         $this->addBreadcrumb(
             'scheme_return_edit',
             'app_scheme_return_edit',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'schemeFundId' => $schemeFund->getId(),
+                'schemeId' => $scheme->getId(),
                 'section' => $section->value,
             ],
             translationKey: "sections.scheme.{$section->value}",
         );
     }
 
-    public function setAtSchemeReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    public function setAtSchemeReadyForSignoff(FundReturn $fundReturn, Scheme $scheme): void
     {
-        $this->setAtSchemeFund($fundReturn, $schemeFund);
+        $this->setAtScheme($fundReturn, $scheme);
         $this->addBreadcrumb(
             'scheme_return_mark_as_ready_for_signoff',
             'app_scheme_return_mark_as_ready_for_signoff',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'schemeFundId' => $schemeFund->getId(),
+                'schemeId' => $scheme->getId(),
             ],
             translationKey: 'frontend.pages.scheme_mark_as_ready_for_signoff.breadcrumb',
         );
     }
 
-    public function setAtSchemeNotReadyForSignoff(FundReturn $fundReturn, SchemeFund $schemeFund): void
+    public function setAtSchemeNotReadyForSignoff(FundReturn $fundReturn, Scheme $scheme): void
     {
-        $this->setAtSchemeFund($fundReturn, $schemeFund);
+        $this->setAtScheme($fundReturn, $scheme);
         $this->addBreadcrumb(
             'scheme_return_mark_as_not_ready_for_signoff',
             'app_scheme_return_mark_as_not_ready_for_signoff',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'schemeFundId' => $schemeFund->getId(),
+                'schemeId' => $scheme->getId(),
             ],
             translationKey: 'frontend.pages.scheme_mark_as_not_ready_for_signoff.breadcrumb',
         );
     }
 
-    public function setAtSchemeExpenseEdit(FundReturn $fundReturn, SchemeFund $scheme, DivisionConfiguration $division): void
+    public function setAtSchemeExpenseEdit(FundReturn $fundReturn, Scheme $scheme, DivisionConfiguration $division): void
     {
-        $this->setAtSchemeFund($fundReturn, $scheme);
+        $this->setAtScheme($fundReturn, $scheme);
         $this->addBreadcrumb(
             'scheme_return_expense_edit',
             'app_scheme_return_expense_edit',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
-                'schemeFundId' => $scheme->getId(),
+                'schemeId' => $scheme->getId(),
                 'divisionKey' => $division->getKey(),
             ],
             text: $division->getLabel(),

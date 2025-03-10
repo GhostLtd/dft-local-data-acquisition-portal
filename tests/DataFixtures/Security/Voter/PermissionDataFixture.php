@@ -7,8 +7,7 @@ use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
-use App\Entity\SchemeFund\CrstsSchemeFund;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\SchemeData\CrstsData;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Authority;
@@ -42,16 +41,16 @@ class PermissionDataFixture extends Fixture
 
         $user = $this->createUser('User', 'user@example.com', 'user');
 
-        [$project1, $projectFund1] = $this->createProjectAndProjectFund('Authority 1, project 1', 'authority:1/project:1', Fund::CRSTS1, $authority1);
-        [$project2, $projectFund2] = $this->createProjectAndProjectFund('Authority 1, project 2', 'authority:1/project:2', Fund::CRSTS1, $authority1);
-        [$project3, $projectFund3] = $this->createProjectAndProjectFund('Authority 2, project 1', 'authority:2/project:1', Fund::CRSTS1, $authority2);
-        [$project4, $projectFund4] = $this->createProjectAndProjectFund('Authority 3, project 1', 'authority:3/project:1', Fund::CRSTS1, $authority3);
+        $scheme1 = $this->createScheme('Authority 1, project 1', 'authority:1/project:1', Fund::CRSTS1, $authority1);
+        $scheme2 = $this->createScheme('Authority 1, project 2', 'authority:1/project:2', Fund::CRSTS1, $authority1);
+        $scheme3 = $this->createScheme('Authority 2, project 1', 'authority:2/project:1', Fund::CRSTS1, $authority2);
+        $scheme4 = $this->createScheme('Authority 3, project 1', 'authority:3/project:1', Fund::CRSTS1, $authority3);
 
-        $projectReturn1 = $this->createProjectReturn('authority:1/return:1/project:1', $projectFund1, $return1);
-        $projectReturn2 = $this->createProjectReturn('authority:1/return:2/project:1', $projectFund1, $return2);
-        $projectReturn3 = $this->createProjectReturn('authority:1/return:1/project:2', $projectFund2, $return1);
-        $projectReturn4 = $this->createProjectReturn('authority:2/return:1/project:1', $projectFund3, $return3);
-        $projectReturn5 = $this->createProjectReturn('authority:3/return:1/project:1', $projectFund4, $return4);
+        $schemeReturn1 = $this->createSchemeReturn('authority:1/return:1/project:1', $scheme1, $return1);
+        $schemeReturn2 = $this->createSchemeReturn('authority:1/return:2/project:1', $scheme1, $return2);
+        $schemeReturn3 = $this->createSchemeReturn('authority:1/return:1/project:2', $scheme2, $return1);
+        $schemeReturn4 = $this->createSchemeReturn('authority:2/return:1/project:1', $scheme3, $return3);
+        $schemeReturn5 = $this->createSchemeReturn('authority:3/return:1/project:1', $scheme4, $return4);
 
         $manager->flush();
     }
@@ -99,39 +98,32 @@ class PermissionDataFixture extends Fixture
     }
 
     /**
-     * @return array{0: Scheme, 1:SchemeFund}
+     * @return Scheme
      */
-    protected function createProjectAndProjectFund(string $name, string $referenceName, Fund $type, Authority $authority): array
+    protected function createScheme(string $name, string $referenceName, Fund $type, Authority $authority): Scheme
     {
-        $project = (new Scheme())
+        $crstsData = (new CrstsData())
+            ->setRetained(true);
+
+        $scheme = (new Scheme())
             ->setAuthority($authority)
-            ->setName($name);
+            ->setName($name)
+            ->setCrstsData($crstsData);
 
-        if ($type === Fund::CRSTS1) {
-            $projectFund = (new CrstsSchemeFund())
-                ->setScheme($project)
-                ->setRetained(true);
-        } else {
-            throw new \RuntimeException('Unsupported fund type');
-        }
-
-        return [
-            $this->persistAndAddReference($project, $referenceName),
-            $this->persistAndAddReference($projectFund, $referenceName.'/fund')
-        ];
+        return $this->persistAndAddReference($scheme, $referenceName);
     }
 
-    public function createProjectReturn(string $referenceName, SchemeFund $projectFund, FundReturn $fundReturn): SchemeReturn
+    public function createSchemeReturn(string $referenceName, Scheme $scheme, FundReturn $fundReturn): SchemeReturn
     {
-        if ($projectFund instanceof CrstsSchemeFund) {
-            $project = (new CrstsSchemeReturn())
-                ->setSchemeFund($projectFund)
+        if ($fundReturn instanceof CrstsFundReturn) {
+            $schemeReturn = (new CrstsSchemeReturn())
+                ->setScheme($scheme)
                 ->setFundReturn($fundReturn);
         } else {
-            throw new \RuntimeException('Unsupported project fund type');
+            throw new \RuntimeException('Unsupported fund return type');
         }
 
-        return $this->persistAndAddReference($project, $referenceName);
+        return $this->persistAndAddReference($schemeReturn, $referenceName);
     }
 
     /**

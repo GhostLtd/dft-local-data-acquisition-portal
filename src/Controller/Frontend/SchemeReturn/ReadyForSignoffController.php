@@ -5,7 +5,7 @@ namespace App\Controller\Frontend\SchemeReturn;
 use App\Controller\Frontend\AbstractReturnController;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\Scheme;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkCoreBundle\Form\ConfirmActionType;
@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 class ReadyForSignoffController extends AbstractReturnController
 {
@@ -30,47 +29,47 @@ class ReadyForSignoffController extends AbstractReturnController
         parent::__construct($entityManager);
     }
 
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/mark-as-ready-for-signoff', name: 'app_scheme_return_mark_as_ready_for_signoff')]
+    #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}/mark-as-ready-for-signoff', name: 'app_scheme_return_mark_as_ready_for_signoff')]
     public function schemeReadyForSignoff(
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund $schemeFund,
+        #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
+        Scheme     $scheme,
         Request    $request,
     ): Response
     {
-        return $this->generateResponse($fundReturn, $schemeFund, $request, self::MARK_AS_READY);
+        return $this->generateResponse($fundReturn, $scheme, $request, self::MARK_AS_READY);
     }
 
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}/mark-as-not-ready-for-signoff', name: 'app_scheme_return_mark_as_not_ready_for_signoff')]
+    #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}/mark-as-not-ready-for-signoff', name: 'app_scheme_return_mark_as_not_ready_for_signoff')]
     public function schemeNotReadyForSignoff(
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund $schemeFund,
+        #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
+        Scheme     $scheme,
         Request    $request,
     ): Response
     {
-        return $this->generateResponse($fundReturn, $schemeFund, $request, self::MARK_AS_NOT_READY);
+        return $this->generateResponse($fundReturn, $scheme, $request, self::MARK_AS_NOT_READY);
     }
 
     protected function generateResponse(
         FundReturn $fundReturn,
-        SchemeFund $schemeFund,
+        Scheme     $scheme,
         Request    $request,
         string     $type,
     ): Response
     {
-        $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
+        $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
 
         if ($type === self::MARK_AS_READY) {
             $this->denyAccessUnlessGranted(Role::CAN_MARK_AS_READY, $schemeReturn);
-            $this->linksBuilder->setAtSchemeReadyForSignoff($fundReturn, $schemeFund);
+            $this->linksBuilder->setAtSchemeReadyForSignoff($fundReturn, $scheme);
             $label = "forms.scheme.mark_as_ready_for_signoff.confirm";
             $template = "frontend/scheme_return/ready_for_signoff.html.twig";
         } else if ($type === self::MARK_AS_NOT_READY) {
             $this->denyAccessUnlessGranted(Role::CAN_MARK_AS_NOT_READY, $schemeReturn);
-            $this->linksBuilder->setAtSchemeNotReadyForSignoff($fundReturn, $schemeFund);
+            $this->linksBuilder->setAtSchemeNotReadyForSignoff($fundReturn, $scheme);
             $label = "forms.scheme.mark_as_not_ready_for_signoff.confirm";
             $template = "frontend/scheme_return/not_ready_for_signoff.html.twig";
         } else {
@@ -79,7 +78,7 @@ class ReadyForSignoffController extends AbstractReturnController
 
         $cancelUrl = $this->generateUrl('app_scheme_return', [
             'fundReturnId' => $fundReturn->getId(),
-            'schemeFundId' => $schemeFund->getId()
+            'schemeId' => $scheme->getId()
         ]);
 
         $form = $this->createForm(ConfirmActionType::class, null, [

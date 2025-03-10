@@ -6,12 +6,10 @@ use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\OnTrackRating;
-use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
 use App\Entity\Milestone;
 use App\Entity\ReturnExpenseTrait;
-use App\Entity\SchemeFund\CrstsSchemeFund;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\SchemeFund\BenefitCostRatio;
 use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
 use App\Utility\CrstsHelper;
 use App\Validator\ExpensesValidator;
@@ -24,6 +22,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: CrstsSchemeReturnRepository::class)]
@@ -58,6 +57,10 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[NotBlank(message: 'crsts_scheme_return.progress_update.not_blank', groups: ["milestone_rating"])]
     private ?string $progressUpdate = null; // 4proj_milestones: Progress update (comment)
+
+    #[ORM\Embedded(class: BenefitCostRatio::class)]
+    #[Valid(groups: ['scheme_details'])]
+    private ?BenefitCostRatio $benefitCostRatio = null;
 
     /**
      * @var Collection<int, Milestone>
@@ -96,27 +99,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     {
         $this->__expenseConstruct();
         $this->milestones = new ArrayCollection();
-    }
-
-
-    public function getSchemeFund(): ?CrstsSchemeFund
-    {
-        $schemeFund = parent::getSchemeFund();
-
-        if ($schemeFund !== null && !$schemeFund instanceof CrstsSchemeFund) {
-            throw new \InvalidArgumentException('parent::getSchemeFund() returned non-CrstsSchemeFund');
-        }
-
-        return $schemeFund;
-    }
-
-    public function setSchemeFund(?SchemeFund $schemeFund): static
-    {
-        if ($schemeFund !== null && !$schemeFund instanceof CrstsSchemeFund) {
-            throw new \InvalidArgumentException('setSchemeFund() called with non-CrstsSchemeFund');
-        }
-
-        return parent::setSchemeFund($schemeFund);
     }
 
     public function getTotalCost(): ?string
@@ -185,6 +167,22 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         return $this;
     }
 
+    public function getFund(): Fund
+    {
+        return Fund::CRSTS1;
+    }
+
+    public function getBenefitCostRatio(): ?BenefitCostRatio
+    {
+        return $this->benefitCostRatio;
+    }
+
+    public function setBenefitCostRatio(?BenefitCostRatio $benefitCostRatio): static
+    {
+        $this->benefitCostRatio = $benefitCostRatio;
+        return $this;
+    }
+
     /**
      * @return Collection<int, Milestone>
      */
@@ -208,11 +206,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         return $this;
     }
 
-    public function getFund(): Fund
-    {
-        return Fund::CRSTS1;
-    }
-
     /**
      * @return array<int, DivisionConfiguration>
      */
@@ -226,7 +219,8 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     {
         $nextSchemeReturn = new self();
         $nextSchemeReturn
-            ->setSchemeFund($this->getSchemeFund())
+            ->setScheme($this->getScheme())
+            ->setBenefitCostRatio($this->getBenefitCostRatio())
 
             ->setBusinessCase($this->getBusinessCase())
             ->setExpectedBusinessCaseApproval($this->getExpectedBusinessCaseApproval())

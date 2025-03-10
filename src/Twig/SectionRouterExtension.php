@@ -45,7 +45,7 @@ class SectionRouterExtension extends AbstractExtension
             $route = $isExpense ? 'app_scheme_return_expense_edit' : 'app_scheme_return_edit';
             $params = [
                 'fundReturnId' => $return->getFundReturn()->getId(),
-                'schemeFundId' => $return->getSchemeFund()->getId(),
+                'schemeId' => $return->getScheme()->getId(),
             ];
         }
 

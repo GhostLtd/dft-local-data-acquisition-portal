@@ -5,7 +5,7 @@ namespace App\Controller\Frontend\SchemeReturn;
 use App\Entity\Enum\Role;
 use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\Scheme;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
@@ -17,21 +17,21 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ViewController extends AbstractController
 {
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeFundId}', name: 'app_scheme_return')]
+    #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}', name: 'app_scheme_return')]
     public function view(
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn              $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeFundId)')]
-        SchemeFund              $schemeFund,
+        #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
+        Scheme                  $scheme,
         DashboardLinksBuilder   $linksBuilder,
         ExpensesTableHelper     $expensesTableHelper,
         ExpensesTableCalculator $expensesTableCalculator,
     ): Response
     {
-        $schemeReturn = $fundReturn->getSchemeReturnForSchemeFund($schemeFund);
+        $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
         $this->denyAccessUnlessGranted(Role::CAN_VIEW, $schemeReturn);
 
-        $linksBuilder->setAtSchemeFund($fundReturn, $schemeFund);
+        $linksBuilder->setAtScheme($fundReturn, $scheme);
 
         $fund = $fundReturn->getFund();
 

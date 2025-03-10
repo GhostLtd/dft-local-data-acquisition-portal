@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Enum\Fund;
-use App\Entity\SchemeFund\SchemeFund;
 use App\Entity\Traits\IdTrait;
 use App\Repository\AuthorityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -124,30 +123,5 @@ class Authority
         }
 
         return $this;
-    }
-
-    // --------------------------------------------------------------------------------
-
-    /**
-     * Returns a collection of the schemes that this authority has, that receive funding from the specified $fund
-     * @return Collection<Scheme>
-     */
-    public function getSchemesForFund(Fund $fund): Collection
-    {
-        return $this->schemes->filter(fn(Scheme $p) => $p->getSchemeFunds()->reduce(
-            fn(bool $carry, SchemeFund $schemeFund) => $carry || $schemeFund->getFund() === $fund,
-            false,
-        ));
-    }
-
-    /**
-     * Returns a collection of the schemeFunds that this authority has, that receive funding from the specified $fund
-     * @return Collection<SchemeFund>
-     */
-    public function getSchemeFundsForFund(Fund $fund): Collection
-    {
-        return $this->schemes
-            ->map(fn(Scheme $s) => $s->getSchemeFundForFund($fund))
-            ->filter(fn(?SchemeFund $sf) => $sf !== null);
     }
 }

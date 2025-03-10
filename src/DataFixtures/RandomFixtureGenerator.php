@@ -9,7 +9,6 @@ use App\DataFixtures\Definition\Expense\ExpenseDefinition;
 use App\DataFixtures\Definition\AuthorityDefinition;
 use App\DataFixtures\Definition\MilestoneDefinition;
 use App\DataFixtures\Definition\SchemeDefinition;
-use App\DataFixtures\Definition\SchemeFund\CrstsSchemeFundDefinition;
 use App\DataFixtures\Definition\SchemeReturn\CrstsSchemeReturnDefinition;
 use App\DataFixtures\Generator\CouncilName;
 use App\DataFixtures\Generator\SchemeName;
@@ -23,6 +22,8 @@ use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Enum\Rating;
 use App\Entity\Enum\TransportMode;
+use App\Entity\Scheme;
+use App\Entity\SchemeData\CrstsData;
 use App\Utility\CrstsHelper;
 use App\Utility\FinancialQuarter;
 use Faker;
@@ -105,15 +106,12 @@ class RandomFixtureGenerator
         $schemes = $this->repeat(SchemeDefinition::class, 4, 8, $this->createRandomScheme(...));
 
         // Find all funds used by all schemes
-        $funds = [];
-        foreach($schemes as $schemeDefinition) {
-            foreach($schemeDefinition->getSchemeFunds() as $fundDefinition) {
-                $fund = $fundDefinition->getFund();
-                $funds[$fund->value] = $fund;
-            }
-        }
+        $funds = [
+            Fund::CRSTS1->value => Fund::CRSTS1,
+        ];
 
         $fundAwards = array_map(fn(Fund $fund) => $this->createRandomFundAward($fund, $schemes, $initialQuarter, $finalQuarter), $funds);
+
         return [$schemes, $fundAwards];
     }
 
@@ -138,27 +136,8 @@ class RandomFixtureGenerator
             $mustBeSignedOff = $financialQuarter < $finalQuarter;
 
             foreach($schemes as $scheme) {
-                $schemeFund = null;
-                foreach($scheme->getSchemeFunds() as $loopSchemeFund) {
-                    if ($loopSchemeFund->getFund() === $fund) {
-                        $schemeFund = $loopSchemeFund;
-                        break;
-                    }
-                }
-
-                // This scheme isn't a recipient of this fund's funds...
-                if (!$schemeFund) {
-                    continue;
-                }
-
                 if ($fund === Fund::CRSTS1) {
-                    if (!$schemeFund instanceof CrstsSchemeFundDefinition) {
-                        throw new \RuntimeException('SchemeFundDefinition / type mismatch');
-                    }
-
-                    if ($schemeFund->isRetained() || $financialQuarter->quarter === 4) {
-                        $schemeReturns[$scheme->getName()] = $this->createRandomCrstsSchemeReturn($financialQuarter);
-                    }
+                    $schemeReturns[$scheme->getName()] = $this->createRandomCrstsSchemeReturn($financialQuarter, $scheme);
                 } else {
                     throw new \RuntimeException("Unsupported Scheme Return Type: ".$scheme::class);
                 }
@@ -225,12 +204,11 @@ class RandomFixtureGenerator
 
     public function createRandomScheme(int $num): SchemeDefinition
     {
-        // Since we currently only have CRSTS, we'll be having at most one fund
-        $schemeFunds = [
-            $this->createRandomCrstsSchemeFund($num)
-        ];
-
         $schemeId = $this->faker->currencyCode() . $this->faker->numberBetween(1, 9999);
+
+        $crstsData = (new CrstsData())
+            ->setRetained($num < 2 || $this->faker->boolean())
+            ->setPreviouslyTcf($this->faker->boolean());
 
         return new SchemeDefinition(
             $this->faker->scheme_name(),
@@ -241,27 +219,11 @@ class RandomFixtureGenerator
             $this->faker->boolean(),
             $this->faker->boolean(),
             $schemeId,
-            $schemeFunds,
+            $crstsData,
         );
     }
 
-    public function createRandomCrstsSchemeFund(int $num): CrstsSchemeFundDefinition
-    {
-        $bcrType = $this->faker->randomElement(BenefitCostRatioType::cases());
-        $bcrValue = $bcrType === BenefitCostRatioType::VALUE ?
-            strval($this->faker->randomFloat(2, 0, 10)) :
-            null;
-
-        return new CrstsSchemeFundDefinition(
-            $num < 2 || $this->faker->boolean(), // Guarantee that at least two schemes are retained
-            $this->faker->boolean(),
-            FundedMostlyAs::CDEL,
-            $bcrType,
-            $bcrValue,
-        );
-    }
-
-    public function createRandomCrstsSchemeReturn(FinancialQuarter $financialQuarter): CrstsSchemeReturnDefinition
+    public function createRandomCrstsSchemeReturn(FinancialQuarter $financialQuarter, SchemeDefinition $scheme): CrstsSchemeReturnDefinition
     {
         $milestones = [];
         $milestoneEarliestDate = new \DateTime('2022-01-01');
@@ -277,7 +239,15 @@ class RandomFixtureGenerator
 
         $expenses = $this->createRandomCrstsExpenses(ExpenseType::filterForScheme(Fund::CRSTS1), $financialQuarter);
 
+        $bcrType = $this->faker->randomElement(BenefitCostRatioType::cases());
+        $bcrValue = $bcrType === BenefitCostRatioType::VALUE ?
+            strval($this->faker->randomFloat(2, 0, 10)) :
+            null;
+
         return new CrstsSchemeReturnDefinition(
+            $scheme,
+            $bcrType,
+            $bcrValue,
             strval($this->faker->randomFloat(2, 1_000, 99_000_000)),
             strval($this->faker->numberBetween(1_000, 99_000_000)),
             $this->faker->randomElement(OnTrackRating::cases()),

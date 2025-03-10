@@ -2,19 +2,19 @@
 
 namespace App\ListPage;
 
-use App\Entity\SchemeFund\CrstsSchemeFund;
+use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 
 class SchemeListPageDataEntry
 {
     public function __construct(
-        protected CrstsSchemeFund $schemeFund,
+        protected Scheme             $scheme,
         protected ?CrstsSchemeReturn $schemeReturn,
     ) {}
 
-    public function getSchemeFund(): CrstsSchemeFund
+    public function getScheme(): Scheme
     {
-        return $this->schemeFund;
+        return $this->scheme;
     }
 
     public function getSchemeReturn(): ?CrstsSchemeReturn

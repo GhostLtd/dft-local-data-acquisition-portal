@@ -16,7 +16,7 @@
 
         {%- set contents -%}
             {{- summaryListStart() -}}
-            {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.schemeFund.retained) }}
+            {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.scheme.crstsData.retained) }}
             {{- yesOrNo('frontend.pages.scheme_return.ready_for_signoff', schemeReturn.readyForSignoff) }}
             {{- summaryListEnd() -}}
         {%- endset %}
@@ -28,7 +28,7 @@
                 {
                     text: 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans,
                     visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
-                    href: path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id}),
+                    href: path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
                 }
             ]) -%}
         {%- endif -%}
@@ -37,7 +37,7 @@
                 {
                     text: 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans,
                     visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
-                    href: path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeFundId: schemeReturn.schemeFund.id}),
+                    href: path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
                 }
             ]) -%}
         {%- endif -%}
@@ -55,11 +55,11 @@
 
         {%- set contents -%}
             {{- summaryListStart() -}}
-            {{- text('frontend.pages.scheme_return.scheme_id', schemeReturn.schemeFund.scheme.schemeIdentifier) -}}
-            {{- text('frontend.pages.scheme_return.description', schemeReturn.schemeFund.scheme.description) -}}
-            {{- text('frontend.pages.scheme_return.risks', schemeReturn.schemeFund.scheme.risks) -}}
-            {{- yesOrNo('frontend.pages.scheme_return.previously_tcf', schemeReturn.schemeFund.previouslyTcf) -}}
-            {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.schemeFund.benefitCostRatio) }}
+            {{- text('frontend.pages.scheme_return.scheme_id', schemeReturn.scheme.schemeIdentifier) -}}
+            {{- text('frontend.pages.scheme_return.description', schemeReturn.scheme.description) -}}
+            {{- text('frontend.pages.scheme_return.risks', schemeReturn.scheme.risks) -}}
+            {{- yesOrNo('frontend.pages.scheme_return.previously_tcf', schemeReturn.scheme.crstsData.previouslyTcf) -}}
+            {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.benefitCostRatio) }}
             {{- summaryListEnd() -}}
         {%- endset -%}
 
@@ -87,8 +87,8 @@
         {%- set contents -%}
             {{- summaryListStart() -}}
 
-            {%- set transportCategory = schemeReturn.schemeFund.scheme.transportMode ? schemeReturn.schemeFund.scheme.transportMode.category.value : null -%}
-            {%- set transportMode = schemeReturn.schemeFund.scheme.transportMode ? schemeReturn.schemeFund.scheme.transportMode.value : null -%}
+            {%- set transportCategory = schemeReturn.scheme.transportMode ? schemeReturn.scheme.transportMode.category.value : null -%}
+            {%- set transportMode = schemeReturn.scheme.transportMode ? schemeReturn.scheme.transportMode.value : null -%}
             {%- set transportCategoryValue = transportCategory ? ("enum.transport_mode.categories.#{transportCategory}" | trans) : null -%}
             {%- set transportModeValue = transportMode ? ("enum.transport_mode.#{transportMode}" | trans) : null -%}
             {%- set html -%}
@@ -102,10 +102,10 @@
             {{- text('frontend.pages.scheme_return.transport_mode', html) -}}
 
             {%- if transportCategory != 'active_travel' -%}
-                {{- enumText('frontend.pages.scheme_return.has_active_travel_elements', 'enum.active_travel_element', schemeReturn.schemeFund.scheme.activeTravelElement) -}}
+                {{- enumText('frontend.pages.scheme_return.has_active_travel_elements', 'enum.active_travel_element', schemeReturn.scheme.activeTravelElement) -}}
             {%- endif -%}
-            {{- yesOrNo('frontend.pages.scheme_return.includes_charging_points', schemeReturn.schemeFund.scheme.includesChargingPoints) -}}
-            {{- yesOrNo('frontend.pages.scheme_return.includes_clean_air_elements', schemeReturn.schemeFund.scheme.includesCleanAirElements) -}}
+            {{- yesOrNo('frontend.pages.scheme_return.includes_charging_points', schemeReturn.scheme.includesChargingPoints) -}}
+            {{- yesOrNo('frontend.pages.scheme_return.includes_clean_air_elements', schemeReturn.scheme.includesCleanAirElements) -}}
             {{- summaryListEnd() -}}
         {%- endset %}
 
@@ -140,7 +140,7 @@
         {%- set contents -%}
             {{- summaryListStart() -}}
             {%- for milestone in schemeReturn.milestones -%}
-                {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.schemeFund.fundedMostlyAs.value})) -%}
+                {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value})) -%}
                 {{- date(label, milestone.date, {translateLabel: false}) -}}
             {%- endfor -%}
             {{- summaryListEnd() -}}

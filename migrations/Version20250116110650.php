@@ -104,8 +104,7 @@ SELECT
 FROM user_permission u
     JOIN scheme_return ON scheme_return.id = u.entity_id
     JOIN fund_return ON scheme_return.fund_return_id = fund_return.id
-    JOIN scheme_fund ON scheme_return.scheme_fund_id = scheme_fund.id
-    JOIN scheme ON scheme_fund.scheme_id = scheme.id
+    JOIN scheme ON scheme_return.scheme_id = scheme.id
     JOIN authority ON scheme.authority_id = authority.id
 WHERE u.entity_class = 'App\Entity\SchemeReturn\SchemeReturn'
 

@@ -5,7 +5,7 @@ namespace App\Entity\FundReturn;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\FundAward;
-use App\Entity\SchemeFund\SchemeFund;
+use App\Entity\Scheme;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Traits\IdTrait;
 use App\Entity\User;
@@ -184,10 +184,10 @@ abstract class FundReturn
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;
 
-    public function getSchemeReturnForSchemeFund(SchemeFund $schemeFund): ?SchemeReturn
+    public function getSchemeReturnForScheme(Scheme $scheme): ?SchemeReturn
     {
         foreach($this->getSchemeReturns() as $schemeReturn) {
-            if ($schemeReturn->getSchemeFund() === $schemeFund) {
+            if ($schemeReturn->getScheme() === $scheme) {
                 return $schemeReturn;
             }
         }

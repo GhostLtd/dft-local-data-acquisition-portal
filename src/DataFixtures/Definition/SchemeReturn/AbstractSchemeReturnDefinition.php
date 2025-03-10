@@ -1,12 +1,11 @@
 <?php
 
-namespace App\DataFixtures\Definition;
+namespace App\DataFixtures\Definition\SchemeReturn;
 
 use App\Entity\Enum\ActiveTravelElement;
 use App\Entity\Enum\TransportMode;
-use App\Entity\SchemeData\CrstsData;
 
-class SchemeDefinition
+abstract class AbstractSchemeReturnDefinition
 {
     public function __construct(
         protected string               $name,
@@ -17,8 +16,8 @@ class SchemeDefinition
         protected ?bool                $includesCleanAirElements = null,
         protected ?bool                $includesChargingPoints = null,
         protected ?string              $schemeIdentifier = null,
-        protected CrstsData            $crstsData,
-    ) {}
+    )
+    {}
 
     public function getName(): string
     {
@@ -58,10 +57,5 @@ class SchemeDefinition
     public function getSchemeIdentifier(): ?string
     {
         return $this->schemeIdentifier;
-    }
-
-    public function getCrstsData(): CrstsData
-    {
-        return $this->crstsData;
     }
 }

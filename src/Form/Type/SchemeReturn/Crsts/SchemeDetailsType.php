@@ -22,35 +22,35 @@ class SchemeDetailsType extends AbstractType
                 'label' => 'forms.crsts.scheme_details.name.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'help' => 'forms.crsts.scheme_details.name.help',
-                'property_path' => 'schemeFund.scheme.name',
+                'property_path' => 'scheme.name',
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'forms.crsts.scheme_details.description.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'help' => 'forms.crsts.scheme_details.description.help',
-                'property_path' => 'schemeFund.scheme.description',
+                'property_path' => 'scheme.description',
             ])
             ->add('risks', TextareaType::class, [
                 'label' => 'forms.crsts.scheme_details.risks.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'help' => 'forms.crsts.scheme_details.risks.help',
-                'property_path' => 'schemeFund.scheme.risks',
+                'property_path' => 'scheme.risks',
             ])
             ->add('schemeIdentifier', InputType::class, [
                 'label' => 'forms.crsts.scheme_details.scheme_identifier.label',
                 'label_attr' => ['class' => 'govuk-label--s'],
-                'property_path' => 'schemeFund.scheme.schemeIdentifier',
+                'property_path' => 'scheme.schemeIdentifier',
                 'disabled' => 'disabled',
             ])
             ->add('previouslyTcf', BooleanChoiceType::class, [
                 'label' => 'forms.crsts.scheme_details.previously_tcf.label',
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
                 'help' => 'forms.crsts.scheme_details.previously_tcf.help',
-                'property_path' => 'schemeFund.previouslyTcf',
+                'property_path' => 'scheme.crstsData.previouslyTcf',
             ])
             ->add('benefitCostRatio', BenefitCostRatioType::class, [
                 'label' => false,
-                'property_path' => 'schemeFund.benefitCostRatio',
+                'property_path' => 'benefitCostRatio',
             ])
         ;
     }
@@ -66,7 +66,7 @@ class SchemeDetailsType extends AbstractType
             'data_class' => CrstsSchemeReturn::class,
             'validation_groups' => ['scheme_details'],
             'error_mapping' => [
-                'schemeFund.benefitCostRatio' => 'benefitCostRatio',
+                'benefitCostRatio' => 'benefitCostRatio',
             ],
         ]);
     }

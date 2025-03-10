@@ -113,11 +113,11 @@
     {%- for result in listData.entities -%}
         {%- set actions = is_granted('CAN_VIEW', result.schemeReturn) ? [
             {
-                href: path('app_scheme_return', {fundReturnId: fundReturn.id, schemeFundId: result.schemeFund.id}),
+                href: path('app_scheme_return', {fundReturnId: fundReturn.id, schemeId: result.scheme.id}),
                 text: 'common.actions.view' | trans,
             },
         ] : [] -%}
-        {%- set nameHtml %}<div class="govuk-!-font-weight-bold">{{ result.schemeFund.scheme.name }}</div>{% endset -%}
+        {%- set nameHtml %}<div class="govuk-!-font-weight-bold">{{ result.scheme.name }}</div>{% endset -%}
         {%- set readyForSignoffHtml -%}
             {%- if result.schemeReturn is not null -%}
                 {{ (result.schemeReturn.readyForSignoff ? 'common.text.yes' : 'common.text.no') | trans }}
@@ -136,7 +136,7 @@
         {{- tableRow([
             {html: nameHtml},
             {html: readyForSignoffHtml},
-            {text: (result.schemeFund.retained ? 'common.scheme.retained' : 'common.scheme.non_retained') | trans},
+            {text: (result.schemeReturn.scheme.crstsData.retained ? 'common.scheme.retained' : 'common.scheme.non_retained') | trans},
             {html: onTrackHtml},
             {html: summaryListActionsList(actions)},
         ]) -}}
