@@ -25,7 +25,7 @@ class UserPermission
     #[ORM\Column(length: 255)]
     private ?string $entityClass = null;
 
-    #[ORM\Column(type: UlidType::NAME, unique: true)]
+    #[ORM\Column(type: UlidType::NAME)]
     private ?Ulid $entityId = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
