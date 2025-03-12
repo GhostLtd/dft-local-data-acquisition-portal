@@ -9,6 +9,7 @@ use App\Entity\SchemeData\CrstsData;
 class SchemeDefinition
 {
     public function __construct(
+        protected CrstsData            $crstsData,
         protected string               $name,
         protected string               $description,
         protected string               $risks,
@@ -17,7 +18,6 @@ class SchemeDefinition
         protected ?bool                $includesCleanAirElements = null,
         protected ?bool                $includesChargingPoints = null,
         protected ?string              $schemeIdentifier = null,
-        protected CrstsData            $crstsData,
     ) {}
 
     public function getName(): string

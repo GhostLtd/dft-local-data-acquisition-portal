@@ -456,6 +456,8 @@ frontend:
       current_business_case: *sr_current_business_case
       description: *sr_scheme_description
       expected_business_case_approval: *sr_expected_business_case_approval
+      expenses_not_required: >-
+        Not required: non-retained schemes need only submit expenses data in Q4.
       has_active_travel_elements: Active travel elements?
       includes_charging_points: Charging points for EVs?
       includes_clean_air_elements: Clean air elements?

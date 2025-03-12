@@ -174,29 +174,37 @@
 
     {%- set sections = [] -%}
 
-    {%- from "frontend/macros.html.twig" import renderTable -%}
-    {%- for division in expenseDivisions -%}
-        {%- set divisionConfiguration = schemeReturn.findDivisionConfigurationByKey(division.key) -%}
-        {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
-        {%- set contents -%}
-            {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
-            {%- if is_granted('CAN_EDIT', schemeReturn) -%}
-                {%- set url = section_edit_path(schemeReturn, division.key, true) -%}
-                <div class="expenses-links">
-                    <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
-                </div>
-            {%- endif -%}
-            {{- renderTable(table) -}}
-            {{- expenseDivisionComments(schemeReturn, division) -}}
-        {%- endset -%}
-        {%- set sections = sections|merge([{
-            label: division.label | trans,
-            id: 'expenses-' ~ division.key,
-            panel: {html: contents},
-        }]) -%}
-    {%- endfor -%}
+    {%- set expensesTitle = 'frontend.pages.scheme_return.titles.expenses' | trans -%}
+    {%- if is_granted('CAN_VIEW_SCHEME_EXPENSES', schemeReturn) -%}
+        {%- from "frontend/macros.html.twig" import renderTable -%}
+        {%- for division in expenseDivisions -%}
+            {%- set divisionConfiguration = schemeReturn.findDivisionConfigurationByKey(division.key) -%}
+            {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
+            {%- set contents -%}
+                {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
+                {%- if is_granted('CAN_EDIT_SCHEME_EXPENSES', schemeReturn) -%}
+                    {%- set url = section_edit_path(schemeReturn, division.key, true) -%}
+                    <div class="expenses-links">
+                        <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
+                    </div>
+                {%- endif -%}
+                {{- renderTable(table) -}}
+                {{- expenseDivisionComments(schemeReturn, division) -}}
+            {%- endset -%}
+            {%- set sections = sections|merge([{
+                label: division.label | trans,
+                id: 'expenses-' ~ division.key,
+                panel: {html: contents},
+            }]) -%}
+        {%- endfor -%}
 
-    {{- displaySectionsAsTabs(sections, 'frontend.pages.scheme_return.titles.expenses' | trans) -}}
+        {{- displaySectionsAsTabs(sections, expensesTitle) -}}
+    {%- else -%}
+        <div class="govuk-!-margin-bottom-9">
+            <h2 class="govuk-heading-m">{{ expensesTitle }}</h2>
+            <p class="govuk-body">{{ 'frontend.pages.scheme_return.expenses_not_required' | trans }}</p>
+        </div>
+    {%- endif -%}
 
     <p class="govuk-body">
         <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">{{-

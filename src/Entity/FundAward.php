@@ -85,4 +85,17 @@ class FundAward
 
         return $this;
     }
+
+    // ----------------------------------------------------------------------
+
+    public function getReturnByYearAndQuarter(int $initialYear, int $quarter): ?FundReturn
+    {
+        foreach($this->getReturns() as $return) {
+            if ($return->getYear() === $initialYear && $return->getQuarter() === $quarter) {
+                return $return;
+            }
+        }
+
+        return null;
+    }
 }

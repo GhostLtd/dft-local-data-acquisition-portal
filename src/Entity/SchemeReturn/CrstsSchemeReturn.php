@@ -7,6 +7,7 @@ use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\ExpensesContainerInterface;
+use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ReturnExpenseTrait;
 use App\Entity\SchemeFund\BenefitCostRatio;
@@ -217,9 +218,11 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
     public function createSchemeReturnForNextQuarter(): static
     {
+        $scheme = $this->getScheme();
+
         $nextSchemeReturn = new self();
         $nextSchemeReturn
-            ->setScheme($this->getScheme())
+            ->setScheme($scheme)
             ->setBenefitCostRatio($this->getBenefitCostRatio())
 
             ->setBusinessCase($this->getBusinessCase())
@@ -238,8 +241,31 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
             $nextSchemeReturn->setProgressUpdate($this->getProgressUpdate());
         }
 
-        $this->createExpensesForNextQuarter($this->getFundReturn()->getYear(), $this->getFundReturn()->getQuarter())
-            ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
+        $year = $this->getFundReturn()->getYear();
+        $quarter = $this->getFundReturn()->getQuarter();
+        $crstsData = $scheme->getCrstsData();
+
+        if ($crstsData->isExpenseDataRequiredFor($quarter)) {
+            if ($crstsData->isRetained()) {
+                $sourceExpenses = $this->expenses;
+            } else {
+                $fundAward = $this->getFundReturn()->getFundAward();
+                $sourceFundReturn = $fundAward->getReturnByYearAndQuarter($year - 1, 4);
+
+                if ($sourceFundReturn !== null && !$sourceFundReturn instanceof CrstsFundReturn) {
+                    throw new \RuntimeException('CrstsSchemeReturn->getFundReturn()->getFundAward()->getReturnByYearAndQuarter() returned an invalid value');
+                }
+
+                $sourceExpenses = $sourceFundReturn
+                    ?->getSchemeReturnForScheme($this->getScheme())
+                    ?->getExpenses();
+            }
+
+            if ($sourceExpenses) {
+                $this->createExpensesForNextQuarter($sourceExpenses, $year, $quarter)
+                    ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
+            }
+        }
 
         $this->milestones->map(fn($m) => $nextSchemeReturn->addMilestone((new Milestone())
             ->setType($m->getType())

@@ -76,7 +76,7 @@ class EditController extends AbstractReturnController
     ): Response
     {
         $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
-        $this->denyAccessUnlessGranted(Role::CAN_EDIT, $schemeReturn);
+        $this->denyAccessUnlessGranted(Role::CAN_EDIT_SCHEME_EXPENSES, $schemeReturn);
         $divisionConfiguration = $schemeReturn->findDivisionConfigurationByKey($divisionKey);
 
         if (!$divisionConfiguration) {

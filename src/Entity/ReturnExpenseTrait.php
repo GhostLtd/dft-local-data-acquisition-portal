@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Utility\FinancialQuarter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -66,10 +65,10 @@ trait ReturnExpenseTrait
         return $this->expenseDivisionComments[$divKey] ?? null;
     }
 
-    public function createExpensesForNextQuarter(int $currentYear, int $currentQuarter): Collection
+    public function createExpensesForNextQuarter(Collection $sourceExpenses, int $currentYear, int $currentQuarter): Collection
     {
         $currentFQ = new FinancialQuarter($currentYear, $currentQuarter);
-        return $this->expenses
+        return $sourceExpenses
             ->map(function(ExpenseEntry $e) use ($currentFQ) {
                 $isCopyValue = $e->getColumn() !== 'forecast'
                     && (FinancialQuarter::createFromDivisionAndColumn($e->getDivision(), $e->getColumn())) <= $currentFQ;

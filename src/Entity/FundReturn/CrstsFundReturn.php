@@ -5,15 +5,16 @@ namespace App\Entity\FundReturn;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
-use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
 use App\Entity\ReturnExpenseTrait;
+use App\Entity\Scheme;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Utility\CrstsHelper;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
 use App\Utility\FinancialQuarter;
+use App\Utility\TypeHelper;
 use App\Validator\ExpensesValidator;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -140,19 +141,42 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
         $nextReturn = new self();
         $this->getFundAward()->addReturn($nextReturn);
 
+        $nextQuarter = (new FinancialQuarter($this->getYear(), $this->getQuarter()))
+            ->getNextQuarter();
+
         $nextReturn
-            ->setQuarter($this->getQuarter() === 4 ? 1 : $this->getQuarter() + 1)
-            ->setYear($this->getQuarter() === 4 ? $this->getYear() + 1 : $this->getYear())
+            ->setQuarter($nextQuarter->quarter)
+            ->setYear($nextQuarter->initialYear)
             ->setLocalContribution($this->getLocalContribution())
-            ->setResourceFunding($this->getResourceFunding())
-            ;
-        $this->createExpensesForNextQuarter($this->getYear(), $this->getQuarter())->map(
+            ->setResourceFunding($this->getResourceFunding());
+
+        $this->createExpensesForNextQuarter($this->expenses, $this->getYear(), $this->getQuarter())->map(
             fn($e) => $nextReturn->addExpense($e)
         );
-//        dump($nextReturn->getExpenses()); exit;
+
         $this->getSchemeReturns()->map(
             fn(SchemeReturn $sr) => $nextReturn->addSchemeReturn($sr->createSchemeReturnForNextQuarter())
         );
         return $nextReturn;
+    }
+
+    // ----- Wrappers for more specific type-hinting + checks
+    public function getSchemeReturnForScheme(Scheme $scheme): ?CrstsSchemeReturn
+    {
+        return TypeHelper::checkMatchesClassOrNull(CrstsSchemeReturn::class, parent::getSchemeReturnForScheme($scheme));
+    }
+
+    /**
+     * @return Collection<int, CrstsSchemeReturn>
+     */
+    public function getSchemeReturns(): Collection
+    {
+        return parent::getSchemeReturns();
+    }
+
+    public function addSchemeReturn(SchemeReturn $schemeReturn): static
+    {
+        TypeHelper::checkMatchesClass(CrstsSchemeReturn::class, $schemeReturn);
+        return parent::addSchemeReturn($schemeReturn);
     }
 }

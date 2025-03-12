@@ -211,6 +211,7 @@ class RandomFixtureGenerator
             ->setPreviouslyTcf($this->faker->boolean());
 
         return new SchemeDefinition(
+            $crstsData,
             $this->faker->scheme_name(),
             $this->faker->text(),
             $this->faker->text(),
@@ -219,7 +220,6 @@ class RandomFixtureGenerator
             $this->faker->boolean(),
             $this->faker->boolean(),
             $schemeId,
-            $crstsData,
         );
     }
 

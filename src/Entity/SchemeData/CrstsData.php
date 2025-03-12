@@ -31,7 +31,7 @@ class CrstsData
         return $this;
     }
 
-    public function isReturnRequiredFor(int $quarter): bool
+    public function isExpenseDataRequiredFor(int $quarter): bool
     {
         // If scheme is retained, we require a return every quarter, otherwise only once a year
         return $this->isRetained() || $quarter === 4;
