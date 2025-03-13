@@ -54,7 +54,7 @@ class EditController extends AbstractReturnController
             return $response;
         }
 
-        return $this->render('frontend/scheme_return_edit.html.twig', [
+        return $this->render('frontend/scheme_return/edit.html.twig', [
             'linksBuilder' => $linksBuilder,
             'form' => $form,
             'fundReturn' => $fundReturn,
@@ -103,7 +103,7 @@ class EditController extends AbstractReturnController
             return $response;
         }
 
-        return $this->render('frontend/scheme_return_expenses_edit.html.twig', [
+        return $this->render('frontend/scheme_return/expenses_edit.html.twig', [
             'linksBuilder' => $linksBuilder,
             'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,

@@ -30,3 +30,9 @@ li.govuk-service-navigation__margin-left-auto {
   padding: govuk-spacing(2);
   @include govuk-font(16);
 }
+
+.guidance-table {
+  .govuk-table__header {
+    white-space: nowrap;
+  }
+}

@@ -10,9 +10,13 @@ use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Twig\Environment;
 
 class OverallProgressType extends AbstractType
 {
+    public function __construct(protected Environment $twig)
+    {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -29,7 +33,9 @@ class OverallProgressType extends AbstractType
                 'choices' => Rating::cases(),
                 'choice_label' => fn(Rating $choice) => "enum.rating.{$choice->value}",
                 'choice_value' => fn(?Rating $choice) => $choice?->value,
-                'label_attr' => ['class' => 'govuk-fieldset__legend--s']
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                'help' => $this->twig->render('frontend/fund_return/includes/overall_confidence_help.html.twig'),
+                'help_html' => true,
             ]);
     }
 

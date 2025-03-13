@@ -284,6 +284,7 @@ forms:
         label: Overall delivery confidence
       overall_confidence:
         label: Overall confidence rating
+        details: View guidance
     scheme_details:
       benefit_cost_ratio:
         label: &sr_benefit_cost_ratio Benefit-cost ratio

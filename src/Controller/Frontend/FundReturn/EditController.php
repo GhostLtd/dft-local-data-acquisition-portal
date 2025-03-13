@@ -7,6 +7,7 @@ use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Form\Type\FundReturn\Crsts\ExpensesType;
+use App\Form\Type\FundReturn\Crsts\OverallProgressType;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
@@ -45,7 +46,7 @@ class EditController extends AbstractReturnController
             return $response;
         }
 
-        return $this->render('frontend/fund_return_edit.html.twig', [
+        return $this->render('frontend/fund_return/edit.html.twig', [
             'linksBuilder' => $linksBuilder,
             'form' => $form,
             'fundReturn' => $fundReturn,
@@ -89,7 +90,7 @@ class EditController extends AbstractReturnController
             return $response;
         }
 
-        return $this->render('frontend/fund_return_expenses_edit.html.twig', [
+        return $this->render('frontend/fund_return/expenses_edit.html.twig', [
             'linksBuilder' => $linksBuilder,
             'expensesTable' => $expensesTableHelper->getTable(),
             'form' => $form,
