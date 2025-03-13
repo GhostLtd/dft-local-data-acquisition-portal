@@ -1,24 +1,106 @@
+let lastInputWasKeyboard = false
+
 const initialise = () => {
+    let isEnabled = false
+
+    const isNamedAttributeEnabled = function(attributes, name) {
+        const attribute = attributes.getNamedItem(name)
+
+        return attribute ?
+            (attribute.value === '1') :
+            false
+    }
+
     const forms = document.getElementsByTagName('form')
     for (let i = 0; i < forms.length; i++) {
         const form = forms.item(i)
-        const dataAutoTotal = form.attributes.getNamedItem('data-auto-total')
+        const isAutoTotalEnabled = isNamedAttributeEnabled(form.attributes, 'data-auto-total')
 
-        if (dataAutoTotal && dataAutoTotal.value === '1') {
-            const autoCommas = form.attributes.getNamedItem('data-auto-commas').value === '1'
-            initForForm(form, autoCommas)
+        if (isAutoTotalEnabled) {
+            const isAutoCommasEnabled = isNamedAttributeEnabled(form.attributes, 'data-auto-commas')
+            initForForm(form, isAutoCommasEnabled)
+            isEnabled = true;
         }
     }
+
+    const inputs = document.getElementsByTagName('input');
+    for (let i = 0; i < inputs.length; i++) {
+        const input = inputs.item(i)
+
+        if (isNamedAttributeEnabled(input.attributes, 'data-auto-commas')) {
+            initAutoCommas(input)
+            formatCellWithCommas(input)
+            isEnabled = true
+        }
+    }
+
+    if (isEnabled) {
+        document.addEventListener('keydown', _ => lastInputWasKeyboard = true)
+        document.addEventListener('mousedown', _ => lastInputWasKeyboard = false)
+    }
 }
+
+function formatCellWithCommas(cell, setSelectionUponChange= false) {
+    if (!valueSensible(cell.value)) {
+        return
+    }
+
+    const value = cell.value
+    const parsedValue = getValue(value)
+
+    cell.value = isNaN(parsedValue)
+        ? value
+        : (document.activeElement === cell ? parsedValue : (parsedValue.toLocaleString('en-GB')))
+
+    // Normally when a text input gets focused due to:
+    // a) tabbing, the contents get selected
+    // b) clicking, no selection occurs, but a caret gets put at the click location
+    //
+    // The autoComma routine was breaking this due to the cell value being replaced, removing the selection.
+    // We use mousedown/keydown to track whether the last input event (which was the cause of the focus event)
+    // was a keyboard or mouse event, and if it was a keyboard event, we can restore the selection.
+    if (setSelectionUponChange && lastInputWasKeyboard && cell.value !== value) {
+        cell.select()
+    }
+}
+
+function initAutoCommas(cell) {
+    cell.addEventListener('focus', _ => formatCellWithCommas(cell, true))
+    cell.addEventListener('blur', _ => formatCellWithCommas(cell))
+}
+
+// Parse a string to retrieve its value (removing commas)
+function getValue(value) {
+    if (!valueSensible(value)) {
+        return value
+    }
+
+    return parseInt(('' + value).replaceAll(',', '').replaceAll(' ', ''))
+}
+
+// Check whether this value should be eligible for summing and/or the addition of commas
+function valueSensible(value) {
+    value = '' + value
+
+    // Firstly, the value needs to comprise only have numbers, commas and spaces
+    // (optionally with leading/trailing whitespace)
+    if (!value.match(/^\s*[0-9, ]*\s*$/)) {
+        return false;
+    }
+
+    // Then the number (without all of the commas and spaces) needs to be a maximum of twelve digits long
+
+    // Anything above around 15 or 16 digits, javascript seems to start rounding the numbers, and toLocaleString
+    // used in addComma doesn't seem to be able to handle more than 12 digits
+    const numberValue = value.replaceAll(/\s|,/g, '')
+    return numberValue.length >= 0 && numberValue.length <= 12
+}
+
 
 function initForForm(form, autoCommas) {
     let cellMap
     let rowToActionMap
     let rowColToActionMap
-    let lastInputWasKeyboard = false
-
-    document.addEventListener('keydown', _ => lastInputWasKeyboard = true)
-    document.addEventListener('mousedown', _ => lastInputWasKeyboard = false)
 
     cellMap = {}
     rowToActionMap = {}
@@ -70,45 +152,20 @@ function initForForm(form, autoCommas) {
         let isDisabled = (cell.attributes.getNamedItem('disabled')?.value === '1');
 
         if (!isDisabled) {
-            cell.addEventListener('change', _ => cellChanged(cell, false))
             cell.addEventListener('keyup', e => e.key !== 'Tab' && cellChanged(cell, false))
-            cell.addEventListener('focus', _ => autoComma(cell, true))
-            cell.addEventListener('blur', _ => autoComma(cell))
+            cell.addEventListener('change', _ => cellChanged(cell, false))
+
+            initAutoCommas(cell)
         }
     }
 
     // Add commas to the given value, if autoCommas is true
     function autoComma(cell, setSelectionUponChange= false) {
-        if (!autoCommas || !valueSensible(cell.value)) {
+        if (!autoCommas) {
             return
         }
 
-        const value = cell.value
-        const parsedValue = getValue(value)
-
-        cell.value = isNaN(parsedValue)
-            ? value
-            : (document.activeElement === cell ? parsedValue : (parsedValue.toLocaleString('en-GB')))
-
-        // Normally when a text input gets focused due to:
-        // a) tabbing, the contents get selected
-        // b) clicking, no selection occurs, but a caret gets put at the click location
-        //
-        // The autoComma routine was breaking this due to the cell value being replaced, removing the selection.
-        // We use mousedown/keydown to track whether the last input event (which was the cause of the focus event)
-        // was a keyboard or mouse event, and if it was a keyboard event, we can restore the selection.
-        if (setSelectionUponChange && lastInputWasKeyboard && cell.value !== value) {
-            cell.select()
-        }
-    }
-
-    // Parse a string to retrieve its value (removing commas)
-    function getValue(value) {
-        if (!valueSensible(value)) {
-            return value
-        }
-
-        return parseInt(('' + value).replaceAll(',', '').replaceAll(' ', ''))
+        formatCellWithCommas(cell, setSelectionUponChange)
     }
 
     // A cell has been changed. Trigger cellTotal updates for cells that depend upon its value.
@@ -176,7 +233,7 @@ function initForForm(form, autoCommas) {
                         return
                     }
                     failure |= !valueSensible(cellMap[row][col].value)
-                    console.log(cellMap[row][col].value + ':' + (failure ? 'Y': 'N'))
+                    // console.log(cellMap[row][col].value + ':' + (failure ? 'Y': 'N'))
 
                     const value = getValue(cellMap[row][col].value)
                     if (!isNaN(value)) {
@@ -193,24 +250,6 @@ function initForForm(form, autoCommas) {
         } else {
             updateCell(cell.value)
         }
-    }
-
-    // Check whether this value should be eligible for summing and/or the addition of commas
-    function valueSensible(value) {
-        value = '' + value
-
-        // Firstly, the value needs to comprise only have numbers, commas and spaces
-        // (optionally with leading/trailing whitespace)
-        if (!value.match(/^\s*[0-9, ]*\s*$/)) {
-            return false;
-        }
-
-        // Then the number (without all of the commas and spaces) needs to be a maximum of twelve digits long
-
-        // Anything above around 15 or 16 digits, javascript seems to start rounding the numbers, and toLocaleString
-        // used in addComma doesn't seem to be able to handle more than 12 digits
-        const numberValue = value.replaceAll(/\s|,/g, '')
-        return numberValue.length >= 0 && numberValue.length <= 12
     }
 }
 
