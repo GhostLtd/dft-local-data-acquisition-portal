@@ -36,3 +36,10 @@ li.govuk-service-navigation__margin-left-auto {
     white-space: nowrap;
   }
 }
+
+.govuk-hint {
+  // Remove the "newline" that appears if you use markdown in a form help block
+  p:first-child {
+    margin-top: 0;
+  }
+}
