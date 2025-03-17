@@ -12,13 +12,14 @@ use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\Scheme;
 
-class CrstsSchemeReturnDefinition
+class CrstsSchemeReturnDefinition extends AbstractSchemeReturnDefinition
 {
     /**
      * @param array<MilestoneDefinition> $milestones
      * @param array<ExpenseDefinition> $expenses
      */
     public function __construct(
+        protected ?string               $risks,
         protected SchemeDefinition      $scheme,
         protected ?BenefitCostRatioType $benefitCostRatioType = null,
         protected ?string               $benefitCostRatioValue = null,
@@ -31,7 +32,9 @@ class CrstsSchemeReturnDefinition
         protected ?bool                 $readyForSignoff = null,
         protected array                 $milestones = [],
         protected array                 $expenses = [],
-    ) {}
+    ) {
+        parent::__construct($this->risks);
+    }
 
     public function getFund(): Fund
     {
@@ -81,11 +84,6 @@ class CrstsSchemeReturnDefinition
     public function getReadyForSignoff(): ?bool
     {
         return $this->readyForSignoff;
-    }
-
-    public function getRetained(): ?bool
-    {
-        return $this->retained;
     }
 
     public function getScheme(): SchemeDefinition

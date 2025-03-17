@@ -30,6 +30,10 @@ class OverallFundingType extends AbstractType implements DataMapperInterface
                 'prefix' => '£',
                 'attr' => ['class' => 'govuk-input--width-10', 'data-auto-commas' => '1'],
             ])
+            ->add('benefitCostRatio', BenefitCostRatioType::class, [
+                'label' => false,
+                'property_path' => 'benefitCostRatio',
+            ])
         ;
     }
 
@@ -43,6 +47,9 @@ class OverallFundingType extends AbstractType implements DataMapperInterface
         $resolver->setDefaults([
             'data_class' => CrstsSchemeReturn::class,
             'validation_groups' => ['overall_funding'],
+            'error_mapping' => [
+                'benefitCostRatio' => 'benefitCostRatio',
+            ],
         ]);
     }
 
@@ -57,6 +64,7 @@ class OverallFundingType extends AbstractType implements DataMapperInterface
 
         $forms['agreedFunding']->setData($viewData->getAgreedFunding());
         $forms['totalCost']->setData($viewData->getTotalCost());
+        $forms['benefitCostRatio']->setData($viewData->getBenefitCostRatio());
     }
 
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
@@ -70,6 +78,7 @@ class OverallFundingType extends AbstractType implements DataMapperInterface
 
         $viewData->setAgreedFunding($this->removeCommas($forms['agreedFunding']->getData()));
         $viewData->setTotalCost($this->removeCommas($forms['totalCost']->getData()));
+        $viewData->setBenefitCostRatio($forms['benefitCostRatio']->getData());
     }
 
     protected function removeCommas(?string $value): ?string

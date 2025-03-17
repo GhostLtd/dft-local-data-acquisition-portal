@@ -35,8 +35,8 @@ crsts_fund_return:
     not_blank: Enter the Resource funding
 
 crsts_scheme_fund:
-  funded_mostly_as:
-    not_null: Choose how this scheme is mostly funded
+  is_retained:
+    not_null: Choose whether this is a retained scheme
   previously_tcf:
     not_null: Choose whether this scheme was previously in TCF
 
@@ -68,6 +68,8 @@ scheme:
     not_null: Choose whether this scheme includes clear air elements
   name:
     not_blank: Enter a scheme name
+  risks:
+    not_blank: Enter scheme risks
   transport_mode:
     not_null: Choose a transport mode
 

@@ -214,12 +214,10 @@ class RandomFixtureGenerator
             $crstsData,
             $this->faker->scheme_name(),
             $this->faker->text(),
-            $this->faker->text(),
             $this->faker->randomElement(TransportMode::cases()),
             $this->faker->randomElement(ActiveTravelElement::cases()),
-            $this->faker->boolean(),
-            $this->faker->boolean(),
             $schemeId,
+            [Fund::CRSTS1],
         );
     }
 
@@ -245,6 +243,7 @@ class RandomFixtureGenerator
             null;
 
         return new CrstsSchemeReturnDefinition(
+            $this->faker->text(),
             $scheme,
             $bcrType,
             $bcrValue,

@@ -10,6 +10,7 @@ use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Form\Type\Admin\AuthorityType;
 use App\ListPage\AuthorityListPage;
 use App\Utility\FinancialQuarter;
+use App\Utility\SampleReturnGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkFrontendBundle\Model\NotificationBanner;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,9 +25,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class AuthorityController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly RandomFixtureGenerator $randomFixtureGenerator,
-        private readonly FixtureHelper          $fixtureHelper,
+        protected EntityManagerInterface $entityManager,
+        protected SampleReturnGenerator $sampleReturnGenerator,
     ) {}
 
     #[Route(path: '', name: '')]
@@ -63,7 +63,7 @@ class AuthorityController extends AbstractController
                 $authority = $form->getData();
                 if (!$form->getData()->getId()) {
                     $this->entityManager->persist($authority);
-                    $this->createAssetsForNewAuthority($authority);
+                    $this->sampleReturnGenerator->createAssetsForNewAuthority($authority);
                     $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority added', 'The new authority has been added', ['style' => NotificationBanner::STYLE_SUCCESS]));
                 } else {
                     $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority updated', 'The authority has been updated', ['style' => NotificationBanner::STYLE_SUCCESS]));
@@ -88,35 +88,5 @@ class AuthorityController extends AbstractController
     public function add(Request $request, Session $session): Response
     {
         return $this->edit($request, $session, new Authority(), 'add');
-    }
-
-    protected function createAssetsForNewAuthority(Authority $authority): void
-    {
-        $this->randomFixtureGenerator->setSeed(random_int(0, PHP_INT_MAX));
-        $this->fixtureHelper->setEntityManager($this->entityManager);
-
-        $returnQuarter = FinancialQuarter::createFromDate(new \DateTime('6 months ago'));
-        [$schemes, $fundAwards] = $this->randomFixtureGenerator
-            ->createSchemeAndFundAwardDefinitions($returnQuarter, $returnQuarter);
-        $this->fixtureHelper->processSchemeAndFundDefinitions($authority, $schemes, $fundAwards);
-
-        // sign off return
-        /** @var CrstsFundReturn $existingReturn */
-        $existingReturn = $authority->getFundAwards()->first()->getReturns()->first();
-        $existingReturn->signoff($authority->getAdmin());
-
-        // create new return for following quarter, from existing one.
-        $nextReturn = $existingReturn->createFundReturnForNextQuarter();
-        $this->entityManager->persist($nextReturn);
-
-//        Add another return...
-//        $nextReturn->signoff($authority->getAdmin());
-//        $nextNextReturn = $nextReturn->createFundReturnForNextQuarter();
-//        $this->entityManager->persist($nextNextReturn);
-
-//        $nextReturn->getSchemeReturns()->map(fn($sr) => $this->entityManager->persist($sr));
-//        $nextReturn->getExpenses()->map(fn($ex) => $this->entityManager->persist($ex));
-//        $nextReturn->getSchemeReturns()->map(fn(CrstsSchemeReturn $sr) => $sr->getExpenses()->map(fn($ex) => $this->entityManager->persist($ex)));
-
     }
 }

@@ -53,6 +53,10 @@ class BenefitCostRatioType extends AbstractType implements DataMapperInterface
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
+        if ($viewData === null) {
+            return;
+        }
+
         if (!$viewData instanceof BenefitCostRatio) {
             throw new UnexpectedTypeException($viewData, BenefitCostRatio::class);
         }

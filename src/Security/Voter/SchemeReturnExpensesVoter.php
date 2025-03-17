@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class SchemeExpensesVoter extends Voter
+class SchemeReturnExpensesVoter extends Voter
 {
     public function __construct(
         protected AuthorizationCheckerInterface $authorizationChecker,
@@ -22,8 +22,8 @@ class SchemeExpensesVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [
-                Role::CAN_EDIT_SCHEME_EXPENSES,
-                Role::CAN_VIEW_SCHEME_EXPENSES,
+                Role::CAN_EDIT_SCHEME_RETURN_EXPENSES,
+                Role::CAN_VIEW_SCHEME_RETURN_EXPENSES,
             ]) &&
             $subject instanceof CrstsSchemeReturn;
     }
@@ -31,8 +31,8 @@ class SchemeExpensesVoter extends Voter
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $internalRole = match($attribute) {
-            Role::CAN_EDIT_SCHEME_EXPENSES => InternalRole::HAS_VALID_EDIT_PERMISSION,
-            Role::CAN_VIEW_SCHEME_EXPENSES => InternalRole::HAS_VALID_VIEW_PERMISSION,
+            Role::CAN_EDIT_SCHEME_RETURN_EXPENSES => InternalRole::HAS_VALID_EDIT_PERMISSION,
+            Role::CAN_VIEW_SCHEME_RETURN_EXPENSES => InternalRole::HAS_VALID_VIEW_PERMISSION,
         };
 
         if (!$this->authorizationChecker->isGranted($internalRole, $subject)) {

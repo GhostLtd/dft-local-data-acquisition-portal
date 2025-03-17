@@ -63,12 +63,12 @@ class ReadyForSignoffController extends AbstractReturnController
         $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
 
         if ($type === self::MARK_AS_READY) {
-            $this->denyAccessUnlessGranted(Role::CAN_MARK_AS_READY, $schemeReturn);
+            $this->denyAccessUnlessGranted(Role::CAN_MARK_SCHEME_RETURN_AS_READY, $schemeReturn);
             $this->linksBuilder->setAtSchemeReadyForSignoff($fundReturn, $scheme);
             $label = "forms.scheme.mark_as_ready_for_signoff.confirm";
             $template = "frontend/scheme_return/ready_for_signoff.html.twig";
         } else if ($type === self::MARK_AS_NOT_READY) {
-            $this->denyAccessUnlessGranted(Role::CAN_MARK_AS_NOT_READY, $schemeReturn);
+            $this->denyAccessUnlessGranted(Role::CAN_MARK_SCHEME_RETURN_AS_NOT_READY, $schemeReturn);
             $this->linksBuilder->setAtSchemeNotReadyForSignoff($fundReturn, $scheme);
             $label = "forms.scheme.mark_as_not_ready_for_signoff.confirm";
             $template = "frontend/scheme_return/not_ready_for_signoff.html.twig";

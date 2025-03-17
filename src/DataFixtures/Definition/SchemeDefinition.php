@@ -3,6 +3,7 @@
 namespace App\DataFixtures\Definition;
 
 use App\Entity\Enum\ActiveTravelElement;
+use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
 use App\Entity\SchemeData\CrstsData;
 
@@ -12,13 +13,17 @@ class SchemeDefinition
         protected CrstsData            $crstsData,
         protected string               $name,
         protected string               $description,
-        protected string               $risks,
         protected ?TransportMode       $transportMode = null,
         protected ?ActiveTravelElement $activeTravelElement = null,
-        protected ?bool                $includesCleanAirElements = null,
-        protected ?bool                $includesChargingPoints = null,
         protected ?string              $schemeIdentifier = null,
-    ) {}
+        protected array                $funds = [],
+    ) {
+        foreach($funds as $fund) {
+            if (!$fund instanceof Fund) {
+                throw new \InvalidArgumentException('Funds must be instance of '.Fund::class);
+            }
+        }
+    }
 
     public function getName(): string
     {
@@ -28,11 +33,6 @@ class SchemeDefinition
     public function getDescription(): string
     {
         return $this->description;
-    }
-
-    public function getRisks(): string
-    {
-        return $this->risks;
     }
 
     public function getTransportMode(): ?TransportMode
@@ -45,16 +45,6 @@ class SchemeDefinition
         return $this->activeTravelElement;
     }
 
-    public function getIncludesCleanAirElements(): ?bool
-    {
-        return $this->includesCleanAirElements;
-    }
-
-    public function getIncludesChargingPoints(): ?bool
-    {
-        return $this->includesChargingPoints;
-    }
-
     public function getSchemeIdentifier(): ?string
     {
         return $this->schemeIdentifier;
@@ -63,5 +53,13 @@ class SchemeDefinition
     public function getCrstsData(): CrstsData
     {
         return $this->crstsData;
+    }
+
+    /**
+     * @return array<int, Fund>
+     */
+    public function getFunds(): array
+    {
+        return $this->funds;
     }
 }

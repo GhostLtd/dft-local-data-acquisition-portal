@@ -1,0 +1,52 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{%- block content -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
+    {%- from "frontend/macros.html.twig" import enumText, text, yesOrNo -%}
+
+    <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme.scheme_details' | trans }}</h2>
+    {{- summaryListStart({classes: 'govuk-!-margin-bottom-7'}) -}}
+    {{- summaryListRow({key: 'frontend.pages.scheme.name' | trans, value: scheme.name ?? '-'}) -}}
+    {{- summaryListRow({key: 'frontend.pages.scheme.description' | trans, value: scheme.description ?? '-'}) -}}
+    {{- summaryListRow({key: 'frontend.pages.scheme.scheme_identifier' | trans, value: scheme.schemeIdentifier ?? '-'}) -}}
+
+    {%- set transportCategory = scheme.transportMode ? scheme.transportMode.category.value : null -%}
+    {%- set transportMode = scheme.transportMode ? scheme.transportMode.value : null -%}
+    {%- set transportCategoryValue = transportCategory ? ("enum.transport_mode.categories.#{transportCategory}" | trans) : null -%}
+    {%- set transportModeValue = transportMode ? ("enum.transport_mode.#{transportMode}" | trans) : null -%}
+    {%- set html -%}
+        {%- if transportModeValue -%}
+            {{ transportCategoryValue }}: {{ transportModeValue }}
+        {%- else -%}
+            {{ '-' }}
+        {%- endif -%}
+    {%- endset -%}
+
+    {{- text('frontend.pages.scheme.transport_mode', html) -}}
+
+    {%- if transportCategory != 'active_travel' -%}
+        {{- enumText('frontend.pages.scheme.has_active_travel_elements', 'enum.active_travel_element', scheme.activeTravelElement) -}}
+    {%- endif -%}
+
+    {{- summaryListRow({key: 'frontend.pages.scheme.funds' | trans, value: scheme.fundsAsString}) -}}
+    {{- summaryListEnd() -}}
+
+    {%- if scheme.hasFundByValue('CRSTS1') -%}
+        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme.crsts.title' | trans }}</h2>
+        {{- summaryListStart({classes: 'govuk-!-margin-bottom-7'}) -}}
+        {{- yesOrNo('frontend.pages.scheme.crsts.is_retained', scheme.crstsData.retained) -}}
+        {{- yesOrNo('frontend.pages.scheme.crsts.previously_tcf', scheme.crstsData.previouslyTcf) -}}
+        {{- summaryListEnd() -}}
+    {%- endif -%}
+
+    <p class="govuk-button-group">
+        <a class="govuk-button" href="{{ path('app_scheme_edit', {authorityId: authority.id, schemeId: scheme.id}) }}">{{ 'frontend.pages.scheme.edit_scheme' | trans }}</a>
+        {% if is_granted('CAN_DELETE_SCHEME', scheme) %}
+            <a class="govuk-button govuk-button--warning" href="{{ path('app_scheme_delete', {authorityId: authority.id, schemeId: scheme.id}) }}">{{ 'frontend.pages.scheme.delete_scheme' | trans }}</a>
+        {% endif %}
+        <a class="govuk-link" href="{{ path('app_schemes_authority', {authorityId: authority.id}) }}">{{ 'frontend.pages.scheme.back_to_schemes' | trans }}</a>
+    </p>
+{%- endblock -%}

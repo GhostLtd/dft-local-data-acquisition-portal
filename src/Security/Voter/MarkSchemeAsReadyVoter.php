@@ -19,7 +19,7 @@ class MarkSchemeAsReadyVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [Role::CAN_MARK_AS_READY, Role::CAN_MARK_AS_NOT_READY]) &&
+        return in_array($attribute, [Role::CAN_MARK_SCHEME_RETURN_AS_READY, Role::CAN_MARK_SCHEME_RETURN_AS_NOT_READY]) &&
             $subject instanceof SchemeReturn;
     }
 
@@ -35,11 +35,11 @@ class MarkSchemeAsReadyVoter extends Voter
         }
 
         /** @var SchemeReturn $subject */
-        if ($attribute === Role::CAN_MARK_AS_READY && !$subject->getReadyForSignoff()) {
+        if ($attribute === Role::CAN_MARK_SCHEME_RETURN_AS_READY && !$subject->getReadyForSignoff()) {
             return true;
         }
 
-        if ($attribute === Role::CAN_MARK_AS_NOT_READY && $subject->getReadyForSignoff()) {
+        if ($attribute === Role::CAN_MARK_SCHEME_RETURN_AS_NOT_READY && $subject->getReadyForSignoff()) {
             return true;
         }
 

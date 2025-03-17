@@ -60,7 +60,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     private ?string $progressUpdate = null; // 4proj_milestones: Progress update (comment)
 
     #[ORM\Embedded(class: BenefitCostRatio::class)]
-    #[Valid(groups: ['scheme_details'])]
+    #[Valid(groups: ['overall_funding'])]
     private ?BenefitCostRatio $benefitCostRatio = null;
 
     /**

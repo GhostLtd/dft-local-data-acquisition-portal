@@ -1,0 +1,15 @@
+{% extends 'frontend/base.html.twig' %}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_delete') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{% block content %}
+    <p class="govuk-body">
+        Deleting the "{{ scheme.name }}" scheme will remove it from all open returns, and delete any entered scheme-related data.
+    </p>
+    <p class="govuk-body">
+        Confirm that you want to delete this scheme. This action cannot be undone.
+    </p>
+
+    {{- form(form) -}}
+{% endblock %}

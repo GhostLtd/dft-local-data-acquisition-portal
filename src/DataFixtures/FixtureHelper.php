@@ -148,13 +148,11 @@ class FixtureHelper
         $scheme = (new Scheme())
             ->setName($definition->getName())
             ->setDescription($definition->getDescription())
-            ->setRisks($definition->getRisks())
             ->setSchemeIdentifier($definition->getSchemeIdentifier())
             ->setActiveTravelElement($definition->getActiveTravelElement())
-            ->setIncludesChargingPoints($definition->getIncludesChargingPoints())
-            ->setIncludesCleanAirElements($definition->getIncludesCleanAirElements())
             ->setTransportMode($definition->getTransportMode())
-            ->setCrstsData($definition->getCrstsData());
+            ->setCrstsData($definition->getCrstsData())
+            ->setFunds($definition->getFunds());
 
         $this->persist([$scheme]);
 
@@ -211,7 +209,7 @@ class FixtureHelper
         $return = (new CrstsSchemeReturn())
             ->setScheme($scheme)
             ->setBenefitCostRatio($bcr)
-
+            ->setRisks($definition->getRisks())
             ->setTotalCost($definition->getTotalCost())
             ->setAgreedFunding($definition->getAgreeFunding())
             ->setOnTrackRating($definition->getOnTrackRating())

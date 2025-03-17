@@ -3,6 +3,7 @@
 namespace App\Repository\FundReturn;
 
 use App\Entity\FundReturn\FundReturn;
+use App\Entity\Scheme;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -29,5 +30,21 @@ class FundReturnRepository extends ServiceEntityRepository
             ->setParameter('id', new Ulid($id), UlidType::NAME)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @param Scheme $scheme
+     * @return array<int, FundReturn>
+     */
+    public function findFundReturnsContainingScheme(Scheme $scheme): array
+    {
+        return $this->createQueryBuilder('fundReturn')
+            ->select('fundReturn, schemeReturn, scheme')
+            ->join('fundReturn.schemeReturns', 'schemeReturn')
+            ->join('schemeReturn.scheme', 'scheme')
+            ->where('scheme.id = :scheme_id')
+            ->setParameter('scheme_id', new Ulid($scheme->getId()), UlidType::NAME)
+            ->getQuery()
+            ->execute();
     }
 }

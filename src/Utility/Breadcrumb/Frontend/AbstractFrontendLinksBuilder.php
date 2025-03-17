@@ -47,6 +47,16 @@ class AbstractFrontendLinksBuilder extends AbstractBreadcrumbAndNavBuilder
             );
         }
 
+        if ($this->security->isGranted(Role::CAN_MANAGE_SCHEMES, $authority)) {
+            $this->addNavLink(
+                'schemes',
+                'app_schemes_authority',
+                routeParameters: ['authorityId' => $authority->getId()],
+                translationKey: 'frontend.pages.dashboard.schemes',
+            );
+        }
+
+
         if ($this->security->isGranted(Role::CAN_CHANGE_AUTHORITY)) {
             $this->addRightNavLink(
                 'change_authority',

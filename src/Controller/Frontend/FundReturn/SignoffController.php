@@ -19,7 +19,7 @@ class SignoffController extends AbstractController
     #[IsGranted(Role::CAN_SIGN_OFF_RETURN, 'fundReturn')]
     #[Route('/fund-return/{fundReturnId}/signoff', name: 'app_fund_return_signoff')]
     #[Template('frontend/fund_return/signoff.html.twig')]
-    public function delete(
+    public function signoff(
         Request                        $request,
         DashboardLinksBuilder          $linksBuilder,
         SignoffFundReturnConfirmAction $signoffFundReturnConfirmAction,
@@ -39,5 +39,4 @@ class SignoffController extends AbstractController
                 $this->generateUrl('app_fund_return', ['fundReturnId' => $fundReturn->getId()])
             );
     }
-
 }

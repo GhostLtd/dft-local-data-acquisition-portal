@@ -9,15 +9,15 @@ use Symfony\Component\Validator\Constraints\NotNull;
 #[ORM\Embeddable]
 class CrstsData
 {
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
+    #[NotNull(message: 'crsts_scheme_fund.is_retained.not_null', groups: ["scheme.crsts1.add", "scheme.crsts1.edit"])]
     private ?bool $retained = null; // 1proj_info: Is this a retained scheme?
 
     #[ORM\Column(nullable: true, enumType: FundedMostlyAs::class)]
-    #[NotNull(message: 'crsts_scheme_fund.funded_mostly_as.not_null', groups: ["scheme_details"])]
     private ?FundedMostlyAs $fundedMostlyAs = FundedMostlyAs::CDEL; // 1proj_info: CDEL or RDEL
 
     #[ORM\Column(nullable: true)]
-    #[NotNull(message: 'crsts_scheme_fund.previously_tcf.not_null', groups: ["scheme_details"])]
+    #[NotNull(message: 'crsts_scheme_fund.previously_tcf.not_null', groups: ["scheme.crsts1.add", "scheme.crsts1.edit"])]
     private ?bool $previouslyTcf = null; // 1proj_info: Was this previously a scheme in the Transporting Cities Fund (TCF)?
 
     public function isRetained(): ?bool
@@ -25,7 +25,7 @@ class CrstsData
         return $this->retained;
     }
 
-    public function setRetained(bool $retained): static
+    public function setRetained(?bool $retained): static
     {
         $this->retained = $retained;
         return $this;

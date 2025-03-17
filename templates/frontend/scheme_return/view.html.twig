@@ -23,7 +23,7 @@
 
         {%- set statusActions = [] -%}
 
-        {%- if is_granted('CAN_MARK_AS_READY', schemeReturn) -%}
+        {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_READY', schemeReturn) -%}
             {%- set statusActions = statusActions|merge([
                 {
                     text: 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans,
@@ -32,7 +32,7 @@
                 }
             ]) -%}
         {%- endif -%}
-        {%- if is_granted('CAN_MARK_AS_NOT_READY', schemeReturn) -%}
+        {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_NOT_READY', schemeReturn) -%}
             {%- set statusActions = statusActions|merge([
                 {
                     text: 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans,
@@ -55,25 +55,9 @@
 
         {%- set contents -%}
             {{- summaryListStart() -}}
-            {{- text('frontend.pages.scheme_return.scheme_id', schemeReturn.scheme.schemeIdentifier) -}}
-            {{- text('frontend.pages.scheme_return.description', schemeReturn.scheme.description) -}}
-            {{- text('frontend.pages.scheme_return.risks', schemeReturn.scheme.risks) -}}
-            {{- yesOrNo('frontend.pages.scheme_return.previously_tcf', schemeReturn.scheme.crstsData.previouslyTcf) -}}
-            {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.benefitCostRatio) }}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.main_details' | trans,
-            'scheme_details',
-            contents
-        ) -}}
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
             {{- money('frontend.pages.scheme_return.total_cost', schemeReturn.totalCost) -}}
             {{- money('frontend.pages.scheme_return.agreed_funding', schemeReturn.agreedFunding) -}}
+            {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.benefitCostRatio) }}
             {{- summaryListEnd() -}}
         {%- endset -%}
 
@@ -81,38 +65,6 @@
             schemeReturn,
             'frontend.pages.scheme_return.titles.overall_funding' | trans,
             'overall_funding',
-            contents
-        ) -}}
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-
-            {%- set transportCategory = schemeReturn.scheme.transportMode ? schemeReturn.scheme.transportMode.category.value : null -%}
-            {%- set transportMode = schemeReturn.scheme.transportMode ? schemeReturn.scheme.transportMode.value : null -%}
-            {%- set transportCategoryValue = transportCategory ? ("enum.transport_mode.categories.#{transportCategory}" | trans) : null -%}
-            {%- set transportModeValue = transportMode ? ("enum.transport_mode.#{transportMode}" | trans) : null -%}
-            {%- set html -%}
-                {%- if transportModeValue -%}
-                    {{ transportCategoryValue }}: {{ transportModeValue }}
-                {%- else -%}
-                    {{ '-' }}
-                {%- endif -%}
-            {%- endset -%}
-
-            {{- text('frontend.pages.scheme_return.transport_mode', html) -}}
-
-            {%- if transportCategory != 'active_travel' -%}
-                {{- enumText('frontend.pages.scheme_return.has_active_travel_elements', 'enum.active_travel_element', schemeReturn.scheme.activeTravelElement) -}}
-            {%- endif -%}
-            {{- yesOrNo('frontend.pages.scheme_return.includes_charging_points', schemeReturn.scheme.includesChargingPoints) -}}
-            {{- yesOrNo('frontend.pages.scheme_return.includes_clean_air_elements', schemeReturn.scheme.includesCleanAirElements) -}}
-            {{- summaryListEnd() -}}
-        {%- endset %}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.transport_mode' | trans,
-            'transport_mode',
             contents
         ) -}}
 
@@ -127,6 +79,7 @@
             {{- summaryListStart() -}}
             {{- onTrackRating('frontend.pages.scheme_return.on_track_rating', schemeReturn.onTrackRating) }}
             {{- text('frontend.pages.scheme_return.progress_update', schemeReturn.progressUpdate) }}
+            {{- text('frontend.pages.scheme_return.risks', schemeReturn.risks) -}}
             {{- summaryListEnd() -}}
         {%- endset -%}
 
@@ -175,14 +128,14 @@
     {%- set sections = [] -%}
 
     {%- set expensesTitle = 'frontend.pages.scheme_return.titles.expenses' | trans -%}
-    {%- if is_granted('CAN_VIEW_SCHEME_EXPENSES', schemeReturn) -%}
+    {%- if is_granted('CAN_VIEW_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
         {%- from "frontend/macros.html.twig" import renderTable -%}
         {%- for division in expenseDivisions -%}
             {%- set divisionConfiguration = schemeReturn.findDivisionConfigurationByKey(division.key) -%}
             {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
             {%- set contents -%}
                 {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
-                {%- if is_granted('CAN_EDIT_SCHEME_EXPENSES', schemeReturn) -%}
+                {%- if is_granted('CAN_EDIT_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
                     {%- set url = section_edit_path(schemeReturn, division.key, true) -%}
                     <div class="expenses-links">
                         <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>

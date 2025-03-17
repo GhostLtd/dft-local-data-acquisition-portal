@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Enum\ActiveTravelElement;
+use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
 use App\Entity\Enum\TransportModeCategory;
 use App\Entity\SchemeData\CrstsData;
@@ -26,41 +27,33 @@ class Scheme
     private ?Authority $authority = null;
 
     #[ORM\Column(length: 255)]
-    #[NotBlank(message: 'scheme.name.not_blank', groups: ["scheme_details"])]
+    #[NotBlank(message: 'scheme.name.not_blank', groups: ["scheme.add", "scheme.edit"])]
     private ?string $name = null; // 1proj_info: Scheme name
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[NotBlank(message: 'scheme.description.not_blank', groups: ["scheme_details"])]
+    #[NotBlank(message: 'scheme.description.not_blank', groups: ["scheme.add", "scheme.edit"])]
     private ?string $description = null; // 1proj_info: Scheme description
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[NotBlank(message: 'scheme.description.not_blank', groups: ["scheme_details"])]
-    private ?string $risks = null; // josh_4/2: Scheme level risks
-
     #[ORM\Column(nullable: true, enumType: TransportMode::class)]
-    #[NotNull(message: 'scheme.transport_mode.not_null', groups: ["scheme_transport_mode"])]
+    #[NotNull(message: 'scheme.transport_mode.not_null', groups: ["scheme.add", "scheme.edit"])]
     private ?TransportMode $transportMode = null; // 1proj_info: Transport mode
 
     #[ORM\Column(nullable: true, enumType: ActiveTravelElement::class)]
     private ?ActiveTravelElement $activeTravelElement = null; // 1proj_info: Does this scheme have active travel elements?
 
-    #[ORM\Column(nullable: true)]
-    #[NotNull(message: 'scheme.includes_clean_air_elements.not_null', groups: ["scheme_transport_mode"])]
-    private ?bool $includesCleanAirElements = null; // 1proj_info: Will this scheme include clean air elements?
-
-    #[ORM\Column(nullable: true)]
-    #[NotNull(message: 'scheme.includes_charging_points.not_null', groups: ["scheme_transport_mode"])]
-    private ?bool $includesChargingPoints = null; // 1proj_info: Will this scheme include charging points for electric vehicles?
-
     #[ORM\Column(length: 255, nullable: true)]
-    #[NotBlank(message: 'scheme.identifier.not_blank', groups: ["scheme_details"])]
+    #[NotNull(message: 'scheme.identifier.not_blank', groups: ["scheme.add", "scheme.edit"])]
     private ?string $schemeIdentifier = null; // 1proj_info: Scheme ID
 
     #[ORM\Embedded]
-    #[Valid(groups: ["scheme_details"])]
-    private CrstsData $crstsData; // 1proj_info
+    #[Valid(groups: ["scheme.crsts1.add", "scheme.crsts1.edit"])]
+    private CrstsData $crstsData;
 
-    #[Callback(groups: ['scheme_transport_mode'])]
+    #[ORM\Column]
+    /** @var $funds array<int, string> */
+    private array $funds = []; // e.g. CRSTS, BSIP
+
+    #[Callback(groups: ["scheme.add", "scheme.edit"])]
     public function validateActiveTravel(ExecutionContextInterface $context): void
     {
         if (!$this->transportMode ||
@@ -77,6 +70,7 @@ class Scheme
 
     public function __construct()
     {
+        $this->crstsData = new CrstsData();
     }
 
     public function getAuthority(): ?Authority
@@ -112,17 +106,6 @@ class Scheme
         return $this;
     }
 
-    public function getRisks(): ?string
-    {
-        return $this->risks;
-    }
-
-    public function setRisks(?string $risks): static
-    {
-        $this->risks = $risks;
-        return $this;
-    }
-
     public function getTransportMode(): ?TransportMode
     {
         return $this->transportMode;
@@ -142,28 +125,6 @@ class Scheme
     public function setActiveTravelElement(?ActiveTravelElement $activeTravelElement): Scheme
     {
         $this->activeTravelElement = $activeTravelElement;
-        return $this;
-    }
-
-    public function includesCleanAirElements(): ?bool
-    {
-        return $this->includesCleanAirElements;
-    }
-
-    public function setIncludesCleanAirElements(?bool $includesCleanAirElements): static
-    {
-        $this->includesCleanAirElements = $includesCleanAirElements;
-        return $this;
-    }
-
-    public function includesChargingPoints(): ?bool
-    {
-        return $this->includesChargingPoints;
-    }
-
-    public function setIncludesChargingPoints(?bool $includesChargingPoints): static
-    {
-        $this->includesChargingPoints = $includesChargingPoints;
         return $this;
     }
 
@@ -189,5 +150,61 @@ class Scheme
         return $this;
     }
 
+    /**
+     * @return array<int, Fund>
+     */
+    public function getFunds(): array
+    {
+        return array_map(fn(string $fund) => Fund::from($fund), $this->funds);
+    }
+
+    public function setFunds(array $funds): static
+    {
+        foreach(Fund::cases() as $fund) {
+            if (in_array($fund, $funds)) {
+                $this->addFund($fund);
+            } else {
+                $this->removeFund($fund);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addFund(Fund $fund): static
+    {
+        if (!in_array($fund->value, $this->funds)) {
+            $this->funds[] = $fund->value;
+        }
+
+        return $this;
+    }
+
+    public function removeFund(Fund $fund): static
+    {
+        foreach($this->funds as $key => $fundValue) {
+            if ($fundValue === $fund->value) {
+                unset($this->funds[$key]);
+            }
+        }
+
+        return $this;
+    }
+
     // --------------------------------------------------------------------------------
+
+    public function fundsAsString(): string
+    {
+        return empty($this->funds) ? '-' : join(', ', $this->funds);
+    }
+
+    public function hasFundByValue(string $fundValue): bool
+    {
+        return $this->hasFund(Fund::from($fundValue));
+    }
+
+    public function hasFund(Fund $fund): bool
+    {
+        return in_array($fund->value, $this->funds);
+    }
 }

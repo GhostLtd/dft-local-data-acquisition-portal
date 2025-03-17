@@ -5,8 +5,7 @@ namespace App\Entity\Enum;
 enum TransportMode: string
 {
     // Multi-modal
-    case MM_INTERCHANGE_OR_TRAVEL_HUB_WITH_ACTIVE_TRAVEL = "multi_modal.interchange_with_active_travel";
-    case MM_INTERCHANGE_OR_TRAVEL_HUB_WITHOUT_ACTIVE_TRAVEL = "multi_modal.interchange_without_active_travel";
+    case MM_INTERCHANGE_OR_TRAVEL_HUB = "multi_modal.interchange";
     case MM_BUS_AND_ACTIVE_TRAVEL_CORRIDOR = "multi_modal.bus_and_active_travel_corridor";
     case MM_TRAFFIC_REDUCTION_OR_MODAL_SHIFT = "multi_modal.traffic_reduction";
     case MM_OTHER = "multi_modal.other";

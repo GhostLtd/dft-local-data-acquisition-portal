@@ -70,6 +70,7 @@ enum:
     ssp: "Capital (CDEL) spend, {fund}"
     ssa: "Capital (CDEL) spend, all sources"
   fund:
+    BSIP: BSIP
     CRSTS1: CRSTS
     CRSTS2: CRSTS2
   funded_mostly_as:
@@ -126,8 +127,7 @@ enum:
       road: Road / Highways maintenance
       other: Other
     multi_modal:
-      interchange_with_active_travel: Interchange or travel hub, with Active Travel elements
-      interchange_without_active_travel: Interchange or travel hub, without Active Travel elements
+      interchange: Interchange or travel hub
       bus_and_active_travel_corridor: Bus & Active Travel corridor
       traffic_reduction: Traffic reduction / modal shift
       other: Other
@@ -285,23 +285,6 @@ forms:
       overall_confidence:
         label: Overall confidence rating
         details: View guidance
-    scheme_details:
-      benefit_cost_ratio:
-        label: &sr_benefit_cost_ratio Benefit-cost ratio
-      description:
-        label: &sr_scheme_description Scheme description
-        help: ''
-      name:
-        label: Scheme name
-        help: ''
-      previously_tcf:
-        label: Was this previously a scheme in Transporting Cities Fund (TCF)?
-        help: ''
-      risks:
-        label: &sr_scheme_risks Scheme risks
-        help: ''
-      scheme_identifier:
-        label: &sr_scheme_identifier Scheme ID
 
   scheme:
     mark_as_ready_for_signoff:
@@ -332,12 +315,35 @@ forms:
         label: &sr_expected_business_case_approval Expected date of approval for current business case
         help: ''
     milestone_progress:
-      progress_update:
-        label: &sr_progress_update Progress update
-        help: ''
       on_track_rating:
         label: &sr_on_track_rating On-track rating
         help: ''
+      progress_update:
+        label: &sr_progress_update Progress update
+        help: ''
+      risks:
+        label: &sr_scheme_risks Scheme risks
+        help: ''
+    scheme:
+      description:
+        label: Description
+        help: ''
+      funds:
+        label: Funds
+        help: Which funds does this scheme receive funding from?
+      scheme_identifier:
+        label: Scheme ID
+        help: ''
+      name:
+        label: Name
+        help: ''
+      crsts:
+        is_retained:
+          label: Is this scheme a retained scheme?
+          help: ''
+        previously_tcf:
+          label: Was this previously a scheme in Transporting Cities Fund (TCF)?
+          help: ''
     transport_mode:
       category:
         label: &sr_transport_mode Transport mode
@@ -371,12 +377,6 @@ forms:
         label: Active travel element
         help: Pick the leading active travel intervention type
         placeholder: Please select an active travel element
-      includes_charging_points:
-        label: Does this scheme include charging points for electric vehicles?
-        help: ''
-      includes_clean_air_elements:
-        label: Does this scheme include clean air elements?
-        help: ''
   user:
     permission:
       label: User permissions
@@ -412,6 +412,7 @@ frontend:
       breadcrumb: "{authorityName}"
       fund_title: "{fundName}: {year}/{nextYear} Q{quarter}"
       home: Home
+      schemes: Schemes
       users: Users
       no_authorities: No authorities are accessible to you
     home:
@@ -438,11 +439,42 @@ frontend:
       confirmed-notification:
         heading: "{fund} return submitted"
         content: "The {fund} return for {year}/{nextYear} Q{quarter} has been signed-off and submitted"
+    schemes:
+      title: &schemes_title "Schemes for {authorityName}"
+      add_scheme: Add scheme
+      breadcrumb: *schemes_title
+    scheme:
+      breadcrumb: "{schemeName}"
+      back_to_schemes: Back to schemes
+      crsts:
+        title: CRSTS details
+        is_retained: Is retained?
+        previously_tcf: Previously a scheme in TCF?
+      edit_scheme: Edit scheme
+      description: Description
+      funds: Funds
+      has_active_travel_elements: Active travel elements?
+      name: Name
+      scheme_details: Scheme details
+      scheme_identifier: Scheme ID
+      transport_mode: *sr_transport_mode
+      delete_scheme: Delete scheme
+    scheme_add:
+      title: &scheme_add_title Add scheme
+      breadcrumb: *scheme_add_title
+    scheme_delete:
+      title: &scheme_delete_title Delete scheme
+      breadcrumb: *scheme_delete_title
+      confirmed-notification:
+        heading: Scheme deleted
+        content: "The {schemeName} scheme has been deleted"
+    scheme_edit:
+      title: &scheme_edit_title Edit scheme
+      breadcrumb: *scheme_edit_title
     scheme_return:
       title: "{schemeName}"
       titles:
         expenses: Expenses
-        main_details: Main details
         milestones: Milestones
         milestone_business_case: Business case
         milestone_dates: Dates
@@ -450,18 +482,14 @@ frontend:
         overall_funding: Overall funding
         scheme_details: Scheme details
         status: Status
-        transport_mode: Transport mode
       agreed_funding: *sr_agreed_funding
       back_to_fund_return: "Back to {fundName} return"
-      benefit_cost_ratio: *sr_benefit_cost_ratio
+      benefit_cost_ratio: Benefit-cost ratio
       current_business_case: *sr_current_business_case
-      description: *sr_scheme_description
+      description: Scheme description
       expected_business_case_approval: *sr_expected_business_case_approval
       expenses_not_required: >-
         Not required: non-retained schemes need only submit expenses data in Q4.
-      has_active_travel_elements: Active travel elements?
-      includes_charging_points: Charging points for EVs?
-      includes_clean_air_elements: Clean air elements?
       mark_as_ready_for_signoff: Mark scheme as ready for sign-off
       on_track_rating: *sr_on_track_rating
       previously_tcf: Previously a scheme in TCF?
@@ -469,9 +497,8 @@ frontend:
       ready_for_signoff: Is ready for signoff?
       retained: Is retained?
       risks: *sr_scheme_risks
-      scheme_id: *sr_scheme_identifier
+      scheme_id: Scheme ID
       total_cost: *sr_total_cost
-      transport_mode: *sr_transport_mode
       unmark_as_ready_for_signoff: Unmark scheme as ready for sign-off
     scheme_mark_as_not_ready_for_signoff:
       breadcrumb: Mark as not ready for signoff
@@ -525,7 +552,6 @@ sections:
     milestone_dates: Milestone dates
     milestone_progress: Milestone progress
     overall_funding: Overall funding totals
-    scheme_details: Scheme details
     transport_mode: Transport mode
 
 site.title: Data acquisition portal

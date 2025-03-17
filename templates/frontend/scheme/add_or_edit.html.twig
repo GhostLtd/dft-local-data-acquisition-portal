@@ -1,0 +1,8 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title_key = "frontend.pages.scheme_#{form.vars.data.id ? 'edit' : 'add'}.title" -%}
+{%- set page_title_params = {schemeName: scheme.name} %}
+
+{%- block content -%}
+    {{ form(form) }}
+{%- endblock -%}

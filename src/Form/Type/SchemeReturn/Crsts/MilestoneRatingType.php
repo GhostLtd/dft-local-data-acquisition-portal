@@ -30,7 +30,13 @@ class MilestoneRatingType extends AbstractType
                 'label' => "forms.scheme.milestone_progress.progress_update.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
                 'help' => "forms.scheme.milestone_progress.progress_update.help",
-            ]);
+            ])
+            ->add('risks', TextareaType::class, [
+                'label' => 'forms.scheme.milestone_progress.risks.label',
+                'label_attr' => ['class' => 'govuk-label--s'],
+                'help' => 'forms.scheme.milestone_progress.risks.help',
+            ])
+        ;
     }
 
     public function getParent(): string

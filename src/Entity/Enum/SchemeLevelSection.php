@@ -7,18 +7,14 @@ use App\Form\Type\SchemeReturn\Crsts\MilestoneBusinessCaseType;
 use App\Form\Type\SchemeReturn\Crsts\MilestoneDatesType;
 use App\Form\Type\SchemeReturn\Crsts\MilestoneRatingType;
 use App\Form\Type\SchemeReturn\Crsts\OverallFundingType;
-use App\Form\Type\SchemeReturn\Crsts\SchemeDetailsType;
-use App\Form\Type\SchemeReturn\Crsts\SchemeTransportModeType;
 
 // N.B. Not used in the database, but rather as keys + translation keys for scheme-level returns
 enum SchemeLevelSection: string
 {
-    case SCHEME_DETAILS = 'scheme_details'; // e.g. name, description, id, retained, cdel/rdel
-    case TRANSPORT_MODE = 'transport_mode';
-    case OVERALL_FUNDING = 'overall_funding'; // total scheme cost, agreed crsts funding
+    case OVERALL_FUNDING = 'overall_funding'; // total scheme cost, agreed crsts funding, bcr
     case MILESTONE_DATES = 'milestone_dates'; // start/end dev/construction, final delivery
     case MILESTONE_BUSINESS = 'milestone_business_case'; // business case state + dates
-    case MILESTONE_PROGRESS = 'milestone_progress'; // rating and progress update
+    case MILESTONE_PROGRESS = 'milestone_progress'; // rating, progress update, and scheme risks
 
     /**
      * @return array<SchemeLevelSectionConfiguration>
@@ -27,8 +23,6 @@ enum SchemeLevelSection: string
     {
         return match($fund) {
             Fund::CRSTS1 => [
-                new SchemeLevelSectionConfiguration(self::SCHEME_DETAILS, SchemeDetailsType::class),
-                new SchemeLevelSectionConfiguration(self::TRANSPORT_MODE, SchemeTransportModeType::class),
                 new SchemeLevelSectionConfiguration(self::OVERALL_FUNDING, OverallFundingType::class, displayGroup: SectionDisplayGroup::EXPENSES),
                 new SchemeLevelSectionConfiguration(self::MILESTONE_DATES, MilestoneDatesType::class, displayGroup: SectionDisplayGroup::MILESTONES),
                 new SchemeLevelSectionConfiguration(self::MILESTONE_BUSINESS, MilestoneBusinessCaseType::class, displayGroup: SectionDisplayGroup::MILESTONES),

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Validator\Constraint as AppAssert;
 
 #[ORM\Embeddable]
-#[AppAssert\BenefitCostRatio(precision: 10, scale: 2, groups: ['scheme_details'])]
+#[AppAssert\BenefitCostRatio(precision: 10, scale: 2, groups: ['overall_funding'])]
 class BenefitCostRatio
 {
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
