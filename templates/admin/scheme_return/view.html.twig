@@ -1,0 +1,15 @@
+{%- extends 'admin/base.html.twig' -%}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+{%- set current_menu = 'authority' -%}
+
+{%- block content -%}
+    {{- block ('viewSchemeReturn', 'frontend/scheme_return/view.html.twig') -}}
+
+    <p class="govuk-body">
+        <a href="{{ path('admin_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">
+            {{- 'frontend.pages.scheme_return.back_to_fund_return' | trans({fundName: "enum.fund.#{fundReturn.fundAward.type.name}" | trans}) -}}
+        </a>
+    </p>
+{%- endblock -%}

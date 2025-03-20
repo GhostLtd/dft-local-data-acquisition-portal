@@ -6,9 +6,9 @@ use App\DataFixtures\FixtureHelper;
 use App\DataFixtures\RandomFixtureGenerator;
 use App\Entity\Authority;
 use App\Entity\FundReturn\CrstsFundReturn;
-use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Form\Type\Admin\AuthorityType;
 use App\ListPage\AuthorityListPage;
+use App\Repository\UserRepository;
 use App\Utility\FinancialQuarter;
 use App\Utility\SampleReturnGenerator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,6 +42,15 @@ class AuthorityController extends AbstractController
         return $this->render('admin/authority/list.html.twig', [
             'data' => $listPage->getData(),
             'form' => $listPage->getFiltersForm(),
+        ]);
+    }
+
+    #[Route(path: '/{id}/view', name: '_view')]
+    public function view(Authority $authority, UserRepository $userRepository): Response
+    {
+        return $this->render('admin/authority/view.html.twig', [
+            'authority' => $authority,
+            'users' => $userRepository->findAllForAuthority($authority),
         ]);
     }
 

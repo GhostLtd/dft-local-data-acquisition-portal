@@ -13,6 +13,7 @@ abstract class AbstractBreadcrumbAndNavBuilder extends AbstractLinksBuilder
         ?string                           $translationKey = null,
         array                             $translationParameters = [],
         null|string|TranslatableInterface $text = null,
+        ?string                           $hash = null,
     ): void {
         $this->addLink('breadcrumbs', ...func_get_args());
     }
@@ -32,6 +33,7 @@ abstract class AbstractBreadcrumbAndNavBuilder extends AbstractLinksBuilder
         ?string                           $translationKey = null,
         array                             $translationParameters = [],
         null|string|TranslatableInterface $text = null,
+        ?string                           $hash = null,
     ): void {
         $this->addLink('nav', ...func_get_args());
     }
@@ -59,6 +61,7 @@ abstract class AbstractBreadcrumbAndNavBuilder extends AbstractLinksBuilder
         ?string                           $translationKey = null,
         array                             $translationParameters = [],
         null|string|TranslatableInterface $text = null,
+        ?string                           $hash = null,
     ): void {
         $this->addLink('right_nav', ...func_get_args());
     }

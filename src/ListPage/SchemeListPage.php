@@ -107,4 +107,10 @@ class SchemeListPage extends AbstractListPage
             Simple::generateId('Name') => 'ASC',
         ];
     }
+
+    public function setRouteName(string $routeName): static
+    {
+        $this->routeName = $routeName;
+        return $this;
+    }
 }

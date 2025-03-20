@@ -14,8 +14,8 @@
     {%- for authority in data.entities -%}
         {%- set actions = [
             {
-                href: path('admin_authority_edit', {id: authority.id}),
-                text: 'authority.list.edit' | trans,
+                href: path('admin_authority_view', {id: authority.id}),
+                text: 'authority.list.view' | trans,
             },
         ] -%}
         {{- tableRow([

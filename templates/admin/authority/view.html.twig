@@ -1,0 +1,64 @@
+{% extends 'admin/base.html.twig' %}
+
+{% trans_default_domain 'admin' %}
+{%- set page_title_key = "pages.authority_view.title" -%}
+{%- set page_title_params = {
+    name: authority.name
+} -%}
+{%- set current_menu = 'authority' -%}
+
+{% block content %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tabs -%}
+    {{- tabs({
+        items: [
+            {id: 'mca-details', label: 'Details', panel: {html: _self.detailsContent(authority)}},
+            {id: 'mca-users', label: 'Users', panel: {html: _self.usersContent(users)}},
+            {id: 'mca-returns', label: 'Returns', panel: {html: _self.returnsContent(authority.fundAwards)}},
+        ]
+    }) -}}
+{% endblock %}
+
+{%- macro detailsContent(authority) -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList -%}
+    {{- summaryList({
+        rows: {
+            'name': authority.name,
+            'admin.name': authority.admin.name,
+            'admin.email': authority.admin.email,
+            'admin.position': authority.admin.position,
+            'admin.phone': authority.admin.phone,
+        } | map ((v,k) => {
+            key: {text: "pages.authority_view.details.#{k}" | trans},
+            value: v is iterable ? v : {text: _self.textValue(v)}
+        })
+    }) -}}
+{%- endmacro -%}
+
+{%- macro textValue(value) -%}
+    {{- ((value is empty) ? '-' : value) | nl2br -}}
+{%- endmacro -%}
+
+{%- macro usersContent(users) -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import table -%}
+    {# @var u \App\Entity\User #}
+    {{- table({
+        head: ['Name', 'Email', 'Permissions'] | map(i => {text: i}),
+        rows: users | map(u => [
+            {text: u.name},
+            {text: u.email},
+            {text: u.permissions | map(p => _self.permission(p)) | join (', ') | default('MCA Admin')}
+        ])
+    }) -}}
+{%- endmacro -%}
+
+{%- macro permission(permission) -%}
+    {# @var permission \App\Entity\UserPermission #}
+    {{- "enum.permission.#{permission.permission.name}" | trans({}, 'messages') -}}
+{%- endmacro -%}
+
+{% macro returnsContent(fundAwards) %}
+    {% from 'frontend/authority_macros.html.twig' import returnTaskList %}
+    {%- for fundAward in fundAwards -%}
+        {{- returnTaskList(fundAward, 'admin_fund_return') -}}
+    {%- endfor -%}
+{% endmacro %}

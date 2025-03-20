@@ -1,0 +1,10 @@
+{%- extends 'admin/base.html.twig' -%}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('fund_return') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+{%- set current_menu = 'authority' -%}
+
+{%- block content -%}
+    {% set schemeViewRoute = 'admin_scheme_return' %}
+    {{- block ('viewFundReturn', 'frontend/fund_return/view.html.twig') -}}
+{%- endblock -%}

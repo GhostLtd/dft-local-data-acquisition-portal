@@ -23,7 +23,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ViewController extends AbstractController
 {
     public function __construct(
-        protected DashboardLinksBuilder $linksBuilder,
         protected SchemeRepository      $schemeRepository,
     ) {}
 
@@ -36,9 +35,10 @@ class ViewController extends AbstractController
         ExpensesTableCalculator $expensesTableCalculator,
         Request                 $request,
         SchemeListPage          $schemeListPage,
+        DashboardLinksBuilder   $linksBuilder,
     ): Response
     {
-        $this->linksBuilder->setAtFundReturn($fundReturn);
+        $linksBuilder->setAtFundReturn($fundReturn);
         $fund = $fundReturn->getFund();
         $schemeFunds = $this->getSchemesForFund($fundReturn, $fund);
 
@@ -54,8 +54,8 @@ class ViewController extends AbstractController
             ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
-        return $this->render('frontend/fund_return/view.html.twig', [
-            'linksBuilder' => $this->linksBuilder,
+        return $this->render($request->attributes->get('template', 'frontend/fund_return/view.html.twig'), [
+            'linksBuilder' => $linksBuilder,
             'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
             'fundLevelSections' => FundLevelSection::filterForFund($fund),
             'fundReturn' => $fundReturn,

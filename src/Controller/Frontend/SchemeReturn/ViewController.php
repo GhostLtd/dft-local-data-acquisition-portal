@@ -12,6 +12,7 @@ use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,6 +20,7 @@ class ViewController extends AbstractController
 {
     #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}', name: 'app_scheme_return')]
     public function view(
+        Request $request,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn              $fundReturn,
         #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
@@ -39,7 +41,7 @@ class ViewController extends AbstractController
             ->setRowGroupConfigurations(CrstsHelper::getSchemeExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
-        return $this->render('frontend/scheme_return/view.html.twig', [
+        return $this->render($request->attributes->get('template', 'frontend/scheme_return/view.html.twig'), [
             'linksBuilder' => $linksBuilder,
             'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
             'expensesTableHelper' => $expensesTableHelper,

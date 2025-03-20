@@ -10,6 +10,15 @@ pages:
     title: Add MCA
   authority_edit:
     title: Edit MCA
+  authority_view:
+    title: "MCA details: {name}"
+    details:
+      name: Name
+      admin:
+        name: Admin name
+        email: Admin email
+        position: Admin position
+        phone: Admin phone
   maintenance:
     title: Maintenance warnings
   maintenance_add:
@@ -24,6 +33,7 @@ authority:
     add: Add MCA
     delete: Delete
     edit: Edit
+    view: View
     no_results: No results
   form:
     name: Authority name

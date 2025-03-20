@@ -4,164 +4,167 @@
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
-    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-    {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
+    {%- block viewSchemeReturn -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
+        {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
 
-    {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
+        {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
 
-    {# @var schemeReturn \App\Entity\SchemeReturn\CrstsSchemeReturn #}
+        {# @var schemeReturn \App\Entity\SchemeReturn\CrstsSchemeReturn #}
 
-    <div class="govuk-!-margin-bottom-9">
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.scheme_details' | trans }}</h2>
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.scheme.crstsData.retained) }}
-            {{- yesOrNo('frontend.pages.scheme_return.ready_for_signoff', schemeReturn.readyForSignoff) }}
-            {{- summaryListEnd() -}}
-        {%- endset %}
-
-        {%- set statusActions = [] -%}
-
-        {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_READY', schemeReturn) -%}
-            {%- set statusActions = statusActions|merge([
-                {
-                    text: 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans,
-                    visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
-                    href: path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
-                }
-            ]) -%}
-        {%- endif -%}
-        {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_NOT_READY', schemeReturn) -%}
-            {%- set statusActions = statusActions|merge([
-                {
-                    text: 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans,
-                    visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
-                    href: path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
-                }
-            ]) -%}
-        {%- endif -%}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.status' | trans,
-            'status',
-            contents,
-            {
-                add_edit_link: false,
-                actions: statusActions,
-            },
-        ) -}}
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- money('frontend.pages.scheme_return.total_cost', schemeReturn.totalCost) -}}
-            {{- money('frontend.pages.scheme_return.agreed_funding', schemeReturn.agreedFunding) -}}
-            {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.benefitCostRatio) }}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.overall_funding' | trans,
-            'overall_funding',
-            contents
-        ) -}}
-
-    {#- MILESTONES ------------------------------------------------------------------------------------------------ -#}
-
-    {%- set configs = [] -%}
-
-    <div class="govuk-!-margin-bottom-9">
-        <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.milestones' | trans }}</h2>
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- onTrackRating('frontend.pages.scheme_return.on_track_rating', schemeReturn.onTrackRating) }}
-            {{- text('frontend.pages.scheme_return.progress_update', schemeReturn.progressUpdate) }}
-            {{- text('frontend.pages.scheme_return.risks', schemeReturn.risks) -}}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.milestone_progress' | trans,
-            'milestone_progress',
-            contents
-        ) -}}
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {%- for milestone in schemeReturn.milestones -%}
-                {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value})) -%}
-                {{- date(label, milestone.date, {translateLabel: false}) -}}
-            {%- endfor -%}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.milestone_dates' | trans,
-            'milestone_dates',
-            contents
-        ) -}}
-
-        {%- set contents -%}
-            {{- summaryListStart() -}}
-            {{- enumText('frontend.pages.scheme_return.current_business_case', 'enum.business_case', schemeReturn.businessCase) -}}
-            {%- if schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable' -%}
-                {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval) -}}
-            {%- endif -%}
-            {{- summaryListEnd() -}}
-        {%- endset -%}
-
-        {{- displayCardForReturn(
-            schemeReturn,
-            'frontend.pages.scheme_return.titles.milestone_business_case' | trans,
-            'milestone_business_case',
-            contents
-        ) -}}
-    </div>
-
-    {#- EXPENSES -------------------------------------------------------------------------------------------------- -#}
-
-    {%- set sections = [] -%}
-
-    {%- set expensesTitle = 'frontend.pages.scheme_return.titles.expenses' | trans -%}
-    {%- if is_granted('CAN_VIEW_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
-        {%- from "frontend/macros.html.twig" import renderTable -%}
-        {%- for division in expenseDivisions -%}
-            {%- set divisionConfiguration = schemeReturn.findDivisionConfigurationByKey(division.key) -%}
-            {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
-            {%- set contents -%}
-                {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
-                {%- if is_granted('CAN_EDIT_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
-                    {%- set url = section_edit_path(schemeReturn, division.key, true) -%}
-                    <div class="expenses-links">
-                        <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
-                    </div>
-                {%- endif -%}
-                {{- renderTable(table) -}}
-                {{- expenseDivisionComments(schemeReturn, division) -}}
-            {%- endset -%}
-            {%- set sections = sections|merge([{
-                label: division.label | trans,
-                id: 'expenses-' ~ division.key,
-                panel: {html: contents},
-            }]) -%}
-        {%- endfor -%}
-
-        {{- displaySectionsAsTabs(sections, expensesTitle) -}}
-    {%- else -%}
         <div class="govuk-!-margin-bottom-9">
-            <h2 class="govuk-heading-m">{{ expensesTitle }}</h2>
-            <p class="govuk-body">{{ 'frontend.pages.scheme_return.expenses_not_required' | trans }}</p>
+            <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.scheme_details' | trans }}</h2>
+
+            {%- set contents -%}
+                {{- summaryListStart() -}}
+                {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.scheme.crstsData.retained) }}
+                {{- yesOrNo('frontend.pages.scheme_return.ready_for_signoff', schemeReturn.readyForSignoff) }}
+                {{- summaryListEnd() -}}
+            {%- endset %}
+
+            {%- set statusActions = [] -%}
+
+            {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_READY', schemeReturn) -%}
+                {%- set statusActions = statusActions|merge([
+                    {
+                        text: 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans,
+                        visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
+                        href: path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
+                    }
+                ]) -%}
+            {%- endif -%}
+            {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_NOT_READY', schemeReturn) -%}
+                {%- set statusActions = statusActions|merge([
+                    {
+                        text: 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans,
+                        visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
+                        href: path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
+                    }
+                ]) -%}
+            {%- endif -%}
+
+            {{- displayCardForReturn(
+                schemeReturn,
+                'frontend.pages.scheme_return.titles.status' | trans,
+                'status',
+                contents,
+                {
+                    add_edit_link: false,
+                    actions: statusActions,
+                },
+            ) -}}
+
+            {%- set contents -%}
+                {{- summaryListStart() -}}
+                {{- money('frontend.pages.scheme_return.total_cost', schemeReturn.totalCost) -}}
+                {{- money('frontend.pages.scheme_return.agreed_funding', schemeReturn.agreedFunding) -}}
+                {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.benefitCostRatio) }}
+                {{- summaryListEnd() -}}
+            {%- endset -%}
+
+            {{- displayCardForReturn(
+                schemeReturn,
+                'frontend.pages.scheme_return.titles.overall_funding' | trans,
+                'overall_funding',
+                contents
+            ) -}}
+
+            {#- MILESTONES ------------------------------------------------------------------------------------------------ -#}
+
+            {%- set configs = [] -%}
+
+            <div class="govuk-!-margin-bottom-9">
+                <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.milestones' | trans }}</h2>
+
+                {%- set contents -%}
+                    {{- summaryListStart() -}}
+                    {{- onTrackRating('frontend.pages.scheme_return.on_track_rating', schemeReturn.onTrackRating) }}
+                    {{- text('frontend.pages.scheme_return.progress_update', schemeReturn.progressUpdate) }}
+                    {{- text('frontend.pages.scheme_return.risks', schemeReturn.risks) -}}
+                    {{- summaryListEnd() -}}
+                {%- endset -%}
+
+                {{- displayCardForReturn(
+                    schemeReturn,
+                    'frontend.pages.scheme_return.titles.milestone_progress' | trans,
+                    'milestone_progress',
+                    contents
+                ) -}}
+
+                {%- set contents -%}
+                    {{- summaryListStart() -}}
+                    {%- for milestone in schemeReturn.milestones -%}
+                        {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value})) -%}
+                        {{- date(label, milestone.date, {translateLabel: false}) -}}
+                    {%- endfor -%}
+                    {{- summaryListEnd() -}}
+                {%- endset -%}
+
+                {{- displayCardForReturn(
+                    schemeReturn,
+                    'frontend.pages.scheme_return.titles.milestone_dates' | trans,
+                    'milestone_dates',
+                    contents
+                ) -}}
+
+                {%- set contents -%}
+                    {{- summaryListStart() -}}
+                    {{- enumText('frontend.pages.scheme_return.current_business_case', 'enum.business_case', schemeReturn.businessCase) -}}
+                    {%- if schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable' -%}
+                        {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval) -}}
+                    {%- endif -%}
+                    {{- summaryListEnd() -}}
+                {%- endset -%}
+
+                {{- displayCardForReturn(
+                    schemeReturn,
+                    'frontend.pages.scheme_return.titles.milestone_business_case' | trans,
+                    'milestone_business_case',
+                    contents
+                ) -}}
+            </div>
+
+            {#- EXPENSES -------------------------------------------------------------------------------------------------- -#}
+
+            {%- set sections = [] -%}
+
+            {%- set expensesTitle = 'frontend.pages.scheme_return.titles.expenses' | trans -%}
+            {%- if is_granted('CAN_VIEW_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
+                {%- from "frontend/macros.html.twig" import renderTable -%}
+                {%- for division in expenseDivisions -%}
+                    {%- set divisionConfiguration = schemeReturn.findDivisionConfigurationByKey(division.key) -%}
+                    {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
+                    {%- set contents -%}
+                        {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
+                        {%- if is_granted('CAN_EDIT_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
+                            {%- set url = section_edit_path(schemeReturn, division.key, true) -%}
+                            <div class="expenses-links">
+                                <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
+                            </div>
+                        {%- endif -%}
+                        {{- renderTable(table) -}}
+                        {{- expenseDivisionComments(schemeReturn, division) -}}
+                    {%- endset -%}
+                    {%- set sections = sections|merge([{
+                        label: division.label | trans,
+                        id: 'expenses-' ~ division.key,
+                        panel: {html: contents},
+                    }]) -%}
+                {%- endfor -%}
+
+                {{- displaySectionsAsTabs(sections, expensesTitle) -}}
+            {%- else -%}
+                <div class="govuk-!-margin-bottom-9">
+                    <h2 class="govuk-heading-m">{{ expensesTitle }}</h2>
+                    <p class="govuk-body">{{ 'frontend.pages.scheme_return.expenses_not_required' | trans }}</p>
+                </div>
+            {%- endif -%}
         </div>
-    {%- endif -%}
+    {%- endblock -%}
 
     <p class="govuk-body">
-        <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">{{-
-            'frontend.pages.scheme_return.back_to_fund_return' | trans({fundName: "enum.fund.#{fundReturn.fundAward.type.name}" | trans})
-        -}}</a>
+        <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">
+            {{- 'frontend.pages.scheme_return.back_to_fund_return' | trans({fundName: "enum.fund.#{fundReturn.fundAward.type.name}" | trans}) -}}
+        </a>
     </p>
 {%- endblock -%}
