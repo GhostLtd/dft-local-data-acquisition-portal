@@ -5,5 +5,6 @@
 {%- set page_heading_class = 'govuk-heading-m' -%}
 
 {%- block content -%}
+    {% form_theme form 'frontend/theme.html.twig' %}
     {{- form(form) -}}
 {%- endblock -%}

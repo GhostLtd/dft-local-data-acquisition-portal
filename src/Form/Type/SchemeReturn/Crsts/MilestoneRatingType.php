@@ -19,7 +19,8 @@ class MilestoneRatingType extends AbstractType
             ->add('onTrackRating', ChoiceType::class, [
                 'label' => "forms.scheme.milestone_progress.on_track_rating.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'help' => "forms.scheme.milestone_progress.on_track_rating.help",
+                /** @link /templates/frontend/theme.html.twig */
+                'help' => 'value overridden in theme',
                 'choices' => OnTrackRating::cases(),
                 'choice_label' => fn(OnTrackRating $choice) => "enum.on_track_rating.{$choice->value}",
                 'choice_value' => fn(?OnTrackRating $choice) => $choice?->value,

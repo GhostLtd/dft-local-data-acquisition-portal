@@ -215,6 +215,9 @@ forms:
   generic:
     placeholder: Please select an option
 
+  rag_guidance_help:
+    details: View guidance
+
   crsts:
     benefit_cost_ratio:
       type:
@@ -284,7 +287,6 @@ forms:
         label: Overall delivery confidence
       overall_confidence:
         label: Overall confidence rating
-        details: View guidance
 
   scheme:
     mark_as_ready_for_signoff:
@@ -317,7 +319,6 @@ forms:
     milestone_progress:
       on_track_rating:
         label: &sr_on_track_rating On-track rating
-        help: ''
       progress_update:
         label: &sr_progress_update Progress update
         help: ''

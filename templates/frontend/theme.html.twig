@@ -1,0 +1,16 @@
+{%- block form_help_with_rag_guidance -%}
+    {%- set help -%}
+        {%- include 'frontend/includes/rag_guidance_help.html.twig' -%}
+    {%- endset -%}
+    {%- set help_html = true -%}
+    {{- block('form_help', '@GhostGovUkFrontend/theme.html.twig') -}}
+{%- endblock -%}
+
+{%- block _overall_progress_overallConfidence_help -%}
+    {{- block('form_help_with_rag_guidance') -}}
+{%- endblock -%}
+
+{%- block _milestone_rating_onTrackRating_help -%}
+    {%- set showAllRagGuidance = false -%}
+    {{- block('form_help_with_rag_guidance') -}}
+{%- endblock -%}
