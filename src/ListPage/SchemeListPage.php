@@ -40,7 +40,7 @@ class SchemeListPage extends AbstractListPage
         return [
             (new TextFilter('Name', 'scheme.name'))->sortable(),
             (new ChoiceFilter('Ready for signoff?', 'schemeReturn.readyForSignoff', ['No' => 0, 'Yes' => 1])),
-            (new ChoiceFilter('Retained?', 'scheme.retained', ['No' => 0, 'Yes' => 1])),
+            (new ChoiceFilter('Retained?', 'scheme.crstsData.retained', ['No' => 0, 'Yes' => 1])),
             // Don't see a way to filter this without using sub-queries and rewriting ListPage.
             // There's a possibility a view might help
             (new Simple('On-track rating', '')),
