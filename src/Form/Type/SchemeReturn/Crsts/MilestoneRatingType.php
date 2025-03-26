@@ -10,16 +10,20 @@ use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Twig\Environment;
 
 class MilestoneRatingType extends AbstractType
 {
+    public function __construct(protected Environment $twig) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('onTrackRating', ChoiceType::class, [
                 'label' => "forms.scheme.milestone_progress.on_track_rating.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'help' => "forms.scheme.milestone_progress.on_track_rating.help",
+                'help' => $this->twig->render('frontend/includes/rag_guidance_help.html.twig', ['showAllRagGuidance' => false]),
+                'help_html' => true,
                 'choices' => OnTrackRating::cases(),
                 'choice_label' => fn(OnTrackRating $choice) => "enum.on_track_rating.{$choice->value}",
                 'choice_value' => fn(?OnTrackRating $choice) => $choice?->value,
