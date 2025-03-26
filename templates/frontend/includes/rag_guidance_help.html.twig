@@ -6,18 +6,22 @@
             <th scope="row" class="govuk-table__header guidance-table_green">Green</th>
             <td class="govuk-table__cell">Successful delivery to baselined time, cost and quality appears very likely</td>
         </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header guidance-table_amber_green">Amber / green</th>
-            <td class="govuk-table__cell">Successful delivery to baselined time, cost and quality appears likely; some minor corrective actions required</td>
-        </tr>
+        {% if showAllRagGuidance ?? true %}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header guidance-table_amber_green">Amber / green</th>
+                <td class="govuk-table__cell">Successful delivery to baselined time, cost and quality appears likely; some minor corrective actions required</td>
+            </tr>
+        {% endif %}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header guidance-table_amber">Amber</th>
             <td class="govuk-table__cell">Successful delivery to baselined time, cost and quality appears feasible but significant issues exist requiring management attention</td>
         </tr>
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header guidance-table_amber_red">Amber / red</th>
-            <td class="govuk-table__cell">Successful delivery to baselined time, cost and quality is unlikely, with major risks or issues apparent in a number of key areas</td>
-        </tr>
+        {% if showAllRagGuidance ?? true %}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header guidance-table_amber_red">Amber / red</th>
+                <td class="govuk-table__cell">Successful delivery to baselined time, cost and quality is unlikely, with major risks or issues apparent in a number of key areas</td>
+            </tr>
+        {% endif %}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header guidance-table_red">Red</th>
             <td class="govuk-table__cell">Successful delivery to baselined time, cost and quality appears to be very unlikely. There are major issues on definition, schedule, budget required, quality or benefits delivery, which do not appear to be manageable or resolvable.</td>
@@ -26,6 +30,7 @@
     </table>
 {%- endset -%}
 {{- details({
-    summaryText: 'forms.crsts.overall_progress.overall_confidence.details' | trans,
+    summaryText: 'forms.rag_guidance_help.details' | trans,
     html: htmlContent,
+    classes: 'govuk-!-margin-bottom-0',
 }) -}}
