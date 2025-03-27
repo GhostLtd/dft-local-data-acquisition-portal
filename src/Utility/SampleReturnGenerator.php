@@ -35,14 +35,5 @@ class SampleReturnGenerator
         $nextReturn = $existingReturn->createFundReturnForNextQuarter();
         $this->entityManager->persist($nextReturn);
 
-//        Add another return...
-//        $nextReturn->signoff($authority->getAdmin());
-//        $nextNextReturn = $nextReturn->createFundReturnForNextQuarter();
-//        $this->entityManager->persist($nextNextReturn);
-
-//        $nextReturn->getSchemeReturns()->map(fn($sr) => $this->entityManager->persist($sr));
-//        $nextReturn->getExpenses()->map(fn($ex) => $this->entityManager->persist($ex));
-//        $nextReturn->getSchemeReturns()->map(fn(CrstsSchemeReturn $sr) => $sr->getExpenses()->map(fn($ex) => $this->entityManager->persist($ex)));
-
     }
 }

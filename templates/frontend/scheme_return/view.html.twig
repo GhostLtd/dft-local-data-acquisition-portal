@@ -131,6 +131,7 @@
             {%- set expensesTitle = 'frontend.pages.scheme_return.titles.expenses' | trans -%}
             {%- if is_granted('CAN_VIEW_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
                 {%- from "frontend/macros.html.twig" import renderTable -%}
+                {% set selectedTabIndex = 0 %}
                 {%- for division in expenseDivisions -%}
                     {%- set divisionConfiguration = schemeReturn.findDivisionConfigurationByKey(division.key) -%}
                     {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
@@ -150,9 +151,12 @@
                         id: 'expenses-' ~ division.key,
                         panel: {html: contents},
                     }]) -%}
+                    {% if division.key == fundReturn.divisionConfigurationKeyForCurrentYear %}
+                        {% set selectedTabIndex = loop.index0 %}
+                    {% endif %}
                 {%- endfor -%}
 
-                {{- displaySectionsAsTabs(sections, expensesTitle) -}}
+                {{- displaySectionsAsTabs(sections, expensesTitle, selectedTabIndex) -}}
             {%- else -%}
                 <div class="govuk-!-margin-bottom-9">
                     <h2 class="govuk-heading-m">{{ expensesTitle }}</h2>

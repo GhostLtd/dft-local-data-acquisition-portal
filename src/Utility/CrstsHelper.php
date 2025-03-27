@@ -91,7 +91,7 @@ class CrstsHelper
         $endYear = max($naturalEndYear, 2026);
 
         foreach(range(2022, $endYear) as $year) {
-            $nextYear = substr(strval($year + 1), 2);
+            $nextYear = self::getNextYear($year);
 
             $columnConfigurations = [];
 
@@ -110,7 +110,7 @@ class CrstsHelper
 
             if (count($columnConfigurations) > 0) {
                 $divisionConfiguration[] = new DivisionConfiguration(
-                    "{$year}-{$nextYear}",
+                    self::getDivisionConfigurationKey($year),
                     $columnConfigurations,
                     label: new TranslatableMessage('forms.crsts.expenses.division_year_title', ['startYear' => $year, 'endYear' => $nextYear]),
                 );
@@ -120,7 +120,7 @@ class CrstsHelper
         // This is a forecast and only added in Q4
         $nextYear = substr(strval($endYear + 1), 2);
         $divisionConfiguration[] = new DivisionConfiguration(
-            "post-{$endYear}-{$nextYear}",
+            self::getDivisionConfigurationKey($endYear, true),
             [
                 new ColumnConfiguration("forecast", isForecast: true, label: new TranslatableMessage('forms.crsts.expenses.forecast'))
             ],
@@ -128,6 +128,16 @@ class CrstsHelper
         );
 
         return $divisionConfiguration;
+    }
+
+    protected static function getNextYear(int $year): int
+    {
+        return substr(strval($year + 1), 2);
+    }
+    public static function getDivisionConfigurationKey(int $year, bool $includePostPrefix = false): string
+    {
+        $nextYear = self::getNextYear($year);
+        return ($includePostPrefix ? 'post-' : '') . "{$year}-{$nextYear}";
     }
 
 }

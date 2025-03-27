@@ -73,6 +73,7 @@
 
         {%- set sections = [] -%}
 
+        {% set selectedTabIndex = 0 %}
         {%- for division in expenseDivisions -%}
             {%- set divisionConfiguration = fundReturn.findDivisionConfigurationByKey(division.key) -%}
             {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
@@ -81,9 +82,12 @@
                 id: 'expenses-' ~ division.key,
                 panel: {html: block('expenseTabContents')},
             }]) -%}
+            {% if division.key == fundReturn.divisionConfigurationKeyForCurrentYear %}
+                {% set selectedTabIndex = loop.index0 %}
+            {% endif %}
         {%- endfor -%}
 
-        {{- displaySectionsAsTabs(sections, 'frontend.pages.fund_return.titles.expenses' | trans) -}}
+        {{- displaySectionsAsTabs(sections, 'frontend.pages.fund_return.titles.expenses' | trans, selectedTabIndex) -}}
 
         {# -- SCHEMES ---------------------------------------------------------------------------------------------------- #}
 
