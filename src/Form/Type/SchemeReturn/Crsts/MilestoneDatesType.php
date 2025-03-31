@@ -36,7 +36,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             throw new UnexpectedTypeException($data, CrstsSchemeReturn::class);
         }
 
-        $fundedMostlyAs = $data->getSchemeFund()->getFundedMostlyAs();
+        $fundedMostlyAs = $data->getScheme()->getCrstsData()->getFundedMostlyAs();
 
         foreach($this->getRelevantMilestoneEnums($data) as $milestoneType) {
             $fieldKey = $milestoneType->value;
@@ -108,7 +108,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
 
     protected function getRelevantMilestoneEnums(CrstsSchemeReturn $schemeReturn): array
     {
-        $isCDEL = $schemeReturn->getSchemeFund()->getFundedMostlyAs() === FundedMostlyAs::CDEL;
+        $isCDEL = $schemeReturn->getScheme()->getCrstsData()->getFundedMostlyAs() === FundedMostlyAs::CDEL;
 
         return array_filter(
             MilestoneEnum::cases(),
