@@ -9,9 +9,11 @@ use App\Entity\Enum\TransportModeCategory;
 use App\Entity\SchemeData\CrstsData;
 use App\Entity\Traits\IdTrait;
 use App\Repository\SchemeRepository;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -30,7 +32,8 @@ class Scheme
     #[NotBlank(message: 'scheme.name.not_blank', groups: ["scheme.add", "scheme.edit"])]
     private ?string $name = null; // 1proj_info: Scheme name
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, length: AbstractMySQLPlatform::LENGTH_LIMIT_TEXT, nullable: true)]
+    #[Length(max: 16383, groups: ["scheme.add", "scheme.edit"])]
     #[NotBlank(message: 'scheme.description.not_blank', groups: ["scheme.add", "scheme.edit"])]
     private ?string $description = null; // 1proj_info: Scheme description
 

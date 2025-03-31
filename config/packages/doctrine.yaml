@@ -7,7 +7,7 @@ doctrine:
         password: '%env(default::APP_DATABASE_PASSWORD)%'
         server_version: '%env(default::APP_DATABASE_SERVER_VERSION)%'
         url: '%env(default::APP_DATABASE_URL)%'
-        charset: utf8
+#        charset: utf8
 
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true

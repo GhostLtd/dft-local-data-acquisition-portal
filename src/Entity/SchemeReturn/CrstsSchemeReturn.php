@@ -16,11 +16,13 @@ use App\Utility\CrstsHelper;
 use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -55,7 +57,8 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[GreaterThan(value: 'now', message: 'crsts_scheme_return.expected_business_case_approval.future', groups: ["milestone_business_case_date"])]
     private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, length: AbstractMySQLPlatform::LENGTH_LIMIT_TEXT, nullable: true)]
+    #[Length(max: 16383, groups: ['milestone_rating'])]
     #[NotBlank(message: 'crsts_scheme_return.progress_update.not_blank', groups: ["milestone_rating"])]
     private ?string $progressUpdate = null; // 4proj_milestones: Progress update (comment)
 

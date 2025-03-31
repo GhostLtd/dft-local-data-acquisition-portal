@@ -8,9 +8,10 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Entity\Traits\IdTrait;
 use App\Repository\SchemeReturn\SchemeReturnRepository;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Constraints\Length;
 
 #[ORM\Entity(repositoryClass: SchemeReturnRepository::class)]
 #[ORM\InheritanceType('JOINED')]
@@ -30,10 +31,11 @@ abstract class SchemeReturn
     #[ORM\JoinColumn(nullable: false)]
     private ?FundReturn $fundReturn = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, length: AbstractMySQLPlatform::LENGTH_LIMIT_TEXT, nullable: true)]
+    #[Length(max: 16383, groups: ['milestone_rating'])]
     private ?string $risks = null; // josh_4/2: Scheme level risks
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::BOOLEAN)]
     private bool $readyForSignoff = false;
 
     public function getScheme(): ?Scheme
