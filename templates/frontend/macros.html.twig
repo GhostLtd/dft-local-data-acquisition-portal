@@ -101,7 +101,7 @@
 {% endmacro %}
 
 {% macro date(label, value, options) %}
-    {%- set value = value ? (value | date('Y/m/d')) : null -%}
+    {%- set value = value ? (value | date('format.date.default' | trans)) : null -%}
     {{- _self.text(label, value, options) -}}
 {% endmacro %}
 
