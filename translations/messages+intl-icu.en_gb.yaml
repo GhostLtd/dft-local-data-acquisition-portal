@@ -228,8 +228,8 @@ forms:
         help: For example, 1.25
     comments:
       comments:
-        label: &fr_comments Comments
-        help: Use this field to give any additional context you would like to add to this return
+        label: &fr_comments Change control / comments
+        help: Use this field to give change control details, and any additional context you would like to add to this return
     expenses:
       actual_or_forecast: >-
         {is_forecast, select,
@@ -553,7 +553,7 @@ sections:
   fund:
     overall_progress: Overall summary and delivery confidence
     local_and_rdel: Local contribution and RDEL funding
-    comments: Comments
+    comments: Change control / comments
   scheme:
     milestone_business_case: Milestone business case
     milestone_dates: Milestone dates
