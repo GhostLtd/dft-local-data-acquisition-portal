@@ -291,8 +291,20 @@ forms:
   scheme:
     mark_as_ready_for_signoff:
       confirm: Mark as ready for signoff
+      help: |-
+        This will lock the scheme for editing and will mark it as being ready for signoff.
+        
+        You will be able to change this back if you need to make further changes.
+      confirmed-notification:
+        heading: ''
+        content: The scheme has been marked as ready for signoff
     mark_as_not_ready_for_signoff:
       confirm: Mark as not ready for signoff
+      help: |-
+        This will mark the scheme as not yet being ready for signoff and will re-allow editing.
+      confirmed-notification:
+        heading: ''
+        content: The scheme has been marked as not yet ready for signoff
     milestone_dates:
       start_development:
         label: Start development
@@ -503,14 +515,8 @@ frontend:
       unmark_as_ready_for_signoff: Unmark scheme as ready for sign-off
     scheme_mark_as_not_ready_for_signoff:
       breadcrumb: Mark as not ready for signoff
-      help: |-
-        This will mark the scheme as not yet being ready for signoff and will re-allow editing.
     scheme_mark_as_ready_for_signoff:
       breadcrumb: Mark as ready for signoff
-      help: |-
-        This will lock the scheme for editing and will mark it as being ready for signoff.
-        
-        You will be able to change this back if you need to make further changes.
     user:
       add_user: Add user
       back_to_users: Back to users

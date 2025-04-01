@@ -1,6 +1,6 @@
 {%- extends 'frontend/base.html.twig' -%}
 
-{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') ~ ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return_mark_as_ready_for_signoff') -%}
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') ~ ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return_signoff') -%}
 {%- set page_heading_class = 'govuk-heading-m' -%}
 
 {%- block content -%}
@@ -8,7 +8,7 @@
         <div class="govuk-grid-column-two-thirds">
             {%- form_theme form '@GhostGovUkFrontend/theme.html.twig' -%}
             <div class="govuk-body">
-                {{- 'frontend.pages.scheme_mark_as_ready_for_signoff.help' | trans -}}
+                {{-  (translation_prefix ~ '.help') | trans -}}
             </div>
             {{- form(form) -}}
         </div>

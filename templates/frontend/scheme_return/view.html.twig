@@ -22,27 +22,6 @@
                 {{- summaryListEnd() -}}
             {%- endset %}
 
-            {%- set statusActions = [] -%}
-
-            {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_READY', schemeReturn) -%}
-                {%- set statusActions = statusActions|merge([
-                    {
-                        text: 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans,
-                        visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
-                        href: path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
-                    }
-                ]) -%}
-            {%- endif -%}
-            {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_NOT_READY', schemeReturn) -%}
-                {%- set statusActions = statusActions|merge([
-                    {
-                        text: 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans,
-                        visuallyHiddenText: ': ' ~ linksBuilder.breadcrumbTitleFor('scheme_return'),
-                        href: path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}),
-                    }
-                ]) -%}
-            {%- endif -%}
-
             {{- displayCardForReturn(
                 schemeReturn,
                 'frontend.pages.scheme_return.titles.status' | trans,
@@ -50,7 +29,6 @@
                 contents,
                 {
                     add_edit_link: false,
-                    actions: statusActions,
                 },
             ) -}}
 
@@ -165,6 +143,28 @@
             {%- endif -%}
         </div>
     {%- endblock -%}
+
+    {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_READY', schemeReturn) -%}
+        <p class="govuk-body">
+            <a class="govuk-button"
+               href="{{ path('app_scheme_return_mark_as_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}) }}"
+            >
+                {{- 'frontend.pages.scheme_return.mark_as_ready_for_signoff' | trans -}}
+                <span class="govuk-visually-hidden">: {{ linksBuilder.breadcrumbTitleFor('scheme_return') }}</span>
+            </a>
+        </p>
+    {%- endif -%}
+    {%- if is_granted('CAN_MARK_SCHEME_RETURN_AS_NOT_READY', schemeReturn) -%}
+        <p class="govuk-body">
+            <a class="govuk-button govuk-button--secondary"
+               href="{{ path('app_scheme_return_mark_as_not_ready_for_signoff', {fundReturnId: fundReturn.id, schemeId: schemeReturn.scheme.id}) }}"
+            >
+                {{- 'frontend.pages.scheme_return.unmark_as_ready_for_signoff' | trans -}}
+                <span class="govuk-visually-hidden">: {{ linksBuilder.breadcrumbTitleFor('scheme_return') }}</span>
+            </a>
+        </p>
+    {%- endif -%}
+
 
     <p class="govuk-body">
         <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">

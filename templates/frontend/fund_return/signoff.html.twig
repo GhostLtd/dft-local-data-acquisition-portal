@@ -4,7 +4,7 @@
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {% block content %}
-    {% from 'frontend/fund_return/macros.html.twig' import overallProgressContent %}
+    {% from 'frontend/fund_return/view.html.twig' import overallProgressContent %}
     {% from '@GhostGovUkFrontend/components/macros.html.twig' import summaryCard %}
 
     {{- summaryCard({

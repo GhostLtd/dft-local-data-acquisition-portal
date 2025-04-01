@@ -7,110 +7,65 @@ use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
+use App\Utility\ConfirmAction\Frontend\SchemeReadyForSignOffConfirmAction;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkCoreBundle\Form\ConfirmActionType;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bridge\Twig\Attribute\Template;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/fund-return/{fundReturnId}/scheme/{schemeId}', name: 'app_scheme_return_mark_as_')]
 class ReadyForSignoffController extends AbstractReturnController
 {
-    protected const string MARK_AS_READY = 'mark_as_ready';
-    protected const string MARK_AS_NOT_READY = 'mark_as_not_ready';
+    public const string MARK_AS_READY = 'mark_as_ready';
+    public const string MARK_AS_NOT_READY = 'mark_as_not_ready';
 
-    public function __construct(
-        EntityManagerInterface          $entityManager,
-        protected DashboardLinksBuilder $linksBuilder,
-    )
-    {
-        parent::__construct($entityManager);
-    }
-
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}/mark-as-ready-for-signoff', name: 'app_scheme_return_mark_as_ready_for_signoff')]
+    #[Route('/mark-as-ready-for-signoff', name: 'ready_for_signoff', defaults: ['type' => self::MARK_AS_READY])]
+    #[Route('/mark-as-not-ready-for-signoff', name: 'not_ready_for_signoff', defaults: ['type' => self::MARK_AS_NOT_READY])]
+    #[Template("frontend/scheme_return/ready_for_signoff.html.twig")]
     public function schemeReadyForSignoff(
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
         FundReturn $fundReturn,
         #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
         Scheme     $scheme,
         Request    $request,
-    ): Response
-    {
-        return $this->generateResponse($fundReturn, $scheme, $request, self::MARK_AS_READY);
-    }
-
-    #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}/mark-as-not-ready-for-signoff', name: 'app_scheme_return_mark_as_not_ready_for_signoff')]
-    public function schemeNotReadyForSignoff(
-        #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn $fundReturn,
-        #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
-        Scheme     $scheme,
-        Request    $request,
-    ): Response
-    {
-        return $this->generateResponse($fundReturn, $scheme, $request, self::MARK_AS_NOT_READY);
-    }
-
-    protected function generateResponse(
-        FundReturn $fundReturn,
-        Scheme     $scheme,
-        Request    $request,
-        string     $type,
-    ): Response
+        SchemeReadyForSignOffConfirmAction $confirmAction,
+        DashboardLinksBuilder $linksBuilder,
+        string $type,
+    ): RedirectResponse | array
     {
         $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
+        $role = match($type) {
+            self::MARK_AS_READY => Role::CAN_MARK_SCHEME_RETURN_AS_READY,
+            self::MARK_AS_NOT_READY => Role::CAN_MARK_SCHEME_RETURN_AS_NOT_READY,
+        };
+        $this->denyAccessUnlessGranted($role, $schemeReturn);
+        match($type) {
+            self::MARK_AS_READY => $linksBuilder->setAtSchemeReadyForSignoff($fundReturn, $scheme),
+            self::MARK_AS_NOT_READY => $linksBuilder->setAtSchemeNotReadyForSignoff($fundReturn, $scheme),
+        };
 
-        if ($type === self::MARK_AS_READY) {
-            $this->denyAccessUnlessGranted(Role::CAN_MARK_SCHEME_RETURN_AS_READY, $schemeReturn);
-            $this->linksBuilder->setAtSchemeReadyForSignoff($fundReturn, $scheme);
-            $label = "forms.scheme.mark_as_ready_for_signoff.confirm";
-            $template = "frontend/scheme_return/ready_for_signoff.html.twig";
-        } else if ($type === self::MARK_AS_NOT_READY) {
-            $this->denyAccessUnlessGranted(Role::CAN_MARK_SCHEME_RETURN_AS_NOT_READY, $schemeReturn);
-            $this->linksBuilder->setAtSchemeNotReadyForSignoff($fundReturn, $scheme);
-            $label = "forms.scheme.mark_as_not_ready_for_signoff.confirm";
-            $template = "frontend/scheme_return/not_ready_for_signoff.html.twig";
-        } else {
-            throw new \InvalidArgumentException('Unexpected value for $type');
-        }
+        return $confirmAction
+            ->setSubject($schemeReturn)
+            ->setType($type)
+            ->setExtraViewData([
+                'linksBuilder' => $linksBuilder,
+                'fundReturn' => $fundReturn,
+                'schemeReturn' => $schemeReturn,
+            ])
+            ->controller($request, $this->getActionUrl($fundReturn->getId(), $scheme->getId()));
+    }
 
-        $cancelUrl = $this->generateUrl('app_scheme_return', [
-            'fundReturnId' => $fundReturn->getId(),
-            'schemeId' => $scheme->getId()
-        ]);
 
-        $form = $this->createForm(ConfirmActionType::class, null, [
-            'cancel_link_options' => [
-                'href' => $cancelUrl,
-            ],
-            'confirm_button_options' => [
-                'label' => $label,
-            ],
-        ]);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $button = $form->get('button_group')->get('confirm');
-            if ($button instanceof SubmitButton && $button->isClicked()) {
-                $value = match($type) {
-                    self::MARK_AS_READY => true,
-                    self::MARK_AS_NOT_READY => false,
-                };
-
-                $schemeReturn->setReadyForSignoff($value);
-                $this->entityManager->flush();
-
-                return new RedirectResponse($cancelUrl);
-            }
-        }
-
-        return $this->render($template, [
-            'linksBuilder' => $this->linksBuilder,
-            'form' => $form,
-            'fundReturn' => $fundReturn,
-            'schemeReturn' => $schemeReturn,
+    protected function getActionUrl(string $fundReturnId, string $schemeId): string
+    {
+        return $this->generateUrl('app_scheme_return', [
+            'fundReturnId' => $fundReturnId,
+            'schemeId' => $schemeId
         ]);
     }
 }

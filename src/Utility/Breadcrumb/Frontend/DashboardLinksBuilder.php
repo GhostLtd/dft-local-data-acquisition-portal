@@ -99,7 +99,7 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
     {
         $this->setAtScheme($fundReturn, $scheme);
         $this->addBreadcrumb(
-            'scheme_return_mark_as_ready_for_signoff',
+            'scheme_return_signoff',
             'app_scheme_return_mark_as_ready_for_signoff',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),
@@ -113,7 +113,7 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
     {
         $this->setAtScheme($fundReturn, $scheme);
         $this->addBreadcrumb(
-            'scheme_return_mark_as_not_ready_for_signoff',
+            'scheme_return_signoff',
             'app_scheme_return_mark_as_not_ready_for_signoff',
             routeParameters: [
                 'fundReturnId' => $fundReturn->getId(),

@@ -145,7 +145,7 @@
         </div>
         {%- if is_granted('CAN_SIGN_OFF_RETURN', fundReturn) -%}
             <p class="govuk-body">
-                <a class="govuk-button govuk-button--red" href="{{ path('app_fund_return_signoff', {fundReturnId: fundReturn.id}) }}">Signoff and submit return</a>
+                <a class="govuk-button" href="{{ path('app_fund_return_signoff', {fundReturnId: fundReturn.id}) }}">Signoff and submit return</a>
             </p>
         {%- endif -%}
     {%- endblock -%}
