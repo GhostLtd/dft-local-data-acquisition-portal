@@ -73,7 +73,7 @@ class SchemeController extends AbstractController
         $this->linksBuilder->setAtSchemeEdit($authority, $scheme);
         $cancelUrl = $this->router->generate('app_scheme', ['authorityId' => $authority->getId(), 'schemeId' => $scheme->getId()]);
 
-        return $this->addOrEdit($authority, $scheme, $request, $cancelUrl, SchemeType::MODE_EDIT);
+        return $this->addOrEdit($authority, $scheme, $request, $cancelUrl);
     }
 
     #[IsGranted(Role::CAN_MANAGE_SCHEMES, 'authority')]
@@ -87,7 +87,7 @@ class SchemeController extends AbstractController
         $this->linksBuilder->setAtSchemeAdd($authority);
         $cancelUrl = $this->router->generate('app_schemes_authority', ['authorityId' => $authority->getId()]);
 
-        return $this->addOrEdit($authority, new Scheme(), $request, $cancelUrl, SchemeType::MODE_ADD);
+        return $this->addOrEdit($authority, new Scheme(), $request, $cancelUrl);
     }
 
     #[IsGranted(Role::CAN_MANAGE_SCHEMES, 'authority')]
@@ -144,10 +144,9 @@ class SchemeController extends AbstractController
             );
     }
 
-    protected function addOrEdit(Authority $authority, Scheme $scheme, Request $request, string $cancelUrl, string $addOrEdit): Response
+    protected function addOrEdit(Authority $authority, Scheme $scheme, Request $request, string $cancelUrl): Response
     {
         $form = $this->createForm(SchemeType::class, $scheme, [
-            'add_or_edit' => $addOrEdit,
             'authority' => $authority,
             'cancel_url' => $cancelUrl,
         ]);
