@@ -175,8 +175,6 @@ class SchemeType extends AbstractType implements DataMapperInterface
         $resolver
             ->setDefault('data_class', Scheme::class)
             ->setDefault('validation_groups', $this->getValidationGroups(...))
-            ->setRequired('add_or_edit')
-            ->setAllowedValues('add_or_edit', [self::MODE_ADD, self::MODE_EDIT])
             ->setRequired('authority')
             ->setAllowedTypes('authority', [Authority::class])
             ->setDefault('error_mapping', [
@@ -190,7 +188,7 @@ class SchemeType extends AbstractType implements DataMapperInterface
 
     public function getValidationGroups(FormInterface $form): array
     {
-        $addOrEdit = $form->getConfig()->getOption('add_or_edit');
+        $addOrEdit = $form->getData()?->getId() ? self::MODE_EDIT : self::MODE_ADD;
         $schemeGroups = array_map(fn(Fund $fund) => 'scheme.'.strtolower($fund->value).'.'.$addOrEdit, $form->get('funds')->getData());
 
         return array_merge([
