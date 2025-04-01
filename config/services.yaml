@@ -36,12 +36,6 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
-      arguments:
-        - !service { class: PDO, factory: ['@database_connection', 'getNativeConnection'] }
-        # If you get transaction issues (e.g. after login) uncomment the line below
-        - { lock_mode: !php/const Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler::LOCK_ADVISORY }
-
     Alphagov\Notifications\Client:
         factory: '@Ghost\GovUkCoreBundle\Utility\AlphagovNotify\ClientFactory'
         arguments:
@@ -54,6 +48,11 @@ services:
     Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface $loginLinkHandler:
         '@security.authenticator.login_link_handler.main'
 
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            - !service { class: PDO, factory: ['@database_connection', 'getNativeConnection'] }
+            # If you get transaction issues (e.g. after login) uncomment the line below
+            - { lock_mode: !php/const Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler::LOCK_ADVISORY }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

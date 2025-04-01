@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 
 #[ORM\Entity(repositoryClass: ExpenseEntryRepository::class)]
-class ExpenseEntry
+class ExpenseEntry implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 

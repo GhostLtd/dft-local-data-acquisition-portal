@@ -5,6 +5,8 @@ namespace App\Entity\FundReturn;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\FundAward;
+use App\Entity\PropertyChangeLog;
+use App\Entity\PropertyChangeLoggableInterface;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Traits\IdTrait;
@@ -21,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorMap([
     Fund::CRSTS1->value => CrstsFundReturn::class,
 ])]
-abstract class FundReturn
+abstract class FundReturn implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 

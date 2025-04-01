@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: MilestoneRepository::class)]
-class Milestone
+class Milestone implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 

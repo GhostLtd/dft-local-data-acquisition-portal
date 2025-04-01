@@ -5,6 +5,7 @@ namespace App\Entity\SchemeReturn;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\FundReturn\FundReturn;
+use App\Entity\PropertyChangeLoggableInterface;
 use App\Entity\Scheme;
 use App\Entity\Traits\IdTrait;
 use App\Repository\SchemeReturn\SchemeReturnRepository;
@@ -19,7 +20,7 @@ use Symfony\Component\Validator\Constraints\Length;
 #[ORM\DiscriminatorMap([
     Fund::CRSTS1->value => CrstsSchemeReturn::class,
 ])]
-abstract class SchemeReturn
+abstract class SchemeReturn implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 

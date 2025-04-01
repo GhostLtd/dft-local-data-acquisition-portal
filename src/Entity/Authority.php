@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\Fund;
 use App\Entity\Traits\IdTrait;
 use App\Repository\AuthorityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AuthorityRepository::class)]
-class Authority
+class Authority implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 

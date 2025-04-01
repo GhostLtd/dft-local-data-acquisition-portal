@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: SchemeRepository::class)]
-class Scheme
+class Scheme implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 
