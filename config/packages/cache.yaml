@@ -26,7 +26,9 @@ framework:
 
 ## This caused issues with maintenance mode. Result was cached in FS and DB. was able to manually
 ## invalidate DB cache, but not FS cache on AppEngine instance.
-#        app: cache.chained.fs_dbal
+#        app: cache.chained.fs_dbal1
+
+        app: cache.adapter.doctrine_dbal
 
 
 services:
