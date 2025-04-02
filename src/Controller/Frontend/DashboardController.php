@@ -24,7 +24,7 @@ class DashboardController extends AbstractController
         DashboardLinksBuilder        $linksBuilder,
         MaintenanceWarningRepository $maintenanceWarningRepository,
         AuthorityRepository          $authorityRepository,
-        UserInterface                $user,
+        ?UserInterface               $user,
         UserReachableEntityResolver  $userReachableEntityResolver,
     ): Response
     {
