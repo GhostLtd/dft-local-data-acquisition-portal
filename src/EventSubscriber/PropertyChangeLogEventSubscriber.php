@@ -87,7 +87,9 @@ class PropertyChangeLogEventSubscriber
             ->setEntityClass(ClassUtils::getRealClass($entityClass))
             ->setTimestamp(new \DateTime())
             ->setUserEmail($userEmail)
-            ->setFirewallName($firewallName);
+            ->setFirewallName($firewallName)
+            ->setPropertyName(null)
+            ->setPropertyValue(null);
 
         $changeLogEntities = [];
         $fieldsChanged = [];
