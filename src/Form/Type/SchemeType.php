@@ -171,7 +171,8 @@ class SchemeType extends AbstractType implements DataMapperInterface
                 'label' => 'forms.scheme.checklist.label',
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
             ]);
-            $builder->get('checklist')
+            $builder
+                ->get('checklist')
                 ->add('dft_approved', CheckboxType::class, [
                     'label' => 'forms.scheme.dft_approved.label',
                     'help' => 'forms.scheme.dft_approved.help',

@@ -4,8 +4,6 @@
 {%- set page_title_suffix = '' -%}
 
 {%- block content -%}
-    <p class="govuk-body">Hello world</p>
-
     {%- if is_granted('ROLE_USER') -%}
         <a href="{{ path('app_dashboard') }}" class="govuk-link">Dashboard</a>
     {% else %}

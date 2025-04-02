@@ -391,7 +391,7 @@ forms:
         help: Pick the leading active travel intervention type
         placeholder: Please select an active travel element
     checklist:
-      label: Checklist
+      label: Authorisation
     dft_approved:
       label: This scheme falls within guidelines for new schemes, or has been pre-approved by DfT
       help: ''
