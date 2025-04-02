@@ -21,6 +21,13 @@ class SecureHeadersSubscriber implements EventSubscriberInterface
     {
         $headers = $event->getResponse()->headers;
         $cspHeader = $headers->get('Content-Security-Policy');
+
+        if ($cspHeader === null) {
+            // If there's no CSP header, no point trying to add things to it!
+            // N.B. this happens on error pages, for example
+            return;
+        }
+
         $cspRules = array_map(trim(...), explode(';', $cspHeader));
 
         $isSmartlookEnabled = $this->smartlookExtension->getSmartLookApiKey() !== null;
