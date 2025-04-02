@@ -16,6 +16,7 @@ class Authority implements PropertyChangeLoggableInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull(message: 'authority.name.not_null', groups: ['authority'])]
+    #[Assert\Length(max: 255, groups: ['authority'])]
     private ?string $name = null; // 1top_info: Local Authority name
 
     #[ORM\ManyToOne(inversedBy: 'authoritiesAdminOf')]

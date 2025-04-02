@@ -28,18 +28,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull(message: 'user.name.not_null', groups: ['authority.new_admin', 'user.edit'])]
+    #[Assert\Length(max: 255, groups: ['authority.new_admin', 'user.edit'])]
     private ?string $name = null; #1top_info
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotNull(message: 'user.position.not_null', groups: ['authority.new_admin', 'user.edit'])]
+    #[Assert\Length(max: 255, groups: ['authority.new_admin', 'user.edit'])]
     private ?string $position = null; #1top_info
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotNull(message: 'user.phone.not_null', groups: ['authority.new_admin', 'user.edit'])]
+    #[Assert\Length(max: 255, groups: ['authority.new_admin', 'user.edit'])]
     private ?string $phone = null; #1top_info
 
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotNull(message: 'user.email.not_null', groups: ['authority.new_admin', 'user.edit'])]
+    #[Assert\Length(max: 255, groups: ['authority.new_admin', 'user.edit'])]
+    #[Assert\Email(message: 'auth.login.invalid_email', groups: ['authority.new_admin', 'user.edit'])]
     private ?string $email = null; #1top_info
 
     /**
