@@ -10,6 +10,7 @@ use App\Entity\Enum\TransportMode;
 use App\Entity\Enum\TransportModeCategory;
 use App\Entity\Scheme;
 use Ghost\GovUkFrontendBundle\Form\Type\BooleanChoiceType;
+use Ghost\GovUkFrontendBundle\Form\Type\CheckboxType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\InputType;
 use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
@@ -21,6 +22,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Validator\Constraints\IsTrue;
 
 class SchemeType extends AbstractType implements DataMapperInterface
 {
@@ -161,6 +163,21 @@ class SchemeType extends AbstractType implements DataMapperInterface
                     'property_path' => 'scheme.crstsData.previouslyTcf',
                 ])
         ;
+
+        /** @var Scheme $scheme */
+        $scheme = $options['data'];
+        if (!$scheme?->getId()) {
+            $builder->add('checklist', FormType::class, [
+                'label' => 'forms.scheme.checklist.label',
+                'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+            ]);
+            $builder->get('checklist')
+                ->add('dft_approved', CheckboxType::class, [
+                    'label' => 'forms.scheme.dft_approved.label',
+                    'help' => 'forms.scheme.dft_approved.help',
+                    'constraints' => [new IsTrue(message: 'scheme.dft_approved.is_true', groups: ['scheme.add'])],
+                ]);
+        }
     }
 
     public function getParent(): ?string

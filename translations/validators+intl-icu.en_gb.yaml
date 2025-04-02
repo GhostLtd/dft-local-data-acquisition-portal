@@ -72,6 +72,8 @@ scheme:
     not_blank: Enter scheme risks
   transport_mode:
     not_null: Choose a transport mode
+  dft_approved:
+    is_true: The scheme must fall within guidelines or be approved by DfT
 
 authority:
   name:
