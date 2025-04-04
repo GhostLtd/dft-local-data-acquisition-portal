@@ -30,7 +30,6 @@ class LoginSubscriber implements EventSubscriberInterface
 
     protected function getFirewallName(TokenInterface $token): ?string
     {
-        dump($token);
         if (!$token instanceof PostAuthenticationToken
             && !$token instanceof UsernamePasswordToken
         ) {
