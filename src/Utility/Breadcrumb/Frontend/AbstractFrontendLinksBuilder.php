@@ -41,7 +41,7 @@ class AbstractFrontendLinksBuilder extends AbstractBreadcrumbAndNavBuilder
         if ($this->security->isGranted(Role::CAN_MANAGE_USERS, $authority)) {
             $this->addNavLink(
                 'users',
-                'app_users',
+                'app_user_list',
                 routeParameters: ['authorityId' => $authority->getId()],
                 translationKey: 'frontend.pages.dashboard.users',
             );

@@ -10,6 +10,7 @@ class Role
     const string CAN_EDIT = 'CAN_EDIT';
     const string CAN_MANAGE_SCHEMES = 'CAN_MANAGE_SCHEMES';
     const string CAN_MANAGE_USERS = 'CAN_MANAGE_USERS';
+    const string CAN_EDIT_USER = 'CAN_EDIT_USER';
     const string CAN_SIGN_OFF_RETURN = 'CAN_SIGN_OFF_RETURN';
     const string CAN_VIEW = 'CAN_VIEW';
 

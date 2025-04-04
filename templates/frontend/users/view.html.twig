@@ -15,7 +15,10 @@
     {{- summaryListEnd() -}}
 
     <p class="govuk-button-group">
-        <a class="govuk-button" href="{{ path('app_user_edit', {authorityId: authority.id, userId: user.id}) }}">{{ 'frontend.pages.user.edit_user' | trans }}</a>
-        <a class="govuk-link" href="{{ path('app_users', {authorityId: authority.id}) }}">{{ 'frontend.pages.user.back_to_users' | trans }}</a>
+        {% if is_granted('CAN_EDIT_USER', user) %}
+            <a class="govuk-button" href="{{ path('app_user_edit', {authorityId: authority.id, userId: user.id}) }}">{{ 'frontend.pages.user.edit_user' | trans }}</a>
+            <a class="govuk-button govuk-button--warning" href="{{ path('app_user_delete', {authorityId: authority.id, userId: user.id}) }}">{{ 'frontend.pages.user.delete_user' | trans }}</a>
+        {% endif %}
+        <a class="govuk-link" href="{{ path('app_user_list', {authorityId: authority.id}) }}">{{ 'frontend.pages.user.back_to_users' | trans }}</a>
     </p>
 {%- endblock -%}

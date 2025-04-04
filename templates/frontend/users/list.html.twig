@@ -7,6 +7,7 @@
 {% block content %}
     {%- from '@GhostGovUkFrontend/components/macros.html.twig' import tableRow, tag, summaryListActionsList -%}
     {%- from "@GhostGovUkCore/list-page.html.twig" import listTableStart, listTableEnd -%}
+    {%- from "frontend/macros.html.twig" import textValue -%}
 
     {%- set listData = listPage.data -%}
     {%- set listForm = listPage.filtersForm.createView -%}
@@ -18,13 +19,14 @@
         {%- for user in listData.entities -%}
             {%- set actions = [
                 {
-                    href: path('app_user', {authorityId: authority.id, userId: user.id}),
+                    href: path('app_user_view', {authorityId: authority.id, userId: user.id}),
                     text: 'common.actions.view' | trans,
                 }
             ] -%}
             {{- tableRow([
                 {text: user.name},
                 {text: user.email},
+                {text: _self.dateValue(user.lastLogin)},
                 {html: summaryListActionsList(actions)},
             ]) -}}
         {%- else -%}
@@ -42,3 +44,7 @@
         <a class="govuk-button" href="{{ path('app_user_add', {authorityId: authority.id}) }}">{{ 'frontend.pages.user.add_user' | trans }}</a>
     </div>
 {% endblock %}
+
+{%- macro dateValue(dateValue) -%}
+    {{- dateValue ? dateValue | date('format.date-time.default' | trans) : '-' -}}
+{% endmacro %}

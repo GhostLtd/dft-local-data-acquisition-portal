@@ -532,6 +532,7 @@ frontend:
       phone: Phone
       position: Position
       edit_user: Edit user
+      delete_user: Delete user
       permission: Permission
       permissions:
         admin: Admin
@@ -548,6 +549,12 @@ frontend:
     users:
       title: &users_title "Users for {authorityName}"
       breadcrumb: *users_title
+    user_delete:
+      title: "Delete user: {userName}"
+      warning: 'Are you sure you want to delete this User?'
+      confirmed-notification:
+        heading: 'User deleted'
+        content: 'The user "{userName}" ({userIdentifier}) was deleted'
 maintenance-warning:
   banner:
     title: Important

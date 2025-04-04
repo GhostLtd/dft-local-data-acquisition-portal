@@ -38,6 +38,7 @@ class UserListPage extends AbstractListPage
         return [
             (new Simple('Name', 'user.name'))->sortable(),
             (new Simple('Email', 'user.email'))->sortable(),
+            (new Simple('Last login', 'user.lastLogin'))->sortable(),
         ];
     }
 
