@@ -29,6 +29,7 @@ class Scheme implements PropertyChangeLoggableInterface
     private ?Authority $authority = null;
 
     #[ORM\Column(length: 255)]
+    #[Length(max: 255, groups: ["scheme.add", "scheme.edit"])]
     #[NotBlank(message: 'scheme.name.not_blank', groups: ["scheme.add", "scheme.edit"])]
     private ?string $name = null; // 1proj_info: Scheme name
 
@@ -45,6 +46,7 @@ class Scheme implements PropertyChangeLoggableInterface
     private ?ActiveTravelElement $activeTravelElement = null; // 1proj_info: Does this scheme have active travel elements?
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Length(max: 255, groups: ["scheme.add", "scheme.edit"])]
     #[NotNull(message: 'scheme.identifier.not_blank', groups: ["scheme.add", "scheme.edit"])]
     private ?string $schemeIdentifier = null; // 1proj_info: Scheme ID
 
