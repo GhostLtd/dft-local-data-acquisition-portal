@@ -4,7 +4,7 @@
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
-    {% set userViewRoute = 'app_user' %}
+    {% set userViewRoute = 'app_user_view' %}
     {%- block viewFundReturn -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
         {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, ratingTag, text -%}

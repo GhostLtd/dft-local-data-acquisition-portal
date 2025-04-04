@@ -18,7 +18,7 @@
         {%- for user in listData.entities -%}
             {%- set actions = [
                 {
-                    href: path('app_user', {authorityId: authority.id, userId: user.id}),
+                    href: path('app_user_view', {authorityId: authority.id, userId: user.id}),
                     text: 'common.actions.view' | trans,
                 }
             ] -%}

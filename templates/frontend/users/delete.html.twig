@@ -1,0 +1,26 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title_key = "frontend.pages.user_delete.title" -%}
+{%- set page_title_params = {userName: subject.name} %}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{%- block content -%}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import summaryList, warningText -%}
+
+    {{ summaryList({
+        rows: {
+            'name': subject.name,
+            'email': subject.userIdentifier,
+        } | map ((v,k) => {
+            key: {text: "frontend.pages.user.#{k}" | trans},
+            value: {text: v}
+        })
+    }) }}
+
+    {%- with {warning: subject} -%}
+
+        {{- warningText({text: "#{translation_prefix}.warning" | trans }) -}}
+
+        {{- form(form) -}}
+    {%- endwith -%}
+{%- endblock -%}

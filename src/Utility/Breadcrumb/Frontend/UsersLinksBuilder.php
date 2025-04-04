@@ -11,7 +11,7 @@ class UsersLinksBuilder extends AbstractFrontendLinksBuilder
     {
         $this->addBreadcrumb(
             'users',
-            'app_users',
+            'app_user_list',
             routeParameters: ['authorityId' => $authority->getId()],
             translationKey: 'frontend.pages.users.breadcrumb',
             translationParameters: ['authorityName' => $authority->getName()],
@@ -26,7 +26,7 @@ class UsersLinksBuilder extends AbstractFrontendLinksBuilder
 
         $this->addBreadcrumb(
             'user',
-            'app_user',
+            'app_user_view',
             routeParameters: ['authorityId' => $authority->getId(), 'userId' => $user->getId()],
             translationKey: 'frontend.pages.user.breadcrumb',
             translationParameters: ['userName' => $user->getName()],
