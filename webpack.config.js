@@ -59,6 +59,11 @@ Encore
         options.sassOptions['quietDeps'] = true // Don't show deprecation warnings that originate from inside node_modules/
     })
 
+    .copyFiles({
+        from: './node_modules/govuk-frontend/dist/govuk/assets/images',
+        to: 'images/[name].[hash:8].[ext]',
+    })
+
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
 
@@ -71,6 +76,7 @@ Encore
 
     // uncomment if you're having problems with a jQuery plugin
     //.autoProvidejQuery()
+    ;
 
 let config = Encore.getWebpackConfig()
 
