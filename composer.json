@@ -41,6 +41,7 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "liip/test-fixtures-bundle": "^3.2",
+        "phpoffice/phpspreadsheet": "^4.1",
         "symfony/debug-bundle": "6.4.*",
         "symfony/maker-bundle": "^1.61",
         "symfony/phpunit-bridge": "^6.4",
