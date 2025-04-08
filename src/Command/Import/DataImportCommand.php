@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Command\Import;
 
-use App\Entity\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -32,6 +30,7 @@ class DataImportCommand extends Command
         protected FundReturnSheetImporter $fundReturnImporter,
         protected CrstsFundReturnSheetImporter $crstsFundReturnImporter,
         protected SchemeSheetImporter $schemeImporter,
+        protected CrstsSchemeReturnSheetImporter $crstsSchemeReturnImporter,
 //        protected ExpenseEntrySheetImporter $expenseEntryImporter,
     ) {
         parent::__construct();
@@ -57,6 +56,7 @@ class DataImportCommand extends Command
         $this->fundReturnImporter->import($io, $spreadsheet->getSheetByName('FundReturn'), $year, $quarter);
         $this->crstsFundReturnImporter->import($io, $spreadsheet->getSheetByName('CrstsFundReturn'), $year, $quarter);
         $this->schemeImporter->import($io, $spreadsheet->getSheetByName('Scheme'), $year, $quarter);
+        $this->crstsSchemeReturnImporter->import($io, $spreadsheet->getSheetByName('CrstsSchemeReturn'), $year, $quarter);
 //        $this->expenseEntryImporter->import($io, $spreadsheet->getSheetByName('ExpenseEntry'), $year, $quarter);
 
         return Command::SUCCESS;

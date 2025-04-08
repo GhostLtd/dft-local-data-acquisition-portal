@@ -4,7 +4,6 @@ namespace App\Command\Import;
 
 use App\Entity\Authority;
 use App\Entity\Enum\Fund;
-use App\Entity\Enum\Rating;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
@@ -90,9 +89,6 @@ abstract class AbstractSheetImporter
         if ($date = $this->attemptToFormatAsDate($value)) {
             return $date;
         }
-        if ($rating = $this->attemptToFormatAsRating($value)) {
-            return $rating;
-        }
         return $value;
     }
 
@@ -105,9 +101,21 @@ abstract class AbstractSheetImporter
         };
     }
 
-    protected function attemptToFormatAsRating(string $value): ?Rating
+    protected function attemptToFormatAsDecimal(?string $value): null|float|string
     {
-        return Rating::tryFrom(strtolower(str_replace(['/'], ['_'], $value)));
+        return match(true) {
+            1 === preg_match('/^£?(?<val>\d+(\.\d+)?)m?$/iu', $value, $matches)
+                => floatval($matches['val']),
+            default => null
+        };
+    }
+
+    protected function attemptToFormatAsEnum(string $enumClass, ?string $value): mixed
+    {
+        if (null === $value || !enum_exists($enumClass)) {
+            return null;
+        }
+        return $enumClass::tryFrom(strtolower(str_replace(['/'], ['_'], $value)));
     }
 
     protected function setColumnValues(object $obj, array $values): void

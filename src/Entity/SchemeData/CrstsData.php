@@ -10,25 +10,25 @@ use Symfony\Component\Validator\Constraints\NotNull;
 #[ORM\Embeddable]
 class CrstsData
 {
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
+    #[ORM\Column(name: 'retained', type: Types::BOOLEAN, nullable: true)]
     #[NotNull(message: 'crsts_scheme_fund.is_retained.not_null', groups: ["scheme.crsts1.add", "scheme.crsts1.edit"])]
-    private ?bool $retained = null; // 1proj_info: Is this a retained scheme?
+    private ?bool $isRetained = null; // 1proj_info: Is this a retained scheme?
 
     #[ORM\Column(nullable: true, enumType: FundedMostlyAs::class)]
     private ?FundedMostlyAs $fundedMostlyAs = FundedMostlyAs::CDEL; // 1proj_info: CDEL or RDEL
 
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
+    #[ORM\Column(name: 'previously_tcf', type: Types::BOOLEAN, nullable: true)]
     #[NotNull(message: 'crsts_scheme_fund.previously_tcf.not_null', groups: ["scheme.crsts1.add", "scheme.crsts1.edit"])]
-    private ?bool $previouslyTcf = null; // 1proj_info: Was this previously a scheme in the Transporting Cities Fund (TCF)?
+    private ?bool $isPreviouslyTcf = null; // 1proj_info: Was this previously a scheme in the Transporting Cities Fund (TCF)?
 
     public function isRetained(): ?bool
     {
-        return $this->retained;
+        return $this->isRetained;
     }
 
-    public function setRetained(?bool $retained): static
+    public function setIsRetained(?bool $retained): static
     {
-        $this->retained = $retained;
+        $this->isRetained = $retained;
         return $this;
     }
 
@@ -51,12 +51,12 @@ class CrstsData
 
     public function isPreviouslyTcf(): ?bool
     {
-        return $this->previouslyTcf;
+        return $this->isPreviouslyTcf;
     }
 
-    public function setPreviouslyTcf(?bool $previouslyTcf): static
+    public function setIsPreviouslyTcf(?bool $isPreviouslyTcf): static
     {
-        $this->previouslyTcf = $previouslyTcf;
+        $this->isPreviouslyTcf = $isPreviouslyTcf;
         return $this;
     }
 }

@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Security\SubjectResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ViewPermissionVoter extends Voter
@@ -21,6 +22,7 @@ class ViewPermissionVoter extends Voter
     public function __construct(
         protected EntityManagerInterface  $entityManager,
         protected SubjectResolver         $subjectResolver,
+        protected AuthorizationCheckerInterface $authorizationChecker,
     ) {
         $this->cache = [];
     }
@@ -36,6 +38,10 @@ class ViewPermissionVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
+        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
+
         $user = $token->getUser();
 
         if (!$user instanceof User) {
