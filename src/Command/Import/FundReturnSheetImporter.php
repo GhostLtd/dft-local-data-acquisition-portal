@@ -17,9 +17,8 @@ class FundReturnSheetImporter extends AbstractSheetImporter
     protected function processRow(Row $row): void
     {
         $values = $this->getCellValues($row);
-        [$authorityName, $values] = $this->extractValueFromArray($values, 0);
+        $authorityName = $this->extractValueFromArray($values, 'authority');
         if ($this->findCrstsFundReturnByAuthorityName($authorityName)) {
-//            $this->io->writeln("FundAward for {$authorityName} already exists: skipping...");
             return;
         }
 
@@ -28,10 +27,10 @@ class FundReturnSheetImporter extends AbstractSheetImporter
             ->setQuarter($this->quarter)
             ->setFundAward($this->findCrstsFundAwardByAuthorityName($authorityName))
         ;
+        $values['signoffDate'] = $this->attemptToFormatAsDate($values['signoffDate']);
+
         $this->setColumnValues($fundReturn, $values);
 
         $this->persist($fundReturn);
-//        $this->io->writeln("FundReturn for {$authorityName} added");
-
     }
 }

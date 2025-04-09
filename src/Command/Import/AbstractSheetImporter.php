@@ -8,6 +8,7 @@ use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
+use BackedEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -66,18 +67,18 @@ abstract class AbstractSheetImporter
 
     protected function getCellValues(Row $row): array
     {
-
-        return array_values(array_map(fn(Cell $c) => $this->getCellValue($c), iterator_to_array($row->getCellIterator())));
+//        $values = array_values();
+        return array_combine(
+            array_keys(static::COLUMNS),
+            array_map(fn(Cell $c) => $this->getCellValue($c), iterator_to_array($row->getCellIterator()))
+        );
     }
 
-    protected function extractValueFromArray(array &$values, int $index): array
+    protected function extractValueFromArray(array &$values, mixed $key): mixed
     {
-        $value = $values[$index];
-        $newValues =
-            array_slice($values, 0, $index, true)
-            + array_slice($values, $index + 1, null, true)
-            ;
-        return [$value, $newValues];
+        $value = $values[$key];
+        unset($values[$key]);
+        return $value;
     }
 
     protected function getCellValue(Cell $cell): mixed
@@ -86,13 +87,10 @@ abstract class AbstractSheetImporter
         if ($value === '') {
             return null;
         }
-        if ($date = $this->attemptToFormatAsDate($value)) {
-            return $date;
-        }
         return $value;
     }
 
-    protected function attemptToFormatAsDate(string $value): ?\DateTimeInterface
+    protected function attemptToFormatAsDate(?string $value): ?\DateTimeInterface
     {
         return match(true) {
             1 === preg_match('/^4\d{4}$/', $value) => Date::excelToDateTimeObject($value),
@@ -101,7 +99,16 @@ abstract class AbstractSheetImporter
         };
     }
 
-    protected function attemptToFormatAsDecimal(?string $value): null|float|string
+    protected function attemptToFormatAsFinancial(?string $value): ?string
+    {
+        $value = $this->attemptToFormatAsDecimal($value);
+        if ($value < 1000) {
+            return $value * 1000000;
+        }
+        return $value;
+    }
+
+    protected function attemptToFormatAsDecimal(?string $value): ?float
     {
         return match(true) {
             1 === preg_match('/^£?(?<val>\d+(\.\d+)?)m?$/iu', $value, $matches)
@@ -110,9 +117,9 @@ abstract class AbstractSheetImporter
         };
     }
 
-    protected function attemptToFormatAsEnum(string $enumClass, ?string $value): mixed
+    protected function attemptToFormatAsEnum(string $enumClass, ?string $value): ?BackedEnum
     {
-        if (null === $value || !enum_exists($enumClass)) {
+        if (null === $value || !$enumClass instanceof BackedEnum) {
             return null;
         }
         return $enumClass::tryFrom(strtolower(str_replace(['/'], ['_'], $value)));
@@ -122,7 +129,7 @@ abstract class AbstractSheetImporter
     {
         foreach ($values as $k=>$v) {
             try {
-                $this->propertyAccessor->setValue($obj, array_keys(static::COLUMNS)[$k], $v);
+                $this->propertyAccessor->setValue($obj, $k, $v);
             } catch (\Throwable $th) {
                 $this->io->writeln("unable to process '$v': {$th->getMessage()}");
             }

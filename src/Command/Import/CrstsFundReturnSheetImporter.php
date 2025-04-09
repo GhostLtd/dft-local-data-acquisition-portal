@@ -20,14 +20,14 @@ class CrstsFundReturnSheetImporter extends AbstractSheetImporter
     protected function processRow(Row $row): void
     {
         $values = $this->getCellValues($row);
-        [$authorityName, $values] = $this->extractValueFromArray($values, 0);
+        $authorityName = $this->extractValueFromArray($values, 'authority');
         if (!($fundReturn = $this->findCrstsFundReturnByAuthorityName($authorityName))) {
             $this->io->error("FundAward for {$authorityName} does not exist");
             return;
         }
 
-        $values[3] = $this->attemptToFormatAsEnum(Rating::class, $values[3]);
+        $values['overallConfidence'] = $this->attemptToFormatAsEnum(Rating::class, $values['overallConfidence']);
+
         $this->setColumnValues($fundReturn, $values);
-//        $this->io->writeln("FundReturn for {$authorityName} updated");
     }
 }

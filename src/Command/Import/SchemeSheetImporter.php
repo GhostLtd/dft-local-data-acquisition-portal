@@ -20,15 +20,17 @@ class SchemeSheetImporter extends AbstractSheetImporter
     protected function processRow(Row $row): void
     {
         $values = $this->getCellValues($row);
-        [$authorityName, $values] = $this->extractValueFromArray($values, 1);
-        if (!($scheme = $this->findSchemeByName($values[0], $authorityName))) {
+        $authorityName = $this->extractValueFromArray($values, 'authorityName');
+        if (!($scheme = $this->findSchemeByName($values['name'], $authorityName))) {
             $scheme = (new Scheme())
                 ->setAuthority($this->findAuthorityByName($authorityName));
             $this->persist($scheme);
         }
-        $values[5] = $this->attemptToFormatAsEnum(TransportMode::class, $values[5]);
-        $values[2] = $values[2] === 'Retained';
-        $values[4] = $values[4] === 'Y';
+
+        $values['transportMode'] = $this->attemptToFormatAsEnum(TransportMode::class, $values['transportMode']);
+        $values['crstsData.retained'] = ($values['crstsData.retained'] === 'Retained');
+        $values['crstsData.previouslyTcf'] = ($values['crstsData.previouslyTcf'] === 'Y');
+
         $this->setColumnValues($scheme, $values);
     }
 }

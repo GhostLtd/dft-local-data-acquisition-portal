@@ -4,6 +4,7 @@ namespace App\Command\Import;
 
 use App\Entity\Enum\BenefitCostRatioType;
 use App\Entity\Enum\BusinessCase;
+use App\Entity\PermissionsView;
 use App\Entity\SchemeFund\BenefitCostRatio;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
@@ -25,9 +26,9 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
     protected function processRow(Row $row): void
     {
         $values = $this->getCellValues($row);
-        unset($values[1]); // type: zebra/retained/standard
-        unset($values[8]); // spendToDate??
-        [$schemeIdentifier, $values] = $this->extractValueFromArray($values, 0);
+        unset($values['schemeType']); // type: zebra/retained/standard
+        unset($values['spendToDate']);
+        $schemeIdentifier = $this->extractValueFromArray($values, 'schemeAuthorityName');
         [$schemeName, $authorityName] = array_map(fn($v) => trim($v), explode('_', $schemeIdentifier));
 
         if (!($scheme = $this->findSchemeByName($schemeName, $authorityName))) {
@@ -36,24 +37,28 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
         }
         $return = $this->findCrstsFundReturnByAuthorityName($authorityName);
         $return->addSchemeReturn($schemeReturn = (new CrstsSchemeReturn())->setScheme($scheme));
-        $this->persist($schemeReturn);
 
-        $values[3] = $this->attemptToFormatAsEnum(BusinessCase::class, $values[3]);
-        if (!$values[4] instanceof \DateTimeInterface) {
-            $values[4] = null;
-        }
-        if ($values[5] !== null) {
-            $type = $this->attemptToFormatAsEnum(BenefitCostRatio::class, $values[5]);
-            if ($type) {
-                $values = (new BenefitCostRatio())->setType($type);
-            } else {
-                $values[5] = (new BenefitCostRatio())->setValue(floatval($values[5]))->setType(BenefitCostRatioType::VALUE);
-            }
-        }
-
-        $values[6] = intval($this->attemptToFormatAsDecimal($values[6]) * 1000000);
-        $values[7] = intval($this->attemptToFormatAsDecimal($values[7]) * 1000000);
+        $values['businessCase'] = $this->attemptToFormatAsEnum(BusinessCase::class, $values['businessCase']);
+        $values['expectedBusinessCaseApproval'] = $this->attemptToFormatAsDate($values['expectedBusinessCaseApproval']);
+        $values['benefitCostRatio'] = $this->attemptToFormatAsBcr($values['benefitCostRatio']);
+        $values['totalCost'] = $this->attemptToFormatAsFinancial($values['totalCost']);
+        $values['agreedFunding'] = $this->attemptToFormatAsFinancial($values['agreedFunding']);
 
         $this->setColumnValues($schemeReturn, $values);
+
+        $this->persist($schemeReturn);
+    }
+
+    protected function attemptToFormatAsBcr(?string $value): ?BenefitCostRatio
+    {
+        if ($value === null) {
+            return null;
+        }
+        /** @var BenefitCostRatioType $type */
+        $type = $this->attemptToFormatAsEnum(BenefitCostRatio::class, $value);
+        if ($type) {
+            return (new BenefitCostRatio())->setType($type);
+        }
+        return (new BenefitCostRatio())->setValue(floatval($value))->setType(BenefitCostRatioType::VALUE);
     }
 }

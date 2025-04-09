@@ -21,8 +21,7 @@ class UserSheetImporter extends AbstractSheetImporter
     protected function processRow(Row $row): void
     {
         $values = $this->getCellValues($row);
-        if ($this->findAuthorityByName($values[0])) {
-//            $this->io->writeln("Authority {$values[0]} already exists: skipping...");
+        if ($this->findAuthorityByName($values['name'])) {
             return;
         }
         $authority = (new Authority())
@@ -32,6 +31,5 @@ class UserSheetImporter extends AbstractSheetImporter
         $this->setColumnValues($authority, $values);
 
         $this->persist($authority, $authority->getAdmin(), $fundAward);
-//        $this->io->writeln("Authority {$authority->getName()} added");
     }
 }
