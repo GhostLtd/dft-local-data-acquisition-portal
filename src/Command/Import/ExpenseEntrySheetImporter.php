@@ -30,6 +30,7 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
             : $this->findCrstsFundReturnByAuthorityName($expenseIdentifier);
 
         if (!$parentEntity) {
+            $this->logger->warning("unable to find parent for ExpenseEntry: {$expenseIdentifier}", $values);
             return;
         }
 
@@ -37,7 +38,8 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
         $values['type'] = $this->attemptToFormatAsExpenseType($values['type']);
         $values['value'] = $this->attemptToFormatAsFinancial($values['value']);
 
-        if (!$values['division'] || !$values['type'] || !$values['value'] || !$values['column']) {
+        if (!$values['division'] || !$values['type'] || $values['value'] === null || !$values['column']) {
+            $this->logger->warning("invalid values for ExpenseEntry: {$expenseIdentifier}", $values);
             return;
         }
 
@@ -64,16 +66,18 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
     protected function attemptToFormatAsExpenseDivision(?string $value): ?string
     {
         $value = strtolower($value);
-        return match($value) {
-            'post-26/27' => 'post-2026-27',
-            'total' => null,
-            default => str_replace(['/'], ['-'], $value),
+        return match(true) {
+            $value === 'post-26/27' => 'post-2026-27',
+            $value === 'total' => ($this->logger->info("expense division: '$value'") ?? null),
+            1 === preg_match('/^\d{4}\/\d{2}$/', $value) => str_replace(['/'], ['-'], $value),
+            default => ($this->logger->error("invalid expense division: '$value'") ?? null),
         };
     }
 
     protected function attemptToFormatAsExpenseType(?string $value): ?ExpenseType
     {
         if (preg_match('/crsts|total/i', $value)) {
+            $this->logger->warning("invalid value for ExpenseEntry type: {$value}");
             return null;
         }
         $value = strtoupper($value);

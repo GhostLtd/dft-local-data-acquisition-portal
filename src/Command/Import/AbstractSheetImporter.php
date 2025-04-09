@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -29,6 +30,7 @@ abstract class AbstractSheetImporter
     public function __construct(
         protected EntityManagerInterface $entityManager,
         protected PropertyAccessorInterface $propertyAccessor,
+        protected LoggerInterface $logger,
     ) {}
 
     public function import(SymfonyStyle $io, Worksheet $sheet, int $year, int $quarter): void
@@ -94,9 +96,9 @@ abstract class AbstractSheetImporter
     protected function attemptToFormatAsDate(?string $value): ?\DateTimeInterface
     {
         return match(true) {
-            1 === preg_match('/^4\d{4}$/', $value) => Date::excelToDateTimeObject($value),
+            1 === preg_match('/^4|5\d{4}$/', $value) => Date::excelToDateTimeObject($value),
             1 === preg_match('/^(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4})$/', $value, $matches) => new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day']),
-            default => null
+            default => $value ? ($this->logger->error("Invalid date format: '$value'") ?? null) : null
         };
     }
 
@@ -104,10 +106,18 @@ abstract class AbstractSheetImporter
     {
         $originalValue = $value;
         $value = $this->attemptToFormatAsDecimal($value);
-        if ($value < 1000) {
-            $value *= 1000000;
-        } elseif ($value > 10000000000) {
-            $value /= 1000000;
+        if ($value > 0) {
+            if ($value < 1000) {
+                $value *= 1000000;
+                $this->logger->info("Financial multiplied by 1m: '$originalValue'");
+            } elseif ($value > 10000000000) {
+                $value /= 1000000;
+                $this->logger->info("Financial divided by 1m: '$originalValue'");
+            }
+        }
+
+        if ($originalValue && !is_numeric($value)) {
+            $this->logger->error("Financial conversion failed: '$originalValue'");
         }
 
         return "" . intval($value);
@@ -118,16 +128,20 @@ abstract class AbstractSheetImporter
         return match(true) {
             1 === preg_match('/^£?(?<val>\d+(\.\d+)?)m?$/iu', $value, $matches)
                 => floatval($matches['val']),
-            default => null
+            1 === preg_match('/^[+\-]?(?=.)(?:0|[1-9]\d*)?(?:\.\d*)?(?:\d[eE][+\-]?\d+)?$/', $value)
+                => intval($value),
+            default => (null !== $value) ? ($this->logger->error("unable to transform decimal: '$value'") ?? null) : null
         };
     }
 
     protected function attemptToFormatAsEnum(string $enumClass, ?string $value): ?BackedEnum
     {
+        $originalEnumClass = $enumClass; // needed to avoid syntax highlight in PHP storm
         if (null === $value || !$enumClass instanceof BackedEnum) {
             return null;
         }
-        return $enumClass::tryFrom(strtolower(str_replace(['/'], ['_'], $value)));
+        return $enumClass::tryFrom(strtolower(str_replace(['/'], ['_'], $value)))
+            ?? ($this->logger->warning("Enum format failed: '$originalEnumClass'/'$value'") ?? null);
     }
 
     protected function setColumnValues(object $obj, array $values): void
@@ -137,6 +151,7 @@ abstract class AbstractSheetImporter
                 $this->propertyAccessor->setValue($obj, $k, $v);
             } catch (\Throwable $th) {
                 $this->io->writeln("unable to process '$v': {$th->getMessage()}");
+                $this->logger->error("Unable to set '$k' => '$v': {$th->getMessage()}");
             }
         }
     }

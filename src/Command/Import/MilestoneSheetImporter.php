@@ -30,12 +30,13 @@ class MilestoneSheetImporter extends AbstractSheetImporter
 
         [$schemeName, $authorityName] = $this->getSchemeAndAuthorityNames($schemeIdentifier);
         if (!($schemeReturn = $this->findCrstsSchemeReturnByName($schemeName, $authorityName))) {
-            $this->io->error("Scheme return not found: {$schemeIdentifier}");
+            $this->logger->error("Scheme return not found: {$schemeIdentifier}");
             return;
         }
 
         $values['type'] = $this->attemptToFormatAsMilestoneType($values['type']);
         if (!$values['type']) {
+            $this->logger->error("Invalid Milestone Type: '{$values['type']}'", [$schemeIdentifier]);
             return;
         }
         $values['date'] = $this->attemptToFormatAsDate($values['date']);

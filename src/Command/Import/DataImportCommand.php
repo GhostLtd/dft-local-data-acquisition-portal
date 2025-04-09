@@ -6,6 +6,7 @@ namespace App\Command\Import;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,6 +31,7 @@ class DataImportCommand extends Command
     public function __construct(
         protected EntityManagerInterface $entityManager,
         protected PropertyAccessorInterface $propertyAccessor,
+        protected LoggerInterface $dataImportLogger,
     ) {
         parent::__construct();
     }
@@ -37,7 +39,6 @@ class DataImportCommand extends Command
     protected function configure(): void
     {
         $this
-//            ->addOption('sheet', 's', InputOption::VALUE_REQUIRED, 'sheet name to import', 'ExpenseEntry')
             ->addArgument('file', InputArgument::REQUIRED, 'File to import');
     }
 
@@ -49,9 +50,13 @@ class DataImportCommand extends Command
 
         [$year, $quarter] = $this->getYearAndQuarterFromFilename($file);
         $io->title("Importing spreadsheet for {$year} Q{$quarter}");
+        $this->dataImportLogger->error("Importing data for {$year} Q{$quarter}...");
 
         foreach(self::SHEET_NAMES as $name) {
-            $importer = new ("App\\Command\\Import\\{$name}SheetImporter")($this->entityManager, $this->propertyAccessor);
+            $this->dataImportLogger->error("  processing sheet: {$name}");
+            $importer = new ("App\\Command\\Import\\{$name}SheetImporter")(
+                $this->entityManager, $this->propertyAccessor, $this->dataImportLogger
+            );
             $importer->import($io, $spreadsheet->getSheetByName($name), $year, $quarter);
         }
 

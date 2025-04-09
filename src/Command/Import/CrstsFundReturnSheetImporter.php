@@ -22,7 +22,7 @@ class CrstsFundReturnSheetImporter extends AbstractSheetImporter
         $values = $this->getCellValues($row);
         $authorityName = $this->extractValueFromArray($values, 'authority');
         if (!($fundReturn = $this->findCrstsFundReturnByAuthorityName($authorityName))) {
-            $this->io->error("FundAward for {$authorityName} does not exist");
+            $this->logger->error("FundAward for {$authorityName} does not exist");
             return;
         }
 

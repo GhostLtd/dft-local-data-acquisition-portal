@@ -33,7 +33,7 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
 
         [$schemeName, $authorityName] = $this->getSchemeAndAuthorityNames($schemeIdentifier);
         if (!($scheme = $this->findSchemeByName($schemeName, $authorityName))) {
-            $this->io->error("Scheme not found: {$schemeIdentifier}");
+            $this->logger->error("Scheme not found: {$schemeIdentifier}");
             return;
         }
         $return = $this->findCrstsFundReturnByAuthorityName($authorityName);
@@ -57,9 +57,9 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
         }
         /** @var BenefitCostRatioType $type */
         $type = $this->attemptToFormatAsEnum(BenefitCostRatio::class, $value);
-        if ($type) {
+        if ($type !== BenefitCostRatioType::VALUE) {
             return (new BenefitCostRatio())->setType($type);
         }
-        return (new BenefitCostRatio())->setValue(floatval($value))->setType(BenefitCostRatioType::VALUE);
+        return (new BenefitCostRatio())->setValue($this->attemptToFormatAsDecimal($value))->setType(BenefitCostRatioType::VALUE);
     }
 }
