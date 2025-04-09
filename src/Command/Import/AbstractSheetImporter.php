@@ -8,6 +8,7 @@ use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use BackedEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
@@ -101,11 +102,15 @@ abstract class AbstractSheetImporter
 
     protected function attemptToFormatAsFinancial(?string $value): ?string
     {
+        $originalValue = $value;
         $value = $this->attemptToFormatAsDecimal($value);
         if ($value < 1000) {
-            return $value * 1000000;
+            $value *= 1000000;
+        } elseif ($value > 10000000000) {
+            $value /= 1000000;
         }
-        return $value;
+
+        return "" . intval($value);
     }
 
     protected function attemptToFormatAsDecimal(?string $value): ?float
@@ -136,6 +141,11 @@ abstract class AbstractSheetImporter
         }
     }
 
+    protected function getSchemeAndAuthorityNames(?string $schemeIdentifier): array
+    {
+        return array_map(fn($v) => trim($v), explode('_', $schemeIdentifier));
+    }
+
     protected function findAuthorityByName(string $name): ?Authority
     {
         return $this->entityManager->getRepository(Authority::class)->findOneBy(['name' => $name]);
@@ -160,6 +170,24 @@ abstract class AbstractSheetImporter
         ]);
     }
 
+    protected function findCrstsSchemeReturnByName(string $schemeName, string $authorityName): ?CrstsSchemeReturn
+    {
+        if ($this->isMissingZebraScheme("{$schemeName}_{$authorityName}")) {return null;}
+
+        $fundReturn = $this->findCrstsFundReturnByAuthorityName($authorityName);
+        if (!$fundReturn) {
+            throw new \RuntimeException('crsts fund return not found: ' . $authorityName);
+        }
+        $scheme = $this->findSchemeByName($schemeName, $authorityName);
+        if (!$scheme) {
+            throw new \RuntimeException('scheme not found: ' . $schemeName);
+        }
+        return $this->entityManager->getRepository(CrstsSchemeReturn::class)->findOneBy([
+            'scheme' => $scheme,
+            'fundReturn' => $fundReturn,
+        ]);
+    }
+
     protected function findSchemeByName(string $schemeName, string $authorityName): ?Scheme
     {
         $authority = $this->findAuthorityByName($authorityName);
@@ -169,6 +197,17 @@ abstract class AbstractSheetImporter
         return $this->entityManager->getRepository(Scheme::class)->findOneBy([
             'name' => $schemeName,
             'authority' => $authority,
+        ]);
+    }
+
+    protected function isMissingZebraScheme(string $identifier): bool
+    {
+        return in_array($identifier, [
+            'Electric Vehicles (EV) Buses_Greater Manchester CA',
+            'CRSTS22/1 Zero Emission Buses - Phase 1 _South Yorkshire MCA',
+            'CRSTS22/1 Zero Emission Buses - Phase 1_South Yorkshire MCA',
+            'Overprogramming - Zero Emission Buses - additional scope opportunity_South Yorkshire MCA',
+            '(51) Zero Emission Buses_The West Yorkshire Combined Authority',
         ]);
     }
 }

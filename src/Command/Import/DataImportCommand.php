@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command\Import;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -11,27 +12,24 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 #[AsCommand(name: 'app:import:jess', description: 'Import data from Jess` spreadsheets' )]
 class DataImportCommand extends Command
 {
     private const SHEET_NAMES = [
-        'CrstsFundReturn',
-        'CrstsSchemeReturn',
-        'Scheme',
-        'ExpenseEntry',
         'User',
         'FundReturn',
+        'CrstsFundReturn',
+        'Scheme',
+        'CrstsSchemeReturn',
+        'ExpenseEntry',
         'Milestone',
     ];
 
     public function __construct(
-        protected UserSheetImporter $userImporter,
-        protected FundReturnSheetImporter $fundReturnImporter,
-        protected CrstsFundReturnSheetImporter $crstsFundReturnImporter,
-        protected SchemeSheetImporter $schemeImporter,
-        protected CrstsSchemeReturnSheetImporter $crstsSchemeReturnImporter,
-//        protected ExpenseEntrySheetImporter $expenseEntryImporter,
+        protected EntityManagerInterface $entityManager,
+        protected PropertyAccessorInterface $propertyAccessor,
     ) {
         parent::__construct();
     }
@@ -52,12 +50,10 @@ class DataImportCommand extends Command
         [$year, $quarter] = $this->getYearAndQuarterFromFilename($file);
         $io->title("Importing spreadsheet for {$year} Q{$quarter}");
 
-        $this->userImporter->import($io, $spreadsheet->getSheetByName('User'), $year, $quarter);
-        $this->fundReturnImporter->import($io, $spreadsheet->getSheetByName('FundReturn'), $year, $quarter);
-        $this->crstsFundReturnImporter->import($io, $spreadsheet->getSheetByName('CrstsFundReturn'), $year, $quarter);
-        $this->schemeImporter->import($io, $spreadsheet->getSheetByName('Scheme'), $year, $quarter);
-        $this->crstsSchemeReturnImporter->import($io, $spreadsheet->getSheetByName('CrstsSchemeReturn'), $year, $quarter);
-//        $this->expenseEntryImporter->import($io, $spreadsheet->getSheetByName('ExpenseEntry'), $year, $quarter);
+        foreach(self::SHEET_NAMES as $name) {
+            $importer = new ("App\\Command\\Import\\{$name}SheetImporter")($this->entityManager, $this->propertyAccessor);
+            $importer->import($io, $spreadsheet->getSheetByName($name), $year, $quarter);
+        }
 
         return Command::SUCCESS;
     }
