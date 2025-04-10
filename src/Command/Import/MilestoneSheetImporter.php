@@ -23,7 +23,7 @@ class MilestoneSheetImporter extends AbstractSheetImporter
 
     protected function processRow(Row $row): void
     {
-        $values = $this->getCellValues($row);
+        $originalValues = $values = $this->getCellValues($row);
         unset($values['flag']);
         $schemeIdentifier = $this->extractValueFromArray($values, 'identifier');
         if ($this->isMissingZebraScheme($schemeIdentifier)) {return;}
@@ -36,7 +36,7 @@ class MilestoneSheetImporter extends AbstractSheetImporter
 
         $values['type'] = $this->attemptToFormatAsMilestoneType($values['type']);
         if (!$values['type']) {
-            $this->logger->error("Invalid MilestoneType", [$authorityName, $schemeName, $values['type']]);
+            $this->logger->error("Invalid MilestoneType", [$values['type'], $authorityName, $schemeName, $originalValues]);
             return;
         }
         $values['date'] = $this->attemptToFormatAsDate($values['date']);
@@ -48,6 +48,17 @@ class MilestoneSheetImporter extends AbstractSheetImporter
         $this->setColumnValues($milestone, $values);
 
         $this->persist($milestone);
+
+        // as per call with Bella/Jess, we want to add final delivery milestone as copy of end construction.
+        // we will be collecting this as a separate value moving forwards
+        if ($values['type'] === MilestoneType::END_CONSTRUCTION) {
+            $fdMilestone = (new Milestone())
+                ->setType(MilestoneType::FINAL_DELIVERY)
+                ->setDate($values['date'])
+            ;
+            $schemeReturn->addMilestone($fdMilestone);
+            $this->persist($fdMilestone);
+        }
     }
 
     protected function attemptToFormatAsMilestoneType(?string $value): ?MilestoneType

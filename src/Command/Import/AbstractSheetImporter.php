@@ -95,15 +95,17 @@ abstract class AbstractSheetImporter
 
     protected function attemptToFormatAsDate(?string $value): ?\DateTimeInterface
     {
-        $ignoreValues = ['tbc', 'n/a', 'post fbc', 'development only', 'various', 'development progressing but dates tbc'];
+        $ignoreValues = ['-', 'tbc', 'n/a', 'post fbc', 'development only', 'various', 'development progressing but dates tbc'];
         return match(true) {
-            1 === preg_match('/^4|5\d{4}$/', $value) => Date::excelToDateTimeObject($value),
+            in_array(strtolower($value), $ignoreValues) => ($this->logger->info("Ignored date", [$value]) ?? null),
+            1 === preg_match('/^[345]\d{4}$/', $value) => Date::excelToDateTimeObject($value),
             1 === preg_match('/^(?<day>[012]\d|3[01])\.(?<month>0\d|1[012])\.(?<year>20\d{2})$/', $value, $matches)
                 => new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day']),
             1 === preg_match('/^(?<day>[012]\d|3[01])\/(?<month>0\d|1[012])\/(?<year>20\d{2})/', $value, $matches)
                 => ($this->logger->info("partial date match", [$value])
                     ?? new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day'])),
-            in_array(strtolower($value), $ignoreValues) => ($this->logger->info("Ignored date", [$value]) ?? null),
+            1 === preg_match('/^(?<year>20\d{2})$/', $value, $matches)
+                => new \DateTime($matches['year'] . '-01-01'),
             $value === null => null,
             default => ($this->logger->error("Invalid date format", [$value]) ?? null)
         };
@@ -117,7 +119,7 @@ abstract class AbstractSheetImporter
             if ($value < 1000) {
                 $value *= 1000000;
                 $this->logger->debug("Financial multiplied by 1m", [$value]);
-            } elseif ($value > 10000000000) {
+            } elseif ($value > 1000000000) {
                 $value /= 1000000;
                 $this->logger->debug("Financial divided by 1m", [$value]);
             }
