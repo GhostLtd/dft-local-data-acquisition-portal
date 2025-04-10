@@ -95,10 +95,17 @@ abstract class AbstractSheetImporter
 
     protected function attemptToFormatAsDate(?string $value): ?\DateTimeInterface
     {
+        $ignoreValues = ['tbc', 'n/a', 'post fbc', 'development only', 'various', 'development progressing but dates tbc'];
         return match(true) {
             1 === preg_match('/^4|5\d{4}$/', $value) => Date::excelToDateTimeObject($value),
-            1 === preg_match('/^(?<day>\d{2})\.(?<month>\d{2})\.(?<year>\d{4})$/', $value, $matches) => new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day']),
-            default => $value ? ($this->logger->error("Invalid date format: '$value'") ?? null) : null
+            1 === preg_match('/^(?<day>[012]\d|3[01])\.(?<month>0\d|1[012])\.(?<year>20\d{2})$/', $value, $matches)
+                => new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day']),
+            1 === preg_match('/^(?<day>[012]\d|3[01])\/(?<month>0\d|1[012])\/(?<year>20\d{2})/', $value, $matches)
+                => ($this->logger->info("partial date match", [$value])
+                    ?? new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day'])),
+            in_array(strtolower($value), $ignoreValues) => ($this->logger->info("Ignored date", [$value]) ?? null),
+            $value === null => null,
+            default => ($this->logger->error("Invalid date format", [$value]) ?? null)
         };
     }
 
@@ -109,15 +116,15 @@ abstract class AbstractSheetImporter
         if ($value > 0) {
             if ($value < 1000) {
                 $value *= 1000000;
-                $this->logger->info("Financial multiplied by 1m: '$originalValue'");
+                $this->logger->debug("Financial multiplied by 1m", [$value]);
             } elseif ($value > 10000000000) {
                 $value /= 1000000;
-                $this->logger->info("Financial divided by 1m: '$originalValue'");
+                $this->logger->debug("Financial divided by 1m", [$value]);
             }
         }
 
-        if ($originalValue && !is_numeric($value)) {
-            $this->logger->error("Financial conversion failed: '$originalValue'");
+        if ($originalValue && $value !== null && !is_numeric($value)) {
+            $this->logger->error("Financial conversion failed", [$originalValue, $value]);
         }
 
         return "" . intval($value);
@@ -125,12 +132,15 @@ abstract class AbstractSheetImporter
 
     protected function attemptToFormatAsDecimal(?string $value): ?float
     {
+        $ignoreValues = ['tbc', 'n/a'];
         return match(true) {
             1 === preg_match('/^£?(?<val>\d+(\.\d+)?)m?$/iu', $value, $matches)
                 => floatval($matches['val']),
             1 === preg_match('/^[+\-]?(?=.)(?:0|[1-9]\d*)?(?:\.\d*)?(?:\d[eE][+\-]?\d+)?$/', $value)
                 => intval($value),
-            default => (null !== $value) ? ($this->logger->error("unable to transform decimal: '$value'") ?? null) : null
+            in_array(strtolower($value), $ignoreValues) => ($this->logger->info("ignore decimal value", [$value]) ?? null),
+            null === $value => null,
+            default => ($this->logger->error("unable to transform decimal", [$value]) ?? null)
         };
     }
 
@@ -141,7 +151,7 @@ abstract class AbstractSheetImporter
             return null;
         }
         return $enumClass::tryFrom(strtolower(str_replace(['/'], ['_'], $value)))
-            ?? ($this->logger->warning("Enum format failed: '$originalEnumClass'/'$value'") ?? null);
+            ?? ($this->logger->warning("Enum format failed", [$originalEnumClass, $value]) ?? null);
     }
 
     protected function setColumnValues(object $obj, array $values): void
@@ -151,7 +161,7 @@ abstract class AbstractSheetImporter
                 $this->propertyAccessor->setValue($obj, $k, $v);
             } catch (\Throwable $th) {
                 $this->io->writeln("unable to process '$v': {$th->getMessage()}");
-                $this->logger->error("Unable to set '$k' => '$v': {$th->getMessage()}");
+                $this->logger->error("Unable to set value", [$k, $v, $th->getMessage()]);
             }
         }
     }

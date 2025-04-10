@@ -38,8 +38,22 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
         $values['type'] = $this->attemptToFormatAsExpenseType($values['type']);
         $values['value'] = $this->attemptToFormatAsFinancial($values['value']);
 
-        if (!$values['division'] || !$values['type'] || $values['value'] === null || !$values['column']) {
-            $this->logger->warning("invalid values for ExpenseEntry: {$expenseIdentifier}", $values);
+        if(!$values['division'] || !$values['type']) {
+            return;
+        }
+
+        if ($values['value'] === null || !$values['column']) {
+            $this->logger->warning("invalid values for ExpenseEntry", [$expenseIdentifier, $values]);
+            return;
+        }
+
+        if ($isSchemeExpense && !in_array($values['type'], [ExpenseType::SCHEME_CAPITAL_SPEND_FUND, ExpenseType::SCHEME_CAPITAL_SPEND_ALL_SOURCES])) {
+            $this->logger->error("invalid ExpenseEntry type for scheme", [$expenseIdentifier, $values]);
+            return;
+        }
+
+        if (!$isSchemeExpense && in_array($values['type'], [ExpenseType::SCHEME_CAPITAL_SPEND_FUND, ExpenseType::SCHEME_CAPITAL_SPEND_ALL_SOURCES])) {
+            $this->logger->error("invalid ExpenseEntry type for return", [$expenseIdentifier, $values]);
             return;
         }
 
@@ -65,24 +79,40 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
 
     protected function attemptToFormatAsExpenseDivision(?string $value): ?string
     {
+        $ignoredValues = ['total', 'comments', 'current date vs date from previous report'];
         $value = strtolower($value);
         return match(true) {
             $value === 'post-26/27' => 'post-2026-27',
-            $value === 'total' => ($this->logger->info("expense division: '$value'") ?? null),
+            $value === 'total' => ($this->logger->info("ignored expense division", [$value]) ?? null),
             1 === preg_match('/^\d{4}\/\d{2}$/', $value) => str_replace(['/'], ['-'], $value),
-            default => ($this->logger->error("invalid expense division: '$value'") ?? null),
+            in_array(strtolower($value), $ignoredValues) => ($this->logger->info("ignored expense division", [$value]) ?? null),
+            default => ($this->logger->error("invalid expense division", [$value]) ?? null),
         };
     }
 
     protected function attemptToFormatAsExpenseType(?string $value): ?ExpenseType
     {
-        if (preg_match('/crsts|total/i', $value)) {
-            $this->logger->warning("invalid value for ExpenseEntry type: {$value}");
+        $subMap = [
+            'FUND_RESOURCE_TOTAL' => ExpenseType::FUND_RESOURCE_EXPENDITURE,
+            'CRSTS SPEND' => ExpenseType::SCHEME_CAPITAL_SPEND_FUND,
+            'TOTAL SPEND' => ExpenseType::SCHEME_CAPITAL_SPEND_ALL_SOURCES,
+        ];
+        $value = strtoupper($value);
+        if (array_key_exists($value, $subMap)) {
+            $this->logger->info("replaced ExpenseEntry type", [$value, $subMap[$value]->name]);
+            return $subMap[$value];
+        }
+        if (preg_match('/_total$/i', $value)) {
+            $this->logger->info("ignored total ExpenseEntry Type", [$value]);
             return null;
         }
-        $value = strtoupper($value);
-        /** @var ExpenseType $enum */
-        $enum = (new \ReflectionEnumBackedCase(ExpenseType::class, $value))->getValue();
-        return $enum;
+        try {
+            /** @var ExpenseType $enum */
+            $enum = (new \ReflectionEnumBackedCase(ExpenseType::class, $value))->getValue();
+            return $enum;
+        } catch (\Throwable $e) {
+            $this->logger->error("invalid expense type", [$value, $e->getMessage()]);
+            return null;
+        }
     }
 }

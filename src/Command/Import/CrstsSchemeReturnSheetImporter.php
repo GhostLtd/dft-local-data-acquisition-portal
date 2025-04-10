@@ -33,7 +33,7 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
 
         [$schemeName, $authorityName] = $this->getSchemeAndAuthorityNames($schemeIdentifier);
         if (!($scheme = $this->findSchemeByName($schemeName, $authorityName))) {
-            $this->logger->error("Scheme not found: {$schemeIdentifier}");
+            $this->logger->error("Scheme not found", [$schemeIdentifier]);
             return;
         }
         $return = $this->findCrstsFundReturnByAuthorityName($authorityName);
