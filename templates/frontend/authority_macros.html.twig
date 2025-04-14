@@ -24,5 +24,6 @@
 {%- endmacro -%}
 
 {%- macro returnTag(fundReturn) -%}
-    {{- fundReturn.signoffUser is null ? 'in_progress' : 'completed' -}}
+    {# @var \App\Entity\FundReturn\FundReturn fundReturn #}
+    {{- fundReturn.signedOff is null ? 'in_progress' : 'completed' -}}
 {%- endmacro -%}

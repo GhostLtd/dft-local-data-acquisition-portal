@@ -5,32 +5,36 @@
 
 {%- block content -%}
     {%- block viewSchemeReturn -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-        {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList, summaryCard, summaryListStart, summaryListEnd, summaryListRow -%}
+        {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue, displayCardForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
 
         {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
 
         {# @var schemeReturn \App\Entity\SchemeReturn\CrstsSchemeReturn #}
 
         <div class="govuk-!-margin-bottom-9">
-            <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.scheme_details' | trans }}</h2>
 
-            {%- set contents -%}
-                {{- summaryListStart() -}}
-                {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.scheme.crstsData.retained) }}
-                {{- yesOrNo('frontend.pages.scheme_return.ready_for_signoff', schemeReturn.readyForSignoff) }}
-                {{- summaryListEnd() -}}
-            {%- endset %}
+            {# @var \App\Entity\Scheme scheme #}
+            {%- set scheme = schemeReturn.scheme -%}
+            {{- summaryCard({
+                title: {text: 'frontend.pages.scheme_return.titles.scheme_details' | trans},
+                attributes: {id: 'scheme_details'},
+            }, summaryList({
+                rows: {
+                    'scheme.scheme_identifier': scheme.schemeIdentifier,
+                    'scheme_return.ready_for_signoff': yesOrNoValue(schemeReturn.readyForSignoff),
+                    'scheme.name': scheme.name,
+                    'scheme.description': scheme.description,
+                    'scheme.transport_mode': (scheme.transportMode.forDisplay ?? null) | trans,
+                    ((scheme.transportMode.activeTravel ?? false) ? '' : 'scheme.has_active_travel_elements'): (scheme.activeTravelElement.forDisplay ?? null) | trans,
+                    'scheme_return.retained': yesOrNoValue(scheme.crstsData.retained),
+                    'scheme_return.previously_tcf': yesOrNoValue(scheme.crstsData.previouslyTcf),
+                } | filter((v,k) => k is not empty) | map ((v,k) => {
+                    key: {text: "frontend.pages.#{k}" | trans},
+                    value: v is iterable ? v : {text: textValue(v)}
+                })
+            })) -}}
 
-            {{- displayCardForReturn(
-                schemeReturn,
-                'frontend.pages.scheme_return.titles.status' | trans,
-                'status',
-                contents,
-                {
-                    add_edit_link: false,
-                },
-            ) -}}
 
             {%- set contents -%}
                 {{- summaryListStart() -}}
@@ -73,7 +77,7 @@
                     {{- summaryListStart() -}}
                     {%- for milestone in schemeReturn.milestones -%}
                         {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value})) -%}
-                        {{- date(label, milestone.date, {translateLabel: false}) -}}
+                        {{- date(label, milestone.date, {translateLabel: false, dateFormat: 'format.date.year-and-month'}) -}}
                     {%- endfor -%}
                     {{- summaryListEnd() -}}
                 {%- endset -%}
@@ -89,7 +93,7 @@
                     {{- summaryListStart() -}}
                     {{- enumText('frontend.pages.scheme_return.current_business_case', 'enum.business_case', schemeReturn.businessCase) -}}
                     {%- if schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable' -%}
-                        {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval) -}}
+                        {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval, {dateFormat: 'format.date.year-and-month'}) -}}
                     {%- endif -%}
                     {{- summaryListEnd() -}}
                 {%- endset -%}

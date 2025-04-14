@@ -118,6 +118,7 @@ enum:
     amber_red: Amber / Red
     red: Red
   transport_mode:
+    full_display: "{category}: {mode}"
     categories:
       multi_modal: Multi-modal
       active_travel: Active travel
@@ -415,6 +416,9 @@ format:
 
 frontend:
   pages:
+    accessibility-statement:
+      page-title: Accessibility statement for {hostname}
+
     auth:
       authenticate:
         title: Login using email link

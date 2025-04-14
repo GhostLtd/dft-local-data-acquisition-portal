@@ -214,4 +214,9 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
             substr(strval($this->year + 1), 2) :
             null;
     }
+
+    public function isSignedOff(): bool
+    {
+        return null !== $this->signoffDate;
+    }
 }

@@ -20,6 +20,8 @@
 
 {%- macro detailsContent(authority) -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList -%}
+    {%- from "frontend/macros.html.twig" import textValue -%}
+
     {{- summaryList({
         rows: {
             'name': authority.name,
@@ -29,13 +31,9 @@
             'admin.phone': authority.admin.phone,
         } | map ((v,k) => {
             key: {text: "pages.authority_view.details.#{k}" | trans},
-            value: v is iterable ? v : {text: _self.textValue(v)}
+            value: v is iterable ? v : {text: textValue(v)}
         })
     }) -}}
-{%- endmacro -%}
-
-{%- macro textValue(value) -%}
-    {{- ((value is empty) ? '-' : value) | nl2br -}}
 {%- endmacro -%}
 
 {%- macro usersContent(users) -%}

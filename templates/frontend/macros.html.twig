@@ -101,7 +101,7 @@
 {% endmacro %}
 
 {% macro date(label, value, options) %}
-    {%- set value = value ? (value | date('format.date.default' | trans)) : null -%}
+    {%- set value = value ? (value | date((options.dateFormat ?? 'format.date.default') | trans)) : null -%}
     {{- _self.text(label, value, options) -}}
 {% endmacro %}
 
@@ -118,6 +118,14 @@
 {% macro text(label, value, options) %}
     {{- _self.displaySummaryListRow(label, (value ?? '-') | nl2br, options) -}}
 {% endmacro %}
+
+{%- macro yesOrNoValue(value) -%}
+    {{- (value == true ? 'common.text.yes' : 'common.text.no') | trans -}}
+{%- endmacro -%}
+
+{%- macro textValue(value) -%}
+    {{- ((value is empty) ? '-' : value) | nl2br -}}
+{%- endmacro -%}
 
 {% macro onTrackRating(label, ratingEnum, options) %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tag -%}
