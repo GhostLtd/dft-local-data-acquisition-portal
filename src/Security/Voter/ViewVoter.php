@@ -21,10 +21,6 @@ class ViewVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if ($this->authorizationChecker->isGranted('ROLE_ADMIN')) {
-            return true;
-        }
-
         if ($this->authorizationChecker->isGranted(InternalRole::HAS_VALID_VIEW_PERMISSION, $subject)) {
             return true;
         }

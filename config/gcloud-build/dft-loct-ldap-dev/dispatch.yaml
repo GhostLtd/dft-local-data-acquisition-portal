@@ -2,5 +2,5 @@
 # (Along with the relevant app.<service>.yaml file)
 #
 dispatch:
-  - url: "admin.dft-loct-ldap-dev.appspot.com/*"
+  - url: "admin.dev.submitlocaldata.dft.gov.uk/*"
     service: admin
