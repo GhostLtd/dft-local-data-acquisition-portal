@@ -23,13 +23,16 @@ class MarkSchemeAsReadyVoter extends Voter
             $subject instanceof SchemeReturn;
     }
 
+    /**
+     * @param SchemeReturn $subject
+     */
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         if (!$this->authorizationChecker->isGranted(InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, $subject)) {
             return false;
         }
 
-        if ($subject->getFundReturn()?->getSignoffUser() !== null) {
+        if ($subject->getFundReturn()?->isSignedOff()) {
             // Cannot mark_as_ready if the return has been signed off
             return false;
         }

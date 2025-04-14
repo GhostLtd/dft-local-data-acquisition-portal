@@ -73,7 +73,7 @@ class SchemeCriticalFieldVoter extends Voter
                 $fundValue = $fundReturn->getFund()->value;
                 $signedOffByFund[$fundValue] ??= false;
 
-                if ($fundReturn->getSignoffUser() !== null) {
+                if ($fundReturn->isSignedOff()) {
                     $signedOffByFund[$fundValue] = true;
                 }
             }

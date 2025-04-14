@@ -31,6 +31,9 @@ class DenyActionsOnSignedOffReturnVoter extends Voter
             ($subject instanceof FundReturn || $subject instanceof SchemeReturn);
     }
 
+    /**
+     * @param FundReturn|SchemeReturn $subject
+     */
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $resolvedSubject = $this->subjectResolver->resolveSubjectForRole($subject, $attribute);
@@ -40,7 +43,7 @@ class DenyActionsOnSignedOffReturnVoter extends Voter
             SchemeReturn::class => $subject->getFundReturn(),
         };
 
-        if (!$fundReturn || $fundReturn->getSignoffUser() !== null) {
+        if (!$fundReturn || $fundReturn->isSignedOff()) {
             // Cannot <sign_off/mark_as_ready_edit> if the return has already been signed off
             return false;
         }

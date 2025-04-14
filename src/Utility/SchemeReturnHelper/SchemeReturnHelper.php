@@ -90,7 +90,7 @@ class SchemeReturnHelper
     public function getUnsubmittedReturnsForSchemeAndFund(Scheme $scheme, Fund $fund): array
     {
         $returns = $this->getReturnsForSchemeAndFund($scheme, $fund);
-        return array_filter($returns, fn(FundReturn $r) => $r->getSignoffUser() === null);
+        return array_filter($returns, fn(FundReturn $r) => !$r->isSignedOff());
     }
 
     /**
