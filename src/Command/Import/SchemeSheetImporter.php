@@ -15,12 +15,14 @@ class SchemeSheetImporter extends AbstractSheetImporter
         'description' => 'description',
         'crstsData.previouslyTcf' => 'crsts_data_is_previously_tcf',
         'transportMode' => 'transport_mode',
+        'schemeType' => 'scheme_type',
     ];
 
     protected function processRow(Row $row): void
     {
         $values = $this->getCellValues($row);
         $authorityName = $this->extractValueFromArray($values, 'authorityName');
+        unset($values['schemeType']);
         if (!($scheme = $this->findSchemeByName($values['name'], $authorityName))) {
             $scheme = (new Scheme())
                 ->setAuthority($this->findAuthorityByName($authorityName));

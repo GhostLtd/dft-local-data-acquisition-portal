@@ -12,11 +12,11 @@ when@dev:
                 type:     stream
                 path:     '%kernel.logs_dir%/data-import_all.log'
                 channels: [dataImport]
-            importError:
+            importWarning:
                 # log all messages (since debug is the lowest level)
-                level:    error
+                level:    warning
                 type:     stream
-                path:     '%kernel.logs_dir%/data-import_error.log'
+                path:     '%kernel.logs_dir%/data-import_warning.log'
                 channels: [dataImport]
 
             main:

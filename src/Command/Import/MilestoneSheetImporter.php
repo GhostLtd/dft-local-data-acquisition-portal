@@ -15,9 +15,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 class MilestoneSheetImporter extends AbstractSheetImporter
 {
     protected const array COLUMNS = [
-        'type' => 'attribute',
         'date' => 'value',
         'flag' => 'baseline_flag',
+        'type' => 'milestone_type',
         'identifier' => 'name_location',
     ];
 
@@ -26,7 +26,6 @@ class MilestoneSheetImporter extends AbstractSheetImporter
         $originalValues = $values = $this->getCellValues($row);
         unset($values['flag']);
         $schemeIdentifier = $this->extractValueFromArray($values, 'identifier');
-        if ($this->isMissingZebraScheme($schemeIdentifier)) {return;}
 
         [$schemeName, $authorityName] = $this->getSchemeAndAuthorityNames($schemeIdentifier);
         if (!($schemeReturn = $this->findCrstsSchemeReturnByName($schemeName, $authorityName))) {
@@ -63,6 +62,21 @@ class MilestoneSheetImporter extends AbstractSheetImporter
 
     protected function attemptToFormatAsMilestoneType(?string $value): ?MilestoneType
     {
+        $ignoredZebMilestones = [
+            'First ZEBs ordered',
+            'First ZEBS delivered',
+            'Final ZEBs enter service',
+            'First Charging/refuelling infrastructure ordered',
+            'Final Charging/refuelling infrastructure installed',
+            'First Grid connection work ordered',
+            'Final Grid connection work complete',
+            'ZEBs ordered (CCS)',
+            'ZEBS delivered (CCS)',
+            'ZEBs enter service (CCS)',
+            'Charging/refuelling infrastructure ordered (CCS)',
+            'Charging/refuelling infrastructure installed (CCS)',
+            '',
+        ];
         $value = strtoupper(str_replace([' / delivery', ' '], ['', '_'], $value));
         /** @var MilestoneType $enum */
         try {

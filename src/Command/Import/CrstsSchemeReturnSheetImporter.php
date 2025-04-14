@@ -29,7 +29,6 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
         unset($values['schemeType']); // type: zebra/retained/standard
         unset($values['spendToDate']);
         $schemeIdentifier = $this->extractValueFromArray($values, 'schemeAuthorityName');
-        if ($this->isMissingZebraScheme($schemeIdentifier)) {return;}
 
         [$schemeName, $authorityName] = $this->getSchemeAndAuthorityNames($schemeIdentifier);
         if (!($scheme = $this->findSchemeByName($schemeName, $authorityName))) {

@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Throwable;
 
 abstract class AbstractSheetImporter
 {
@@ -56,9 +57,10 @@ abstract class AbstractSheetImporter
     protected function verifyExpectedHeaderRow(Worksheet $sheet, array $expectedHeaders): void
     {
         $row = $sheet->getRowIterator(1)->current();
-        $cellValues = $this->getCellValues($row);
+        $cellValues = array_map(fn(Cell $c) => $c->getValue(), iterator_to_array($row->getCellIterator()));
         if (!empty(array_diff($cellValues, $expectedHeaders))) {
-            throw new \RuntimeException('headers not as expected: ' . implode(', ', $cellValues));
+            dump(['values' => array_values($cellValues), 'expected' => array_values($expectedHeaders)]);
+            throw new \RuntimeException('headers not as expected');
         }
     }
 
@@ -71,10 +73,14 @@ abstract class AbstractSheetImporter
     protected function getCellValues(Row $row): array
     {
 //        $values = array_values();
-        return array_combine(
-            array_keys(static::COLUMNS),
-            array_map(fn(Cell $c) => $this->getCellValue($c), iterator_to_array($row->getCellIterator()))
-        );
+        try {
+            return array_combine(
+                $k = array_keys(static::COLUMNS),
+                $v = array_map(fn(Cell $c) => $this->getCellValue($c), iterator_to_array($row->getCellIterator()))
+            );
+        } catch (\Throwable $e) {
+            dump($k, $v ?? null); exit;
+        }
     }
 
     protected function extractValueFromArray(array &$values, mixed $key): mixed
@@ -107,7 +113,8 @@ abstract class AbstractSheetImporter
             1 === preg_match('/^(?<year>20\d{2})$/', $value, $matches)
                 => new \DateTime($matches['year'] . '-01-01'),
             $value === null => null,
-            default => ($this->logger->error("Invalid date format", [$value]) ?? null)
+            default => (function($v) {try{return new \DateTime($v);}catch(Throwable $e){return null;}})($value)
+                ?? ($this->logger->error("Invalid date format", [$value]) ?? null)
         };
     }
 
@@ -119,7 +126,7 @@ abstract class AbstractSheetImporter
             if ($value < 1000) {
                 $value *= 1000000;
                 $this->logger->debug("Financial multiplied by 1m", [$value]);
-            } elseif ($value > 1000000000) {
+            } elseif ($value > 5000000000) {
                 $value /= 1000000;
                 $this->logger->debug("Financial divided by 1m", [$value]);
             }
@@ -199,8 +206,6 @@ abstract class AbstractSheetImporter
 
     protected function findCrstsSchemeReturnByName(string $schemeName, string $authorityName): ?CrstsSchemeReturn
     {
-        if ($this->isMissingZebraScheme("{$schemeName}_{$authorityName}")) {return null;}
-
         $fundReturn = $this->findCrstsFundReturnByAuthorityName($authorityName);
         if (!$fundReturn) {
             throw new \RuntimeException('crsts fund return not found: ' . $authorityName);
@@ -224,17 +229,6 @@ abstract class AbstractSheetImporter
         return $this->entityManager->getRepository(Scheme::class)->findOneBy([
             'name' => $schemeName,
             'authority' => $authority,
-        ]);
-    }
-
-    protected function isMissingZebraScheme(string $identifier): bool
-    {
-        return in_array($identifier, [
-            'Electric Vehicles (EV) Buses_Greater Manchester CA',
-            'CRSTS22/1 Zero Emission Buses - Phase 1 _South Yorkshire MCA',
-            'CRSTS22/1 Zero Emission Buses - Phase 1_South Yorkshire MCA',
-            'Overprogramming - Zero Emission Buses - additional scope opportunity_South Yorkshire MCA',
-            '(51) Zero Emission Buses_The West Yorkshire Combined Authority',
         ]);
     }
 }
