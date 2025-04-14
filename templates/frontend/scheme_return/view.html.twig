@@ -5,32 +5,36 @@
 
 {%- block content -%}
     {%- block viewSchemeReturn -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-        {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList, summaryCard, summaryListStart, summaryListEnd, summaryListRow -%}
+        {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue, displayCardForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
 
         {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
 
         {# @var schemeReturn \App\Entity\SchemeReturn\CrstsSchemeReturn #}
 
         <div class="govuk-!-margin-bottom-9">
-            <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.scheme_details' | trans }}</h2>
 
-            {%- set contents -%}
-                {{- summaryListStart() -}}
-                {{- yesOrNo('frontend.pages.scheme_return.retained', schemeReturn.scheme.crstsData.retained) }}
-                {{- yesOrNo('frontend.pages.scheme_return.ready_for_signoff', schemeReturn.readyForSignoff) }}
-                {{- summaryListEnd() -}}
-            {%- endset %}
+            {# @var \App\Entity\Scheme scheme #}
+            {%- set scheme = schemeReturn.scheme -%}
+            {{- summaryCard({
+                title: {text: 'frontend.pages.scheme_return.titles.scheme_details' | trans},
+                attributes: {id: 'scheme_details'},
+            }, summaryList({
+                rows: {
+                    'scheme.scheme_identifier': scheme.schemeIdentifier,
+                    'scheme_return.ready_for_signoff': yesOrNoValue(schemeReturn.readyForSignoff),
+                    'scheme.name': scheme.name,
+                    'scheme.description': {text: scheme.description, classes: 'govuk-body-s'},
+                    'scheme.transport_mode': (scheme.transportMode.forDisplay ?? null) | trans,
+                    (scheme.transportMode.activeTravel ? '' : 'scheme.has_active_travel_elements'): (scheme.activeTravelElement.forDisplay ?? null) | trans,
+                    'scheme_return.retained': yesOrNoValue(scheme.crstsData.retained),
+                    'scheme_return.previously_tcf': yesOrNoValue(scheme.crstsData.previouslyTcf),
+                } | filter((v,k) => k is not empty) | map ((v,k) => {
+                    key: {text: "frontend.pages.#{k}" | trans},
+                    value: v is iterable ? v : {text: textValue(v)}
+                })
+            })) -}}
 
-            {{- displayCardForReturn(
-                schemeReturn,
-                'frontend.pages.scheme_return.titles.status' | trans,
-                'status',
-                contents,
-                {
-                    add_edit_link: false,
-                },
-            ) -}}
 
             {%- set contents -%}
                 {{- summaryListStart() -}}

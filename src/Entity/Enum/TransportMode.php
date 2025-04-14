@@ -2,6 +2,8 @@
 
 namespace App\Entity\Enum;
 
+use Symfony\Component\Translation\TranslatableMessage;
+
 enum TransportMode: string
 {
     // Multi-modal
@@ -64,5 +66,24 @@ enum TransportMode: string
     {
         $categoryValue = substr($this->value, 0, strpos($this->value, "."));
         return TransportModeCategory::from($categoryValue);
+    }
+
+    public function isActiveTravel(): bool
+    {
+        return $this->category() === TransportModeCategory::ACTIVE_TRAVEL;
+    }
+
+    public function getForDisplay(): ?TranslatableMessage
+    {
+        if (!$this->value) {
+            return null;
+        }
+        return new TranslatableMessage(
+            "enum.transport_mode.full_display",
+            [
+                "{category}" => new TranslatableMessage("enum.transport_mode.categories.{$this->category()->value}"),
+                "{mode}" => new TranslatableMessage("enum.transport_mode.{$this->value}"),
+            ]
+        );
     }
 }

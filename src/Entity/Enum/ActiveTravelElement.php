@@ -2,6 +2,8 @@
 
 namespace App\Entity\Enum;
 
+use Symfony\Component\Translation\TranslatableMessage;
+
 enum ActiveTravelElement: string
 {
     case NO_ACTIVE_TRAVEL_ELEMENTS = "no_active_travel_elements";
@@ -29,5 +31,15 @@ enum ActiveTravelElement: string
     public function isNoActiveElement(): bool
     {
         return $this->value !== ActiveTravelElement::NO_ACTIVE_TRAVEL_ELEMENTS->value;
+    }
+
+    public function getForDisplay(): ?TranslatableMessage
+    {
+        if (!$this->value) {
+            return null;
+        }
+        return new TranslatableMessage(
+            "enum.active_travel_element.{$this->value}"
+        );
     }
 }

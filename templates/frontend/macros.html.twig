@@ -119,6 +119,14 @@
     {{- _self.displaySummaryListRow(label, (value ?? '-') | nl2br, options) -}}
 {% endmacro %}
 
+{%- macro yesOrNoValue(value) -%}
+    {{- (value == true ? 'common.text.yes' : 'common.text.no') | trans -}}
+{%- endmacro -%}
+
+{%- macro textValue(value) -%}
+    {{- ((value is empty) ? '-' : value) | nl2br -}}
+{%- endmacro -%}
+
 {% macro onTrackRating(label, ratingEnum, options) %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tag -%}
     {%- set value = ratingEnum is null ? '-' : tag({text: "enum.on_track_rating.#{ratingEnum.value}" | trans, classes: ratingEnum.tagClass}) -%}
