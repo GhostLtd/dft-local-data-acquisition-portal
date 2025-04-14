@@ -17,6 +17,8 @@ parameters:
     admin_hostname: '%env(string:APP_ADMIN_HOSTNAME)%'
     frontend_hostname: '%env(string:APP_FRONTEND_HOSTNAME)%'
 
+    screenshots.path: '%env(resolve:SCREENSHOTS_PATH)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -35,6 +37,12 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    App\Command\ScreenshotsCommand:
+        lazy: true
+        arguments:
+            $frontendHostname: '%frontend_hostname%'
+            $screenshotsPath: '%screenshots.path%'
 
     Alphagov\Notifications\Client:
         factory: '@Ghost\GovUkCoreBundle\Utility\AlphagovNotify\ClientFactory'

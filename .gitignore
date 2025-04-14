@@ -2,6 +2,7 @@
 .yarn
 /local/
 /public/.htaccess
+/screenshots/node_modules
 keys.json
 
 ###> symfony/framework-bundle ###

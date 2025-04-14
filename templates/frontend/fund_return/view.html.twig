@@ -107,7 +107,7 @@
                 {%- set actions = is_granted('CAN_VIEW', result.schemeReturn) ? [
                     {
                         href: path(schemeViewRoute ?? 'app_scheme_return', {fundReturnId: fundReturn.id, schemeId: result.scheme.id}),
-                        text: 'common.actions.view' | trans,
+                        html: 'common.actions.view' | trans ~ '<span class="govuk-visually-hidden">' ~ result.scheme.name ~ '</span>',
                     },
                 ] : [] -%}
                 {%- set nameHtml %}<div class="govuk-!-font-weight-bold">{{ result.scheme.name }}</div>{% endset -%}
