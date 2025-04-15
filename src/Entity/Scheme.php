@@ -12,6 +12,7 @@ use App\Repository\SchemeRepository;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -20,6 +21,8 @@ use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: SchemeRepository::class)]
+#[UniqueEntity(fields: ['authority', 'schemeIdentifier'], groups: ["scheme.add", "scheme.edit"])]
+#[UniqueEntity(fields: ['authority', 'name'], groups: ["scheme.add", "scheme.edit"])]
 class Scheme implements PropertyChangeLoggableInterface
 {
     use IdTrait;
@@ -133,9 +136,14 @@ class Scheme implements PropertyChangeLoggableInterface
         return $this;
     }
 
-    public function getSchemeIdentifier(): ?string
+    public function getSchemeIdentifier(bool $numberPatOnly = false): ?string
     {
-        return $this->schemeIdentifier;
+        if ($numberPatOnly) {
+            return $this->schemeIdentifier;
+        }
+        $words = preg_split("/[\s\/,-]+/", $this->authority->getName());
+        $prefix = join('', array_map(fn($n) => substr($n, 0, 1), $words));
+        return $prefix . '-' . $this->schemeIdentifier;
     }
 
     public function setSchemeIdentifier(?string $schemeIdentifier): static

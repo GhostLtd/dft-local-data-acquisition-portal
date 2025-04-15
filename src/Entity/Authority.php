@@ -73,14 +73,27 @@ class Authority implements PropertyChangeLoggableInterface
         return $this->schemes;
     }
 
-    public function addScheme(Scheme $scheme): static
+    public function addScheme(Scheme $scheme, bool $setSchemeIdentifier = true): static
     {
         if (!$this->schemes->contains($scheme)) {
             $this->schemes->add($scheme);
             $scheme->setAuthority($this);
+            if ($setSchemeIdentifier) {
+                $scheme->setSchemeIdentifier($this->getNextSchemeIdentifier());
+            }
         }
 
         return $this;
+    }
+
+    public function getNextSchemeIdentifier(): ?string
+    {
+        $maxId = 0;
+        $this->schemes->forAll(function(Scheme $s) use($maxId) {
+            $x = intval($s->getSchemeIdentifier(true));
+            $maxId = ($x > $maxId) ? $x : $maxId;
+        });
+        return $maxId + 1;
     }
 
     public function removeScheme(Scheme $scheme): static
