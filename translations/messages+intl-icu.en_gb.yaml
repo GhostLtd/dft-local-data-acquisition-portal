@@ -416,6 +416,9 @@ format:
 
 frontend:
   pages:
+    accessibility-statement:
+      page-title: Accessibility statement for {hostname}
+
     auth:
       authenticate:
         title: Login using email link

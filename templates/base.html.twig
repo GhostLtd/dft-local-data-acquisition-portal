@@ -91,3 +91,12 @@
         <h1 class="{{ page_heading_class ?? 'govuk-heading-l' }}">{{ page_heading }}</h1>
     {%- endblock -%}
 {%- endblock -%}
+
+{% block footer %}
+    {%- import '@GhostGovUkFrontend/components/macros.html.twig' as govuk -%}
+    {{- govuk.footer({
+        meta: {items: [
+            {href: path('app_pages_accessibility'), text: 'Accessibility'},
+        ]}
+    }) -}}
+{% endblock %}
