@@ -138,11 +138,13 @@ class Scheme implements PropertyChangeLoggableInterface
 
     public function getSchemeIdentifier(bool $numberPatOnly = false): ?string
     {
+        if (null === $this->schemeIdentifier) {
+            return null;
+        }
         if ($numberPatOnly) {
             return $this->schemeIdentifier;
         }
-        $words = preg_split("/[\s\/,-]+/", $this->authority->getName());
-        $prefix = join('', array_map(fn($n) => substr($n, 0, 1), $words));
+        $prefix = preg_replace('/[^A-Z]/', '', $this->authority->getName());
         return $prefix . '-' . $this->schemeIdentifier;
     }
 

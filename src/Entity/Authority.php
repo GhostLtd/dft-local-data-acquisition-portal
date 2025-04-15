@@ -89,11 +89,13 @@ class Authority implements PropertyChangeLoggableInterface
     public function getNextSchemeIdentifier(): ?string
     {
         $maxId = 0;
-        $this->schemes->forAll(function(Scheme $s) use($maxId) {
-            $x = intval($s->getSchemeIdentifier(true));
-            $maxId = ($x > $maxId) ? $x : $maxId;
+        $this->schemes->map(function(Scheme $s) use(&$maxId) {
+            $x = intval($s->getSchemeIdentifier(true) ?? 0);
+            if ($x > $maxId) {
+                $maxId = $x;
+            }
         });
-        return $maxId + 1;
+        return sprintf('%05d', $maxId + 1);
     }
 
     public function removeScheme(Scheme $scheme): static

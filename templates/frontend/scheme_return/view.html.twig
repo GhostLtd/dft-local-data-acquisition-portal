@@ -24,9 +24,9 @@
                     'scheme.scheme_identifier': scheme.schemeIdentifier,
                     'scheme_return.ready_for_signoff': yesOrNoValue(schemeReturn.readyForSignoff),
                     'scheme.name': scheme.name,
-                    'scheme.description': {text: scheme.description, classes: 'govuk-body-s'},
+                    'scheme.description': scheme.description,
                     'scheme.transport_mode': (scheme.transportMode.forDisplay ?? null) | trans,
-                    (scheme.transportMode.activeTravel ? '' : 'scheme.has_active_travel_elements'): (scheme.activeTravelElement.forDisplay ?? null) | trans,
+                    ((scheme.transportMode.activeTravel ?? false) ? '' : 'scheme.has_active_travel_elements'): (scheme.activeTravelElement.forDisplay ?? null) | trans,
                     'scheme_return.retained': yesOrNoValue(scheme.crstsData.retained),
                     'scheme_return.previously_tcf': yesOrNoValue(scheme.crstsData.previouslyTcf),
                 } | filter((v,k) => k is not empty) | map ((v,k) => {
@@ -77,7 +77,7 @@
                     {{- summaryListStart() -}}
                     {%- for milestone in schemeReturn.milestones -%}
                         {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value})) -%}
-                        {{- date(label, milestone.date, {translateLabel: false}) -}}
+                        {{- date(label, milestone.date, {translateLabel: false, dateFormat: 'format.date.year-and-month'}) -}}
                     {%- endfor -%}
                     {{- summaryListEnd() -}}
                 {%- endset -%}
@@ -93,7 +93,7 @@
                     {{- summaryListStart() -}}
                     {{- enumText('frontend.pages.scheme_return.current_business_case', 'enum.business_case', schemeReturn.businessCase) -}}
                     {%- if schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable' -%}
-                        {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval) -}}
+                        {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval, {dateFormat: 'format.date.year-and-month'}) -}}
                     {%- endif -%}
                     {{- summaryListEnd() -}}
                 {%- endset -%}
