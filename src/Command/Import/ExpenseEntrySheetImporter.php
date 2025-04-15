@@ -36,7 +36,8 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
 
         $values['division'] = $this->attemptToFormatAsExpenseDivision($values['division']);
         $values['type'] = $this->attemptToFormatAsExpenseType($values['type']);
-        $values['value'] = $this->attemptToFormatAsFinancial($values['value']);
+        // we need to sometimes apply 1m multipliers, but only on scheme expenses.
+        $values['value'] = $this->attemptToFormatAsFinancial($values['value'], $isSchemeExpense, ['isScheme' => $isSchemeExpense, 'id' => $expenseIdentifier]);
 
         if(!$values['division'] || !$values['type']) {
             return;

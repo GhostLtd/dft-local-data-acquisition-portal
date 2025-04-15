@@ -118,18 +118,18 @@ abstract class AbstractSheetImporter
         };
     }
 
-    protected function attemptToFormatAsFinancial(?string $value): ?string
+    protected function attemptToFormatAsFinancial(?string $value, $autoMultiply = false, array $additionalLoggingContext = []): ?string
     {
         $originalValue = $value;
         $value = $this->attemptToFormatAsDecimal($value);
-        if ($value > 0) {
+        if ($autoMultiply && $value > 0) {
             if ($value < 1000) {
                 $value *= 1000000;
-                $this->logger->debug("Financial multiplied by 1m", [$value]);
-            } elseif ($value > 5000000000) {
+                $this->logger->debug("Financial multiplied by 1m", array_merge(['orig' => $originalValue, 'new' => $value], $additionalLoggingContext));
+            } /* elseif ($value > 5000000000) {
                 $value /= 1000000;
-                $this->logger->debug("Financial divided by 1m", [$value]);
-            }
+                $this->logger->warning("Financial divided by 1m", array_merge(['orig' => $originalValue, 'new' => $value], $additionalLoggingContext));
+            } */
         }
 
         if ($originalValue && $value !== null && !is_numeric($value)) {

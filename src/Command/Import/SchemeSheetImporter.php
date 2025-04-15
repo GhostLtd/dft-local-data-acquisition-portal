@@ -53,8 +53,8 @@ class SchemeSheetImporter extends AbstractSheetImporter
             'tram/metro/light rail' => TransportMode::TRAM_OTHER,
             'active travel' => TransportMode::AT_OTHER,
             'highways maintenance' => TransportMode::ROAD_HIGHWAYS_MAINTENANCE,
-//            'other maintenance' => TransportMode::,
-            'multi-modal (inc. at or bus)' => TransportMode::MM_BUS_AND_ACTIVE_TRAVEL_CORRIDOR,
+            'other maintenance' => TransportMode::OTHER_OTHER,
+            'multi-modal (inc. at or bus)' => TransportMode::MM_OTHER,
 
         ];
         return $map[strtolower($value)] ?? ($this->logger->warning('Unhandled transport mode', [$value]) ?? null);

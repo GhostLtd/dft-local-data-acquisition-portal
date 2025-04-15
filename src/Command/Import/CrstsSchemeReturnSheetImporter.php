@@ -41,8 +41,8 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
         $values['businessCase'] = $this->attemptToFormatAsBusinessCase($values['businessCase']);
         $values['expectedBusinessCaseApproval'] = $this->attemptToFormatAsDate($values['expectedBusinessCaseApproval']);
         $values['benefitCostRatio'] = $this->attemptToFormatAsBcr($values['benefitCostRatio']);
-        $values['totalCost'] = $this->attemptToFormatAsFinancial($values['totalCost']);
-        $values['agreedFunding'] = $this->attemptToFormatAsFinancial($values['agreedFunding']);
+        $values['totalCost'] = $this->attemptToFormatAsFinancial($values['totalCost'], true, ['type' => 'scheme-total-cost']);
+        $values['agreedFunding'] = $this->attemptToFormatAsFinancial($values['agreedFunding'], true, ['type' => 'scheme-agreed-funding']);
 
         $this->setColumnValues($schemeReturn, $values);
 
@@ -58,6 +58,7 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
         $map = [
             'OBC' => BusinessCase::WORKING_TOWARDS_OBC,
             'SOBC' => BusinessCase::WORKING_TOWARDS_SOBC,
+            'SOC' => BusinessCase::WORKING_TOWARDS_SOBC,
             'pre-SOBC' => BusinessCase::WORKING_TOWARDS_SOBC,
             'FBC' => BusinessCase::WORKING_TOWARDS_FBC,
             'Post-FBC' => BusinessCase::POST_FBC,
@@ -78,7 +79,7 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
         return match(true) {
             1 === preg_match('/^tbc/', $value),
             1 === preg_match('/^to be confirmed/', $value),
-            1 === preg_match('/^bcr will be determined/', $value),
+            1 === preg_match('/^(bcr will|to) be determined/', $value),
                 => (new BenefitCostRatio())->setType(BenefitCostRatioType::TBC),
             'na' === $value,
             'n/a' === $value,
@@ -86,7 +87,7 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
             is_numeric($value) => (new BenefitCostRatio())
                 ->setType(BenefitCostRatioType::VALUE)
                 ->setValue($this->attemptToFormatAsDecimal($value)),
-            1 === preg_match('/^(?<val>\d+(\.\d+)?)/', $value, $matches)
+            1 === preg_match('/^>?(?<val>\d+(\.\d+)?)/', $value, $matches)
                 => (new BenefitCostRatio())
                     ->setType(BenefitCostRatioType::VALUE)
                     ->setValue($matches['val']),
