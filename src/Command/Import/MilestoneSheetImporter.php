@@ -48,16 +48,16 @@ class MilestoneSheetImporter extends AbstractSheetImporter
 
         $this->persist($milestone);
 
-        // as per call with Bella/Jess, we want to add final delivery milestone as copy of end construction.
-        // we will be collecting this as a separate value moving forwards
-        if ($values['type'] === MilestoneType::END_CONSTRUCTION) {
-            $fdMilestone = (new Milestone())
-                ->setType(MilestoneType::FINAL_DELIVERY)
-                ->setDate($values['date'])
-            ;
-            $schemeReturn->addMilestone($fdMilestone);
-            $this->persist($fdMilestone);
-        }
+//        // as per call with Bella/Jess, we want to add final delivery milestone as copy of end construction.
+//        // we will be collecting this as a separate value moving forwards
+//        if ($values['type'] === MilestoneType::END_CONSTRUCTION) {
+//            $fdMilestone = (new Milestone())
+//                ->setType(MilestoneType::FINAL_DELIVERY)
+//                ->setDate($values['date'])
+//            ;
+//            $schemeReturn->addMilestone($fdMilestone);
+//            $this->persist($fdMilestone);
+//        }
     }
 
     protected function attemptToFormatAsMilestoneType(?string $value): ?MilestoneType
