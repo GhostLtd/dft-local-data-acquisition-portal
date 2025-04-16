@@ -5,8 +5,8 @@
 
 {%- block content -%}
     {%- block viewSchemeReturn -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList, summaryCard, summaryListStart, summaryListEnd, summaryListRow -%}
-        {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue, displayCardForReturn, displaySectionsAsTabs, bcr, date, enumText, money, onTrackRating, ratingTag, text, yesOrNo, expenseDivisionComments -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList, summaryCard -%}
+        {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue, moneyValue, bcrValue, onTrackRatingValue, dateValue, enumTextValue, displayCardForReturn, displaySectionsAsTabs, expenseDivisionComments -%}
 
         {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
 
@@ -16,39 +16,24 @@
 
             {# @var \App\Entity\Scheme scheme #}
             {%- set scheme = schemeReturn.scheme -%}
+            {% from 'frontend/scheme/view.html.twig' import schemeDetailsSummaryList %}
             {{- summaryCard({
                 title: {text: 'frontend.pages.scheme_return.titles.scheme_details' | trans},
                 attributes: {id: 'scheme_details'},
-            }, summaryList({
-                rows: {
-                    'scheme.scheme_identifier': scheme.schemeIdentifier,
-                    'scheme_return.ready_for_signoff': yesOrNoValue(schemeReturn.readyForSignoff),
-                    'scheme.name': scheme.name,
-                    'scheme.description': scheme.description,
-                    'scheme.transport_mode': (scheme.transportMode.forDisplay ?? null) | trans,
-                    ((scheme.transportMode.activeTravel ?? false) ? '' : 'scheme.has_active_travel_elements'): (scheme.activeTravelElement.forDisplay ?? null) | trans,
-                    'scheme_return.retained': yesOrNoValue(scheme.crstsData.retained),
-                    'scheme_return.previously_tcf': yesOrNoValue(scheme.crstsData.previouslyTcf),
-                } | filter((v,k) => k is not empty) | map ((v,k) => {
-                    key: {text: "frontend.pages.#{k}" | trans},
-                    value: v is iterable ? v : {text: textValue(v)}
-                })
-            })) -}}
+            },
+                schemeDetailsSummaryList(scheme, {showFundList: false, schemeReturn})
+            ) -}}
 
-
-            {%- set contents -%}
-                {{- summaryListStart() -}}
-                {{- money('frontend.pages.scheme_return.total_cost', schemeReturn.totalCost) -}}
-                {{- money('frontend.pages.scheme_return.agreed_funding', schemeReturn.agreedFunding) -}}
-                {{- bcr('frontend.pages.scheme_return.benefit_cost_ratio', schemeReturn.benefitCostRatio) }}
-                {{- summaryListEnd() -}}
-            {%- endset -%}
 
             {{- displayCardForReturn(
                 schemeReturn,
                 'frontend.pages.scheme_return.titles.overall_funding' | trans,
                 'overall_funding',
-                contents
+                summaryList({rows: {
+                    ('frontend.pages.scheme_return.total_cost' | trans): moneyValue(schemeReturn.totalCost),
+                    ('frontend.pages.scheme_return.agreed_funding' | trans): moneyValue(schemeReturn.agreedFunding),
+                    ('frontend.pages.scheme_return.benefit_cost_ratio' | trans): bcrValue(schemeReturn.benefitCostRatio),
+                }})
             ) -}}
 
             {#- MILESTONES ------------------------------------------------------------------------------------------------ -#}
@@ -58,52 +43,40 @@
             <div class="govuk-!-margin-bottom-9">
                 <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.milestones' | trans }}</h2>
 
-                {%- set contents -%}
-                    {{- summaryListStart() -}}
-                    {{- onTrackRating('frontend.pages.scheme_return.on_track_rating', schemeReturn.onTrackRating) }}
-                    {{- text('frontend.pages.scheme_return.progress_update', schemeReturn.progressUpdate) }}
-                    {{- text('frontend.pages.scheme_return.risks', schemeReturn.risks) -}}
-                    {{- summaryListEnd() -}}
-                {%- endset -%}
-
                 {{- displayCardForReturn(
                     schemeReturn,
                     'frontend.pages.scheme_return.titles.milestone_progress' | trans,
                     'milestone_progress',
-                    contents
+                    summaryList({rows: {
+                        ('frontend.pages.scheme_return.on_track_rating' | trans): onTrackRatingValue(schemeReturn.onTrackRating),
+                        ('frontend.pages.scheme_return.progress_update' | trans): textValue(schemeReturn.progressUpdate),
+                        ('frontend.pages.scheme_return.risks' | trans): textValue(schemeReturn.risks),
+                    }})
                 ) -}}
-
-                {%- set contents -%}
-                    {{- summaryListStart() -}}
-                    {%- for milestone in schemeReturn.milestones -%}
-                        {%- set label = ("enum.milestone_type.#{milestone.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value})) -%}
-                        {{- date(label, milestone.date, {translateLabel: false, dateFormat: 'format.date.year-and-month'}) -}}
-                    {%- endfor -%}
-                    {{- summaryListEnd() -}}
-                {%- endset -%}
 
                 {{- displayCardForReturn(
                     schemeReturn,
                     'frontend.pages.scheme_return.titles.milestone_dates' | trans,
                     'milestone_dates',
-                    contents
+                    summaryList({rows:
+                        schemeReturn.milestones | map((v,k) => {
+                            key: {text: ("enum.milestone_type.#{v.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value}))},
+                            value: {text: dateValue(v.date, {dateFormat: 'format.date.year-and-month'})},
+                        })
+                    })
                 ) -}}
-
-                {%- set contents -%}
-                    {{- summaryListStart() -}}
-                    {{- enumText('frontend.pages.scheme_return.current_business_case', 'enum.business_case', schemeReturn.businessCase) -}}
-                    {%- if schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable' -%}
-                        {{- date('frontend.pages.scheme_return.expected_business_case_approval', schemeReturn.expectedBusinessCaseApproval, {dateFormat: 'format.date.year-and-month'}) -}}
-                    {%- endif -%}
-                    {{- summaryListEnd() -}}
-                {%- endset -%}
 
                 {{- displayCardForReturn(
                     schemeReturn,
                     'frontend.pages.scheme_return.titles.milestone_business_case' | trans,
                     'milestone_business_case',
-                    contents
-                ) -}}
+                    summaryList({rows: {
+                        ('frontend.pages.scheme_return.current_business_case' | trans): enumTextValue('enum.business_case', schemeReturn.businessCase),
+                        ((schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable')
+                                ? ('frontend.pages.scheme_return.expected_business_case_approval' | trans) : ''
+                            ): dateValue(schemeReturn.expectedBusinessCaseApproval, {dateFormat: 'format.date.year-and-month'}),
+                    } | filter((v,k) => k is not empty)
+                })) -}}
             </div>
 
             {#- EXPENSES -------------------------------------------------------------------------------------------------- -#}

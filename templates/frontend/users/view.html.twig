@@ -4,15 +4,21 @@
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
-    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList -%}
+    {% from "frontend/macros.html.twig" import textValue %}
 
-    {{- summaryListStart() -}}
-    {{- summaryListRow({key: 'frontend.pages.user.name' | trans, value: user.name ?? '-'}) -}}
-    {{- summaryListRow({key: 'frontend.pages.user.email' | trans, value: user.email ?? '-'}) -}}
-    {{- summaryListRow({key: 'frontend.pages.user.position' | trans, value: user.position ?? '-'}) -}}
-    {{- summaryListRow({key: 'frontend.pages.user.phone' | trans, value: user.phone ?? '-'}) -}}
-    {{- summaryListRow({key: 'frontend.pages.user.permission' | trans, value: simplifiedPermission ? ("frontend.pages.user.permissions.#{simplifiedPermission}" | trans) : '-'}) -}}
-    {{- summaryListEnd() -}}
+    {{- summaryList({
+        rows: {
+            'name': user.name,
+            'email': user.email,
+            'position': user.position,
+            'phone': user.phone,
+            'permission': simplifiedPermission ? ("frontend.pages.user.permissions.#{simplifiedPermission}" | trans) : '-',
+        } | map((v,k) => {
+            key: {text: "frontend.pages.user.#{k}" | trans},
+            value: {text: textValue(v)},
+        })
+    }) -}}
 
     <p class="govuk-button-group">
         {% if is_granted('CAN_EDIT_USER', user) %}

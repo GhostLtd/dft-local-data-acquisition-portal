@@ -4,24 +4,22 @@
 {%- set current_menu = 'dashboard' -%}
 
 {%- block content -%}
-    {% from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow %}
+    {% from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList %}
 
     {%- if authorities is empty -%}
         <p class="govuk-body">{{ 'frontend.pages.dashboard.no_authorities' | trans }}</p>
     {%- else -%}
-        {{- summaryListStart() -}}
-        {%- for authority in authorities -%}
-            {{ summaryListRow({
-                key: authority.name,
-                value: '',
-                actions: [
+        {{- summaryList({
+            rows: authorities | map((a,k) => {
+                key: {text: a.name},
+                value: {text: ''},
+                actions: {items: [
                     {
                         text: 'common.actions.view' | trans,
-                        href: path('app_dashboard_authority', {authorityId: authority.id}),
+                        href: path('app_dashboard_authority', {authorityId: a.id}),
                     },
-                ]
-            }) }}
-        {%- endfor -%}
-        {{ summaryListEnd() }}
+                ]}
+            })
+        }) -}}
     {%- endif -%}
 {%- endblock -%}

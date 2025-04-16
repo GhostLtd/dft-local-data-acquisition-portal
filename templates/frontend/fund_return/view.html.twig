@@ -6,8 +6,8 @@
 {%- block content -%}
     {% set userViewRoute = 'app_user_view' %}
     {%- block viewFundReturn -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-        {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, ratingTag, text -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList -%}
+        {%- from "frontend/macros.html.twig" import displayCardForReturn, displaySectionsAsTabs, textValue -%}
 
         {# -- DETAILS ---------------------------------------------------------------------------------------------------- #}
 
@@ -18,17 +18,14 @@
 
         <div class="govuk-!-margin-bottom-9">
             <h2 class="govuk-heading-m">{{ 'frontend.pages.fund_return.titles.fund_details' | trans }}</h2>
-            {%- set contents -%}
-                {{- summaryListStart() -}}
-                {{- summaryListRow({key: 'frontend.pages.fund_return.sign_off' | trans, value: block('signoffValue')}) -}}
-                {{- summaryListEnd() -}}
-            {%- endset -%}
 
             {{- displayCardForReturn(
                 fundReturn,
                 'frontend.pages.fund_return.titles.basic_details' | trans,
                 'basic_details',
-                contents,
+                summaryList({rows: [
+                    {key: {text: 'frontend.pages.fund_return.sign_off' | trans}, value: {html: block('signoffValue')}},
+                ]}),
                 {
                     add_edit_link: false
                 }
@@ -41,31 +38,23 @@
                 _self.overallProgressContent(fundReturn)
             ) -}}
 
-            {%- set contents -%}
-                {{- summaryListStart() -}}
-                {{- text('frontend.pages.fund_return.local_contribution', fundReturn.localContribution) -}}
-                {{- text('frontend.pages.fund_return.resource_funding', fundReturn.resourceFunding) -}}
-                {{- summaryListEnd() -}}
-            {%- endset -%}
-
             {{- displayCardForReturn(
                 fundReturn,
                 'frontend.pages.fund_return.titles.local_and_rdel' | trans,
                 'local_and_rdel',
-                contents
+                summaryList({rows: {
+                    ('frontend.pages.fund_return.local_contribution' | trans): textValue(fundReturn.localContribution),
+                    ('frontend.pages.fund_return.resource_funding' | trans): textValue(fundReturn.resourceFunding),
+                }})
             ) -}}
-
-            {%- set contents -%}
-                {{- summaryListStart() -}}
-                {{- text('frontend.pages.fund_return.comments', fundReturn.comments) -}}
-                {{- summaryListEnd() -}}
-            {%- endset -%}
 
             {{- displayCardForReturn(
                 fundReturn,
                 'frontend.pages.fund_return.titles.comments' | trans,
                 'comments',
-                contents
+                summaryList({rows: {
+                    ('frontend.pages.fund_return.comments' | trans): textValue(fundReturn.comments),
+                }})
             ) -}}
         </div>
 
@@ -166,13 +155,13 @@
 {% endblock %}
 
 {%- macro overallProgressContent(fundReturn) -%}
-    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import summaryListStart, summaryListEnd, summaryListRow -%}
-    {%- from 'frontend/macros.html.twig' import ratingTag, text -%}
-    {{- summaryListStart() -}}
-    {{- ratingTag('frontend.pages.fund_return.overall_confidence', fundReturn.overallConfidence) -}}
-    {{- text('frontend.pages.fund_return.overall_progress_summary', fundReturn.progressSummary) -}}
-    {{- text('frontend.pages.fund_return.overall_delivery_confidence', fundReturn.deliveryConfidence) -}}
-    {{- summaryListEnd() -}}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import summaryList -%}
+    {%- from 'frontend/macros.html.twig' import textValue, ratingTagValue -%}
+    {{- summaryList({rows: {
+        0: {key: {text: 'frontend.pages.fund_return.overall_confidence' | trans}, value: {html: ratingTagValue(fundReturn.overallConfidence)}},
+        ('frontend.pages.fund_return.overall_progress_summary' | trans): textValue(fundReturn.progressSummary),
+        ('frontend.pages.fund_return.overall_delivery_confidence' | trans): textValue(fundReturn.deliveryConfidence),
+    }}) -}}
 {%- endmacro -%}
 
 {%- block signoffValue -%}

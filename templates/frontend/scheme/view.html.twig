@@ -4,42 +4,21 @@
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
 {%- block content -%}
-    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryListStart, summaryListEnd, summaryListRow -%}
-    {%- from "frontend/macros.html.twig" import enumText, text, yesOrNo -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList -%}
+    {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue -%}
 
     <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme.scheme_details' | trans }}</h2>
-    {{- summaryListStart({classes: 'govuk-!-margin-bottom-7'}) -}}
-    {{- summaryListRow({key: 'frontend.pages.scheme.name' | trans, value: scheme.name ?? '-'}) -}}
-    {{- summaryListRow({key: 'frontend.pages.scheme.description' | trans, value: scheme.description ?? '-'}) -}}
-    {{- summaryListRow({key: 'frontend.pages.scheme.scheme_identifier' | trans, value: scheme.schemeIdentifier ?? '-'}) -}}
 
-    {%- set transportCategory = scheme.transportMode ? scheme.transportMode.category.value : null -%}
-    {%- set transportMode = scheme.transportMode ? scheme.transportMode.value : null -%}
-    {%- set transportCategoryValue = transportCategory ? ("enum.transport_mode.categories.#{transportCategory}" | trans) : null -%}
-    {%- set transportModeValue = transportMode ? ("enum.transport_mode.#{transportMode}" | trans) : null -%}
-    {%- set html -%}
-        {%- if transportModeValue -%}
-            {{ transportCategoryValue }}: {{ transportModeValue }}
-        {%- else -%}
-            {{ '-' }}
-        {%- endif -%}
-    {%- endset -%}
-
-    {{- text('frontend.pages.scheme.transport_mode', html) -}}
-
-    {%- if transportCategory != 'active_travel' -%}
-        {{- enumText('frontend.pages.scheme.has_active_travel_elements', 'enum.active_travel_element', scheme.activeTravelElement) -}}
-    {%- endif -%}
-
-    {{- summaryListRow({key: 'frontend.pages.scheme.funds' | trans, value: scheme.fundsAsString}) -}}
-    {{- summaryListEnd() -}}
+    {{- _self.schemeDetailsSummaryList(scheme) -}}
 
     {%- if scheme.hasFundByValue('CRSTS1') -%}
         <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme.crsts.title' | trans }}</h2>
-        {{- summaryListStart({classes: 'govuk-!-margin-bottom-7'}) -}}
-        {{- yesOrNo('frontend.pages.scheme.crsts.is_retained', scheme.crstsData.retained) -}}
-        {{- yesOrNo('frontend.pages.scheme.crsts.previously_tcf', scheme.crstsData.previouslyTcf) -}}
-        {{- summaryListEnd() -}}
+        {{- summaryList({
+            rows: {
+                ("frontend.pages.scheme.crsts.is_retained" | trans): yesOrNoValue(scheme.crstsData.retained),
+                ("frontend.pages.scheme.crsts.previously_tcf" | trans): yesOrNoValue(scheme.crstsData.previouslyTcf),
+            }
+        }) -}}
     {%- endif -%}
 
     <p class="govuk-button-group">
@@ -50,3 +29,28 @@
         <a class="govuk-link" href="{{ path('app_schemes_authority', {authorityId: authority.id}) }}">{{ 'frontend.pages.scheme.back_to_schemes' | trans }}</a>
     </p>
 {%- endblock -%}
+
+
+{%- macro schemeDetailsSummaryList(scheme, options) -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList -%}
+    {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue -%}
+
+    {%- set showFundList = options.showFundList ?? true -%}
+    {%- set schemeReturn = options.schemeReturn ?? false -%}
+    {{- summaryList({
+        rows: {
+            (schemeReturn ? 'scheme_return.ready_for_signoff' : ''): yesOrNoValue(schemeReturn.readyForSignoff ?? false),
+            'scheme.scheme_identifier': scheme.schemeIdentifier,
+            'scheme.name': scheme.name,
+            'scheme.description': {html: scheme.description | escape | nl2br},
+            'scheme.transport_mode': (scheme.transportMode.forDisplay ?? null) | trans,
+            ((scheme.transportMode.activeTravel ?? false) ? '' : 'scheme.has_active_travel_elements'): (scheme.activeTravelElement.forDisplay ?? null) | trans,
+            (showFundList ? 'scheme.funds' : ''): scheme.fundsAsString,
+            (showFundList ? '': 'scheme_return.retained'): yesOrNoValue(scheme.crstsData.retained),
+            (showFundList ? '': 'scheme_return.previously_tcf'): yesOrNoValue(scheme.crstsData.previouslyTcf),
+        } | filter((v,k) => k is not empty) | map ((v,k) => {
+            key: {text: "frontend.pages.#{k}" | trans},
+            value: v is iterable ? v : {text: textValue(v)}
+        })
+    }) -}}
+{%- endmacro -%}

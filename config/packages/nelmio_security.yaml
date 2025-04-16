@@ -20,6 +20,10 @@ nelmio_security:
                 - 'self'
             img-src:
                 - 'self'
+            base-uri:
+                - 'none'
+            frame-ancestors:
+                - 'none'
             block-all-mixed-content: true # defaults to false, blocks HTTP content over HTTPS transport
             # upgrade-insecure-requests: true # defaults to false, upgrades HTTP requests to HTTPS transport
 
@@ -37,3 +41,7 @@ nelmio_security:
         policies:
             - 'no-referrer'
             - 'strict-origin-when-cross-origin'
+
+    forced-ssl:
+        hsts_max_age: 2592000 # 30 days
+        hsts_subdomains: true
