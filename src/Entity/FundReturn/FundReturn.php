@@ -5,13 +5,13 @@ namespace App\Entity\FundReturn;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\FundAward;
-use App\Entity\PropertyChangeLog;
 use App\Entity\PropertyChangeLoggableInterface;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Entity\Traits\IdTrait;
 use App\Entity\User;
 use App\Repository\FundReturn\FundReturnRepository;
+use App\Utility\FinancialQuarter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -182,6 +182,7 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
 
     abstract public function getFund(): Fund;
     abstract public function createFundReturnForNextQuarter(): static;
+    abstract public static function createInitialFundReturnStartingAt(FinancialQuarter $financialQuarter, FundAward $fundAward): static;
 
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;
@@ -218,5 +219,10 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
     public function isSignedOff(): bool
     {
         return null !== $this->signoffDate;
+    }
+
+    public function getFinancialQuarter(): FinancialQuarter
+    {
+        return new FinancialQuarter($this->year, $this->quarter);
     }
 }

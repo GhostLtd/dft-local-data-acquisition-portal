@@ -74,6 +74,5 @@ module.exports.fundReturnFlow = async function(page, frontendUrl, screenshot) {
         '#expenses_expense__2022-23__fre__Q4': '672287',
     }, 'Save')
 
-    await clickElementContainingText(page, 'a', '2022/23', 0, false)
     await screenshot('fund-return/6-dashboard_filled.png')
 }

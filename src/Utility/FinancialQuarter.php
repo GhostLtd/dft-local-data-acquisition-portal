@@ -51,6 +51,14 @@ class FinancialQuarter
         };
     }
 
+    public function getPreviousQuarter(): static
+    {
+        return match($this->quarter) {
+            1 => new static($this->initialYear - 1, 4),
+            default => new static($this->initialYear, $this->quarter - 1)
+        };
+    }
+
     /**
      * Needed for comparisons
      */

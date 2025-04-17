@@ -117,6 +117,5 @@ module.exports.schemeReturnFlow = async function(page, frontendUrl, screenshot) 
         '#expenses_comments': 'Mysteriously higher than expected spend in Q3',
     }, 'Save')
 
-    await clickElementContainingText(page, 'a', '2022/23', 0, false)
     await screenshot('scheme-return/7-dashboard_filled.png')
 }

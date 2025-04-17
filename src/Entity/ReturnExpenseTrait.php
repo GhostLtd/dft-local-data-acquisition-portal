@@ -65,13 +65,13 @@ trait ReturnExpenseTrait
         return $this->expenseDivisionComments[$divKey] ?? null;
     }
 
-    public function createExpensesForNextQuarter(Collection $sourceExpenses, int $currentYear, int $currentQuarter): Collection
+    public function createExpensesForNextQuarter(Collection $sourceExpenses, FinancialQuarter $copyUpToAndIncluding): Collection
     {
-        $currentFQ = new FinancialQuarter($currentYear, $currentQuarter);
         return $sourceExpenses
-            ->map(function(ExpenseEntry $e) use ($currentFQ) {
-                $isCopyValue = $e->getColumn() !== 'forecast'
-                    && (FinancialQuarter::createFromDivisionAndColumn($e->getDivision(), $e->getColumn())) <= $currentFQ;
+            ->map(function (ExpenseEntry $e) use ($copyUpToAndIncluding) {
+                $entryFQ = FinancialQuarter::createFromDivisionAndColumn($e->getDivision(), $e->getColumn());
+                $isCopyValue = $entryFQ <= $copyUpToAndIncluding;
+
                 return (new ExpenseEntry())
                     ->setDivision($e->getDivision())
                     ->setColumn($e->getColumn())

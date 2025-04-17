@@ -87,6 +87,7 @@ abstract class SchemeReturn implements PropertyChangeLoggableInterface
 
     abstract public function getFund(): Fund;
     abstract public function createSchemeReturnForNextQuarter(): static;
+    abstract public static function createInitialSchemeReturnFor(Scheme $scheme): static;
 
     /** @return array<int, DivisionConfiguration> */
     abstract public function getDivisionConfigurations(): array;

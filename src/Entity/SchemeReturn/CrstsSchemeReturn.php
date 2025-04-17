@@ -10,6 +10,7 @@ use App\Entity\ExpensesContainerInterface;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ReturnExpenseTrait;
+use App\Entity\Scheme;
 use App\Entity\SchemeFund\BenefitCostRatio;
 use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
 use App\Utility\CrstsHelper;
@@ -223,7 +224,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     {
         $scheme = $this->getScheme();
 
-        $nextSchemeReturn = new self();
+        $nextSchemeReturn = new static();
         $nextSchemeReturn
             ->setScheme($scheme)
             ->setBenefitCostRatio($this->getBenefitCostRatio())
@@ -244,16 +245,19 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
             $nextSchemeReturn->setProgressUpdate($this->getProgressUpdate());
         }
 
-        $year = $this->getFundReturn()->getYear();
-        $quarter = $this->getFundReturn()->getQuarter();
+        $fq = $this->getFundReturn()
+            ->getFinancialQuarter()
+            ->getNextQuarter(); // This is the source fundReturn, but we're generating the next quarter...
+
         $crstsData = $scheme->getCrstsData();
 
-        if ($crstsData->isExpenseDataRequiredFor($quarter)) {
+        if ($crstsData->isExpenseDataRequiredFor($fq->quarter)) {
             if ($crstsData->isRetained()) {
+                $sourceFundReturn = $this->getFundReturn();
                 $sourceExpenses = $this->expenses;
             } else {
                 $fundAward = $this->getFundReturn()->getFundAward();
-                $sourceFundReturn = $fundAward->getReturnByYearAndQuarter($year - 1, 4);
+                $sourceFundReturn = $fundAward->getReturnByYearAndQuarter($fq->initialYear - 1, 4);
 
                 if ($sourceFundReturn !== null && !$sourceFundReturn instanceof CrstsFundReturn) {
                     throw new \RuntimeException('CrstsSchemeReturn->getFundReturn()->getFundAward()->getReturnByYearAndQuarter() returned an invalid value');
@@ -265,7 +269,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
             }
 
             if ($sourceExpenses) {
-                $this->createExpensesForNextQuarter($sourceExpenses, $year, $quarter)
+                $this->createExpensesForNextQuarter($sourceExpenses, $sourceFundReturn->getFinancialQuarter())
                     ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
             }
         }
@@ -276,5 +280,13 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         ));
 
         return $nextSchemeReturn;
+    }
+
+    public static function createInitialSchemeReturnFor(Scheme $scheme): static
+    {
+        $schemeReturn = new static();
+        $schemeReturn->setScheme($scheme);
+
+        return $schemeReturn;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\Fund;
 use App\Entity\Traits\IdTrait;
 use App\Repository\AuthorityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -138,5 +139,15 @@ class Authority implements PropertyChangeLoggableInterface
         }
 
         return $this;
+    }
+
+    // ----------------------------------------------------------------------------------------------------
+
+    /**
+     * @return Collection<Scheme>
+     */
+    public function getSchemesForFund(Fund $fund): Collection
+    {
+        return $this->schemes->filter(fn(Scheme $scheme) => $scheme->hasFund($fund));
     }
 }

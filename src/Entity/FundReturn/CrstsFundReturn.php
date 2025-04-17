@@ -6,6 +6,7 @@ use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\ExpensesContainerInterface;
+use App\Entity\FundAward;
 use App\Entity\ReturnExpenseTrait;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
@@ -150,7 +151,7 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 
     public function createFundReturnForNextQuarter(): static
     {
-        $nextReturn = new self();
+        $nextReturn = new static();
         $this->getFundAward()->addReturn($nextReturn);
 
         $nextQuarter = (new FinancialQuarter($this->getYear(), $this->getQuarter()))
@@ -162,7 +163,7 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
             ->setLocalContribution($this->getLocalContribution())
             ->setResourceFunding($this->getResourceFunding());
 
-        $this->createExpensesForNextQuarter($this->expenses, $this->getYear(), $this->getQuarter())->map(
+        $this->createExpensesForNextQuarter($this->expenses, $this->getFinancialQuarter())->map(
             fn($e) => $nextReturn->addExpense($e)
         );
 
@@ -172,7 +173,23 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
         return $nextReturn;
     }
 
+    public static function createInitialFundReturnStartingAt(FinancialQuarter $financialQuarter, FundAward $fundAward): static
+    {
+        $return = new static();
+        $fundAward->addReturn($return);
+
+        $return
+            ->setQuarter($financialQuarter->quarter)
+            ->setYear($financialQuarter->initialYear);
+
+        $schemes = $fundAward->getAuthority()->getSchemesForFund($fundAward->getType());
+        $schemes->map(fn(Scheme $s) => CrstsSchemeReturn::createInitialSchemeReturnFor($s));
+
+        return $return;
+    }
+
     // ----- Wrappers for more specific type-hinting + checks
+
     public function getSchemeReturnForScheme(Scheme $scheme): ?CrstsSchemeReturn
     {
         return TypeHelper::checkMatchesClassOrNull(CrstsSchemeReturn::class, parent::getSchemeReturnForScheme($scheme));
