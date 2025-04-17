@@ -5,6 +5,8 @@ namespace App\Command\Import;
 use App\Entity\Enum\ExpenseType;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
+use App\Entity\FundReturn\CrstsFundReturn;
+use App\Utility\FinancialQuarter;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 
@@ -33,6 +35,10 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
             $this->logger->warning("unable to find parent for ExpenseEntry: {$expenseIdentifier}", $values);
             return;
         }
+
+        /** @var CrstsFundReturn $fundReturn */
+        $fundReturn = $isSchemeExpense ? $parentEntity->getFundReturn() : $parentEntity;
+        $returnQuarter = FinancialQuarter::createFromDivisionAndColumn("{$fundReturn->getYear()}-{$fundReturn->getNextYearAsTwoDigits()}", "Q{$fundReturn->getQuarter()}");
 
         $values['division'] = $this->attemptToFormatAsExpenseDivision($values['division']);
         $values['type'] = $this->attemptToFormatAsExpenseType($values['type']);
@@ -63,7 +69,8 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
             return;
         }
 
-        $values['forecast'] = 'Y' === $values['forecast'];
+        $expenseQuarter = FinancialQuarter::createFromDivisionAndColumn($values['division'], "{$values['column']}");
+        $values['forecast'] = $expenseQuarter->getStartDate() > $returnQuarter->getStartDate();
 
         // find existing expense entry, or add new one
         $newExpense = new ExpenseEntry();
