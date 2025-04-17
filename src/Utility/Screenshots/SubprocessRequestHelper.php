@@ -26,7 +26,7 @@ class SubprocessRequestHelper
         protected EntityManagerInterface $entityManager,
     ) {}
 
-    public function process(string $buffer, InputStream $inputStream): void
+    public function process(string $buffer, InputStream $inputStream, callable $outputCallback): void
     {
         $lines = explode("\n", $buffer);
         foreach($lines as $line) {
@@ -35,7 +35,7 @@ class SubprocessRequestHelper
                 $command = substr($line, strlen('SCREENSHOTS:'));
                 $this->processCommand($command, $inputStream);
             } else {
-                echo "- " . $line . "\n";
+                $outputCallback($line);
             }
         }
     }

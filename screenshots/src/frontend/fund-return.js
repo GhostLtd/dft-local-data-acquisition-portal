@@ -35,6 +35,7 @@ module.exports.fundReturnFlow = async function(page, frontendUrl, screenshot) {
         'Change control / comments': 'No comments',
     }, 'Save')
 
+    await clickElementContainingText(page, 'a', '2022/23', 0, false)
     await clickElementContainingText(page, 'a/span', '2022/23', 0, true, '/..')
     await clickElementContainingText(page, 'span', 'Comments', 0, false)
     await page.evaluate(() => window.scroll(0,0))
@@ -73,5 +74,6 @@ module.exports.fundReturnFlow = async function(page, frontendUrl, screenshot) {
         '#expenses_expense__2022-23__fre__Q4': '672287',
     }, 'Save')
 
+    await clickElementContainingText(page, 'a', '2022/23', 0, false)
     await screenshot('fund-return/6-dashboard_filled.png')
 }

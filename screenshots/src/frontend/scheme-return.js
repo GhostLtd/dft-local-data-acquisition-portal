@@ -96,6 +96,7 @@ module.exports.schemeReturnFlow = async function(page, frontendUrl, screenshot) 
         }
     }, 'Save')
 
+    await clickElementContainingText(page, 'a', '2022/23', 0, false)
     await clickElementContainingText(page, 'a/span', '2022/23', 0, true, '/..')
     await clickElementContainingText(page, 'span', 'Comments', 0, false)
     await page.evaluate(() => window.scroll(0,0))
@@ -113,8 +114,9 @@ module.exports.schemeReturnFlow = async function(page, frontendUrl, screenshot) 
         '#expenses_expense__2022-23__ssa__Q3': '916841',
         '#expenses_expense__2022-23__ssa__Q4': '764112',
         // Comments
-        '#expenses_comments': 'Mysterious higher than expected spend in Q3',
+        '#expenses_comments': 'Mysteriously higher than expected spend in Q3',
     }, 'Save')
 
+    await clickElementContainingText(page, 'a', '2022/23', 0, false)
     await screenshot('scheme-return/7-dashboard_filled.png')
 }
