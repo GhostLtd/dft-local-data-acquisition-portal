@@ -1,0 +1,13 @@
+{% extends 'admin/base.html.twig' %}
+
+{% trans_default_domain 'admin' %}
+{%- set page_title_key = "pages.authority_admin_edit.title" -%}
+{%- set current_menu = 'authority' -%}
+{%- set page_title_params = {
+    mca: authority.name
+} -%}
+
+{%- block content -%}
+    {% form_theme form '@GhostGovUkFrontend/theme.html.twig' %}
+    {{ form(form) }}
+{%- endblock -%}

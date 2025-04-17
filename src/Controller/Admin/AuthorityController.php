@@ -7,6 +7,7 @@ use App\DataFixtures\RandomFixtureGenerator;
 use App\Entity\Authority;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Form\Type\Admin\AuthorityType;
+use App\Form\Type\UserType;
 use App\ListPage\AuthorityListPage;
 use App\Repository\UserRepository;
 use App\Utility\FinancialQuarter;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/authority', name: 'admin_authority')]
 class AuthorityController extends AbstractController
@@ -59,31 +61,27 @@ class AuthorityController extends AbstractController
     {
         /** @var Form $form */
         $form = $this->createForm(AuthorityType::class, $authority, [
-            'cancel_url' => $this->generateUrl('admin_authority'),
+            'cancel_url' => $type === 'edit'
+                ? $this->generateUrl('admin_authority_view', ['id' => $authority->getId()])
+                : $this->generateUrl('admin_authority'),
         ]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            if ($form->getClickedButton()->getName() === 'cancel') {
-                return $this->redirectToRoute('admin_authority');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $authority = $form->getData();
+            if (!$form->getData()->getId()) {
+                $this->entityManager->persist($authority);
+                $this->sampleReturnGenerator->createAssetsForNewAuthority($authority);
+                $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority added', 'The new authority has been added', ['style' => NotificationBanner::STYLE_SUCCESS]));
+            } else {
+                $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority updated', 'The authority has been updated', ['style' => NotificationBanner::STYLE_SUCCESS]));
+            }
+            if (!$authority?->getAdmin()?->getId()) {
+                $this->entityManager->persist($authority->getAdmin());
             }
 
-            if ($form->isValid()) {
-                $authority = $form->getData();
-                if (!$form->getData()->getId()) {
-                    $this->entityManager->persist($authority);
-                    $this->sampleReturnGenerator->createAssetsForNewAuthority($authority);
-                    $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority added', 'The new authority has been added', ['style' => NotificationBanner::STYLE_SUCCESS]));
-                } else {
-                    $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority updated', 'The authority has been updated', ['style' => NotificationBanner::STYLE_SUCCESS]));
-                }
-                if (!$authority?->getAdmin()?->getId()) {
-                    $this->entityManager->persist($authority->getAdmin());
-                }
-
-                $this->entityManager->flush();
-                return $this->redirectToRoute('admin_authority');
-            }
+            $this->entityManager->flush();
+            return $this->redirectToRoute('admin_authority_view', ['id' => $authority->getId()]);
         }
 
         return $this->render('admin/authority/edit.html.twig', [
@@ -97,5 +95,26 @@ class AuthorityController extends AbstractController
     public function add(Request $request, Session $session): Response
     {
         return $this->edit($request, $session, new Authority(), 'add');
+    }
+
+    #[IsGranted(attribute: 'DFT_SUPER_ADMIN')]
+    #[Route(path: '/{id}/edit-admin-user', name: '_edit_admin_user')]
+    public function editAdmin(Request $request, Authority $authority): Response
+    {
+        $form = $this->createForm(UserType::class, $authority->getAdmin(), [
+            'cancel_url' => $this->generateUrl('admin_authority_view', ['id' => $authority->getId()]),
+            'authority' => $authority,
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+            return $this->redirectToRoute('admin_authority_view', ['id' => $authority->getId()]);
+        }
+
+        return $this->render('admin/authority/edit_admin_user.html.twig', [
+            'form' => $form,
+            'authority' => $authority,
+        ]);
     }
 }

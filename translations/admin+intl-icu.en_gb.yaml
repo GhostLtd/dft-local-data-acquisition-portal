@@ -19,6 +19,8 @@ pages:
         email: Admin email
         position: Admin position
         phone: Admin phone
+  authority_admin_edit:
+    title: "Edit {mca} admin user"
   maintenance:
     title: Maintenance warnings
   maintenance_add:
@@ -33,6 +35,7 @@ authority:
     add: Add MCA
     delete: Delete
     edit: Edit
+    edit_admin_user: Edit admin user
     view: View
     no_results: No results
   form:

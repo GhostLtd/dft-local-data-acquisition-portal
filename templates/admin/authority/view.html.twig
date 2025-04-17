@@ -34,6 +34,13 @@
             value: v is iterable ? v : {text: textValue(v)}
         })
     }) -}}
+
+    <div class="govuk-button-group">
+        <a href="{{ path('admin_authority_edit', {id: authority.id}) }}" class="govuk-button" data-module="govuk-button">{{ 'authority.list.edit' | trans }}</a>
+        {% if is_granted('DFT_SUPER_ADMIN') %}
+            <a href="{{ path('admin_authority_edit_admin_user', {id: authority.id}) }}" class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ 'authority.list.edit_admin_user' | trans }}</a>
+        {% endif %}
+    </div>
 {%- endmacro -%}
 
 {%- macro usersContent(users) -%}
