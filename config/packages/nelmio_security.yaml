@@ -42,6 +42,9 @@ nelmio_security:
             - 'no-referrer'
             - 'strict-origin-when-cross-origin'
 
-#    forced-ssl:
-#        hsts_max_age: 2592000 # 30 days
-#        hsts_subdomains: true
+    forced-ssl:
+        allow_list:
+            - ^/_ah/
+            - ^/cron/
+        hsts_max_age: 2592000 # 30 days
+        hsts_subdomains: true
