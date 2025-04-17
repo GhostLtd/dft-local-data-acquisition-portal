@@ -43,6 +43,11 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
             return;
         }
 
+        if (strtolower($values['column']) === 'total') {
+            $this->logger->debug("ignoring total column", [$expenseIdentifier, $values]);
+            return;
+        }
+
         if ($values['value'] === null || !$values['column']) {
             $this->logger->warning("invalid values for ExpenseEntry", [$expenseIdentifier, $values]);
             return;
