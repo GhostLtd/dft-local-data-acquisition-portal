@@ -24,7 +24,7 @@ class ExpenseEntry implements PropertyChangeLoggableInterface
     private ?string $column = null;
 
     // N.B. See ExpenseValidator
-    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 2, nullable: true)]
     private ?string $value = null;
 
     #[ORM\Column]

@@ -1,4 +1,5 @@
 let lastInputWasKeyboard = false
+let bigDecimal = require('js-big-decimal')
 
 const initialise = () => {
     let isEnabled = false
@@ -46,11 +47,17 @@ function formatCellWithCommas(cell, setSelectionUponChange= false) {
     }
 
     const value = cell.value
-    const parsedValue = getValue(value)
+    const decimalValue = parseDecimalValue(value)
 
-    cell.value = isNaN(parsedValue)
-        ? value
-        : (document.activeElement === cell ? parsedValue : (parsedValue.toLocaleString('en-GB')))
+    if (!decimalValue) {
+        cell.value = value
+    } else {
+        if (document.activeElement) {
+            cell.value = decimalValue.getValue()
+        } else {
+            cell.value = decimalValue.getPrettyValue(3)
+        }
+    }
 
     // Normally when a text input gets focused due to:
     // a) tabbing, the contents get selected
@@ -70,32 +77,27 @@ function initAutoCommas(cell) {
 }
 
 // Parse a string to retrieve its value (removing commas)
-function getValue(value) {
-    if (!valueSensible(value)) {
-        return value
+function parseDecimalValue(value) {
+    try {
+        let strippedValue = value.trim().replaceAll(',', '').replaceAll(' ', '')
+        return new bigDecimal(strippedValue).round(2, bigDecimal.RoundingModes.HALF_UP)
     }
-
-    return parseInt(('' + value).replaceAll(',', '').replaceAll(' ', ''))
+    catch(e) {
+        return null
+    }
 }
 
 // Check whether this value should be eligible for summing and/or the addition of commas
 function valueSensible(value) {
-    value = '' + value
+    let parsedValue = parseDecimalValue(value)
 
-    // Firstly, the value needs to comprise only have numbers, commas and spaces
-    // (optionally with leading/trailing whitespace)
-    if (!value.match(/^\s*[0-9, ]*\s*$/)) {
-        return false;
+    if (parsedValue === null) {
+        return false
     }
 
-    // Then the number (without all of the commas and spaces) needs to be a maximum of twelve digits long
-
-    // Anything above around 15 or 16 digits, javascript seems to start rounding the numbers, and toLocaleString
-    // used in addComma doesn't seem to be able to handle more than 12 digits
-    const numberValue = value.replaceAll(/\s|,/g, '')
-    return numberValue.length >= 0 && numberValue.length <= 12
+    [integral, fractional] = parsedValue.getValue().split('.')
+    return !(fractional.length > 2 || integral.length > 12);
 }
-
 
 function initForForm(form, autoCommas) {
     let cellMap
@@ -191,7 +193,16 @@ function initForForm(form, autoCommas) {
     // Update a cell's value
     function updateCellTotal(cell) {
         const updateCell = function(value) {
-            const hasChanged = getValue(value) !== getValue(cell.value)
+            const decimalValue = parseDecimalValue(value)
+            const cellDecimalValue = parseDecimalValue(cell.value)
+
+            let hasChanged
+            if (decimalValue === null || cellDecimalValue === null) {
+                hasChanged = decimalValue !== cellDecimalValue
+            } else {
+                hasChanged = decimalValue.compareTo(cellDecimalValue) !== 0
+            }
+
             cell.value = value
             autoComma(cell)
 
@@ -200,7 +211,7 @@ function initForForm(form, autoCommas) {
             }
         }
 
-        let total = 0
+        let total = new bigDecimal()
         let failure = false
 
         if (cell.dataset.totalSumRowsInColumn !== undefined) {
@@ -212,13 +223,14 @@ function initForForm(form, autoCommas) {
                     }
                     failure |= !valueSensible(cellMap[row][col].value)
 
-                    const value = getValue(cellMap[row][col].value)
-                    if (!isNaN(value)) {
-                        total += value
+                    const value = parseDecimalValue(cellMap[row][col].value)
+                    if (value !== null) {
+                        total = total.add(value)
                     }
                 }
             )
 
+            total = total.getPrettyValue(3)
             if (failure || !valueSensible(total)) {
                 updateCell('Error')
             } else {
@@ -235,13 +247,14 @@ function initForForm(form, autoCommas) {
                     failure |= !valueSensible(cellMap[row][col].value)
                     // console.log(cellMap[row][col].value + ':' + (failure ? 'Y': 'N'))
 
-                    const value = getValue(cellMap[row][col].value)
-                    if (!isNaN(value)) {
-                        total += value
+                    const value = parseDecimalValue(cellMap[row][col].value)
+                    if (value !== null) {
+                        total = total.add(value)
                     }
                 }
             })
 
+            total = total.getPrettyValue(3)
             if (failure || !valueSensible(total)) {
                 updateCell('Error')
             } else {

@@ -34,13 +34,13 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 {
     use ReturnExpenseTrait;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
-    #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
+    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 2, nullable: true)]
+    #[Decimal(precision: 14, scale: 2, groups: ['overall_funding'])]
     #[NotBlank(message: 'crsts_scheme_return.total_cost.not_blank', groups: ["overall_funding"])]
     private ?string $totalCost = null; // 2proj_exp: Total cost of scheme (<this fund> plus other expenditure)
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 12, scale: 0, nullable: true)]
-    #[Decimal(precision: 12, scale: 0, groups: ['overall_funding'])]
+    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 2, nullable: true)]
+    #[Decimal(precision: 14, scale: 2, groups: ['overall_funding'])]
     #[NotBlank(message: 'crsts_scheme_return.agreed_funding.not_blank', groups: ["overall_funding"])]
     private ?string $agreedFunding = null; // 2proj_exp: Agreed funding, <this fund>
 

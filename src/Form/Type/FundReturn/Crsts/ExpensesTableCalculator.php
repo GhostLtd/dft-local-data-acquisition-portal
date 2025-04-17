@@ -7,6 +7,8 @@ use App\Config\Table\Table;
 use App\Config\Table\TableBody;
 use App\Config\Table\TableHead;
 use App\Entity\ExpensesContainerInterface;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 
 class ExpensesTableCalculator
 {
@@ -30,7 +32,13 @@ class ExpensesTableCalculator
                     $key = $cell->getOption('key');
 
                     if ($cell->getAttribute('is_data_cell')) {
-                        $cell = $this->getCalculatedCell($cell, $cellValues[$key] ?? null);
+                        $value = $cellValues[$key] ?? null;
+
+                        if ($value !== null) {
+                            $value = BigDecimal::of($value);
+                        }
+
+                        $cell = $this->getCalculatedCell($cell, $value);
                     }
 
                     $row = $cell->getAttribute('row_key');
@@ -53,6 +61,23 @@ class ExpensesTableCalculator
                 }
             }
         } while(!$completed);
+
+        foreach($cellMap as $rowKey => $row) {
+            foreach($row as $colKey => $col) {
+                if ($col instanceof Cell) {
+                    $value = $col->getOption('text');
+
+                    if ($value !== '') {
+                        $roundedValue = $this->parseDecimalValue($value);
+
+                        $cellMap[$rowKey][$colKey] = new Cell(
+                            array_merge($col->getOptions(), ['text' => $this->formatValue($roundedValue, 0)]),
+                            $col->getOptions()
+                        );
+                    }
+                }
+            }
+        }
 
         // Now construct the new table...
         $tableHeadAndBodies = [];
@@ -99,7 +124,7 @@ class ExpensesTableCalculator
         $totalRow = $cell->getAttribute('is_row_total');
 
         if ($totalRow) {
-            $total = 0;
+            $total = BigDecimal::zero();
             foreach($cellMap[$row] as $rowCell) {
                 if ($rowCell === $cell) {
                     continue;
@@ -111,7 +136,8 @@ class ExpensesTableCalculator
 
                 $value = $rowCell->getOption('text');
                 if ($value !== '') {
-                    $total += intval(str_replace(['£', ','], ['', ''], $value));
+                    $decimalValue = $this->parseDecimalValue($value);
+                    $total = $total->plus($decimalValue);
                 }
             }
 
@@ -119,7 +145,7 @@ class ExpensesTableCalculator
         }
 
         if ($rowsToSum) {
-            $total = 0;
+            $total = BigDecimal::zero();
             foreach($rowsToSum as $expenseType) {
                 $rowToSum = $cellMap[$expenseType->value];
 
@@ -131,7 +157,8 @@ class ExpensesTableCalculator
 
                 $value = $rowCell->getOption('text');
                 if ($value !== '') {
-                    $total += intval(str_replace(['£', ','], ['', ''], $value));
+                    $decimalValue = $this->parseDecimalValue($value);
+                    $total = $total->plus($decimalValue);
                 }
             }
 
@@ -141,13 +168,30 @@ class ExpensesTableCalculator
         return true;
     }
 
-    protected function getCalculatedCell(mixed $cell, ?string $value): Cell
+    protected function getCalculatedCell(mixed $cell, ?BigDecimal $value): Cell
     {
-        $formattedValue = $value ? number_format($value) : '';
-
         return new Cell(
-            array_merge($cell->getOptions(), ['text' => $formattedValue]),
+            array_merge($cell->getOptions(), ['text' => $this->formatValue($value)]),
             array_merge($cell->getAttributes(), ['calculated' => true])
         );
+    }
+
+    protected function parseDecimalValue($value): BigDecimal
+    {
+        return BigDecimal::of(str_replace(['£', ','], ['', ''], $value));
+    }
+
+    public function formatValue(?BigDecimal $value, int $scale = 2): string
+    {
+        if ($value) {
+            $value = $value->toScale($scale, RoundingMode::HALF_UP);
+
+            $integralPart = number_format($value->getIntegralPart());
+            return $scale === 0 ?
+                $integralPart :
+                "{$integralPart}.{$value->getFractionalPart()}";
+        } else {
+            return '';
+        }
     }
 }

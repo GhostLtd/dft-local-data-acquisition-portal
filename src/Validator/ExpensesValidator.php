@@ -33,7 +33,7 @@ class ExpensesValidator
             $context->getValidator()
                 ->inContext($context)
                 ->atPath("expense__{$division}__{$expenseType}__{$column}")
-                ->validate($expense->getValue(), [new Decimal(precision: 12, scale: 0)], ['Default']);
+                ->validate($expense->getValue(), [new Decimal(precision: 14, scale: 2)], ['Default']);
         }
     }
 }
