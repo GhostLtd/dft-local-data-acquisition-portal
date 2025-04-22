@@ -18,7 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 #[AsCommand(name: 'app:import:jess', description: 'Import data from Jess` spreadsheets' )]
 class DataImportCommand extends Command
 {
-    private const SHEET_NAMES = [
+    private const array SHEET_NAMES = [
         'User',
         'FundReturn',
         'CrstsFundReturn',

@@ -9,6 +9,7 @@ use App\Entity\FundReturn\CrstsFundReturn;
 use App\Utility\FinancialQuarter;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
+use Throwable;
 
 class ExpenseEntrySheetImporter extends AbstractSheetImporter
 {
@@ -26,19 +27,6 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
         $values = $this->getCellValues($row);
         $expenseIdentifier = $this->extractValueFromArray($values, 'identifier');
         $isSchemeExpense = stripos($expenseIdentifier, '_') !== false;
-        /** @var ExpensesContainerInterface $parentEntity */
-        $parentEntity = $isSchemeExpense
-            ? $this->findCrstsSchemeReturnByName(...$this->getSchemeAndAuthorityNames($expenseIdentifier))
-            : $this->findCrstsFundReturnByAuthorityName($expenseIdentifier);
-
-        if (!$parentEntity) {
-            $this->logger->warning("unable to find parent for ExpenseEntry: {$expenseIdentifier}", $values);
-            return;
-        }
-
-        /** @var CrstsFundReturn $fundReturn */
-        $fundReturn = $isSchemeExpense ? $parentEntity->getFundReturn() : $parentEntity;
-        $returnQuarter = FinancialQuarter::createFromDivisionAndColumn("{$fundReturn->getYear()}-{$fundReturn->getNextYearAsTwoDigits()}", "Q{$fundReturn->getQuarter()}");
 
         $values['division'] = $this->attemptToFormatAsExpenseDivision($values['division']);
         $values['type'] = $this->attemptToFormatAsExpenseType($values['type']);
@@ -47,6 +35,10 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
 
         if(!$values['division'] || !$values['type']) {
             return;
+        }
+
+        if ($values['division'] === 'post-2026-27') {
+            $values['column'] = 'forecast';
         }
 
         if (strtolower($values['column']) === 'total') {
@@ -69,8 +61,27 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
             return;
         }
 
-        $expenseQuarter = FinancialQuarter::createFromDivisionAndColumn($values['division'], "{$values['column']}");
-        $values['forecast'] = $expenseQuarter->getStartDate() > $returnQuarter->getStartDate();
+
+        /** @var ExpensesContainerInterface $parentEntity */
+        $parentEntity = $isSchemeExpense
+            ? $this->findCrstsSchemeReturnByName(...$this->getSchemeAndAuthorityNames($expenseIdentifier))
+            : $this->findCrstsFundReturnByAuthorityName($expenseIdentifier);
+
+        if (!$parentEntity) {
+            $this->logger->warning("unable to find parent for ExpenseEntry: {$expenseIdentifier}", $values);
+            return;
+        }
+
+        /** @var CrstsFundReturn $fundReturn */
+        $fundReturn = $isSchemeExpense ? $parentEntity->getFundReturn() : $parentEntity;
+        $returnQuarter = FinancialQuarter::createFromDivisionAndColumn("{$fundReturn->getYear()}-{$fundReturn->getNextYearAsTwoDigits()}", "Q{$fundReturn->getQuarter()}");
+
+        try {
+            $expenseQuarter = FinancialQuarter::createFromDivisionAndColumn($values['division'], "{$values['column']}");
+            $values['forecast'] = $expenseQuarter->getStartDate() > $returnQuarter->getStartDate();
+        } catch (Throwable $e) {
+            $values['forecast'] = true;
+        }
 
         // find existing expense entry, or add new one
         $newExpense = new ExpenseEntry();
