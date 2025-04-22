@@ -17,6 +17,7 @@ nelmio_security:
             connect-src:
                 - 'self'
             font-src:
+                - 'https://%frontend_hostname%'
                 - 'self'
             img-src:
                 - 'self'
