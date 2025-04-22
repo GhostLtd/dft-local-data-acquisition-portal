@@ -52,7 +52,7 @@ function formatCellWithCommas(cell, setSelectionUponChange= false) {
     if (!decimalValue) {
         cell.value = value
     } else {
-        if (document.activeElement) {
+        if (document.activeElement === cell) {
             cell.value = decimalValue.getValue()
         } else {
             cell.value = decimalValue.getPrettyValue(3)

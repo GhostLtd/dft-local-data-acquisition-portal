@@ -136,7 +136,7 @@ abstract class AbstractSheetImporter
             $this->logger->error("Financial conversion failed", [$originalValue, $value]);
         }
 
-        return "" . intval($value);
+        return "" . floatval($value);
     }
 
     protected function attemptToFormatAsDecimal(?string $value): ?float
