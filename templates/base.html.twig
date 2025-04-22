@@ -14,9 +14,6 @@
         {% for stylesheet in encore_entry_css_files('app') %}
             <link rel="stylesheet" href="{{ absolute_url(asset(stylesheet)) | replace({(hostnames.admin): hostnames.frontend}) }}" nonce="{{ csp_nonce('style') }}">
         {% endfor %}
-{#        {{- encore_entry_link_tags('app', attributes={#}
-{#            nonce: csp_nonce('style')#}
-{#        }) -}}#}
     {%- endblock -%}
     {% if env_google_site_verification ?? false %}<meta name="google-site-verification" content="{{ env_google_site_verification }}" />{% endif %}
 {% endblock %}
@@ -26,9 +23,6 @@
         {% for script in encore_entry_js_files('app') %}
             <script src="{{ absolute_url(asset(script)) | replace({(hostnames.admin): hostnames.frontend}) }}" nonce="{{ csp_nonce('script') }}"></script>
         {% endfor %}
-{#        {{- encore_entry_script_tags('app', attributes={#}
-{#            nonce: csp_nonce('script')#}
-{#        }) -}}#}
     {%- endblock -%}
 {% endblock %}
 
