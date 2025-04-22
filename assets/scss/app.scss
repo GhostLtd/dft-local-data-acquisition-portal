@@ -4,6 +4,10 @@
 
 @import 'expenses.scss';
 
+.govuk-width-container {
+  max-width: 1080px;
+}
+
 section.govuk-service-navigation__wrapper-full-width {
   nav.govuk-service-navigation__wrapper {
     flex-grow: 1;
