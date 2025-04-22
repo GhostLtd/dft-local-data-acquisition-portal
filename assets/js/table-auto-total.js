@@ -49,7 +49,7 @@ function formatCellWithCommas(cell, setSelectionUponChange= false) {
     const value = cell.value
     const decimalValue = parseDecimalValue(value)
 
-    if (!decimalValue) {
+    if (decimalValue === null) {
         cell.value = value
     } else {
         if (document.activeElement === cell) {
@@ -78,6 +78,10 @@ function initAutoCommas(cell) {
 
 // Parse a string to retrieve its value (removing commas)
 function parseDecimalValue(value) {
+    if (value.trim() === '') {
+        return null
+    }
+
     try {
         let strippedValue = value.trim().replaceAll(',', '').replaceAll(' ', '')
         return new bigDecimal(strippedValue).round(2, bigDecimal.RoundingModes.HALF_UP)
@@ -89,6 +93,10 @@ function parseDecimalValue(value) {
 
 // Check whether this value should be eligible for summing and/or the addition of commas
 function valueSensible(value) {
+    if (value.trim() === '') {
+        return true
+    }
+
     let parsedValue = parseDecimalValue(value)
 
     if (parsedValue === null) {
