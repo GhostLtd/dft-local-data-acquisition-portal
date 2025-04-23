@@ -99,7 +99,7 @@
 {% endmacro %}
 
 {% macro dateValue(value, options) %}
-    {{- value ? (value | date((options.dateFormat ?? 'format.date.default') | trans)) : null -}}
+    {{- value ? (value | date((options.dateFormat ?? 'format.date.default') | trans)) : '-' -}}
 {% endmacro %}
 
 {% macro moneyValue(value) %}
