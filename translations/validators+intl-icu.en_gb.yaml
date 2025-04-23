@@ -56,6 +56,7 @@ crsts_scheme_return:
   expected_business_case_approval:
     future: Enter a date in the future
     not_null: Enter the expected business case approval date
+    past: Enter a date in the past
 
 scheme:
   active_travel_element:

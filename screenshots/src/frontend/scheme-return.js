@@ -97,7 +97,7 @@ module.exports.schemeReturnFlow = async function(page, frontendUrl, screenshot) 
         'Current business case': {
             'Working towards OBC': true,
         },
-        'Expected date of approval for current business case': {
+        'Expected or actual date of approval for current business case': {
             'Day': '20',
             'Month': '1',
             'Year': '' + ((new Date).getFullYear() + 1),

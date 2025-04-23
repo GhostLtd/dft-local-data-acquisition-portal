@@ -26,6 +26,7 @@ use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -57,7 +58,8 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null', groups: ["milestone_business_case_date"])]
-    #[GreaterThan(value: 'now', message: 'crsts_scheme_return.expected_business_case_approval.future', groups: ["milestone_business_case_date"])]
+    #[GreaterThan(value: 'now', message: 'crsts_scheme_return.expected_business_case_approval.future', groups: ["milestone_business_case_date_future"])]
+    #[LessThanOrEqual(value: 'now', message: 'crsts_scheme_return.expected_business_case_approval.past', groups: ["milestone_business_case_date_past"])]
     private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, length: AbstractMySQLPlatform::LENGTH_LIMIT_TEXT, nullable: true)]
@@ -82,14 +84,21 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[Callback(groups: ['milestone_business_case'])]
     public function validateExpectedBusinessCaseApproval(ExecutionContextInterface $context): void
     {
-        if ($this->businessCase !== BusinessCase::NOT_APPLICABLE) {
-            $violations = $context->getValidator()->validateProperty($this, 'expectedBusinessCaseApproval', ['milestone_business_case_date']);
-            foreach($violations as $violation) {
-                $context
-                    ->buildViolation($violation->getMessage(), $violation->getParameters())
-                    ->atPath($violation->getPropertyPath())
-                    ->addViolation();
-            }
+        if ($this->businessCase === BusinessCase::NOT_APPLICABLE) {
+            return;
+        }
+
+        $groups = ['milestone_business_case_date'];
+        $groups[] = $this->businessCase === BusinessCase::POST_FBC ?
+            'milestone_business_case_date_past' :
+            'milestone_business_case_date_future';
+
+        $violations = $context->getValidator()->validateProperty($this, 'expectedBusinessCaseApproval', $groups);
+        foreach($violations as $violation) {
+            $context
+                ->buildViolation($violation->getMessage(), $violation->getParameters())
+                ->atPath($violation->getPropertyPath())
+                ->addViolation();
         }
     }
 

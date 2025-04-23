@@ -331,7 +331,7 @@ forms:
         label: &sr_current_business_case Current business case
         help: ''
       expected_business_case_approval:
-        label: &sr_expected_business_case_approval Expected date of approval for current business case
+        label: &sr_expected_business_case_approval Expected or actual date of approval for current business case
         help: ''
     milestone_progress:
       on_track_rating:
