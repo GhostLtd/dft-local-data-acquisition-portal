@@ -67,7 +67,6 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             $parent->add($milestoneType->value, DateType::class, [
                 'label' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'label_translation_parameters' => ['funded_mostly_as' => $fundedMostlyAs->value],
                 'help' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.help",
                 'priority' => 1,
             ]);
@@ -149,10 +148,20 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
     {
         $isCDEL = $schemeReturn->getScheme()->getCrstsData()->getFundedMostlyAs() === FundedMostlyAs::CDEL;
 
-        return array_filter(
-            MilestoneType::cases(),
-            fn(MilestoneType $e) => $isCDEL || $e !== MilestoneType::FINAL_DELIVERY
-        );
+        return $isCDEL ?
+            [
+                MilestoneType::START_DEVELOPMENT,
+                MilestoneType::END_DEVELOPMENT,
+                MilestoneType::START_CONSTRUCTION,
+                MilestoneType::END_CONSTRUCTION,
+                MilestoneType::FINAL_DELIVERY,
+            ] :
+            [
+                MilestoneType::START_DEVELOPMENT,
+                MilestoneType::END_DEVELOPMENT,
+                MilestoneType::START_DELIVERY,
+                MilestoneType::END_DELIVERY,
+            ];
     }
 
     public function getMilestone(CrstsSchemeReturn $crstsSchemeReturn, MilestoneType $milestoneEnum): ?Milestone

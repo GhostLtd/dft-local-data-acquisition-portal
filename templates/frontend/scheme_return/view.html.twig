@@ -60,7 +60,7 @@
                     'milestone_dates',
                     summaryList({rows:
                         schemeReturn.milestones | map((v,k) => {
-                            key: {text: ("enum.milestone_type.#{v.type.value}" | trans({funded_mostly_as: schemeReturn.scheme.crstsData.fundedMostlyAs.value}))},
+                            key: {text: "enum.milestone_type.#{v.type.value}" | trans},
                             value: {text: dateValue(v.date, {dateFormat: 'format.date.year-and-month'})},
                         })
                     })

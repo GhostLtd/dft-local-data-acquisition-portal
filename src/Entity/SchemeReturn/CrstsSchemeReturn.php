@@ -108,7 +108,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
                 $context
                     ->buildViolation('milestone.date.not_null', [
                         'milestone_type' => $milestone->getType()->value,
-                        'funded_mostly_as' => $fundedMostlyAs?->value,
                     ])
                     ->atPath($milestone->getType()->value)
                     ->addViolation();

@@ -79,16 +79,10 @@ enum:
   milestone_type:
     start_development: Start development
     end_development: End development
-    start_construction: &milestone_start_construction >-
-      {funded_mostly_as, select,
-        CDEL  {Start construction}
-        other {Start delivery}
-      }
-    end_construction: &milestone_end_construction >-
-      {funded_mostly_as, select,
-        CDEL  {End construction}
-        other {End delivery}
-      }
+    start_construction: Start construction
+    end_construction: End construction
+    start_delivery: Start delivery
+    end_delivery: End delivery
     final_delivery: Final delivery
   on_track_rating:
     green: Green
@@ -318,10 +312,16 @@ forms:
           label: End development
           help: ''
         start_construction:
-          label: *milestone_start_construction
+          label: Start construction
           help: ''
         end_construction:
-          label: *milestone_end_construction
+          label: End construction
+          help: ''
+        start_delivery:
+          label: Start delivery
+          help: ''
+        end_delivery:
+          label: End delivery
           help: ''
         final_delivery:
           label: Final delivery
