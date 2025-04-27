@@ -70,7 +70,7 @@ trait ReturnExpenseTrait
         return $sourceExpenses
             ->map(function (ExpenseEntry $e) use ($copyUpToAndIncluding) {
                 $entryFQ = FinancialQuarter::createFromDivisionAndColumn($e->getDivision(), $e->getColumn());
-                $isCopyValue = $entryFQ <= $copyUpToAndIncluding;
+                $isCopyValue = $entryFQ <= $copyUpToAndIncluding || $e->getType()->isBaseline();
 
                 return (new ExpenseEntry())
                     ->setDivision($e->getDivision())
@@ -79,5 +79,16 @@ trait ReturnExpenseTrait
                     ->setValue($isCopyValue ? $e->getValue() : null)
                     ->setForecast(!$isCopyValue);
             });
+    }
+
+    public function getExpenseWithSameDivisionTypeAndColumnAs(ExpenseEntry $other): ?ExpenseEntry
+    {
+        foreach($this->expenses as $expense) {
+            if ($expense->hasSameDivisionTypeAndColumnAs($other)) {
+                return $expense;
+            }
+        }
+
+        return null;
     }
 }

@@ -84,4 +84,10 @@ class ExpenseEntry implements PropertyChangeLoggableInterface
         $this->forecast = $forecast;
         return $this;
     }
+
+    // --------------------------------------------------------------------------------------------------------------
+
+    public function hasSameDivisionTypeAndColumnAs(ExpenseEntry $other): bool {
+        return $this->division === $other->division && $this->type === $other->type && $this->column === $other->column;
+    }
 }

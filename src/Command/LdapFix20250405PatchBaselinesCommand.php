@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\ExpenseEntry;
 use App\Entity\FundReturn\CrstsFundReturn;
+use App\Entity\FundReturn\FundReturn;
 use App\EventSubscriber\PropertyChangeLogEventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -22,8 +23,7 @@ class LdapFix20250405PatchBaselinesCommand extends Command
     public function __construct(
         protected EntityManagerInterface           $entityManager,
         protected PropertyChangeLogEventSubscriber $changeLogEventSubscriber,
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -40,8 +40,10 @@ class LdapFix20250405PatchBaselinesCommand extends Command
         /** @var array<int, CrstsFundReturn> $fundReturns */
         $fundReturns = $fundReturnRepository
             ->createQueryBuilder('r')
-            ->select('r, re')
+            ->select('r, re, fa, a')
             ->join('r.expenses', 're')
+            ->join('r.fundAward', 'fa')
+            ->join('fa.authority', 'a')
             ->where('r.year = 2024')
             ->andWhere('r.quarter = 4')
             ->getQuery()
@@ -68,12 +70,16 @@ class LdapFix20250405PatchBaselinesCommand extends Command
 
             $previousExpenses = $previousReturn->getExpenses();
 
+            $getInfoString = fn(FundReturn $f, ExpenseEntry $e) =>
+              "{$f->getFundAward()->getAuthority()->getName()} Return {$f->getYear()}Q{$f->getQuarter()} <comment>{$e->getDivision()} {$e->getColumn()} {$e->getType()->name}</comment>";
+
+
             foreach($previousExpenses as $previousExpense) {
                 if ($previousExpense->getType()->isBaseline()) {
                     $existingExpense = $fundReturn->getExpenseWithSameDivisionTypeAndColumnAs($previousExpense, true);
                     if ($existingExpense) {
                         if ($existingExpense->getValue() !== null) {
-                            $io->writeln("<info>EXISTS</info> for <comment>{$fundReturn->getId()} {$previousExpense->getDivision()} {$previousExpense->getColumn()} {$previousExpense->getType()->name}</comment>");
+                            $io->writeln("<info>EXISTS</info> {$getInfoString($fundReturn, $previousExpense)}");
                             continue;
                         }
 
@@ -90,7 +96,7 @@ class LdapFix20250405PatchBaselinesCommand extends Command
 
                     $newExpense->setValue($previousExpense->getValue());
                     $expenses->add($newExpense);
-                    $io->writeln("<error>ADDING</error> for <comment>{$fundReturn->getId()} {$previousExpense->getDivision()} {$previousExpense->getColumn()} {$previousExpense->getType()->name}</comment>");
+                    $io->writeln("<error>ADDING</error> {$getInfoString($fundReturn, $previousExpense)}");
                 }
             }
         }
