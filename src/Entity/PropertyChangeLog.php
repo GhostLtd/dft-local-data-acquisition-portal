@@ -31,7 +31,7 @@ class PropertyChangeLog
     private mixed $propertyValue;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $userEmail = null;
+    private ?string $source = null;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     private ?string $firewallName = null;
@@ -105,14 +105,14 @@ class PropertyChangeLog
         }
     }
 
-    public function getUserEmail(): ?string
+    public function getSource(): ?string
     {
-        return $this->userEmail;
+        return $this->source;
     }
 
-    public function setUserEmail(?string $userEmail): static
+    public function setSource(?string $source): static
     {
-        $this->userEmail = $userEmail;
+        $this->source = $source;
         return $this;
     }
 

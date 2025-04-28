@@ -23,21 +23,27 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[AsDoctrineListener(event: Events::onFlush)]
 class PropertyChangeLogEventSubscriber
 {
+    protected ?string $defaultSource;
+
     public function __construct(
         protected Security                 $security,
         protected EntityManagerInterface   $defaultEntityManager,
         protected EventDispatcherInterface $eventDispatcher,
-    ) {}
+    ) {
+        $this->defaultSource = null;
+    }
+
+    public function setDefaultSource(?string $defaultSource): static
+    {
+        $this->defaultSource = $defaultSource;
+        return $this;
+    }
 
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
         $token = $this->security->getToken();
 
-        if (!$token) {
-            return;
-        }
-
-        $user = $token->getUser();
+        $user = $token?->getUser();
         $userEmail = $user instanceof UserInterface ? $user->getUserIdentifier() : null;
 
         // Doing it like this so there is no crash if I've failed to enumerate all possible token types
@@ -86,7 +92,7 @@ class PropertyChangeLogEventSubscriber
             ->setEntityId($entity->getId())
             ->setEntityClass(ClassUtils::getRealClass($entityClass))
             ->setTimestamp(new \DateTime())
-            ->setUserEmail($userEmail)
+            ->setSource($userEmail ?? $this->defaultSource)
             ->setFirewallName($firewallName)
             ->setPropertyName(null)
             ->setPropertyValue(null);
