@@ -25,6 +25,7 @@
             {{- tableRow([
                 {text: scheme.name},
                 {text: scheme.fundsAsString},
+                {text: scheme.schemeIdentifier},
                 {html: summaryListActionsList(actions)},
             ]) -}}
         {%- else -%}

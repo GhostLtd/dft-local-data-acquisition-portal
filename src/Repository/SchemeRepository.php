@@ -29,13 +29,18 @@ class SchemeRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getQueryBuilderForSchemesForAuthority(Authority $authority): QueryBuilder
+    public function getQueryBuilderForSchemesForAuthority(Authority $authority, bool $noOrder=false): QueryBuilder
     {
-        return $this->createQueryBuilder('scheme')
+        $qb = $this->createQueryBuilder('scheme')
             ->join('scheme.authority', 'authority')
             ->where('authority.id = :authority_id')
-            ->orderBy('scheme.name', 'ASC')
             ->setParameter('authority_id', $authority->getId(), UlidType::NAME);
+
+        if (!$noOrder) {
+            $qb->orderBy('scheme.name', 'ASC');
+        }
+
+        return $qb;
     }
 
     public function getQueryBuilderForSchemesForFundReturn(FundReturn $fundReturn): QueryBuilder

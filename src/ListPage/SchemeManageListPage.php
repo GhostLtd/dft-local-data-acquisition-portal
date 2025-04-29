@@ -32,13 +32,14 @@ class SchemeManageListPage extends AbstractListPage
         return [
             (new TextFilter('Name', 'scheme.name'))->sortable(),
             (new TextFilter('Funds', 'scheme.funds'))->sortable(),
+            (new TextFilter('Identifier', 'scheme.schemeIdentifier'))->sortable(),
         ];
     }
 
     #[\Override]
     protected function getQueryBuilder(): QueryBuilder
     {
-        return $this->schemeRepository->getQueryBuilderForSchemesForAuthority($this->authority);
+        return $this->schemeRepository->getQueryBuilderForSchemesForAuthority($this->authority, noOrder: true);
     }
 
     #[\Override]

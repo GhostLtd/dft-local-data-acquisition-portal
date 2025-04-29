@@ -44,7 +44,8 @@ class SchemeType extends AbstractType implements DataMapperInterface
 
         if ($data->getAuthority() === null) {
             // This is needed for the voter to work...
-            $data->setAuthority($this->authority);
+            // It also sets the scheme identifier
+            $this->authority->addScheme($data);
         }
 
         $canEditCriticalSchemeFields = $this->authorizationChecker->isGranted(Role::CAN_EDIT_CRITICAL_SCHEME_FIELDS, $data);
@@ -69,7 +70,7 @@ class SchemeType extends AbstractType implements DataMapperInterface
                 'label' => "forms.scheme.scheme.scheme_identifier.label",
                 'label_attr' => ['class' => 'govuk-label--s'],
                 'help' => "forms.scheme.scheme.scheme_identifier.help",
-                'disabled' => !$canEditCriticalSchemeFields,
+                'disabled' => true,
             ])
             ->add('transportModeCategory', ChoiceType::class, [
                 'label' => 'forms.scheme.transport_mode.category.label',
@@ -261,7 +262,6 @@ class SchemeType extends AbstractType implements DataMapperInterface
 
         $viewData->setName($forms['name']->getData());
         $viewData->setDescription($forms['description']->getData());
-        $viewData->setSchemeIdentifier($forms['schemeIdentifier']->getData());
 
         $viewData->setFunds($forms['funds']->getData());
 
