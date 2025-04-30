@@ -94,9 +94,9 @@ class ExpenseEntryChangeLogSubscriber implements EventSubscriberInterface
 
         $division = $expenseType->getDivision();
         $column = $expenseType->getColumn();
-        $type = strtolower($expenseType->getType()->name);
+        $type = strtolower($expenseType->getType()->value);
 
-        // e.g. expenses.2022-23.Q1.fund_capital_expenditure
+        // e.g. expenses.2022-23.Q1.feb
         $propertyName = "expenses.{$division}.{$column}.{$type}";
 
         $changeLog
