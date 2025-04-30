@@ -44,6 +44,10 @@ services:
             $frontendHostname: '%frontend_hostname%'
             $screenshotsPath: '%screenshots.path%'
 
+    App\Utility\SampleReturnGenerator:
+        arguments:
+            $environment: '%kernel.environment%'
+
     Alphagov\Notifications\Client:
         factory: '@Ghost\GovUkCoreBundle\Utility\AlphagovNotify\ClientFactory'
         arguments:
