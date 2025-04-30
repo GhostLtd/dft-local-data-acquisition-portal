@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FundAwardRepository::class)]
-class FundAward
+class FundAward implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 
