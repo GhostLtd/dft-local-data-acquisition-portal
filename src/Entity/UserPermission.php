@@ -11,7 +11,7 @@ use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Uid\Ulid;
 
 #[ORM\Entity(repositoryClass: UserPermissionRepository::class)]
-class UserPermission
+class UserPermission implements PropertyChangeLoggableInterface
 {
     use IdTrait;
 
