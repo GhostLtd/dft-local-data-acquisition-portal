@@ -92,17 +92,10 @@ class ExpenseEntryChangeLogSubscriber implements EventSubscriberInterface
             throw new \RuntimeException('Unable to match expense to parent');
         }
 
-        $division = $expenseType->getDivision();
-        $column = $expenseType->getColumn();
-        $type = strtolower($expenseType->getType()->value);
-
-        // e.g. expenses.2022-23.Q1.feb
-        $propertyName = "expenses.{$division}.{$column}.{$type}";
-
         $changeLog
             ->setEntityId($entityId)
             ->setEntityClass($entityClass)
-            ->setPropertyName($propertyName);
+            ->setPropertyName($expenseType->getPropertyChangeLogPropertyName());
     }
 
     public static function getSubscribedEvents(): array

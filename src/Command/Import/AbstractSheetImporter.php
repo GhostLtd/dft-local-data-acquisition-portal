@@ -28,6 +28,14 @@ abstract class AbstractSheetImporter
     protected int $year;
     protected Worksheet $sheet;
 
+    protected const array AUTHORITY_NAME_MAP = [
+        'Greater Manchester CA' => 'Greater Manchester Combined Authority',
+        'South Yorkshire MCA' => 'South Yorkshire Mayoral Combined Authority',
+        'North East Joint Transport Committee / Transport North East' => 'North East Combined Authority',
+        'The West Yorkshire Combined Authority' => 'West Yorkshire Combined Authority',
+    ];
+
+
     public function __construct(
         protected EntityManagerInterface $entityManager,
         protected PropertyAccessorInterface $propertyAccessor,
@@ -122,8 +130,8 @@ abstract class AbstractSheetImporter
     {
         $originalValue = $value;
         $value = $this->attemptToFormatAsDecimal($value);
-        if ($autoMultiply && $value > 0) {
-            if ($value < 1000) {
+        if ($autoMultiply && $value !== 0) {
+            if ($value < 1000 && $value > -10) {
                 $value *= 1000000;
                 $this->logger->debug("Financial multiplied by 1m", array_merge(['orig' => $originalValue, 'new' => $value], $additionalLoggingContext));
             } /* elseif ($value > 5000000000) {
@@ -146,7 +154,7 @@ abstract class AbstractSheetImporter
             1 === preg_match('/^£?(?<val>\d+(\.\d+)?)m?$/iu', $value, $matches)
                 => floatval($matches['val']),
             1 === preg_match('/^[+\-]?(?=.)(?:0|[1-9]\d*)?(?:\.\d*)?(?:\d[eE][+\-]?\d+)?$/', $value)
-                => intval($value),
+                => floatval($value),
             in_array(strtolower($value), $ignoreValues) => ($this->logger->info("ignore decimal value", [$value]) ?? null),
             null === $value => null,
             default => ($this->logger->error("unable to transform decimal", [$value]) ?? null)
@@ -177,11 +185,14 @@ abstract class AbstractSheetImporter
 
     protected function getSchemeAndAuthorityNames(?string $schemeIdentifier): array
     {
-        return array_map(fn($v) => trim($v), explode('_', $schemeIdentifier));
+        [$schemeName, $authorityName] = array_map(fn($v) => trim($v), explode('_', $schemeIdentifier));
+        $authorityName = static::AUTHORITY_NAME_MAP[$authorityName] ?? $authorityName;
+        return [$schemeName, $authorityName];
     }
 
     protected function findAuthorityByName(string $name): ?Authority
     {
+        $name = static::AUTHORITY_NAME_MAP[$name] ?? $name;
         return $this->entityManager->getRepository(Authority::class)->findOneBy(['name' => $name]);
     }
 

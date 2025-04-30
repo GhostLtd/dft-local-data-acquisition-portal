@@ -18,14 +18,14 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 #[AsCommand(name: 'app:import:jess', description: 'Import data from Jess` spreadsheets' )]
 class DataImportCommand extends Command
 {
-    private const array SHEET_NAMES = [
-        'User',
-        'FundReturn',
-        'CrstsFundReturn',
-        'Scheme',
-        'CrstsSchemeReturn',
-        'ExpenseEntry',
-        'Milestone',
+    protected const array SHEET_NAMES = [
+        'User' => 'User',
+        'FundReturn' => 'FundReturn',
+        'CrstsFundReturn' => 'CrstsFundReturn',
+        'Scheme' => 'Scheme',
+        'CrstsSchemeReturn' => 'CrstsSchemeReturn',
+        'ExpenseEntry' => 'ExpenseEntry',
+        'Milestone' => 'Milestone',
     ];
 
     public function __construct(
@@ -52,12 +52,12 @@ class DataImportCommand extends Command
         $io->title("Importing spreadsheet for {$year} Q{$quarter}");
         $this->dataImportLogger->error("Importing data for {$year} Q{$quarter}...");
 
-        foreach(self::SHEET_NAMES as $name) {
-            $this->dataImportLogger->error("  processing sheet: {$name}");
-            $importer = new ("App\\Command\\Import\\{$name}SheetImporter")(
+        foreach(static::SHEET_NAMES as $classname => $sheetname) {
+            $this->dataImportLogger->error("  processing sheet: {$sheetname}");
+            $importer = new ("App\\Command\\Import\\{$classname}SheetImporter")(
                 $this->entityManager, $this->propertyAccessor, $this->dataImportLogger
             );
-            $importer->import($io, $spreadsheet->getSheetByName($name), $year, $quarter);
+            $importer->import($io, $spreadsheet->getSheetByName($sheetname), $year, $quarter);
         }
 
         return Command::SUCCESS;

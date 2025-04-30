@@ -90,4 +90,11 @@ class ExpenseEntry implements PropertyChangeLoggableInterface
     public function hasSameDivisionTypeAndColumnAs(ExpenseEntry $other): bool {
         return $this->division === $other->division && $this->type === $other->type && $this->column === $other->column;
     }
+
+    public function getPropertyChangeLogPropertyName(): string
+    {
+        $type = strtolower($this->getType()->value);
+        // e.g. expenses.2022-23.Q1.feb
+        return "expenses.{$this->getDivision()}.{$this->getColumn()}.{$type}";
+    }
 }
