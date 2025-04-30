@@ -69,8 +69,14 @@ trait ReturnExpenseTrait
     {
         return $sourceExpenses
             ->map(function (ExpenseEntry $e) use ($copyUpToAndIncluding) {
-                $entryFQ = FinancialQuarter::createFromDivisionAndColumn($e->getDivision(), $e->getColumn());
-                $isCopyValue = $entryFQ <= $copyUpToAndIncluding || $e->getType()->isBaseline();
+                if ($e->getType()->isBaseline()) {
+                    $isCopyValue = true;
+                } else if ($e->getDivision() === 'post-2026-27') {
+                    $isCopyValue = false; // We shouldn't be issuing returns past this date in any case
+                } else {
+                    $entryFQ = FinancialQuarter::createFromDivisionAndColumn($e->getDivision(), $e->getColumn());
+                    $isCopyValue = $entryFQ <= $copyUpToAndIncluding;
+                }
 
                 return (new ExpenseEntry())
                     ->setDivision($e->getDivision())
