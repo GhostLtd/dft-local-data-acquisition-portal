@@ -95,8 +95,10 @@ class ExpenseEntrySheetImporter extends BaseExpenseEntrySheetImporter
             && $e->getColumn() === $values['column']
         );
         if ($existingExpense) {
-            if (number_format($values['value'], 2, '.', '') === $existingExpense->getValue()) {
-                $this->logger->info("ignoring unchanged expense value", [$existingExpense->getValue(), $values['value'], $expenseIdentifier, $values]);
+            if ($existingExpense->getValue() === null
+                || number_format($values['value'], 2, '.', '') === $existingExpense->getValue()
+            ) {
+                $this->logger->info("ignoring unchanged or null expense value", [$existingExpense->getValue(), $values['value'], $expenseIdentifier, $values]);
                 return;
             }
             // lookup change log
