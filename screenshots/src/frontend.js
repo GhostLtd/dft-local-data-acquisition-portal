@@ -11,6 +11,7 @@ const {stdin: input} = require('node:process')
 const {loginFlow} = require("./frontend/login")
 const {fundReturnFlow} = require("./frontend/fund-return")
 const {schemeReturnFlow} = require("./frontend/scheme-return")
+const {schemeManagementFlow} = require("./frontend/scheme-management");
 
 Error.stackTraceLimit = Infinity
 
@@ -22,6 +23,7 @@ const frontendFlow = async function(page, baseUrl, outputDir, frontendUrl) {
     await loginFlow(page, frontendUrl, screenshot)
     await fundReturnFlow(page, frontendUrl, screenshot)
     await schemeReturnFlow(page, frontendUrl, screenshot)
+    await schemeManagementFlow(page, frontendUrl, screenshot)
 
     // await clickLinkContainingText(page, 'Logout')
 }

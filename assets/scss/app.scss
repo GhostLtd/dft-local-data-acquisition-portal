@@ -47,3 +47,21 @@ li.govuk-service-navigation__margin-left-auto {
     margin-top: 0;
   }
 }
+
+// Used for screenshots
+#select-choices {
+  position: absolute;
+  background: white;
+  border: 1px solid govuk-colour('dark-grey');
+
+  span {
+    display: block;
+    padding: 2px 5px;
+    @include govuk-font(19);
+  }
+
+  span.selected {
+    background: #1967D2;
+    color: white;
+  }
+}

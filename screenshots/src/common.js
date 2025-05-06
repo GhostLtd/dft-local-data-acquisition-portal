@@ -70,10 +70,10 @@ const findElement = async function(page, expression, index=0) {
     const elements = await page.$$(expression)
 
     if (!elements[index]) {
-        throw new Error(`Element not found for ${expression}[${index}]`);
+        throw new Error(`Element not found for ${expression}[${index}]`)
     }
 
-    return elements[index];
+    return elements[index]
 }
 
 module.exports.findElement = findElement
@@ -94,8 +94,15 @@ const clickLink = async function(page, expression, index = 0, waitForNavigation 
     await clickElement(page, element, waitForNavigation)
 }
 
+const fetchAndClickLabelTarget = async function(page, label, clickCount = 1) {
+    const targetId = await getTargetIdForLabel(page, label)
+    const element = await findElement(page, targetId)
+    await element.click({clickCount})
+}
+
 module.exports.clickElement = clickElement
 module.exports.clickLink = clickLink
+module.exports.fetchAndClickLabelTarget = fetchAndClickLabelTarget
 
 module.exports.clickElementWithText = async function(page, elementType, text, index = 0, waitForNavigation = true) {
     await clickLink(page, `xpath///${elementType}${predicate({text})}`, index, waitForNavigation)
@@ -119,6 +126,14 @@ module.exports.clickLinkWithTextThatStartsWith = async function(page, textStarts
 
 module.exports.clickButtonWithText = async function(page, text, index = 0, waitForNavigation = true) {
     await clickLink(page, `xpath///button${predicate({text})}`, index, waitForNavigation)
+}
+
+module.exports.clickButtonContainingText = async function(page, textContains, index = 0, waitForNavigation = true) {
+    await clickLink(page, `xpath///button${predicate({textContains})}`, index, waitForNavigation)
+}
+
+module.exports.clickButtonWithTextThatStartsWith = async function(page, textStartsWith, index = 0, waitForNavigation = true) {
+    await clickLink(page, `xpath///button${predicate({textStartsWith})}`, index, waitForNavigation)
 }
 
 module.exports.enterDate = async function(page, id_prefix, year, month, day) {
@@ -166,24 +181,7 @@ const fillForm = async function(/** @type {puppeteer.Page} */ page, data, xpathP
         if (labelOrId.startsWith('#')) {
             targetId = labelOrId
         } else {
-            const xpath = xpathHelper({
-                prefix: xpathPrefix,
-                tags: ['label'],
-                text: labelOrId,
-                textStartsWith: true,
-            })
-
-            const labelElement = await page.$(xpath)
-            if (!labelElement) {
-                throw new Error(`Could not find match for "${labelOrId}" [XPath: "${xpath}]"]`)
-            }
-
-            targetId = await labelElement.evaluate(x => x.getAttribute('for'))
-            if (!targetId) {
-                throw new Error(`Could not find referenced (for) element for label element "${labelOrId}"`)
-            }
-
-            targetId = `#${targetId}`
+            targetId = await getTargetIdForLabel(page, labelOrId, xpathPrefix);
         }
 
         /** @type {puppeteer.ElementHandle} */
@@ -214,6 +212,29 @@ const fillForm = async function(/** @type {puppeteer.Page} */ page, data, xpathP
 }
 
 module.exports.fillForm = fillForm;
+
+async function getTargetIdForLabel(page, labelOrId, xpathPrefix = 'xpath///form') {
+    const xpath = xpathHelper({
+        prefix: xpathPrefix,
+        tags: ['label'],
+        text: labelOrId,
+        textStartsWith: true,
+    })
+
+    const labelElement = await page.$(xpath)
+    if (!labelElement) {
+        throw new Error(`Could not find match for "${labelOrId}" [XPath: "${xpath}]"]`)
+    }
+
+    const targetId = await labelElement.evaluate(x => x.getAttribute('for'))
+    if (!targetId) {
+        throw new Error(`Could not find referenced (for) element for label element "${labelOrId}"`)
+    }
+
+    return `#${targetId}`
+}
+
+module.exports.getTargetIdForLabel = getTargetIdForLabel;
 
 module.exports.submit = async function(page, data, buttonText) {
     const buttons = {}
@@ -397,4 +418,45 @@ module.exports.executeCommand = (command) => {
             process.exit(1)
         }
     }))
+}
+
+module.exports.showSelectOptionsFor = async function(page, label) {
+    await module.exports.clearSelectOptions(page)
+
+    const targetId = await getTargetIdForLabel(page, label)
+    await page.evaluate((elementId) => {
+        const element = document.getElementById(elementId)
+        const options = element.querySelectorAll('option')
+
+        const container = document.createElement('div')
+        const clientRect = element.getBoundingClientRect()
+        container.id = 'select-choices'
+
+        container.style.top = (clientRect.top + window.scrollY + clientRect.height) + 'px'
+        container.style.left = clientRect.left + 'px'
+        container.style.width = (clientRect.width - 2) + 'px' // 2 for the border from CSS
+
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i]
+            const textElement = document.createElement('span')
+            textElement.innerText = option.innerText
+
+            if (option.selected) {
+                textElement.classList.add('selected')
+            }
+
+            container.append(textElement)
+        }
+
+        document.body.append(container)
+    }, targetId.slice(1))
+}
+
+module.exports.clearSelectOptions = async function(page) {
+    page.evaluate(() => {
+        const element = document.getElementById('select-choices')
+        if (element) {
+            element.remove()
+        }
+    })
 }
