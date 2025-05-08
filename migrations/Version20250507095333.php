@@ -76,7 +76,7 @@ SELECT
     fr.quarter as return_quarter,
     --
     s.id as scheme_id,
-    s.scheme_identifier,
+    CONCAT(REGEXP_REPLACE(a.name, '[^A-Z]', '', 1, 0, 'c'), '-', s.scheme_identifier) AS scheme_identifier,
     s.name as scheme_name,
     s.crsts_data_retained AS is_retained,
     csr.development_only AS is_development_only,
@@ -124,7 +124,7 @@ SELECT
     fr.quarter as return_quarter,
     --
     s.id as scheme_id,
-    s.scheme_identifier,
+    CONCAT(REGEXP_REPLACE(a.name, '[^A-Z]', '', 1, 0, 'c'), '-', s.scheme_identifier) AS scheme_identifier,
     s.name AS scheme_name,
     ee.type,
     ee.col,
