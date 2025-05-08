@@ -86,6 +86,10 @@ table.calculated-expenses {
   font-weight: bold;
   margin-top: -15px;
   margin-bottom: 15px;
+
+   p {
+     @include govuk-font($size: 16, $weight: regular);
+   }
 }
 
 .expense-comments {

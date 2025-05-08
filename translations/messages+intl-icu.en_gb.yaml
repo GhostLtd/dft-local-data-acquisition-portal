@@ -515,7 +515,7 @@ frontend:
       description: Scheme description
       expected_business_case_approval: *sr_expected_business_case_approval
       expenses_not_required: >-
-        Not required: non-retained schemes need only submit expenses data in Q4.
+        Not editable: non-retained schemes need only submit expense data in Q4 returns
       mark_as_ready_for_signoff: Mark scheme as ready for sign-off
       on_track_rating: *sr_on_track_rating
       previously_tcf: Previously a scheme in TCF?

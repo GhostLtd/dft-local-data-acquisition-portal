@@ -46,8 +46,12 @@ class SchemeReturnExpensesVoter extends Voter
         $crstsData = $subject->getScheme()->getCrstsData();
         $quarter = $subject->getFundReturn()->getQuarter();
 
-        // Essentially retained schemes always require expense data, and non-retained
-        // schemes only require it in Q4.
-        return $crstsData->isExpenseDataRequiredFor($quarter);
+        // Non-retained scheme expense data can only be edited in quarter 4...
+        if ($attribute === Role::CAN_EDIT_SCHEME_RETURN_EXPENSES) {
+            return $crstsData->isExpenseDataRequiredFor($quarter);
+        }
+
+        // ...but scheme expense data is visible (retained or not), as long as permission checks pass
+        return true;
     }
 }
