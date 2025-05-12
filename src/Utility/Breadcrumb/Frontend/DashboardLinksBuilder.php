@@ -50,6 +50,18 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
         );
     }
 
+    public function setAtFundReturnReOpen(FundReturn $fundReturn): void
+    {
+        $this->setAtFundReturn($fundReturn);
+        $this->addBreadcrumb(
+            'fund_return_reopen',
+            'app_fund_return_reopen',
+            routeParameters: ['fundReturnId' => $fundReturn->getId()],
+            translationKey: 'frontend.pages.fund_return_reopen.title',
+            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
+        );
+    }
+
     protected function getFundReturnTranslationKeys(FundReturn $fundReturn): array
     {
         $typeKey = "enum.fund.".$fundReturn->getFundAward()->getType()->value;

@@ -137,6 +137,11 @@
                 <a class="govuk-button" href="{{ path('app_fund_return_signoff', {fundReturnId: fundReturn.id}) }}">Signoff and submit return</a>
             </p>
         {%- endif -%}
+        {%- if is_granted('CAN_REOPEN_RETURN', fundReturn) -%}
+            <p class="govuk-body">
+                <a class="govuk-button" href="{{ path('app_fund_return_reopen', {fundReturnId: fundReturn.id}) }}">Re-open return</a>
+            </p>
+        {%- endif -%}
     {%- endblock -%}
 {%- endblock -%}
 

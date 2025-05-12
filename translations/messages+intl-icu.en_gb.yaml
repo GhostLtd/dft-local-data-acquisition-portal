@@ -1,3 +1,11 @@
+admin:
+  pages:
+    fund_return_reopen:
+      title: Re-open fund return
+      confirmed-notification:
+        heading: "{fund} return re-opened"
+        content: "The {fund} return for {year}/{nextYear} Q{quarter} has been re-opened"
+
 auth:
   change_authority: Change MCA
   error: Error
@@ -441,8 +449,6 @@ frontend:
       schemes: Schemes
       users: Users
       no_authorities: No authorities are accessible to you
-    home:
-      title: Local data acquisition portal
     fund_return:
       title: "{type} return for {year}/{nextYear} Q{quarter}"
       titles:
@@ -460,11 +466,16 @@ frontend:
       overall_progress_summary: Progress summary
       resource_funding: *fr_resource_funding
       sign_off: Sign off
+    fund_return_reopen:
+      title: Re-open fund return
+      warning: This will re-open the return and allow it to again be editable by the MCA. Are you sure you wish to proceed?
     fund_return_signoff:
       title: Sign-off and submit
       confirmed-notification:
         heading: "{fund} return submitted"
         content: "The {fund} return for {year}/{nextYear} Q{quarter} has been signed-off and submitted"
+    home:
+      title: Local data acquisition portal
     schemes:
       title: &schemes_title "Schemes for {authorityName}"
       add_scheme: Add scheme
