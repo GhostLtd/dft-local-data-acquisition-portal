@@ -98,6 +98,11 @@
                                 <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
                             </div>
                         {%- endif -%}
+                        {%- if not scheme.crstsData.isExpenseDataRequiredFor(fundReturn.quarter) -%}
+                            <div class="expenses-links">
+                                <p>{{ 'frontend.pages.scheme_return.expenses_not_required' | trans }}</p>
+                            </div>
+                        {%- endif -%}
                         {{- renderTable(table) -}}
                         {{- expenseDivisionComments(schemeReturn, division) -}}
                     {%- endset -%}
@@ -112,11 +117,6 @@
                 {%- endfor -%}
 
                 {{- displaySectionsAsTabs(sections, expensesTitle, selectedTabIndex) -}}
-            {%- else -%}
-                <div class="govuk-!-margin-bottom-9">
-                    <h2 class="govuk-heading-m">{{ expensesTitle }}</h2>
-                    <p class="govuk-body">{{ 'frontend.pages.scheme_return.expenses_not_required' | trans }}</p>
-                </div>
             {%- endif -%}
         </div>
     {%- endblock -%}

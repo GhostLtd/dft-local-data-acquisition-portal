@@ -296,34 +296,12 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
             $nextSchemeReturn->setProgressUpdate($this->getProgressUpdate());
         }
 
-        $fq = $this->getFundReturn()
-            ->getFinancialQuarter()
-            ->getNextQuarter(); // This is the source fundReturn, but we're generating the next quarter...
-
-        $crstsData = $scheme->getCrstsData();
-
-        if ($crstsData->isExpenseDataRequiredFor($fq->quarter)) {
-            if ($crstsData->isRetained()) {
-                $sourceFundReturn = $this->getFundReturn();
-                $sourceExpenses = $this->expenses;
-            } else {
-                $fundAward = $this->getFundReturn()->getFundAward();
-                $sourceFundReturn = $fundAward->getReturnByYearAndQuarter($fq->initialYear - 1, 4);
-
-                if ($sourceFundReturn !== null && !$sourceFundReturn instanceof CrstsFundReturn) {
-                    throw new \RuntimeException('CrstsSchemeReturn->getFundReturn()->getFundAward()->getReturnByYearAndQuarter() returned an invalid value');
-                }
-
-                $sourceExpenses = $sourceFundReturn
-                    ?->getSchemeReturnForScheme($this->getScheme())
-                    ?->getExpenses();
-            }
-
-            if ($sourceExpenses) {
-                $this->createExpensesForNextQuarter($sourceExpenses, $sourceFundReturn->getFinancialQuarter())
-                    ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
-            }
-        }
+        // We now copy all expenses from the previous quarter, whether the scheme is retained or not.
+        // (But for non-retained schemes that data may only be edited in Q4)
+        $sourceFundReturn = $this->getFundReturn();
+        $sourceExpenses = $this->expenses;
+        $this->createExpensesForNextQuarter($sourceExpenses, $sourceFundReturn->getFinancialQuarter())
+            ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
 
         $this->milestones->map(fn($m) => $nextSchemeReturn->addMilestone((new Milestone())
             ->setType($m->getType())
