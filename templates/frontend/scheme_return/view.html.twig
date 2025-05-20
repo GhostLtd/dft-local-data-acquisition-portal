@@ -97,10 +97,8 @@
                             <div class="expenses-links">
                                 <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
                             </div>
-                        {%- elseif
-                            not fundReturn.signedOff and
-                            not scheme.crstsData.isExpenseDataRequiredFor(fundReturn.quarter)
-                        -%}
+                        {%- endif -%}
+                        {%- if not scheme.crstsData.isExpenseDataRequiredFor(fundReturn.quarter) -%}
                             <div class="expenses-links">
                                 <p>{{ 'frontend.pages.scheme_return.expenses_not_required' | trans }}</p>
                             </div>
