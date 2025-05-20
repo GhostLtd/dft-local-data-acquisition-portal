@@ -71,6 +71,16 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
         return $this;
     }
 
+    public function reOpen(): static
+    {
+        $this
+            ->setSignoffUser(null)
+            ->setSignoffDate(null)
+            ->setSignoffEmail(null)
+            ->setSignoffName(null);
+        return $this;
+    }
+
     public function getYear(): ?int
     {
         return $this->year;

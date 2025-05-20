@@ -1,0 +1,10 @@
+{% extends 'frontend/base.html.twig' %}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('fund_return_reopen') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{% block content %}
+    <p class="govuk-body">{{ 'frontend.pages.fund_return_reopen.warning' | trans }}</p>
+
+    {{- form(form) -}}
+{% endblock %}
