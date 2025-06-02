@@ -1327,30 +1327,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ghost/govuk-core-bundle@git+https://git.tomarq.net/ghost/govuk-core-bundle.git#1.0.8":
+"@ghost/govuk-core-bundle@file:vendor/ghost/govuk-core-bundle::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "@ghost/govuk-core-bundle@https://git.tomarq.net/ghost/govuk-core-bundle.git#commit=94b1f6e2b6708f4520e994e9e86977bd975da845"
+  resolution: "@ghost/govuk-core-bundle@file:vendor/ghost/govuk-core-bundle#vendor/ghost/govuk-core-bundle::hash=eb1437&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
-    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.2"
-  checksum: 10c0/c95b57f7553c01d844f360f63c4e0aa6b01a2acffdf4bd5708bb9beb2c40a54673337d2da5901d6ba974ff020ff3dc97c1610e32ddc00bd878155be97581ae65
+    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.0.1"
+  checksum: 10c0/7641410ca0106aa04664c82a58546331a4aee8af28548eaf05d31dc8db41d8acc283bdb03aa7842b2bc0f21fbb110a6c59b5591ac61cf9e7c29a6948081d32b8
   languageName: node
   linkType: hard
 
-"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.14":
+"@ghost/govuk-frontend-bundle@file:vendor/ghost/govuk-frontend-bundle::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=ac85bf469e88c9c6e8baadbb77f4a452be6b624f"
+  resolution: "@ghost/govuk-frontend-bundle@file:vendor/ghost/govuk-frontend-bundle#vendor/ghost/govuk-frontend-bundle::hash=0427c4&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
-    govuk-frontend: "npm:5.6.*"
-  checksum: 10c0/de63813056badc15512e3c1113396ab3b32d929f192e1a281f5d664e79f1c0bc1afc1a3aeb445c2cb0bb292270f8d2b19b4ca5fc9fc2a4abf7c345eb79ac4b31
+    govuk-frontend: "npm:5.10.*"
+  checksum: 10c0/e8a0e8ab56a305e075cd641d3f3b032df1580e1c89dc758ac5732cd4af92d310f7ce78eae359bc5be58975d195ca2e067589253c640d5583e26569ceb5f74304
   languageName: node
   linkType: hard
 
-"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.2":
+"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.0.1":
   version: 0.0.0
-  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=57122f818ae5402d7b15edf8ba05bee4ebaae3ac"
+  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=60bda0a01999aa6ce82e870cf2ce6812575e3595"
   dependencies:
-    govuk-frontend: "npm:5.6.*"
-  checksum: 10c0/85c92b43cb268fcade46f0ee627dd6d970eb287bd4a5242c976088e7fb798d038c119472d11c890d046a9305291f5a422a8c99e66e770253a080a885165c3720
+    govuk-frontend: "npm:5.10.*"
+  checksum: 10c0/283da5f50447590c79efa9178a801d6657caef198d13262b912b2a200ae162be9639831056e4577a9819ca28584d29cac651c8082a5db80ccbb23307bf0518d5
   languageName: node
   linkType: hard
 
@@ -3789,10 +3789,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"govuk-frontend@npm:5.6.*":
-  version: 5.6.0
-  resolution: "govuk-frontend@npm:5.6.0"
-  checksum: 10c0/e3bd8e50b6d4e0ef2190f0bc14ecbdd4a126abce52a683c2008e32d16185ec5d7963bbfce53f7ef17026b97ee1dbe340272cc624f883e1e8a054aa90423f2293
+"govuk-frontend@npm:5.10.*":
+  version: 5.10.2
+  resolution: "govuk-frontend@npm:5.10.2"
+  checksum: 10c0/d18d5f101072f63ce18183e2ded89da7fa255596de18cc43a8845a9f2dcb2e583ba36181119a1ba9fec456db09c0d1921a734d030f75c4befd7bffef2ba94909
   languageName: node
   linkType: hard
 
@@ -5839,8 +5839,8 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.17.0"
     "@babel/preset-env": "npm:^7.16.0"
-    "@ghost/govuk-core-bundle": "git+https://git.tomarq.net/ghost/govuk-core-bundle.git#1.0.8"
-    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#2.0.14"
+    "@ghost/govuk-core-bundle": "file:vendor/ghost/govuk-core-bundle"
+    "@ghost/govuk-frontend-bundle": "file:vendor/ghost/govuk-frontend-bundle"
     "@symfony/webpack-encore": "npm:^4.0.0"
     core-js: "npm:^3.23.0"
     file-loader: "npm:^6.0.0"

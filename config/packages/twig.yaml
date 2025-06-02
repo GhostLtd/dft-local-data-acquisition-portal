@@ -7,6 +7,8 @@ twig:
         env_label_background: '%env(string:APP_ENV_LABEL_BACKGROUND)%'
         env_google_site_verification: '%env(default::APP_GOOGLE_SITE_VERIFICATION)%'
 
+        govukRebrand: true
+
         hostnames:
             frontend: '%frontend_hostname%'
             admin: '%admin_hostname%'
