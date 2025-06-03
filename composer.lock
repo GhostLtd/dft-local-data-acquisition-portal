@@ -1608,11 +1608,11 @@
         },
         {
             "name": "ghost/govuk-core-bundle",
-            "version": "3.0.1",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://git.tomarq.net/ghost/govuk-core-bundle.git",
-                "reference": "fbf5afedadbe27814776da7404c93f369ad14a7e"
+                "reference": "bbcd616163b32c77c69431165b4d3a27382e81b8"
             },
             "require": {
                 "alphagov/notifications-php-client": "^6.2",
@@ -1671,15 +1671,15 @@
                 }
             ],
             "description": "Symfony bundle for core govuk-related classes",
-            "time": "2025-06-02T16:00:12+00:00"
+            "time": "2025-06-03T14:41:28+00:00"
         },
         {
             "name": "ghost/govuk-frontend-bundle",
-            "version": "3.0.1",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://git.tomarq.net/ghost/govuk-frontend-bundle.git",
-                "reference": "60bda0a01999aa6ce82e870cf2ce6812575e3595"
+                "reference": "5ed31a8e29007d0ab5df562f9d883a47002b2721"
             },
             "require": {
                 "brick/math": "^0.12.1",
@@ -1735,7 +1735,7 @@
                 }
             ],
             "description": "Symfony integration bundle for govuk-frontend",
-            "time": "2025-06-02T13:13:17+00:00"
+            "time": "2025-06-03T14:40:26+00:00"
         },
         {
             "name": "google/auth",
@@ -3161,16 +3161,16 @@
         },
         {
             "name": "nette/utils",
-            "version": "v4.0.6",
+            "version": "v4.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "ce708655043c7050eb050df361c5e313cf708309"
+                "reference": "e67c4061eb40b9c113b218214e42cb5a0dda28f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/ce708655043c7050eb050df361c5e313cf708309",
-                "reference": "ce708655043c7050eb050df361c5e313cf708309",
+                "url": "https://api.github.com/repos/nette/utils/zipball/e67c4061eb40b9c113b218214e42cb5a0dda28f2",
+                "reference": "e67c4061eb40b9c113b218214e42cb5a0dda28f2",
                 "shasum": ""
             },
             "require": {
@@ -3241,9 +3241,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/utils/issues",
-                "source": "https://github.com/nette/utils/tree/v4.0.6"
+                "source": "https://github.com/nette/utils/tree/v4.0.7"
             },
-            "time": "2025-03-30T21:06:30+00:00"
+            "time": "2025-06-03T04:55:08+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

@@ -32,6 +32,9 @@ module.exports.run = async function (argv) {
     const {outputDir, baseUrl} = argv
 
     const [browser, page] = await setupBrowserAndPage()
+    const version = await page.browser().version()
+
+    console.log("Using chrome version: " + version)
 
     try {
         {

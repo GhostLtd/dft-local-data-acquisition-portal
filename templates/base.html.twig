@@ -35,8 +35,7 @@
     {#    <link rel="manifest" href="{{ asset('build/manifest.json') }}">#}
 {% endblock %}
 
-{%- block headerBar -%}
-    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import header -%}
+{%- block headerStart -%}
     {%- if env_label_frontend ?? false -%}
         <style nonce="{{ csp_nonce('style') }}">
             #envLabel {
@@ -49,13 +48,13 @@
             {{ env_label_frontend | raw }}
         </div>
     {%- endif -%}
+{%- endblock -%}
+
+{%- block headerBar -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import header -%}
     {{- header({
         classes: 'govuk-header--full-width-border'
     }) -}}
-{%- endblock -%}
-
-{%- block phaseBanner -%}
-    {%- block navigation %}{% endblock -%}
 {%- endblock -%}
 
 {%- block beforeMainWrapper -%}

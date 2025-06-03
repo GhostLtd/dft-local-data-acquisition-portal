@@ -1329,25 +1329,25 @@ __metadata:
 
 "@ghost/govuk-core-bundle@file:vendor/ghost/govuk-core-bundle::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "@ghost/govuk-core-bundle@file:vendor/ghost/govuk-core-bundle#vendor/ghost/govuk-core-bundle::hash=eb1437&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@ghost/govuk-core-bundle@file:vendor/ghost/govuk-core-bundle#vendor/ghost/govuk-core-bundle::hash=2f721c&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
-    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.0.1"
-  checksum: 10c0/7641410ca0106aa04664c82a58546331a4aee8af28548eaf05d31dc8db41d8acc283bdb03aa7842b2bc0f21fbb110a6c59b5591ac61cf9e7c29a6948081d32b8
+    "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.1.1"
+  checksum: 10c0/2141b266e8e64856e698c5f897c28314ba282fa534369ea7318618a126ab48c5492cf27d33360a240aa6ff9b14256b0145b2204eadbdbe7ad8518884c9d3a77e
   languageName: node
   linkType: hard
 
 "@ghost/govuk-frontend-bundle@file:vendor/ghost/govuk-frontend-bundle::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.0.0
-  resolution: "@ghost/govuk-frontend-bundle@file:vendor/ghost/govuk-frontend-bundle#vendor/ghost/govuk-frontend-bundle::hash=0427c4&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@ghost/govuk-frontend-bundle@file:vendor/ghost/govuk-frontend-bundle#vendor/ghost/govuk-frontend-bundle::hash=a66354&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     govuk-frontend: "npm:5.10.*"
-  checksum: 10c0/e8a0e8ab56a305e075cd641d3f3b032df1580e1c89dc758ac5732cd4af92d310f7ce78eae359bc5be58975d195ca2e067589253c640d5583e26569ceb5f74304
+  checksum: 10c0/5f6ddc75bed8f25419d06ccdc3d8b7ef7ce5c3489a3f8313eb72ee2bb8a6da209b2d4bc41b2002fe493f628e693c9d2de325401f773d846d9e44b594deee96de
   languageName: node
   linkType: hard
 
-"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.0.1":
+"@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.1.1":
   version: 0.0.0
-  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=60bda0a01999aa6ce82e870cf2ce6812575e3595"
+  resolution: "@ghost/govuk-frontend-bundle@https://git.tomarq.net/ghost/govuk-frontend-bundle.git#commit=5ed31a8e29007d0ab5df562f9d883a47002b2721"
   dependencies:
     govuk-frontend: "npm:5.10.*"
   checksum: 10c0/283da5f50447590c79efa9178a801d6657caef198d13262b912b2a200ae162be9639831056e4577a9819ca28584d29cac651c8082a5db80ccbb23307bf0518d5
