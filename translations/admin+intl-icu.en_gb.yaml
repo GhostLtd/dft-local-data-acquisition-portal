@@ -3,7 +3,10 @@ site.title: LDAP
 
 pages:
   dashboard:
-    title: Dashboard
+    title: Latest returns
+    authority: "{authorityName}"
+    no_returns: "No returns currently available"
+    page_title: Latest returns for {year} Q{quarter}
   authority:
     title: MCAs
   authority_add:

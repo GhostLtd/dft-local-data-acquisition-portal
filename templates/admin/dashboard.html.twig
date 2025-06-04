@@ -1,10 +1,42 @@
 {%- extends 'admin/base.html.twig' -%}
 
-{%- set page_title_key = 'pages.dashboard.title' -%}
+{%- set page_title_key = 'pages.dashboard.page_title' -%}
+{%- set page_title_params = {
+    year: latestQuarter.initialYear,
+    quarter: latestQuarter.quarter,
+} -%}
 {%- set current_menu = 'dashboard' -%}
 
+{%- trans_default_domain 'admin' -%}
+
 {%- block content -%}
+
     <div class="govuk-body">
-        Admin dashboard...
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import taskList, tag -%}
+        {%- from 'frontend/authority_macros.html.twig' import returnTag -%}
+
+        {%- for fundValue, returns in groupedReturns -%}
+            <h2 class="govuk-heading-m">{{ fundValue }}</h2>
+            {{- taskList({
+                items: returns
+                | filter(fundReturn => is_granted('CAN_VIEW', fundReturn))
+                | map(fundReturn => {
+                    title: {
+                        text: "pages.dashboard.authority" | trans({
+                            authorityName: fundReturn.fundAward.authority.name
+                        })
+                    },
+                    href: path(viewRoute ?? 'admin_fund_return', {fundReturnId: fundReturn.id}),
+                    status: {
+                        tag: {
+                            text: "tags.#{returnTag(fundReturn)}.name" | trans({}, 'messages'),
+                            classes: "govuk-tag--" ~ ("tags.#{returnTag(fundReturn)}.colour" | trans({}, 'messages')),
+                        }
+                    },
+                })
+            }) -}}
+        {%- else -%}
+            <p class="govuk-body">{{ 'pages.dashboard.no_returns' | trans }}</p>
+        {%- endfor -%}
     </div>
 {%- endblock -%}

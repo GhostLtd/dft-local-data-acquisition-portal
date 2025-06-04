@@ -4,6 +4,7 @@ namespace App\Repository\FundReturn;
 
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
+use App\Utility\FinancialQuarter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Types\UlidType;
@@ -44,6 +45,45 @@ class FundReturnRepository extends ServiceEntityRepository
             ->join('schemeReturn.scheme', 'scheme')
             ->where('scheme.id = :scheme_id')
             ->setParameter('scheme_id', new Ulid($scheme->getId()), UlidType::NAME)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @param FinancialQuarter $financialQuarter
+     * @return array<string, array<int, FundReturn>}
+     */
+    public function findFundReturnsForQuarterGroupedByFund(FinancialQuarter $financialQuarter): array
+    {
+        $returnsByFund = [];
+
+        foreach($this->findFundReturnsForQuarter($financialQuarter) as $fundReturn) {
+            $fund = $fundReturn->getFundAward()->getType();
+            $returnsByFund[$fund->value] ??= [];
+            $returnsByFund[$fund->value][] = $fundReturn;
+        }
+
+        ksort($returnsByFund);
+
+        return $returnsByFund;
+    }
+
+    /**
+     * @param FinancialQuarter $financialQuarter
+     * @return array<int, FundReturn>
+     */
+    public function findFundReturnsForQuarter(FinancialQuarter $financialQuarter): array
+    {
+        return $this->createQueryBuilder('fundReturn')
+            ->select('fundReturn, fundAward, authority')
+            ->join('fundReturn.fundAward', 'fundAward')
+            ->join('fundAward.authority', 'authority')
+            ->where('fundReturn.quarter = :quarter')
+            ->andWhere('fundReturn.year = :year')
+            ->orderBy('fundAward.type', 'ASC')
+            ->addOrderBy('authority.name', 'ASC')
+            ->setParameter('quarter', $financialQuarter->quarter)
+            ->setParameter('year', $financialQuarter->initialYear)
             ->getQuery()
             ->execute();
     }
