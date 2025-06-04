@@ -1327,23 +1327,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ghost/govuk-core-bundle@file:vendor/ghost/govuk-core-bundle::locator=root-workspace-0b6124%40workspace%3A.":
-  version: 0.0.0
-  resolution: "@ghost/govuk-core-bundle@file:vendor/ghost/govuk-core-bundle#vendor/ghost/govuk-core-bundle::hash=2f721c&locator=root-workspace-0b6124%40workspace%3A."
+"@ghost/govuk-core-bundle@portal:vendor/ghost/govuk-core-bundle::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@ghost/govuk-core-bundle@portal:vendor/ghost/govuk-core-bundle::locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@ghost/govuk-frontend-bundle": "git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.1.1"
-  checksum: 10c0/2141b266e8e64856e698c5f897c28314ba282fa534369ea7318618a126ab48c5492cf27d33360a240aa6ff9b14256b0145b2204eadbdbe7ad8518884c9d3a77e
   languageName: node
-  linkType: hard
-
-"@ghost/govuk-frontend-bundle@file:vendor/ghost/govuk-frontend-bundle::locator=root-workspace-0b6124%40workspace%3A.":
-  version: 0.0.0
-  resolution: "@ghost/govuk-frontend-bundle@file:vendor/ghost/govuk-frontend-bundle#vendor/ghost/govuk-frontend-bundle::hash=a66354&locator=root-workspace-0b6124%40workspace%3A."
-  dependencies:
-    govuk-frontend: "npm:5.10.*"
-  checksum: 10c0/5f6ddc75bed8f25419d06ccdc3d8b7ef7ce5c3489a3f8313eb72ee2bb8a6da209b2d4bc41b2002fe493f628e693c9d2de325401f773d846d9e44b594deee96de
-  languageName: node
-  linkType: hard
+  linkType: soft
 
 "@ghost/govuk-frontend-bundle@git+https://git.tomarq.net/ghost/govuk-frontend-bundle.git#3.1.1":
   version: 0.0.0
@@ -1353,6 +1343,14 @@ __metadata:
   checksum: 10c0/283da5f50447590c79efa9178a801d6657caef198d13262b912b2a200ae162be9639831056e4577a9819ca28584d29cac651c8082a5db80ccbb23307bf0518d5
   languageName: node
   linkType: hard
+
+"@ghost/govuk-frontend-bundle@portal:vendor/ghost/govuk-frontend-bundle::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@ghost/govuk-frontend-bundle@portal:vendor/ghost/govuk-frontend-bundle::locator=root-workspace-0b6124%40workspace%3A."
+  dependencies:
+    govuk-frontend: "npm:5.10.*"
+  languageName: node
+  linkType: soft
 
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
@@ -2522,9 +2520,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001646":
-  version: 1.0.30001660
-  resolution: "caniuse-lite@npm:1.0.30001660"
-  checksum: 10c0/d28900b56c597176d515c3175ca75c454f2d30cb2c09a44d7bdb009bb0c4d8a2557905adb77642889bbe9feb85fbfe9d974c8b8e53521fb4b50ee16ab246104e
+  version: 1.0.30001721
+  resolution: "caniuse-lite@npm:1.0.30001721"
+  checksum: 10c0/fa3a8926899824b385279f1f886fe34c5efb1321c9ece1b9df25c8d567a2706db8450cc5b4d969e769e641593e08ea644909324aba93636a43e4949a75f81c4c
   languageName: node
   linkType: hard
 
@@ -5839,8 +5837,8 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.17.0"
     "@babel/preset-env": "npm:^7.16.0"
-    "@ghost/govuk-core-bundle": "file:vendor/ghost/govuk-core-bundle"
-    "@ghost/govuk-frontend-bundle": "file:vendor/ghost/govuk-frontend-bundle"
+    "@ghost/govuk-core-bundle": "portal:vendor/ghost/govuk-core-bundle"
+    "@ghost/govuk-frontend-bundle": "portal:vendor/ghost/govuk-frontend-bundle"
     "@symfony/webpack-encore": "npm:^4.0.0"
     core-js: "npm:^3.23.0"
     file-loader: "npm:^6.0.0"

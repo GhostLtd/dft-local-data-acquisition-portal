@@ -33,12 +33,12 @@ steps:
       args: ['-c', 'gsutil rsync config/gcloud-build/all/ . && gsutil rsync config/gcloud-build/$PROJECT_ID/ .']
 #      waitFor: ['pre-install-script']
 
-    - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
-      id: 'copy-deploy-files'
+  # We need vendor/ghost/govuk-frontend-bundle since the CSS/JS references resources from it
+    - name: composer:2.3
+      id: 'install-ghost-bundle'
       entrypoint: sh
-      args: ['-c', 'gsutil rsync config/gcloud-build/all/ . && gsutil rsync config/gcloud-build/$PROJECT_ID/ .']
-#      waitFor: ['pre-install-script']
-
+      args: [ '-c', 'composer install --ignore-platform-reqs --no-scripts' ]
+      waitFor: [ 'copy-deploy-files' ]
 
     # build assets, and .env.local file
     - name: node:22
@@ -46,7 +46,7 @@ steps:
       entrypoint: sh
       args: ['-c', 'corepack enable && yarn install --immutable --network-timeout 60000 && yarn run deploy-build && yarn run build-env-subs']
       automapSubstitutions: true
-      waitFor: ['copy-deploy-files']
+      waitFor: ['install-ghost-bundle']
 
     ## The app deployment will not run `composer install` if the composer.lock file has not changed
     ## meaning that post install scripts, or even update scripts to not get run

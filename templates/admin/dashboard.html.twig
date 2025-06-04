@@ -4,6 +4,7 @@
 {%- set page_title_params = {
     year: latestQuarter.initialYear,
     quarter: latestQuarter.quarter,
+    nextYear: (latestQuarter.initialYear + 1)[-2:]
 } -%}
 {%- set current_menu = 'dashboard' -%}
 

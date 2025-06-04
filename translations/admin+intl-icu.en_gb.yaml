@@ -6,7 +6,7 @@ pages:
     title: Latest returns
     authority: "{authorityName}"
     no_returns: "No returns currently available"
-    page_title: Latest returns for {year} Q{quarter}
+    page_title: Latest returns for {year}/{nextYear} Q{quarter}
   authority:
     title: MCAs
   authority_add:
