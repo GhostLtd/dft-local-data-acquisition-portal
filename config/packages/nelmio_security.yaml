@@ -18,6 +18,8 @@ nelmio_security:
                 - 'self'
             font-src:
                 - 'self'
+            frame-src:
+                - 'self'
             img-src:
                 - 'self'
             base-uri:

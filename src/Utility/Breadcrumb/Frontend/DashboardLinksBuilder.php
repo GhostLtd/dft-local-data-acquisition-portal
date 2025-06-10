@@ -38,6 +38,17 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
         );
     }
 
+    public function setAtSpreadsheetExport(FundReturn $fundReturn): void
+    {
+        $this->setAtFundReturn($fundReturn);
+        $this->addBreadcrumb(
+            'spreadsheet_export',
+            'app_fund_return_export_spreadsheet',
+            routeParameters: ['fundReturnId' => $fundReturn->getId()],
+            translationKey: 'frontend.pages.export_spreadsheet.title',
+        );
+    }
+
     public function setAtFundReturnSignoff(FundReturn $fundReturn): void
     {
         $this->setAtFundReturn($fundReturn);

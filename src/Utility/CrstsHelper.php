@@ -100,7 +100,7 @@ class CrstsHelper
     /**
      * @return array<int, DivisionConfiguration>
      */
-    protected static function getExpenseDivisionConfigurations(int $returnYear, int $returnQuarter, bool $hideForecastAndActual=false): array
+    public static function getExpenseDivisionConfigurations(int $returnYear, int $returnQuarter, bool $hideForecastAndActual=false): array
     {
         $naturalEndYear = 2026;
 

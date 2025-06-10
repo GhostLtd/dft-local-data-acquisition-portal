@@ -3,6 +3,7 @@
 namespace App\Repository\FundReturn;
 
 use App\Entity\Enum\Fund;
+use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Utility\FinancialQuarter;
@@ -28,6 +29,22 @@ class FundReturnRepository extends ServiceEntityRepository
             ->select('fundReturn, fundAward, authority')
             ->join('fundReturn.fundAward', 'fundAward')
             ->join('fundAward.authority', 'authority')
+            ->where('fundReturn.id = :id')
+            ->setParameter('id', new Ulid($id), UlidType::NAME)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findForSpreadsheetExport(string $id): ?FundReturn
+    {
+        return $this
+            ->getEntityManager()
+            ->createQueryBuilder()
+            ->from(CrstsFundReturn::class, 'fundReturn')
+            ->select('fundReturn, fundAward, authority, expenses')
+            ->join('fundReturn.fundAward', 'fundAward')
+            ->join('fundAward.authority', 'authority')
+            ->leftJoin('fundReturn.expenses', 'expenses')
             ->where('fundReturn.id = :id')
             ->setParameter('id', new Ulid($id), UlidType::NAME)
             ->getQuery()

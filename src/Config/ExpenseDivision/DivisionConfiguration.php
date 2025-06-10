@@ -39,6 +39,11 @@ class DivisionConfiguration
         return $this->columnConfigurations;
     }
 
+    public function getColumnCount(): int
+    {
+        return count($this->columnConfigurations);
+    }
+
     public function getColumnConfigurationByKey(string $key): ?ColumnConfiguration
     {
         foreach($this->columnConfigurations as $columnConfiguration) {

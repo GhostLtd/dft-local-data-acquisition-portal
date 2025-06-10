@@ -2,6 +2,10 @@
 
 # Changelog
 
+## Upcoming
+
+- **Feature**: Ability to export a return as an excel file
+
 ## 7th July 2025
 
 - **Fix**: Update export_scheme_return_data (i.e. export view) to use the property change log for scheme-related details

@@ -249,6 +249,17 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         return new ArrayCollection(iterator_to_array($iterator));
     }
 
+    public function getMilestoneByType(MilestoneType $type): ?Milestone
+    {
+        foreach($this->milestones as $milestone) {
+            if ($milestone->getType() === $type) {
+                return $milestone;
+            }
+        }
+
+        return null;
+    }
+
     public function addMilestone(Milestone $milestone): static
     {
         if (!$this->milestones->contains($milestone)) {

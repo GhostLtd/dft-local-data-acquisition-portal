@@ -33,10 +33,16 @@ framework:
 
 services:
     # Override the default cache for rate_limiter as per https://symfony.com/doc/current/rate_limiter.html#storing-rate-limiter-state
+    cache.messenger.restart_workers_signal:
+        parent: 'cache.adapter.doctrine_dbal'
+        tags: [ { name: 'cache.pool', namespace: 'messenger-restart-signal' } ]
+
     cache.rate_limiter:
         parent: 'cache.adapter.doctrine_dbal'
         tags: [{ name: 'cache.pool', namespace: 'rate-limiter' }]
 
-    cache.messenger.restart_workers_signal:
+    cache.spreadsheet_jobs:
         parent: 'cache.adapter.doctrine_dbal'
-        tags: [{ name: 'cache.pool', namespace: 'messenger-restart-signal' }]
+        tags: [ { name: 'cache.pool', namespace: 'rate-limiter' } ]
+        arguments:
+            $defaultLifetime: 3600 # 1 hour

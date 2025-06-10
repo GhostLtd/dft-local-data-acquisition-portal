@@ -17,11 +17,17 @@ class TableConfiguration
         protected array $extraTranslationParameters,
     ) {}
 
+    /**
+     * @return array<int, RowGroupInterface>
+     */
     public function getRowGroupConfigurations(): array
     {
         return $this->rowGroupConfigurations;
     }
 
+    /**
+     * @return array<int, DivisionConfiguration>
+     */
     public function getDivisionConfigurations(): array
     {
         return $this->divisionConfigurations;
@@ -38,6 +44,9 @@ class TableConfiguration
         return null;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getExtraTranslationParameters(): array
     {
         return $this->extraTranslationParameters;

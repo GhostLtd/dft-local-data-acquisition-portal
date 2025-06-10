@@ -1,0 +1,50 @@
+{% extends 'frontend/base.html.twig' %}
+
+{%- set page_title_key = 'frontend.pages.export_spreadsheet.title' -%}
+
+{% block head %}
+    {{ parent() }}
+    <meta http-equiv="refresh" content="5;" />
+{% endblock %}
+
+{% block content %}
+    {%- from "frontend/macros.html.twig" import loadingSpinner -%}
+
+    {%- set jobStatus = jobStatus ?? null -%}
+    {%- if jobStatus and jobStatus.state.value == 'failed' %}
+        <h1 class="govuk-heading-m">Spreadsheet generation failed</h1>
+    {%- else -%}
+        {%- set statusContents -%}
+            {%- if jobStatus is null -%}
+                <h1 class="govuk-heading-m">Initialising...</h1>
+            {%- elseif jobStatus.state.value == 'running' -%}
+                <h1 class="govuk-heading-m">Generating spreadsheet...</h1>
+            {%- elseif jobStatus.state.value == 'completed' -%}
+                <h1 class="govuk-heading-m">Downloading spreadsheet...</h1>
+            {%- endif -%}
+        {%- endset -%}
+
+        {{- loadingSpinner({
+            content: {html: statusContents}
+        }) -}}
+
+        {%- if downloadUrl -%}
+            <script nonce="{{ csp_nonce('script') }}">
+                const iframe = document.createElement('iframe')
+                iframe.style.display = 'none'
+                iframe.src = '{{ downloadUrl }}'
+                document.body.appendChild(iframe)
+
+                setTimeout(() => {
+                    window.location.href = '{{ redirectUrl }}'
+                }, 1500)
+                {# N.B. timeout here must be less than the page refresh #}
+            </script>
+
+            <p class="govuk-body">
+                If your download does not automatically, please <a href="{{ downloadUrl }}" target="_blank">click here</a>.
+            </p>
+        {%- endif -%}
+    {%- endif -%}
+{% endblock %}
+
