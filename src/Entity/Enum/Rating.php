@@ -12,12 +12,17 @@ enum Rating: string
 
     public function getTagClass(): string
     {
-        return 'govuk-tag--' . match ($this) {
-                self::RED => 'red',
-                self::AMBER_RED => 'pink',
-                self::AMBER => 'orange',
-                self::GREEN_AMBER => 'yellow',
-                self::GREEN => 'green',
-            };
+        return "govuk-tag--{$this->getTagColour()}";
+    }
+
+    public function getTagColour(): string
+    {
+        return match ($this) {
+            self::RED => 'red',
+            self::AMBER_RED => 'pink',
+            self::AMBER => 'orange',
+            self::GREEN_AMBER => 'yellow',
+            self::GREEN => 'green',
+        };
     }
 }

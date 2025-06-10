@@ -2,6 +2,7 @@
 
 namespace App\Utility;
 
+use App\Config\ExpenseDivision\ColumnConfiguration;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Config\ExpenseDivision\TableConfiguration;
 use App\Config\ExpenseRow\CategoryConfiguration;
@@ -267,6 +268,125 @@ class ExpensesTableHelper
 
         $this->cache[$cacheKey] = new Table($tableHeadAndBodies, ['classes' => 'expenses']);
         return $this->cache[$cacheKey];
+    }
+
+    /**
+     * @return array<int, RowGroupInterface>
+     */
+    public function getRowGroupConfigurations(): array
+    {
+        return $this->configuration->getRowGroupConfigurations();
+    }
+
+    public function getRowCount(): int
+    {
+        $count = 0;
+        foreach($this->getRowGroupConfigurations() as $groupConfiguration) {
+            $count += $groupConfiguration instanceof CategoryConfiguration ? $groupConfiguration->rowCount() : 1;
+        }
+        return $count;
+    }
+
+    /**
+     * @return \Generator<TotalConfiguration|ExpenseType>
+     */
+    public function walkRowConfigurations(): \Generator
+    {
+        foreach($this->getRowGroupConfigurations() as $rowGroupConfiguration) {
+            if ($rowGroupConfiguration instanceof CategoryConfiguration) {
+                foreach($rowGroupConfiguration->getRowConfigurations() as $rowConfiguration) {
+                    yield $rowConfiguration;
+                }
+            } else if ($rowGroupConfiguration instanceof TotalConfiguration) {
+                yield $rowGroupConfiguration;
+            }
+        }
+    }
+
+    /**
+     * @template T
+     * @param class-string<T> $type
+     * @return \Generator<T>
+     */
+    public function getRowConfigurationsByType(string $type): \Generator
+    {
+        foreach($this->walkRowConfigurations() as $rowConfiguration) {
+            if ($rowConfiguration::class === $type) {
+                yield $rowConfiguration;
+            }
+        }
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function getRowIndexes(): array
+    {
+        static $rowIndexes = null;
+
+        if ($rowIndexes === null) {
+            $row = 0;
+            $rowIndexes = [];
+            foreach($this->walkRowConfigurations() as $rowConfiguration) {
+                if ($rowConfiguration instanceof ExpenseType) {
+                    $key = $rowConfiguration->value;
+                } else if ($rowConfiguration instanceof TotalConfiguration) {
+                    $key = $rowConfiguration->getKey();
+                }
+
+                $rowIndexes[$key] = $row++;
+            }
+        }
+
+        return $rowIndexes;
+    }
+
+    public function getAbsoluteRowIndexFor(ExpenseType|TotalConfiguration $type): ?int
+    {
+        $key = $type instanceof ExpenseType ? $type->value : $type->getKey();
+        return $this->getAbsoluteRowIndexForKey($key);
+    }
+
+    public function getAbsoluteRowIndexForKey(string $key): ?int
+    {
+        return $this->getRowIndexes()[$key] ?? null;
+    }
+
+    /**
+     * @param array<int, DivisionConfiguration> $divisionConfigurations
+     */
+    public function getAbsoluteColumnIndexFor(array $divisionConfigurations, string $divisionKey, string $columnKey, bool $accountForTotalColumns=false): ?int
+    {
+        $columnIdx = 0;
+        foreach($divisionConfigurations as $divisionConfiguration) {
+            foreach($divisionConfiguration->getColumnConfigurations() as $columnConfiguration) {
+                if (
+                    $divisionConfiguration->getKey() === $divisionKey &&
+                    $columnConfiguration->getKey() === $columnKey
+                ) {
+                    return $columnIdx;
+                }
+
+                $columnIdx++;
+            }
+
+            if ($accountForTotalColumns) {
+                $columnIdx++;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<int, ExpenseType>
+     */
+    public function getExpenseTypes(): array
+    {
+        return array_merge(...array_map(
+            fn(CategoryConfiguration $category) => $category->getExpenseTypes(),
+            array_filter($this->getRowGroupConfigurations(), fn(RowGroupInterface $r) => $r instanceof CategoryConfiguration)
+        ));
     }
 
     /**

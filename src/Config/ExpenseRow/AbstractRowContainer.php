@@ -2,10 +2,9 @@
 
 namespace App\Config\ExpenseRow;
 
-use App\Config\ExpenseRow\RowGroupInterface;
 use App\Entity\Enum\ExpenseType;
 
-class AbstractRowContainer implements RowGroupInterface
+abstract class AbstractRowContainer implements RowGroupInterface
 {
     /**
      * @param array<int, ExpenseType|TotalConfiguration> $rowConfigurations

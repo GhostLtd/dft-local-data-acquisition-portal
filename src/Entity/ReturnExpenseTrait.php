@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\ExpenseType;
 use App\Utility\FinancialQuarter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -91,6 +92,21 @@ trait ReturnExpenseTrait
     {
         foreach($this->expenses as $expense) {
             if ($expense->hasSameDivisionTypeAndColumnAs($other)) {
+                return $expense;
+            }
+        }
+
+        return null;
+    }
+
+    public function getExpenseByDivisionColumnAndType(string $divisionKey, string $columnKey, ExpenseType $type): ?ExpenseEntry
+    {
+        foreach($this->expenses as $expense) {
+            if (
+                $expense->getDivision() === $divisionKey
+                && $expense->getColumn() === $columnKey
+                && $expense->getType() === $type
+            ) {
                 return $expense;
             }
         }
