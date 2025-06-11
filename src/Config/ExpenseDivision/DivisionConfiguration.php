@@ -34,6 +34,11 @@ class DivisionConfiguration
         return $this->columnConfigurations;
     }
 
+    public function getColumnCount(): int
+    {
+        return count($this->columnConfigurations);
+    }
+
     public function shouldHaveTotal(): bool
     {
         return count($this->getColumnConfigurations()) > 1;

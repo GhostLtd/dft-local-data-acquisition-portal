@@ -142,6 +142,11 @@
                 <a class="govuk-button" href="{{ path('app_fund_return_reopen', {fundReturnId: fundReturn.id}) }}">Re-open return</a>
             </p>
         {%- endif -%}
+        {%- if is_granted('CAN_EXPORT_SPREADSHEET', fundReturn) -%}
+            <p class="govuk-body">
+                <a class="govuk-button" href="{{ path('app_fund_return_export_spreadsheet', {fundReturnId: fundReturn.id}) }}">Export spreadsheet</a>
+            </p>
+        {%- endif -%}
     {%- endblock -%}
 {%- endblock -%}
 
