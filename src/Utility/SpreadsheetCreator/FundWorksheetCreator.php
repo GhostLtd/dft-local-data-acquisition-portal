@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FundWorksheetCreator
 {
-    const string NUMERIC_FORMAT_CODE = '#,##0;[Red]-#,##0';
+    const string NUMERIC_FORMAT_CODE = '#,##0.00;[Red]-#,##0.00';
 
     protected Worksheet $worksheet;
     protected int $originX = 2;
@@ -66,8 +66,15 @@ class FundWorksheetCreator
             ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
             ->setFund($fundReturn->getFund());
 
+        $divisionConfigurations = CrstsHelper::getExpenseDivisionConfigurations($fundReturn->getYear(), $fundReturn->getQuarter());
+
+        $columnCount = array_sum(array_map(fn(DivisionConfiguration $d) => count($d->getColumnConfigurations()) + 1, $divisionConfigurations)) + 2;
+        $rowCount = $this->expensesTableHelper->getRowCount();
+
+        $lastColumn = Coordinate::stringFromColumnIndex($this->originX + $columnCount - 1);
+
         $this->worksheet = $worksheet;
-        $this->worksheet->setTitle('Fund expenses');
+        $this->worksheet->setTitle('Fund expenditure');
         
         $fundStr = $this->translator->trans("enum.fund.{$fundReturn->getFund()->value}");
 
@@ -94,13 +101,6 @@ class FundWorksheetCreator
             ->getStyle("{$firstColumn}:{$firstColumn}")
             ->getFont()
             ->setBold(true);
-
-        $divisionConfigurations = CrstsHelper::getExpenseDivisionConfigurations($fundReturn->getYear(), $fundReturn->getQuarter());
-
-        $columnCount = array_sum(array_map(fn(DivisionConfiguration $d) => count($d->getColumnConfigurations()) + 1, $divisionConfigurations)) + 2;
-        $rowCount = $this->expensesTableHelper->getRowCount();
-
-        $lastColumn = Coordinate::stringFromColumnIndex($this->originX + $columnCount - 1);
 
         $this->writeRowHeaders($fundStr, $columnCount);
         $this->writeColumnHeaders($divisionConfigurations, $rowCount);
@@ -230,7 +230,7 @@ class FundWorksheetCreator
 
             foreach($columnConfigurations as $columnConfiguration) {
                 $this->worksheet->setCellValue([$currentX, $this->originY + 2], $columnConfiguration->getLabel()->trans($this->translator));
-                $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($currentX))->setWidth(15);
+                $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($currentX))->setWidth(16);
                 $currentX++;
             }
 
@@ -241,7 +241,7 @@ class FundWorksheetCreator
                 $text->createTextRun("\n(£)");
                 return $text;
             })());
-            $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($currentX))->setWidth(15);
+            $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($currentX))->setWidth(18);
             $style = $this->worksheet->getStyle([$currentX, $this->originY + 2]);
             $style->getFont()->setBold(true);
             $style->getAlignment()->setWrapText(true);
@@ -260,7 +260,7 @@ class FundWorksheetCreator
                     $sumParts = [];
                     foreach($totalRow->getKeysOfRowsToSum() as $srcKey) {
                         $srcRowIdx = $this->expensesTableHelper->getAbsoluteRowIndexForKey($srcKey->value);
-                        $sumParts[] = Coordinate::stringFromColumnIndex($this->originX + 2 + $columnIdx) . ($this->originY + 4 + $srcRowIdx);
+                        $sumParts[] = Coordinate::stringFromColumnIndex($this->originX + 2 + $columnIdx) . ($this->originY + 3 + $srcRowIdx);
                     }
 
                     $targetRowIdx = $this->expensesTableHelper->getAbsoluteRowIndexForKey($totalRow->getKey());
@@ -301,8 +301,11 @@ class FundWorksheetCreator
                     $sumCells = [];
                     $currentX = $this->originX + 2 - 1;
                     foreach($divisionConfigurations as $innerDivisionConfiguration) {
-                        $currentX += $innerDivisionConfiguration->getColumnCount() + 1;
-                        $sumCells[] = Coordinate::stringFromColumnIndex("{$currentX}").$row;
+                        $innerColumnCount = $innerDivisionConfiguration->getColumnCount();
+                        if ($innerColumnCount > 1) {
+                            $currentX += $innerColumnCount + 1;
+                            $sumCells[] = Coordinate::stringFromColumnIndex("{$currentX}") . $row;
+                        }
                     }
 
                     $cell = $this->worksheet->getCell([$columnIdx + $columnCount, $row]);
