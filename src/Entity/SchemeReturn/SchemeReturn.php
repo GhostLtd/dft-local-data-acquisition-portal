@@ -2,7 +2,6 @@
 
 namespace App\Entity\SchemeReturn;
 
-use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\PropertyChangeLoggableInterface;
@@ -88,18 +87,4 @@ abstract class SchemeReturn implements PropertyChangeLoggableInterface
     abstract public function getFund(): Fund;
     abstract public function createSchemeReturnForNextQuarter(): static;
     abstract public static function createInitialSchemeReturnFor(Scheme $scheme): static;
-
-    /** @return array<int, DivisionConfiguration> */
-    abstract public function getDivisionConfigurations(): array;
-
-    public function findDivisionConfigurationByKey(string $key): ?DivisionConfiguration
-    {
-        foreach($this->getDivisionConfigurations() as $divisionConfiguration) {
-            if ($divisionConfiguration->getKey() === $key) {
-                return $divisionConfiguration;
-            }
-        }
-
-        return null;
-    }
 }

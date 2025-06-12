@@ -3,10 +3,12 @@ site.title: LDAP
 
 pages:
   dashboard:
+    breadcrumb: Latest returns
     title: Latest returns
     authority: "{authorityName}"
     no_returns: "No returns currently available"
     page_title: Latest returns for {year}/{nextYear} Q{quarter}
+    release_returns: Release returns for {fundName}
   authority:
     title: MCAs
   authority_add:
@@ -24,6 +26,7 @@ pages:
         phone: Admin phone
   authority_admin_edit:
     title: "Edit {mca} admin user"
+    breadcrumb: "Edit admin user"
   maintenance:
     title: Maintenance warnings
   maintenance_add:
@@ -32,6 +35,17 @@ pages:
     title: Delete maintenance warning
   maintenance_edit:
     title: Edit maintenance warning
+  release_returns:
+    title: &release_returns_title Release returns for {fundName} {year}/{nextYear} Q{quarter}
+    breadcrumb: *release_returns_title
+    confirmation: I understand that this action cannot be undone
+    confirmed-notification:
+      heading: "Returns releases"
+      content: "The {fundName} returns for {year}/{nextYear} Q{quarter} have been released"
+    warning: |-
+      Once you release these returns:
+      * Baselines will no longer be editable
+      * The returns will be visible to MCAs
 
 authority:
   list:

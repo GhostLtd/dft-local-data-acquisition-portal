@@ -8,6 +8,7 @@ use App\Entity\Enum\Fund;
 use App\Entity\Enum\TransportMode;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
+use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Entity\SchemeData\CrstsData;
 use App\Entity\User;
@@ -44,6 +45,8 @@ class SubprocessRequestHelper
     {
         if (preg_match("/^screenshotsSetup\('(?P<username>[^']*)'\)$/", $command, $matches)) {
             $this->screenshotsSetup($matches, $inputStream);
+        } else if (preg_match("/^screenshotsTeardown\(\)$/", $command, $matches)) {
+            $this->screenshotsTeardown($inputStream);
         } else if (preg_match("/^retrieveEmailLink\('(?P<username>[^']*)'\)$/", $command, $matches)) {
             $this->retrieveEmailLink($matches, $inputStream);
         } else {
@@ -120,6 +123,65 @@ class SubprocessRequestHelper
                 ->executeQuery('DELETE FROM messenger_messages WHERE id=:id', ['id' => $message['id']]);
         }
 
+        $this->deleteExistingScreenshotsAuthority();
+
+        $admin = (new User())
+            ->setName('Mark')
+            ->setEmail(self::SCREENSHOTS_USER)
+            ->setPhone('1122345')
+            ->setPosition('Screenshots generator');
+
+        $this->entityManager->persist($admin);
+
+        $authority = (new Authority())
+            ->setName(self::AUTHORITY_NAME)
+            ->setAdmin($admin);
+
+        $this->entityManager->persist($authority);
+
+        $fundAward = (new FundAward())
+            ->setType(Fund::CRSTS1);
+
+        $authority->addFundAward($fundAward);
+        $this->entityManager->persist($fundAward);
+
+        $return = (new CrstsFundReturn())
+            ->setYear(2025)
+            ->setQuarter(1)
+            ->setState(FundReturn::STATE_OPEN);
+
+        $fundAward->addReturn($return);
+        $this->entityManager->persist($return);
+
+        $crstsData = (new CrstsData())
+            ->setRetained(true)
+            ->setPreviouslyTcf(false);
+
+        $scheme = (new Scheme())
+            ->addFund(Fund::CRSTS1)
+            ->setName('Casper railway station improvements')
+            ->setSchemeIdentifier('GRA00001')
+            ->setTransportMode(TransportMode::RAIL_INTERCHANGE_OR_NETWORK_UPGRADE)
+            ->setActiveTravelElement(ActiveTravelElement::PROVISION_OF_SECURE_CYCLE_PARKING)
+            ->setDescription('Various improvements')
+            ->setCrstsData($crstsData);
+
+        $authority->addScheme($scheme);
+        $this->entityManager->persist($scheme);
+
+        $this->entityManager->flush();
+
+        $inputStream->write("OK: Created\n");
+    }
+
+    protected function screenshotsTeardown(InputStream $inputStream): void
+    {
+        $this->deleteExistingScreenshotsAuthority();
+        $inputStream->write("OK: Created\n");
+    }
+
+    protected function deleteExistingScreenshotsAuthority(): void
+    {
         $existingAuthority = $this->entityManager
             ->getRepository(Authority::class)
             ->findOneBy(['name' => self::AUTHORITY_NAME]);
@@ -146,52 +208,5 @@ class SubprocessRequestHelper
 
             $this->entityManager->flush();
         }
-
-        $admin = (new User())
-            ->setName('Mark')
-            ->setEmail(self::SCREENSHOTS_USER)
-            ->setPhone('1122345')
-            ->setPosition('Screenshots generator');
-
-        $this->entityManager->persist($admin);
-
-        $authority = (new Authority())
-            ->setName(self::AUTHORITY_NAME)
-            ->setAdmin($admin);
-
-        $this->entityManager->persist($authority);
-
-        $fundAward = (new FundAward())
-            ->setType(Fund::CRSTS1);
-
-        $authority->addFundAward($fundAward);
-        $this->entityManager->persist($fundAward);
-
-        $return = (new CrstsFundReturn())
-            ->setYear(2025)
-            ->setQuarter(1);
-
-        $fundAward->addReturn($return);
-        $this->entityManager->persist($return);
-
-        $crstsData = (new CrstsData())
-            ->setRetained(true)
-            ->setPreviouslyTcf(false);
-
-        $scheme = (new Scheme())
-            ->addFund(Fund::CRSTS1)
-            ->setName('Casper railway station improvements')
-            ->setSchemeIdentifier('GRA00001')
-            ->setTransportMode(TransportMode::RAIL_INTERCHANGE_OR_NETWORK_UPGRADE)
-            ->setActiveTravelElement(ActiveTravelElement::PROVISION_OF_SECURE_CYCLE_PARKING)
-            ->setDescription('Various improvements')
-            ->setCrstsData($crstsData);
-
-        $authority->addScheme($scheme);
-        $this->entityManager->persist($scheme);
-
-        $this->entityManager->flush();
-
-        $inputStream->write("OK: Created\n");
     }
 }

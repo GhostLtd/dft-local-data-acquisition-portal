@@ -8,12 +8,14 @@ class Role
     // See: https://github.com/symfony/symfony/discussions/46006
     const string CAN_CHANGE_AUTHORITY = 'CAN_CHANGE_AUTHORITY';
     const string CAN_EDIT = 'CAN_EDIT';
+    const string CAN_EDIT_USER = 'CAN_EDIT_USER';
     const string CAN_MANAGE_SCHEMES = 'CAN_MANAGE_SCHEMES';
     const string CAN_MANAGE_USERS = 'CAN_MANAGE_USERS';
-    const string CAN_EDIT_USER = 'CAN_EDIT_USER';
+    const string CAN_RELEASE_RETURNS = 'CAN_RELEASE_RETURNS';
     const string CAN_VIEW = 'CAN_VIEW';
 
     // Return specific
+    const string CAN_EDIT_BASELINES = 'CAN_EDIT_BASELINES';
     const string CAN_SIGN_OFF_RETURN = 'CAN_SIGN_OFF_RETURN';
     const string CAN_REOPEN_RETURN = 'CAN_REOPEN_RETURN';
 

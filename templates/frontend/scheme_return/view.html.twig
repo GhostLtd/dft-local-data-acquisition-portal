@@ -87,9 +87,8 @@
             {%- if is_granted('CAN_VIEW_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
                 {%- from "frontend/macros.html.twig" import renderTable -%}
                 {% set selectedTabIndex = 0 %}
-                {%- for division in expenseDivisions -%}
-                    {%- set divisionConfiguration = schemeReturn.findDivisionConfigurationByKey(division.key) -%}
-                    {%- do expensesTableHelper.setDivisionConfiguration(divisionConfiguration) -%}
+                {%- for division in expensesTableHelper.divisionConfigurations -%}
+                    {%- do expensesTableHelper.setDivisionKey(division.key) -%}
                     {%- set contents -%}
                         {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
                         {%- if is_granted('CAN_EDIT_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
@@ -111,7 +110,7 @@
                         id: 'expenses-' ~ division.key,
                         panel: {html: contents},
                     }]) -%}
-                    {% if division.key == fundReturn.divisionConfigurationKeyForCurrentYear %}
+                    {% if division.key == returnYearDivisionKey %}
                         {% set selectedTabIndex = loop.index0 %}
                     {% endif %}
                 {%- endfor -%}

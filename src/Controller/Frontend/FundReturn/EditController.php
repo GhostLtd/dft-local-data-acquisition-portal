@@ -7,7 +7,6 @@ use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Form\Type\FundReturn\Crsts\ExpensesType;
-use App\Form\Type\FundReturn\Crsts\OverallProgressType;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
@@ -65,8 +64,11 @@ class EditController extends AbstractReturnController
         ExpensesTableHelper   $tableHelper,
     ): Response
     {
-        $divisionConfiguration = $fundReturn->findDivisionConfigurationByKey($divisionKey);
+        $tableHelper
+            ->setConfiguration(CrstsHelper::getFundExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter()))
+            ->setDivisionKey($divisionKey);
 
+        $divisionConfiguration = $tableHelper->getDivisionConfiguration();
         if (!$divisionConfiguration) {
             throw new NotFoundHttpException();
         }
@@ -76,14 +78,10 @@ class EditController extends AbstractReturnController
             'fundReturnId' => $fundReturn->getId()
         ])."#expenses-{$divisionKey}";
 
-        $expensesTableHelper = $tableHelper
-            ->setDivisionConfiguration($divisionConfiguration)
-            ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
-            ->setFund($fundReturn->getFund());
 
         $form = $this->createForm(ExpensesType::class, $fundReturn, [
             'cancel_url' => $cancelUrl,
-            'expenses_table_helper' => $expensesTableHelper,
+            'expenses_table_helper' => $tableHelper,
         ]);
 
         if ($response = $this->processForm($form, $request, $cancelUrl)) {
@@ -92,7 +90,7 @@ class EditController extends AbstractReturnController
 
         return $this->render('frontend/fund_return/expenses_edit.html.twig', [
             'linksBuilder' => $linksBuilder,
-            'expensesTable' => $expensesTableHelper->getTable(),
+            'expensesTable' => $tableHelper->getTable(),
             'form' => $form,
         ]);
     }

@@ -2,7 +2,6 @@
 
 namespace App\Entity\FundReturn;
 
-use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\FundAward;
 use App\Entity\PropertyChangeLoggableInterface;
@@ -25,6 +24,14 @@ use Doctrine\ORM\Mapping as ORM;
 ])]
 abstract class FundReturn implements PropertyChangeLoggableInterface
 {
+    public const string STATE_INITIAL = 'initial';
+    public const string STATE_OPEN = 'open';
+    public const string STATE_SUBMITTED = 'submitted';
+
+    public const string TRANSITION_OPEN_RETURN = 'open_return';
+    public const string TRANSITION_REOPEN_RETURN = 'reopen_return';
+    public const string TRANSITION_SUBMIT_RETURN = 'submit_return';
+
     use IdTrait;
 
     #[ORM\Column]
@@ -32,6 +39,9 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $quarter = null;
+
+    #[ORM\Column(length: 10)]
+    private string $state;
 
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
@@ -59,6 +69,18 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
     public function __construct()
     {
         $this->schemeReturns = new ArrayCollection();
+        $this->state = self::STATE_INITIAL;
+    }
+
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    public function setState(string $state): static
+    {
+        $this->state = $state;
+        return $this;
     }
 
     public function signoff(User $user): static
@@ -194,25 +216,11 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
     abstract public function createFundReturnForNextQuarter(): static;
     abstract public static function createInitialFundReturnStartingAt(FinancialQuarter $financialQuarter, FundAward $fundAward): static;
 
-    /** @return array<int, DivisionConfiguration> */
-    abstract public function getDivisionConfigurations(): array;
-
     public function getSchemeReturnForScheme(Scheme $scheme): ?SchemeReturn
     {
         foreach($this->getSchemeReturns() as $schemeReturn) {
             if ($schemeReturn->getScheme() === $scheme) {
                 return $schemeReturn;
-            }
-        }
-
-        return null;
-    }
-
-    public function findDivisionConfigurationByKey(string $key): ?DivisionConfiguration
-    {
-        foreach($this->getDivisionConfigurations() as $divisionConfiguration) {
-            if ($divisionConfiguration->getKey() === $key) {
-                return $divisionConfiguration;
             }
         }
 
@@ -228,7 +236,7 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
 
     public function isSignedOff(): bool
     {
-        return null !== $this->signoffDate;
+        return $this->state === self::STATE_SUBMITTED;
     }
 
     public function getFinancialQuarter(): FinancialQuarter

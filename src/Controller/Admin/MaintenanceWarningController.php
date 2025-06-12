@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\MaintenanceWarning;
 use App\Form\Type\Admin\MaintenanceWarningType;
 use App\ListPage\MaintenanceWarningListPage;
+use App\Utility\Breadcrumb\Admin\MaintenanceLinksBuilder;
 use App\Utility\ConfirmAction\Admin\DeleteMaintenanceWarningConfirmAction;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkFrontendBundle\Model\NotificationBanner;
@@ -21,8 +22,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class MaintenanceWarningController extends AbstractController
 {
     #[Route(path: '', name: '')]
-    public function list(MaintenanceWarningListPage $listPage, Request $request): Response
+    public function list(
+        MaintenanceLinksBuilder    $linksBuilder,
+        MaintenanceWarningListPage $listPage,
+        Request                    $request,
+    ): Response
     {
+        $linksBuilder->setNavLinks(null);
+
         $listPage
             ->handleRequest($request);
 
@@ -33,12 +40,26 @@ class MaintenanceWarningController extends AbstractController
         return $this->render('admin/maintenance_warning/list.html.twig', [
             'data' => $listPage->getData(),
             'form' => $listPage->getFiltersForm(),
+            'linksBuilder' => $linksBuilder,
         ]);
     }
 
     #[Route(path: '/{id}/edit', name: '_edit')]
-    public function edit(Request $request, EntityManagerInterface $entityManager, Session $session, MaintenanceWarning $maintenanceWarning, string $type='edit'): Response
+    public function edit(
+        EntityManagerInterface  $entityManager,
+        MaintenanceLinksBuilder $linksBuilder,
+        MaintenanceWarning      $maintenanceWarning,
+        Request                 $request,
+        Session                 $session,
+        string                  $type = 'edit'
+    ): Response
     {
+        if ($type === 'edit') {
+            $linksBuilder->setAtEdit($maintenanceWarning);
+        } else {
+            $linksBuilder->setAtAdd();
+        }
+
         /** @var Form $form */
         $form = $this->createForm(MaintenanceWarningType::class, $maintenanceWarning, [
             'cancel_url' => $this->generateUrl('admin_maintenance'),
@@ -64,23 +85,46 @@ class MaintenanceWarningController extends AbstractController
 
         return $this->render('admin/maintenance_warning/edit.html.twig', [
             'form' => $form,
+            'linksBuilder' => $linksBuilder,
             'maintenanceWarning' => $form->getData(),
             'type' => $type,
         ]);
     }
 
     #[Route(path: '/add', name: '_add')]
-    public function add(Request $request, EntityManagerInterface $entityManager, Session $session): Response
+    public function add(
+        EntityManagerInterface  $entityManager,
+        MaintenanceLinksBuilder $linksBuilder,
+        Request                 $request,
+        Session                 $session,
+    ): Response
     {
-        return $this->edit($request, $entityManager, $session, new MaintenanceWarning(), 'add');
+        return $this->edit(
+            $entityManager,
+            $linksBuilder,
+            new MaintenanceWarning(),
+            $request,
+            $session,
+            'add'
+        );
     }
 
     #[Route(path: '{id}/delete', name: '_delete')]
     #[Template('admin/maintenance_warning/delete.html.twig')]
-    public function delete(Request $request, DeleteMaintenanceWarningConfirmAction $deleteMaintenanceWarningConfirmAction, MaintenanceWarning $maintenanceWarning): RedirectResponse|array
+    public function delete(
+        DeleteMaintenanceWarningConfirmAction $deleteMaintenanceWarningConfirmAction,
+        MaintenanceLinksBuilder               $linksBuilder,
+        MaintenanceWarning                    $maintenanceWarning,
+        Request                               $request,
+    ): RedirectResponse|array
     {
+        $linksBuilder->setAtDelete($maintenanceWarning);
+
         return $deleteMaintenanceWarningConfirmAction
             ->setSubject($maintenanceWarning)
+            ->setExtraViewData([
+                'linksBuilder' => $linksBuilder,
+            ])
             ->controller(
                 $request,
                 $this->generateUrl('admin_maintenance')

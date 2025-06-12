@@ -3,6 +3,7 @@
 namespace App\Utility;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
+use App\Config\ExpenseDivision\TableConfiguration;
 use App\Config\ExpenseRow\CategoryConfiguration;
 use App\Config\ExpenseRow\RowGroupInterface;
 use App\Config\ExpenseRow\TotalConfiguration;
@@ -14,7 +15,6 @@ use App\Config\Table\Table;
 use App\Config\Table\TableBody;
 use App\Config\Table\TableHead;
 use App\Entity\Enum\ExpenseType;
-use App\Entity\Enum\Fund;
 use Symfony\Component\Translation\TranslatableMessage;
 
 /**
@@ -27,53 +27,55 @@ use Symfony\Component\Translation\TranslatableMessage;
  */
 class ExpensesTableHelper
 {
-    /**
-     * @var array<int, RowGroupInterface>
-     */
-    protected array $rowGroupConfigurations;
-
-    protected DivisionConfiguration $divisionConfiguration;
-    protected Fund $fund;
-
     protected array $cache = [];
+    protected TableConfiguration $configuration;
+    protected string $divisionKey;
 
-    /**
-     * @param array<int, RowGroupInterface> $rowGroupConfigurations
-     */
-    public function setRowGroupConfigurations(array $rowGroupConfigurations): static
+    protected bool $editableBaselines = false;
+
+    public function setConfiguration(TableConfiguration $configuration): static
     {
-        $this->rowGroupConfigurations = $rowGroupConfigurations;
+        $this->configuration = $configuration;
         return $this;
     }
 
-    public function setDivisionConfiguration(DivisionConfiguration $divisionConfiguration): static
+    public function setDivisionKey(string $divisionKey): static
     {
-        $this->divisionConfiguration = $divisionConfiguration;
+        $this->divisionKey = $divisionKey;
         return $this;
     }
 
-    public function setFund(Fund $fund): ExpensesTableHelper
+    public function getDivisionKey(): string
     {
-        $this->fund = $fund;
+        return $this->divisionKey;
+    }
+
+    public function setEditableBaselines(bool $editableBaselines): static
+    {
+        $this->editableBaselines = $editableBaselines;
         return $this;
     }
 
-    public function getTable(): Table
+    public function getTable(): ?Table
     {
-        $cacheKey = $this->fund->value . '-' . $this->divisionConfiguration->getKey();
+        $cacheKey = spl_object_id($this->configuration) . '-' . $this->divisionKey;
+
         if (isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
         }
 
+        $divisionConfiguration = $this->getDivisionConfigurationByKey($this->divisionKey);
+        if (!$divisionConfiguration) {
+            return null;
+        }
+
         $tableHeadAndBodies = [];
 
-        $divKey = $this->divisionConfiguration->getKey();
-
         $totalTitle = new TranslatableMessage('forms.crsts.expenses.total');
-        $extraParameters = ['fund' => new TranslatableMessage("enum.fund.{$this->fund->value}")];
+        $extraParameters = $this->configuration->getExtraTranslationParameters();
 
         $hasCategories = false;
-        foreach($this->rowGroupConfigurations as $rowGroupConfiguration) {
+        foreach($this->configuration->getRowGroupConfigurations() as $rowGroupConfiguration) {
             if ($rowGroupConfiguration instanceof CategoryConfiguration) {
                 $hasCategories = true;
                 break;
@@ -87,14 +89,14 @@ class ExpensesTableHelper
             new Header($hasCategories ? ['colspan' => 2] : [])
         ];
 
-        foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
+        foreach($divisionConfiguration->getColumnConfigurations() as $subDiv) {
             $cells[] = new Header([
                 'text' => $subDiv->getLabel($extraParameters),
                 'classes' => 'number_column',
             ]);
         }
 
-        if ($this->divisionConfiguration->shouldHaveTotal()) {
+        if ($divisionConfiguration->shouldHaveTotal()) {
             $cells[] = new Header([
                 'text' => $totalTitle,
                 'classes' => 'number_column'
@@ -105,7 +107,7 @@ class ExpensesTableHelper
 
         // Table data rows...
         // --------------------------------------------------------------------------------
-        foreach($this->rowGroupConfigurations as $group) {
+        foreach($this->configuration->getRowGroupConfigurations() as $group) {
             $cells = [];
             $rowHasGroupHeader = false;
 
@@ -158,9 +160,9 @@ class ExpensesTableHelper
                         $isPossiblyADataCell = false;
                     } else if ($row instanceof ExpenseType) {
                         $rowKey = $row->value;
-                        $disabled = $row->isBaseline();
+                        $disabled = !$this->editableBaselines && $row->isBaseline();
                         $attributes = [
-                            'division' => $divKey,
+                            'division' => $this->divisionKey,
                             'expense_type' => $row,
                             'row_key' => $row->value,
                         ];
@@ -170,7 +172,7 @@ class ExpensesTableHelper
                         throw new \RuntimeException('Unexpected row configuration');
                     }
 
-                    $columnConfigurations = $this->divisionConfiguration->getColumnConfigurations();
+                    $columnConfigurations = $divisionConfiguration->getColumnConfigurations();
 
                     $rowTitle = $row->getLabel($extraParameters);
 
@@ -185,7 +187,7 @@ class ExpensesTableHelper
                         $colKey = $subDiv->getKey();
                         $cells[] = new Cell([
                             'disabled' => $disabled,
-                            'key' => "expense__{$divKey}__{$rowKey}__{$colKey}",
+                            'key' => "expense__{$this->divisionKey}__{$rowKey}__{$colKey}",
                             'text' => $this->cellTitle($rowTitle, $subDiv->getLabel($extraParameters), $groupLabel),
                             'classes' => $isOdd ? 'odd' : 'even',
                         ], array_merge($attributes, [
@@ -198,10 +200,10 @@ class ExpensesTableHelper
                     }
 
                     // If a row has more than one cell, it gets a row total cell
-                    if ($this->divisionConfiguration->shouldHaveTotal()) {
+                    if ($divisionConfiguration->shouldHaveTotal()) {
                         $cells[] = new Cell([
                             'disabled' => true,
-                            'key' => "expense__{$divKey}__{$rowKey}__total",
+                            'key' => "expense__{$this->divisionKey}__{$rowKey}__total",
                             'text' => $this->cellTitle($rowTitle, $totalTitle, $groupLabel),
                             'classes' => $isOdd ? 'odd' : 'even',
                         ], array_merge($attributes, [
@@ -225,7 +227,7 @@ class ExpensesTableHelper
                 ];
 
                 $isOdd = true;
-                foreach($this->divisionConfiguration->getColumnConfigurations() as $subDiv) {
+                foreach($divisionConfiguration->getColumnConfigurations() as $subDiv) {
                     $colKey = $subDiv->getKey();
 
                     $cells[] = new Cell([
@@ -245,7 +247,7 @@ class ExpensesTableHelper
                 }
 
                 // If a row has more than one cell, it gets a row total cell
-                if ($this->divisionConfiguration->shouldHaveTotal()) {
+                if ($divisionConfiguration->shouldHaveTotal()) {
                     $cells[] = new Cell([
                         'disabled' => true,
                         'key' => "expense__{$rowKey}__total",
@@ -269,31 +271,13 @@ class ExpensesTableHelper
     }
 
     /**
-     * @return array<int, RowGroupInterface>
-     */
-    public function getRowGroupConfigurations(): array
-    {
-        return $this->rowGroupConfigurations;
-    }
-
-    public function getDivisionConfiguration(): DivisionConfiguration
-    {
-        return $this->divisionConfiguration;
-    }
-
-    public function getFund(): Fund
-    {
-        return $this->fund;
-    }
-
-    /**
      * @return array<int, ExpenseType>
      */
     public function getExpenseTypes(): array
     {
         return array_merge(...array_map(
             fn(CategoryConfiguration $category) => $category->getExpenseTypes(),
-            array_filter($this->rowGroupConfigurations, fn(RowGroupInterface $r) => $r instanceof CategoryConfiguration)
+            array_filter($this->configuration->getRowGroupConfigurations(), fn(RowGroupInterface $r) => $r instanceof CategoryConfiguration)
         ));
     }
 
@@ -304,7 +288,7 @@ class ExpensesTableHelper
     {
         return array_merge(...array_map(
             fn(Row $row) => array_filter($row->getCells(), fn($cell) => $cell instanceof Cell),
-            $this->getTable()->getRows()
+            $this->getTable($this->divisionKey)->getRows()
         ));
     }
 
@@ -319,5 +303,29 @@ class ExpensesTableHelper
             'row' => $rowLabel,
             'column' => $columnLabel,
         ]);
+    }
+
+    /**
+     * @return array<int, DivisionConfiguration>
+     */
+    public function getDivisionConfigurations(): array
+    {
+        return $this->configuration->getDivisionConfigurations();
+    }
+
+    public function getDivisionConfiguration(): ?DivisionConfiguration
+    {
+        return $this->getDivisionConfigurationByKey($this->divisionKey);
+    }
+
+    public function getDivisionConfigurationByKey(string $divisionKey): ?DivisionConfiguration
+    {
+        foreach($this->getDivisionConfigurations() as $divisionConfiguration) {
+            if ($divisionConfiguration->getKey() === $divisionKey) {
+                return $divisionConfiguration;
+            }
+        }
+
+        return null;
     }
 }

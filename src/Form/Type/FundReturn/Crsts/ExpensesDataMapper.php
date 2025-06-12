@@ -46,7 +46,9 @@ class ExpensesDataMapper implements DataMapperInterface
             }
         }
 
-        $forms['comments']->setData($viewData->getExpenseDivisionComment($divKey));
+        if ($forms['comments'] ?? null) {
+            $forms['comments']->setData($viewData->getExpenseDivisionComment($divKey));
+        }
     }
 
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
@@ -117,7 +119,9 @@ class ExpensesDataMapper implements DataMapperInterface
             }
         }
 
-        $viewData->setExpenseDivisionComment($divKey, $forms['comments']->getData());
+        if ($forms['comments'] ?? null) {
+            $viewData->setExpenseDivisionComment($divKey, $forms['comments']->getData());
+        }
     }
 
     protected function findExpenseEntry(ExpensesContainerInterface $viewData, string $divKey, string $column, ExpenseType $expenseType): ?ExpenseEntry

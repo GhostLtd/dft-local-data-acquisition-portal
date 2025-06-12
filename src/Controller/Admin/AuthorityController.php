@@ -10,7 +10,7 @@ use App\Form\Type\Admin\AuthorityType;
 use App\Form\Type\UserType;
 use App\ListPage\AuthorityListPage;
 use App\Repository\UserRepository;
-use App\Utility\FinancialQuarter;
+use App\Utility\Breadcrumb\Admin\DashboardLinksBuilder;
 use App\Utility\SampleReturnGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkFrontendBundle\Model\NotificationBanner;
@@ -28,12 +28,20 @@ class AuthorityController extends AbstractController
 {
     public function __construct(
         protected EntityManagerInterface $entityManager,
-        protected SampleReturnGenerator $sampleReturnGenerator,
-    ) {}
+        protected SampleReturnGenerator  $sampleReturnGenerator,
+    )
+    {
+    }
 
     #[Route(path: '', name: '')]
-    public function list(AuthorityListPage $listPage, Request $request): Response
+    public function list(
+        AuthorityListPage     $listPage,
+        Request               $request,
+        DashboardLinksBuilder $linksBuilder,
+    ): Response
     {
+        $linksBuilder->setNavLinks(null);
+
         $listPage
             ->handleRequest($request);
 
@@ -42,23 +50,43 @@ class AuthorityController extends AbstractController
         }
 
         return $this->render('admin/authority/list.html.twig', [
+            'linksBuilder' => $linksBuilder,
             'data' => $listPage->getData(),
             'form' => $listPage->getFiltersForm(),
         ]);
     }
 
     #[Route(path: '/{id}/view', name: '_view')]
-    public function view(Authority $authority, UserRepository $userRepository): Response
+    public function view(
+        Authority             $authority,
+        UserRepository        $userRepository,
+        DashboardLinksBuilder $linksBuilder,
+    ): Response
     {
+        $linksBuilder->setAtAuthority($authority);
+
         return $this->render('admin/authority/view.html.twig', [
             'authority' => $authority,
+            'linksBuilder' => $linksBuilder,
             'users' => $userRepository->findAllForAuthority($authority),
         ]);
     }
 
     #[Route(path: '/{id}/edit', name: '_edit')]
-    public function edit(Request $request, Session $session, Authority $authority, string $type='edit'): Response
+    public function edit(
+        Authority             $authority,
+        DashboardLinksBuilder $linksBuilder,
+        Request               $request,
+        Session               $session,
+        string                $type = 'edit'
+    ): Response
     {
+        if ($type === 'edit') {
+            $linksBuilder->setAtAuthorityEdit($authority);
+        } else {
+            $linksBuilder->setAtAuthorityAdd();
+        }
+
         /** @var Form $form */
         $form = $this->createForm(AuthorityType::class, $authority, [
             'cancel_url' => $type === 'edit'
@@ -85,22 +113,33 @@ class AuthorityController extends AbstractController
         }
 
         return $this->render('admin/authority/edit.html.twig', [
-            'form' => $form,
             'authority' => $form->getData(),
+            'linksBuilder' => $linksBuilder,
+            'form' => $form,
             'type' => $type,
         ]);
     }
 
     #[Route(path: '/add', name: '_add')]
-    public function add(Request $request, Session $session): Response
+    public function add(
+        DashboardLinksBuilder $linksBuilder,
+        Request               $request,
+        Session               $session,
+    ): Response
     {
-        return $this->edit($request, $session, new Authority(), 'add');
+        return $this->edit(new Authority(), $linksBuilder, $request, $session, 'add');
     }
 
     #[IsGranted(attribute: 'DFT_SUPER_ADMIN')]
     #[Route(path: '/{id}/edit-admin-user', name: '_edit_admin_user')]
-    public function editAdmin(Request $request, Authority $authority): Response
+    public function editAdmin(
+        Authority             $authority,
+        DashboardLinksBuilder $linksBuilder,
+        Request               $request,
+    ): Response
     {
+        $linksBuilder->setAtAuthorityEditAdmin($authority);
+
         $form = $this->createForm(UserType::class, $authority->getAdmin(), [
             'cancel_url' => $this->generateUrl('admin_authority_view', ['id' => $authority->getId()]),
             'authority' => $authority,
@@ -113,8 +152,9 @@ class AuthorityController extends AbstractController
         }
 
         return $this->render('admin/authority/edit_admin_user.html.twig', [
-            'form' => $form,
             'authority' => $authority,
+            'form' => $form,
+            'linksBuilder' => $linksBuilder,
         ]);
     }
 }

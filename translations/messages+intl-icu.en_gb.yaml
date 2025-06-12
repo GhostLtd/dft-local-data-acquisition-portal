@@ -61,10 +61,11 @@ enum:
     crsts1: CRSTS1
     crsts2: CRSTS2
   expense_category:
+    baselines: Baselines
     fund_capital: "{fund} Capital"
     fund_resource: "{fund} Resource"
-    local_capital_contributions: "Local capital contributions"
-    other_capital_contributions: "Other capital contributions"
+    local_capital_contributions: Local capital contributions
+    other_capital_contributions: Other capital contributions
   expense_type:
     fex: "{fund} expenditure"
     feb: "Baseline, {fund} expenditure"
@@ -248,18 +249,25 @@ forms:
       forecast: |-
         Forecast
         (£)
-      Q1: |-
-        Q1 {actual_or_forecast} 
-        (£)
-      Q2: |-
-        Q2 {actual_or_forecast} 
-        (£)
-      Q3: |-
-        Q3 {actual_or_forecast} 
-        (£)
-      Q4: |-
-        Q4 {actual_or_forecast} 
-        (£)
+      just_units: (£)
+      quarter:
+        Q1: |-
+          Q1 {actual_or_forecast} 
+          (£)
+        Q2: |-
+          Q2 {actual_or_forecast} 
+          (£)
+        Q3: |-
+          Q3 {actual_or_forecast} 
+          (£)
+        Q4: |-
+          Q4 {actual_or_forecast} 
+          (£)
+      quarter_only:
+        Q1: Q1
+        Q2: Q2
+        Q3: Q3
+        Q4: Q4
       sub_total: Sub-total
       total: |-
         Total
@@ -452,6 +460,7 @@ frontend:
     fund_return:
       title: "{type} return for {year}/{nextYear} Q{quarter}"
       titles:
+        baselines: Baselines
         basic_details: Main details
         comments: Miscellaneous
         expenses: Expenses
@@ -459,6 +468,7 @@ frontend:
         local_and_rdel: Funding
         overall_progress: Overall progress
         schemes: Schemes
+      back_to_latest_returns: Back to latest returns
       comments: *fr_comments
       local_contribution: *fr_local_contribution
       overall_confidence: Confidence rating
@@ -595,15 +605,12 @@ sections:
 site.title: Data acquisition portal
 
 tags:
-  completed:
-    name: Completed
-    colour: green
-  in_progress:
+  initial:
+    name: Preparing
+    colour: blue
+  open:
     name: In progress
     colour: yellow
-  not_started:
-    name: Not started
-    colour: blue
-  not_required:
-    name: Not required
-    colour: grey
+  submitted:
+    name: Completed
+    colour: green

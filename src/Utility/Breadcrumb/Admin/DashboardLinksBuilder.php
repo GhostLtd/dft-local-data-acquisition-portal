@@ -3,16 +3,25 @@
 namespace App\Utility\Breadcrumb\Admin;
 
 use App\Entity\Authority;
-use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder as FrontendDashboardLinksBuilder;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
-class DashboardLinksBuilder extends FrontendDashboardLinksBuilder
+class DashboardLinksBuilder extends AbstractAdminLinksBuilder
 {
-    protected function addLink(string $set, string $key, string $routeName, array $routeParameters = [], ?string $translationKey = null, array $translationParameters = [], TranslatableInterface|string|null $text = null, ?string $hash = null): void
+    protected function addLink(
+        string                            $set,
+        string                            $key,
+        string                            $routeName,
+        array                             $routeParameters = [],
+        ?string                           $translationKey = null,
+        array                             $translationParameters = [],
+        ?string                           $translationDomain = null,
+        null|string|TranslatableInterface $text = null,
+        ?string                           $hash = null,
+    ): void
     {
         $routeName = preg_replace('/^app_/', 'admin_', $routeName);
-        parent::addLink($set, $key, $routeName, $routeParameters, $translationKey, $translationParameters, $text, $hash);
+        parent::addLink($set, $key, $routeName, $routeParameters, $translationKey, $translationParameters, $translationDomain, $text, $hash);
     }
 
     public function setAtAuthority(Authority $authority): void
@@ -25,7 +34,35 @@ class DashboardLinksBuilder extends FrontendDashboardLinksBuilder
             hash: 'mca-returns'
         );
 
-        $this->setNavLinks($authority);
+        $this->setNavLinks(null);
     }
 
+    public function setAtAuthorityAdd(): void
+    {
+        $this->setNavLinks(null);
+    }
+
+    public function setAtAuthorityEdit(Authority $authority): void
+    {
+        $this->setAtAuthority($authority);
+
+        $this->addBreadcrumb(
+            'authority_edit',
+            'admin_authority_edit',
+            routeParameters: ['id' => $authority->getId()],
+            text: new TranslatableMessage('pages.authority_edit.title', ['name' => $authority->getName()], 'admin'),
+        );
+    }
+
+    public function setAtAuthorityEditAdmin(Authority $authority): void
+    {
+        $this->setAtAuthority($authority);
+
+        $this->addBreadcrumb(
+            'edit_admin_user',
+            'admin_authority_edit_admin_user',
+            routeParameters: ['id' => $authority->getId()],
+            text: new TranslatableMessage('pages.authority_admin_edit.breadcrumb', ['name' => $authority->getName()], 'admin'),
+        );
+    }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Entity\FundReturn;
 
-use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\Rating;
 use App\Entity\ExpensesContainerInterface;
@@ -11,7 +10,6 @@ use App\Entity\ReturnExpenseTrait;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
-use App\Utility\CrstsHelper;
 use App\Repository\FundReturn\CrstsFundReturnRepository;
 use App\Utility\FinancialQuarter;
 use App\Utility\TypeHelper;
@@ -134,19 +132,6 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
     public function getFund(): Fund
     {
         return Fund::CRSTS1;
-    }
-
-    /**
-     * @return array<int, DivisionConfiguration>
-     */
-    public function getDivisionConfigurations(): array
-    {
-        return CrstsHelper::getExpenseDivisionConfigurations($this->getYear(), $this->getQuarter());
-    }
-
-    public function getDivisionConfigurationKeyForCurrentYear(): string
-    {
-        return CrstsHelper::getDivisionConfigurationKey($this->getYear());
     }
 
     public function createFundReturnForNextQuarter(): static

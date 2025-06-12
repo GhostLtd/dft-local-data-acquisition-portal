@@ -2,6 +2,7 @@
 
 namespace App\Repository\FundReturn;
 
+use App\Entity\Enum\Fund;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Utility\FinancialQuarter;
@@ -51,7 +52,7 @@ class FundReturnRepository extends ServiceEntityRepository
 
     /**
      * @param FinancialQuarter $financialQuarter
-     * @return array<string, array<int, FundReturn>}
+     * @return array<string, array{fund: Fund, returns: array<int, FundReturn>}>
      */
     public function findFundReturnsForQuarterGroupedByFund(FinancialQuarter $financialQuarter): array
     {
@@ -59,8 +60,11 @@ class FundReturnRepository extends ServiceEntityRepository
 
         foreach($this->findFundReturnsForQuarter($financialQuarter) as $fundReturn) {
             $fund = $fundReturn->getFundAward()->getType();
-            $returnsByFund[$fund->value] ??= [];
-            $returnsByFund[$fund->value][] = $fundReturn;
+            $returnsByFund[$fund->value] ??= [
+                'fund' => $fund,
+                'returns' => [],
+            ];
+            $returnsByFund[$fund->value]['returns'][] = $fundReturn;
         }
 
         ksort($returnsByFund);

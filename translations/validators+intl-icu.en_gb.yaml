@@ -19,6 +19,10 @@ auth:
     email_blank: Enter an email address
     invalid_email: Enter a valid email address
 
+authority:
+  name:
+    not_null: Enter a name for the authority
+
 benefit_cost_ratio:
   not_null: Choose whether the benefit-cost ratio is known
 
@@ -58,6 +62,24 @@ crsts_scheme_return:
     not_null: Enter the expected business case approval date
     past: Enter a date in the past
 
+milestone:
+  date:
+    not_null: >-
+      Enter a date{milestone_type, select,
+        start_development { for the start of development}
+        end_development { for the end of development}
+        start_construction { for the start of construction}
+        end_construction { for the end of construction}
+        start_delivery { for the start of delivery}
+        end_delivery { for the end of delivery}
+        final_delivery { for the final delivery}
+        other {}
+      }
+
+release_returns:
+  confirm:
+    not_blank: You must tick this box to continue
+
 scheme:
   active_travel_element:
     not_null: Choose whether this scheme has active travel elements
@@ -78,10 +100,6 @@ scheme:
   dft_approved:
     is_true: The scheme must fall within guidelines or be approved by DfT
 
-authority:
-  name:
-    not_null: Enter a name for the authority
-
 user:
   email:
     not_null: Enter an email address for the user
@@ -94,17 +112,3 @@ user:
     not_null: Enter a phone number for the user
   position:
     not_null: Enter a position for the user
-
-milestone:
-  date:
-    not_null: >-
-      Enter a date{milestone_type, select,
-        start_development { for the start of development}
-        end_development { for the end of development}
-        start_construction { for the start of construction}
-        end_construction { for the end of construction}
-        start_delivery { for the start of delivery}
-        end_delivery { for the end of delivery}
-        final_delivery { for the final delivery}
-        other {}
-      }

@@ -2,19 +2,16 @@
 
 namespace App\Entity\SchemeReturn;
 
-use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Entity\Enum\BusinessCase;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\Enum\OnTrackRating;
 use App\Entity\ExpensesContainerInterface;
-use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
 use App\Entity\ReturnExpenseTrait;
 use App\Entity\Scheme;
 use App\Entity\SchemeFund\BenefitCostRatio;
 use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
-use App\Utility\CrstsHelper;
 use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -260,15 +257,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     {
         $this->milestones->removeElement($milestone);
         return $this;
-    }
-
-    /**
-     * @return array<int, DivisionConfiguration>
-     */
-    public function getDivisionConfigurations(): array
-    {
-        $fundReturn = $this->getFundReturn();
-        return CrstsHelper::getExpenseDivisionConfigurations($fundReturn->getYear(), $fundReturn->getQuarter());
     }
 
     public function createSchemeReturnForNextQuarter(): static

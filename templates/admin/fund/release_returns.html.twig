@@ -1,0 +1,10 @@
+{% extends 'admin/base.html.twig' %}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('release_returns') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{% block content %}
+    <div class="prose-scope govuk-!-margin-bottom-7">{{ 'pages.release_returns.warning' | trans({}, 'admin') | markdown_to_html }}</div>
+
+    {{- form(form) -}}
+{% endblock %}

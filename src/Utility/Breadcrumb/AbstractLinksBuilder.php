@@ -23,6 +23,7 @@ abstract class AbstractLinksBuilder
         array                             $routeParameters = [],
         ?string                           $translationKey = null,
         array                             $translationParameters = [],
+        ?string                           $translationDomain = null,
         null|string|TranslatableInterface $text = null,
         ?string                           $hash = null,
     ): void
@@ -36,7 +37,7 @@ abstract class AbstractLinksBuilder
         }
 
         $this->links[$set][$key] = [
-            'text' => $text ?? $this->translator->trans($translationKey, $translationParameters),
+            'text' => $text ?? $this->translator->trans($translationKey, $translationParameters, $translationDomain),
             'href' => $this->router->generate($routeName, $routeParameters) . ($hash ? "#$hash" : ""),
         ];
     }

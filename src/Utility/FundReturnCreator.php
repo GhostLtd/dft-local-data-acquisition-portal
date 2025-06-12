@@ -15,11 +15,18 @@ class FundReturnCreator
         protected LoggerInterface        $logger,
     ) {}
 
+    public function getLatestFinancialQuarterToCreate(): FinancialQuarter
+    {
+        // This is the amount of time in advance we create new surveys
+        $cutoffDate = (new \DateTime('midnight today'))->modify('+3 weeks');
+
+        return FinancialQuarter::createFromDate($cutoffDate)
+            ->getPreviousQuarter();
+    }
+
     public function createRequiredFundReturns(): void
     {
-        $nextQuarter = FinancialQuarter::createFromDate(new \DateTime())
-            ->getPreviousQuarter();
-
+        $nextQuarter = $this->getLatestFinancialQuarterToCreate();
         $this->createFundReturnsForFinancialQuarter($nextQuarter);
     }
 
@@ -46,6 +53,12 @@ class FundReturnCreator
                 ->getQuery()
                 ->getOneOrNullResult();
 
+            $returnName = "{$authority->getName()} {$financialQuarter->initialYear}Q{$financialQuarter->quarter}";
+            if ($previousReturn && $previousReturn->getState() !== FundReturn::STATE_SUBMITTED) {
+                $this->logger->error("Unable to create return for {$returnName}: Previous return is not in the submitted state");
+                continue;
+            }
+
             if (!$previousReturn) {
                 $returnsForAward = $fundReturnRepository
                     ->createQueryBuilder('r')
@@ -55,20 +68,22 @@ class FundReturnCreator
                     ->execute();
 
                 if (count($returnsForAward) > 0) {
-                    throw new \RuntimeException("Previous return not found for {$authority->getName()}, despite other returns existing (Searched for {$previousQuarter->initialYear}Q{$previousQuarter->quarter})");
+                    $this->logger->error("Unable to create return for {$returnName}: Previous return not found, despite other returns existing (Searched for {$previousQuarter->initialYear}Q{$previousQuarter->quarter})");
+                    continue;
                 }
 
                 $fundReturnClass = $award->getType()->getFundReturnClass();
 
-                $this->logger->info("Created initial return for {$authority->getName()} {$financialQuarter->initialYear}Q{$financialQuarter->quarter}");
+                $message = "Created initial return for {$returnName}";
                 $newReturn = $fundReturnClass::createInitialFundReturnStartingAt($financialQuarter, $award);
             } else {
-                $this->logger->info("Created return for {$authority->getName()} {$financialQuarter->initialYear}Q{$financialQuarter->quarter}");
+                $message = "Created return for {$returnName}";
                 $newReturn = $previousReturn->createFundReturnForNextQuarter();
             }
 
             $this->entityManager->persist($newReturn);
             $this->entityManager->flush();
+            $this->logger->info($message);
         }
     }
 

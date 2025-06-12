@@ -38,15 +38,14 @@ class ViewController extends AbstractController
         $fund = $fundReturn->getFund();
 
         $expensesTableHelper = $expensesTableHelper
-            ->setRowGroupConfigurations(CrstsHelper::getSchemeExpenseRowsConfiguration())
-            ->setFund($fundReturn->getFund());
+            ->setConfiguration(CrstsHelper::getSchemeExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter()));
 
         return $this->render($request->attributes->get('template', 'frontend/scheme_return/view.html.twig'), [
             'linksBuilder' => $linksBuilder,
-            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
             'expensesTableHelper' => $expensesTableHelper,
             'expensesTableCalculator' => $expensesTableCalculator,
             'fundReturn' => $fundReturn,
+            'returnYearDivisionKey' => CrstsHelper::getDivisionConfigurationKey($fundReturn->getYear()),
             'schemeReturn' => $schemeReturn,
             'schemeLevelSectionsConfiguration' => SchemeLevelSection::getConfigurationForFund($fund),
         ]);

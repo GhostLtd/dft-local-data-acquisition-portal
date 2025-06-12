@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ViewController extends AbstractController
 {
     public function __construct(
-        protected SchemeRepository      $schemeRepository,
+        protected SchemeRepository $schemeRepository,
     ) {}
 
     #[Route('/fund-return/{fundReturnId}', name: 'app_fund_return')]
@@ -50,17 +50,21 @@ class ViewController extends AbstractController
             return new RedirectResponse($schemeListPage->getClearUrl());
         }
 
-        $expensesTableHelper
-            ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
-            ->setFund($fundReturn->getFund());
+        $isInitialState = $fundReturn->getState() === FundReturn::STATE_INITIAL;
+
+        if ($isInitialState) {
+            $expensesTableHelper->setConfiguration(CrstsHelper::getFundBaselinesTable($fundReturn->getYear(), $fundReturn->getQuarter()));
+        } else {
+            $expensesTableHelper->setConfiguration(CrstsHelper::getFundExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter()));
+        }
 
         return $this->render($request->attributes->get('template', 'frontend/fund_return/view.html.twig'), [
             'linksBuilder' => $linksBuilder,
-            'expenseDivisions' => $fundReturn->getDivisionConfigurations(),
+            'expensesTableCalculator' => $expensesTableCalculator,
+            'expensesTableHelper' => $expensesTableHelper,
             'fundLevelSections' => FundLevelSection::filterForFund($fund),
             'fundReturn' => $fundReturn,
-            'expensesTableHelper' => $expensesTableHelper,
-            'expensesTableCalculator' => $expensesTableCalculator,
+            'returnYearDivisionKey' => CrstsHelper::getDivisionConfigurationKey($fundReturn->getYear()),
             'schemeFunds' => $schemeFunds,
             'schemeListPage' => $schemeListPage,
         ]);

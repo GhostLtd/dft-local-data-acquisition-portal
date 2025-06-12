@@ -77,7 +77,12 @@ class EditController extends AbstractReturnController
     {
         $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
         $this->denyAccessUnlessGranted(Role::CAN_EDIT_SCHEME_RETURN_EXPENSES, $schemeReturn);
-        $divisionConfiguration = $schemeReturn->findDivisionConfigurationByKey($divisionKey);
+
+        $tableHelper
+            ->setConfiguration(CrstsHelper::getSchemeExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter()))
+            ->setDivisionKey($divisionKey);
+
+        $divisionConfiguration = $tableHelper->getDivisionConfiguration();
 
         if (!$divisionConfiguration) {
             throw new NotFoundHttpException();
@@ -89,14 +94,9 @@ class EditController extends AbstractReturnController
             'schemeId' => $scheme->getId()
         ])."#expenses-{$divisionKey}";
 
-        $expensesTableHelper = $tableHelper
-            ->setDivisionConfiguration($divisionConfiguration)
-            ->setRowGroupConfigurations(CrstsHelper::getSchemeExpenseRowsConfiguration())
-            ->setFund($fundReturn->getFund());
-
         $form = $this->createForm(ExpensesType::class, $schemeReturn, [
             'cancel_url' => $cancelUrl,
-            'expenses_table_helper' => $expensesTableHelper,
+            'expenses_table_helper' => $tableHelper,
         ]);
 
         if ($response = $this->processForm($form, $request, $cancelUrl)) {
@@ -105,7 +105,7 @@ class EditController extends AbstractReturnController
 
         return $this->render('frontend/scheme_return/expenses_edit.html.twig', [
             'linksBuilder' => $linksBuilder,
-            'expensesTable' => $expensesTableHelper->getTable(),
+            'expensesTable' => $tableHelper->getTable(),
             'form' => $form,
         ]);
     }

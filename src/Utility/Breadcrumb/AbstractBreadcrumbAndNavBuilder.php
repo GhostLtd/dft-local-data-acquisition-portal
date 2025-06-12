@@ -12,6 +12,7 @@ abstract class AbstractBreadcrumbAndNavBuilder extends AbstractLinksBuilder
         array                             $routeParameters = [],
         ?string                           $translationKey = null,
         array                             $translationParameters = [],
+        ?string                           $translationDomain = null,
         null|string|TranslatableInterface $text = null,
         ?string                           $hash = null,
     ): void {
@@ -32,6 +33,7 @@ abstract class AbstractBreadcrumbAndNavBuilder extends AbstractLinksBuilder
         array                             $routeParameters = [],
         ?string                           $translationKey = null,
         array                             $translationParameters = [],
+        ?string                           $translationDomain = null,
         null|string|TranslatableInterface $text = null,
         ?string                           $hash = null,
     ): void {
@@ -60,6 +62,7 @@ abstract class AbstractBreadcrumbAndNavBuilder extends AbstractLinksBuilder
         array                             $routeParameters = [],
         ?string                           $translationKey = null,
         array                             $translationParameters = [],
+        ?string                           $translationDomain = null,
         null|string|TranslatableInterface $text = null,
         ?string                           $hash = null,
     ): void {

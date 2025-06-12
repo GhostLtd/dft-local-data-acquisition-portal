@@ -49,12 +49,14 @@ class ExpensesType extends AbstractType
             ]);
         }
 
-        $builder->add('comments', TextareaType::class, [
-            'label' => "forms.crsts.expenses.comments.label",
-            'label_attr' => ['class' => 'govuk-visually-hidden'],
-            'help' => "forms.crsts.expenses.comments.help",
-            'attr' => ['class' => 'govuk-!-margin-bottom-0'],
-        ]);
+        if ($options['comments_enabled']) {
+            $builder->add('comments', TextareaType::class, [
+                'label' => "forms.crsts.expenses.comments.label",
+                'label_attr' => ['class' => 'govuk-visually-hidden'],
+                'help' => "forms.crsts.expenses.comments.help",
+                'attr' => ['class' => 'govuk-!-margin-bottom-0'],
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -67,6 +69,8 @@ class ExpensesType extends AbstractType
                 'data-auto-commas' => '1',
                 'class' => 'expenses',
             ])
+            ->setDefault('comments_enabled', true)
+            ->setAllowedTypes('comments_enabled', ['boolean'])
             ->setDefault('validation_groups', ['expenses'])
             ->setDefault('data_class', ExpensesContainerInterface::class);
     }

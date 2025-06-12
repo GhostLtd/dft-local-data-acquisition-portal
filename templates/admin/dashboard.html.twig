@@ -11,15 +11,14 @@
 {%- trans_default_domain 'admin' -%}
 
 {%- block content -%}
-
     <div class="govuk-body">
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import taskList, tag -%}
         {%- from 'frontend/authority_macros.html.twig' import returnTag -%}
 
-        {%- for fundValue, returns in groupedReturns -%}
-            <h2 class="govuk-heading-m">{{ fundValue }}</h2>
+        {%- for fundValue, group in groupedReturns -%}
+            <h2 class="govuk-heading-m" id="latest-{{ fundValue }}">{{ fundValue }}</h2>
             {{- taskList({
-                items: returns
+                items: group.returns
                 | filter(fundReturn => is_granted('CAN_VIEW', fundReturn))
                 | map(fundReturn => {
                     title: {
@@ -30,12 +29,17 @@
                     href: path(viewRoute ?? 'admin_fund_return', {fundReturnId: fundReturn.id}),
                     status: {
                         tag: {
-                            text: "tags.#{returnTag(fundReturn)}.name" | trans({}, 'messages'),
-                            classes: "govuk-tag--" ~ ("tags.#{returnTag(fundReturn)}.colour" | trans({}, 'messages')),
+                            text: "tags.#{fundReturn.state}.name" | trans({}, 'messages'),
+                            classes: "govuk-tag--" ~ ("tags.#{fundReturn.state}.colour" | trans({}, 'messages')),
                         }
                     },
                 })
             }) -}}
+            {%- if is_granted('CAN_RELEASE_RETURNS', group.fund) -%}
+                <p class="govuk-body">
+                    <a class="govuk-button" href="{{ path('admin_fund_release_returns', {fund: group.fund.value}) }}">{{ 'pages.dashboard.release_returns' | trans({fundName: group.fund.name}) }}</a>
+                </p>
+            {%- endif -%}
         {%- else -%}
             <p class="govuk-body">{{ 'pages.dashboard.no_returns' | trans }}</p>
         {%- endfor -%}

@@ -26,6 +26,8 @@ const frontendFlow = async function(page, baseUrl, outputDir, frontendUrl) {
     await schemeManagementFlow(page, frontendUrl, screenshot)
 
     // await clickLinkContainingText(page, 'Logout')
+
+    await executeCommand(`screenshotsTeardown()`)
 }
 
 module.exports.run = async function (argv) {

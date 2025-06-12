@@ -66,10 +66,10 @@
     }, contents) }}
 {%- endmacro -%}
 
-{% macro displaySectionsAsTabs(items, heading, selectedIndex) %}
+{% macro displaySectionsAsTabs(items, heading, selectedIndex, containerClass = 'govuk-!-margin-bottom-9') %}
     {%- if items is not empty -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tabs -%}
-        <div class="govuk-!-margin-bottom-9">
+        <div class="{{ containerClass }}">
             <h2 class="govuk-heading-m">{{ heading }}</h2>
             {{- tabs({items, selectedIndex: selectedIndex ?? false}) -}}
         </div>

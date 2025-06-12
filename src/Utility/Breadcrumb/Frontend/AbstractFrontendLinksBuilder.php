@@ -23,11 +23,11 @@ class AbstractFrontendLinksBuilder extends AbstractBreadcrumbAndNavBuilder
         parent::__construct($router, $translator);
     }
 
-    protected function setNavLinks(Authority $authority): void
+    protected function setNavLinks(?Authority $authority): void
     {
         $user = $this->security->getUser();
 
-        if (!$user instanceof User) {
+        if (!$user instanceof User || $authority === null) {
             return;
         }
 
