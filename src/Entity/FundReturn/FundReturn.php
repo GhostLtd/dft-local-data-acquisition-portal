@@ -25,6 +25,10 @@ use Doctrine\ORM\Mapping as ORM;
 ])]
 abstract class FundReturn implements PropertyChangeLoggableInterface
 {
+    public const string STATE_INITIAL = 'initial';
+    public const string STATE_OPEN = 'open';
+    public const string STATE_SUBMITTED = 'submitted';
+
     use IdTrait;
 
     #[ORM\Column]
@@ -32,6 +36,9 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $quarter = null;
+
+    #[ORM\Column(length: 10)]
+    private string $state;
 
     #[ORM\ManyToOne(inversedBy: 'returns')]
     #[ORM\JoinColumn(nullable: false)]
@@ -59,6 +66,18 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
     public function __construct()
     {
         $this->schemeReturns = new ArrayCollection();
+        $this->state = self::STATE_INITIAL;
+    }
+
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    public function setState(string $state): static
+    {
+        $this->state = $state;
+        return $this;
     }
 
     public function signoff(User $user): static

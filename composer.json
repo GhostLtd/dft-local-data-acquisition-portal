@@ -35,6 +35,7 @@
         "symfony/twig-bundle": "6.4.*",
         "symfony/validator": "6.4.*",
         "symfony/webpack-encore-bundle": "^2.1",
+        "symfony/workflow": "6.4.*",
         "symfony/yaml": "6.4.*",
         "twig/intl-extra": "^3.13"
     },
