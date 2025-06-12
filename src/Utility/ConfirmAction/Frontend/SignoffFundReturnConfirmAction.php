@@ -9,6 +9,7 @@ use Ghost\GovUkCoreBundle\Utility\ConfirmAction\AbstractConfirmAction;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 
 class SignoffFundReturnConfirmAction extends AbstractConfirmAction
@@ -20,7 +21,8 @@ class SignoffFundReturnConfirmAction extends AbstractConfirmAction
         FormFactoryInterface             $formFactory,
         RequestStack                     $requestStack,
         protected EntityManagerInterface $entityManager,
-        protected Security               $security
+        protected Security               $security,
+        protected WorkflowInterface      $returnStateStateMachine,
     ) {
         parent::__construct($formFactory, $requestStack);
     }
@@ -55,9 +57,7 @@ class SignoffFundReturnConfirmAction extends AbstractConfirmAction
     #[\Override]
     public function doConfirmedAction($formData): void
     {
-        /** @var User $user */
-        $user = $this->security->getUser();
-        $this->subject->signoff($user);
+        $this->returnStateStateMachine->apply($this->subject, FundReturn::TRANSITION_SUBMIT_RETURN);
         $this->entityManager->flush();
     }
 }

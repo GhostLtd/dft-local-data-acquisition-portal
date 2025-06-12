@@ -16,14 +16,9 @@
                 },
                 href: path(viewRoute ?? 'app_fund_return', {fundReturnId: fundReturn.id}),
                 status: {tag: {
-                    text: "tags.#{_self.returnTag(fundReturn)}.name" | trans,
-                    classes: "govuk-tag--" ~ ("tags.#{_self.returnTag(fundReturn)}.colour" | trans),
+                    text: "tags.#{fundReturn.state}.name" | trans,
+                    classes: "govuk-tag--" ~ ("tags.#{fundReturn.state}.colour" | trans),
                 }},
             })
     }) -}}
-{%- endmacro -%}
-
-{%- macro returnTag(fundReturn) -%}
-    {# @var \App\Entity\FundReturn\FundReturn fundReturn #}
-    {{- fundReturn.signedOff ? 'completed' : 'in_progress' -}}
 {%- endmacro -%}

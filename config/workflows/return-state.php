@@ -11,7 +11,7 @@ return static function (FrameworkConfig $config): void {
     $returnState
         ->type('state_machine')
         ->supports([FundReturn::class])
-        ->initialMarking([FundReturn::STATE_INITIAL]);
+        ->initialMarking(FundReturn::STATE_INITIAL);
 
     $returnState->auditTrail()->enabled(true);
     $returnState->markingStore()
@@ -23,17 +23,17 @@ return static function (FrameworkConfig $config): void {
     $returnState->place()->name(FundReturn::STATE_SUBMITTED);
 
     $returnState->transition()
-        ->name('open_return')
+        ->name(FundReturn::TRANSITION_OPEN_RETURN)
         ->from(FundReturn::STATE_INITIAL)
         ->to(FundReturn::STATE_OPEN);
 
     $returnState->transition()
-        ->name('submit_return')
+        ->name(FundReturn::TRANSITION_SUBMIT_RETURN)
         ->from(FundReturn::STATE_OPEN)
         ->to(FundReturn::STATE_SUBMITTED);
 
     $returnState->transition()
-        ->name('reopen_return')
+        ->name(FundReturn::TRANSITION_REOPEN_RETURN)
         ->from(FundReturn::STATE_SUBMITTED)
         ->to(FundReturn::STATE_OPEN);
 };

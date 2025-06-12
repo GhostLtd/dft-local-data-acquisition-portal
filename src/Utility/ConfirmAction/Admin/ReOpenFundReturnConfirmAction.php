@@ -8,6 +8,7 @@ use Ghost\GovUkCoreBundle\Utility\ConfirmAction\AbstractConfirmAction;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 class ReOpenFundReturnConfirmAction extends AbstractConfirmAction
 {
@@ -18,7 +19,8 @@ class ReOpenFundReturnConfirmAction extends AbstractConfirmAction
         FormFactoryInterface             $formFactory,
         RequestStack                     $requestStack,
         protected EntityManagerInterface $entityManager,
-        protected Security               $security
+        protected Security               $security,
+        protected WorkflowInterface      $returnStateStateMachine,
     ) {
         parent::__construct($formFactory, $requestStack);
     }
@@ -53,7 +55,7 @@ class ReOpenFundReturnConfirmAction extends AbstractConfirmAction
     #[\Override]
     public function doConfirmedAction($formData): void
     {
-        $this->subject->reOpen();
+        $this->returnStateStateMachine->apply($this->subject, FundReturn::TRANSITION_REOPEN_RETURN);
         $this->entityManager->flush();
     }
 }

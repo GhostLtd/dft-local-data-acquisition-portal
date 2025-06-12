@@ -595,15 +595,12 @@ sections:
 site.title: Data acquisition portal
 
 tags:
-  completed:
-    name: Completed
-    colour: green
-  in_progress:
+  initial:
+    name: Preparing
+    colour: blue
+  open:
     name: In progress
     colour: yellow
-  not_started:
-    name: Not started
-    colour: blue
-  not_required:
-    name: Not required
-    colour: grey
+  submitted:
+    name: Completed
+    colour: green

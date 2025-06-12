@@ -29,6 +29,10 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
     public const string STATE_OPEN = 'open';
     public const string STATE_SUBMITTED = 'submitted';
 
+    public const string TRANSITION_OPEN_RETURN = 'open_return';
+    public const string TRANSITION_REOPEN_RETURN = 'reopen_return';
+    public const string TRANSITION_SUBMIT_RETURN = 'submit_return';
+
     use IdTrait;
 
     #[ORM\Column]
@@ -247,7 +251,7 @@ abstract class FundReturn implements PropertyChangeLoggableInterface
 
     public function isSignedOff(): bool
     {
-        return null !== $this->signoffDate;
+        return $this->state === self::STATE_SUBMITTED;
     }
 
     public function getFinancialQuarter(): FinancialQuarter
