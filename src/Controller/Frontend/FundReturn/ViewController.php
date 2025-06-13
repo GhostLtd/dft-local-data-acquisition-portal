@@ -50,9 +50,14 @@ class ViewController extends AbstractController
             return new RedirectResponse($schemeListPage->getClearUrl());
         }
 
-        $expensesTableHelper
-            ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
-            ->setFund($fundReturn->getFund());
+        $isInitialState = $fundReturn->getState() === FundReturn::STATE_INITIAL;
+        $expensesTableHelper->setFund($fundReturn->getFund());
+
+        if ($isInitialState) {
+            $expensesTableHelper->setRowGroupConfigurations(CrstsHelper::getFundBaselineRowsConfiguration());
+        } else {
+            $expensesTableHelper->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration());
+        }
 
         return $this->render($request->attributes->get('template', 'frontend/fund_return/view.html.twig'), [
             'linksBuilder' => $linksBuilder,

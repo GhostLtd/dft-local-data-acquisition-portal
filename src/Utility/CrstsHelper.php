@@ -27,6 +27,18 @@ class CrstsHelper
         ];
     }
 
+    public static function getFundBaselineRowsConfiguration(): array
+    {
+        return [
+            new CategoryConfiguration(ExpenseCategory::BASELINES,
+            [
+                ExpenseType::FUND_CAPITAL_EXPENDITURE_BASELINE,
+                ExpenseType::FUND_CAPITAL_EXPENDITURE_WITH_OVER_PROGRAMMING_BASELINE,
+                ExpenseType::FUND_CAPITAL_LOCAL_CONTRIBUTION_BASELINE,
+            ]),
+        ];
+    }
+
     /**
      * @return array<int, RowGroupInterface>
      */

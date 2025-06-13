@@ -8,4 +8,6 @@ enum ExpenseCategory: string
     case LOCAL_CAPITAL_CONTRIBUTIONS = 'local_capital_contributions';
     case OTHER_CAPTIAL_CONTRIBUTIONS = 'other_capital_contributions';
     case FUND_RESOURCE = 'fund_resource';
+
+    case BASELINES = 'baselines';
 }

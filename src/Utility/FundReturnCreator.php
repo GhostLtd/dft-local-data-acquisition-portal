@@ -15,14 +15,18 @@ class FundReturnCreator
         protected LoggerInterface        $logger,
     ) {}
 
-    public function createRequiredFundReturns(): void
+    public function getLatestFinancialQuarterToCreate(): FinancialQuarter
     {
         // This is the amount of time in advance we create new surveys
         $cutoffDate = (new \DateTime('midnight today'))->modify('+3 weeks');
 
-        $nextQuarter = FinancialQuarter::createFromDate($cutoffDate)
+        return FinancialQuarter::createFromDate($cutoffDate)
             ->getPreviousQuarter();
+    }
 
+    public function createRequiredFundReturns(): void
+    {
+        $nextQuarter = $this->getLatestFinancialQuarterToCreate();
         $this->createFundReturnsForFinancialQuarter($nextQuarter);
     }
 
