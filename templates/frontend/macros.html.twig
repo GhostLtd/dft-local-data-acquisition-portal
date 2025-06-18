@@ -116,7 +116,7 @@
 
 {% macro onTrackRatingValue(ratingEnum) %}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import tag -%}
-    {{- ratingEnum is null ? '-' : tag({text: "enum.on_track_rating.#{ratingEnum.value}" | trans, classes: ratingEnum.tagClass}) -}}
+    {{- ratingEnum is null ? '-' : tag({text: "enum.on_track_rating_shortened.#{ratingEnum.value}" | trans, classes: ratingEnum.tagClass}) -}}
 {% endmacro %}
 
 {%- macro ratingTagValue(ratingEnum) -%}

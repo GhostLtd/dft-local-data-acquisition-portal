@@ -97,7 +97,7 @@ enum:
     green: Green
     amber: Amber
     red: Red
-    scheme_cancelled: Scheme cancelled
+    scheme_cancelled: Scheme cancelled / on hold
     scheme_completed: Scheme completed
     scheme_merged: Scheme merged
     scheme_split: Scheme split
@@ -105,7 +105,7 @@ enum:
     green: Green
     amber: Amber
     red: Red
-    scheme_cancelled: Cancelled
+    scheme_cancelled: Cancelled / on hold
     scheme_completed: Completed
     scheme_merged: Merged
     scheme_split: Split
