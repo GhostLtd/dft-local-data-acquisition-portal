@@ -25,4 +25,14 @@ enum OnTrackRating: string
             self::SCHEME_SPLIT => 'blue',
         };
     }
+
+    public function shouldBePropagatedToFutureReturns(): bool
+    {
+        return in_array($this, [
+            OnTrackRating::SCHEME_CANCELLED,
+            OnTrackRating::SCHEME_COMPLETED,
+            OnTrackRating::SCHEME_MERGED,
+            OnTrackRating::SCHEME_SPLIT,
+        ]);
+    }
 }

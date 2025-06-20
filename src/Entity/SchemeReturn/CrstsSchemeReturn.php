@@ -270,17 +270,16 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
             ->setBusinessCase($this->getBusinessCase())
             ->setExpectedBusinessCaseApproval($this->getExpectedBusinessCaseApproval())
-            ->setOnTrackRating($this->getOnTrackRating())
             ->setTotalCost($this->getTotalCost())
             ->setAgreedFunding($this->getAgreedFunding())
         ;
 
-        if (in_array($this->onTrackRating, [
-            OnTrackRating::SCHEME_CANCELLED,
-            OnTrackRating::SCHEME_COMPLETED,
-        ])) {
-            // Normally we don't want to copy the textual progress update, but if the scheme's won't receive further
-            // updates, then do
+        if ($this->getOnTrackRating()->shouldBePropagatedToFutureReturns()) {
+            // Only copy ratings like cancelled/completed/merged/split
+            $nextSchemeReturn->setOnTrackRating($this->getOnTrackRating());
+
+            // Normally we wouldn't want to copy the textual progress update, but if the
+            // scheme won't receive further updates, then we should
             $nextSchemeReturn->setProgressUpdate($this->getProgressUpdate());
         }
 
