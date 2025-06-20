@@ -31,6 +31,8 @@ common:
     no_results: No results
     tbc: To be confirmed
     yes: Yes
+  title:
+    information: Information
 
 enum:
   active_travel_element:
@@ -538,6 +540,7 @@ frontend:
       expenses_not_required: >-
         Not editable: non-retained schemes need only submit expense data in Q4 returns
       mark_as_ready_for_signoff: Mark scheme as ready for sign-off
+      non_editable: "This scheme is not editable as it was marked as %tag% in the {year}/{nextYear} Q{quarter} return"
       on_track_rating: *sr_on_track_rating
       previously_tcf: Previously a scheme in TCF?
       progress_update: *sr_progress_update

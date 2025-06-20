@@ -7,6 +7,7 @@ use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
+use App\Repository\SchemeReturn\SchemeReturnRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
@@ -28,6 +29,7 @@ class ViewController extends AbstractController
         DashboardLinksBuilder   $linksBuilder,
         ExpensesTableHelper     $expensesTableHelper,
         ExpensesTableCalculator $expensesTableCalculator,
+        SchemeReturnRepository  $schemeReturnRepository,
     ): Response
     {
         $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
@@ -41,10 +43,11 @@ class ViewController extends AbstractController
             ->setConfiguration(CrstsHelper::getSchemeExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter()));
 
         return $this->render($request->attributes->get('template', 'frontend/scheme_return/view.html.twig'), [
-            'linksBuilder' => $linksBuilder,
             'expensesTableHelper' => $expensesTableHelper,
             'expensesTableCalculator' => $expensesTableCalculator,
             'fundReturn' => $fundReturn,
+            'linksBuilder' => $linksBuilder,
+            'nonEditablePoint' => $schemeReturnRepository->cachedFindPointWhereReturnBecameNonEditable($schemeReturn),
             'returnYearDivisionKey' => CrstsHelper::getDivisionConfigurationKey($fundReturn->getYear()),
             'schemeReturn' => $schemeReturn,
             'schemeLevelSectionsConfiguration' => SchemeLevelSection::getConfigurationForFund($fund),

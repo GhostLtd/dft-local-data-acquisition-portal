@@ -5,7 +5,7 @@
 
 {%- block content -%}
     {%- block viewSchemeReturn -%}
-        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList, summaryCard -%}
+        {%- from "@GhostGovUkFrontend/components/macros.html.twig" import notificationBanner, summaryList, summaryCard -%}
         {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue, moneyValue, bcrValue, onTrackRatingValue, dateValue, enumTextValue, displayCardForReturn, displaySectionsAsTabs, expenseDivisionComments -%}
 
         {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
@@ -13,6 +13,20 @@
         {# @var schemeReturn \App\Entity\SchemeReturn\CrstsSchemeReturn #}
 
         <div class="govuk-!-margin-bottom-9">
+
+            {%- if schemeReturn.fundReturn.state == 'open' and nonEditablePoint -%}
+                {%- set nonEditableFundReturn = nonEditablePoint.fundReturn -%}
+                {{ notificationBanner({
+                    content: 'frontend.pages.scheme_return.non_editable'
+                        | trans({
+                            year: nonEditableFundReturn.year,
+                            nextYear: (nonEditableFundReturn.year + 1) | slice(-2),
+                            quarter: nonEditableFundReturn.quarter,
+                        }) | replace({'%tag%': onTrackRatingValue(nonEditablePoint.onTrackRating)}),
+                    title: 'common.title.information',
+                    options: {html_content: true}
+                }) }}
+            {%- endif -%}
 
             {# @var \App\Entity\Scheme scheme #}
             {%- set scheme = schemeReturn.scheme -%}

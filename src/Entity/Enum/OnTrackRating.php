@@ -35,4 +35,25 @@ enum OnTrackRating: string
             OnTrackRating::SCHEME_SPLIT,
         ]);
     }
+
+    public function shouldSchemeBeEditableInTheFuture(): bool
+    {
+        // If this state is set in one return, should the next return be editable?
+        // e.g. If a scheme completed in Q3 2024 then it should not be editable in Q4 2024
+        return !in_array($this, self::getFutureNonEditableStates());
+    }
+
+    /**
+     * @return array<int, OnTrackRating>
+     */
+    public static function getFutureNonEditableStates(): array
+    {
+        // N.B. "scheme_cancelled" is not on the list because this state translates as being "Cancelled / on hold"
+        //      As such, such a scheme could be put back into active development in the future
+        return [
+            OnTrackRating::SCHEME_COMPLETED,
+            OnTrackRating::SCHEME_MERGED,
+            OnTrackRating::SCHEME_SPLIT,
+        ];
+    }
 }
