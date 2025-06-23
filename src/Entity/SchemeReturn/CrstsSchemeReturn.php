@@ -21,9 +21,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\LessThanOrEqual;
+use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -55,8 +55,8 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null', groups: ["milestone_business_case_date"])]
-    #[GreaterThan(value: 'now', message: 'crsts_scheme_return.expected_business_case_approval.future', groups: ["milestone_business_case_date_future"])]
-    #[LessThanOrEqual(value: 'now', message: 'crsts_scheme_return.expected_business_case_approval.past', groups: ["milestone_business_case_date_past"])]
+    #[GreaterThanOrEqual(propertyPath: 'startOfNextQuarter', message: 'crsts_scheme_return.expected_business_case_approval.future', groups: ["milestone_business_case_date_future"])]
+    #[LessThan(propertyPath: 'startOfNextQuarter', message: 'crsts_scheme_return.expected_business_case_approval.end_of_quarter', groups: ["milestone_business_case_date_past"])]
     private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, length: AbstractMySQLPlatform::LENGTH_LIMIT_TEXT, nullable: true)]
@@ -77,6 +77,11 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
      */
     #[ORM\ManyToMany(targetEntity: Milestone::class, cascade: ['persist'])]
     private Collection $milestones;
+
+    public function startOfNextQuarter(): \DateTime
+    {
+        return $this->getFundReturn()->getFinancialQuarter()->getNextQuarter()->getStartDate();
+    }
 
     #[Callback(groups: ['milestone_business_case'])]
     public function validateExpectedBusinessCaseApproval(ExecutionContextInterface $context): void

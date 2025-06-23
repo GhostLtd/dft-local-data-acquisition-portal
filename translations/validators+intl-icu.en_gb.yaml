@@ -58,9 +58,9 @@ crsts_scheme_return:
   business_case:
     not_null: Choose the current business case
   expected_business_case_approval:
-    future: Enter a date in the future
+    future: Enter a date after the end of the quarter
     not_null: Enter the expected business case approval date
-    past: Enter a date in the past
+    end_of_quarter: Enter a date no later than the end of the quarter
 
 milestone:
   date:
