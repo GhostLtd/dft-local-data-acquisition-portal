@@ -1,0 +1,36 @@
+{% extends 'frontend/base.html.twig' %}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('fund_return_signoff_issues') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{% block content %}
+    {% from 'frontend/fund_return/view.html.twig' import overallProgressContent %}
+    {% from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner, summaryCard, summaryList, table %}
+
+    {%- if signoffEligibilityStatus.isEligible -%}
+        <p class="govuk-body">
+            There are no problems preventing signoff.
+        </p>
+    {%- else -%}
+        <p class="govuk-body">
+            The following issues must be resolved before signoff is possible:
+        </p>
+        {%- for type, problems in signoffEligibilityStatus.getProblemsByType() -%}
+            {%- set content -%}
+                {{- table({
+                    rows: problems | map(p => [
+                        {text: p.message | trans(p.messageParameters, p.messageDomain)},
+                        {html: "<a class=\"govuk-link\" href=\"#{p.url}\">View</a>", classes: 'links'},
+                    ]) | sort((a,b) => (a[0].text <=> b[0].text)),
+                    classes: 'signoff-eligibility-status-problems',
+                }) }}
+            {%- endset -%}
+            {{- summaryCard({
+                title: {text: "enum.eligibility_problem_type.#{type}" | trans}
+            }, content) -}}
+        {%- endfor -%}
+        <p class="govuk-body">
+            <a href="{{ path(viewFundReturnRoute, {fundReturnId: fundReturn.id}) }}">Back to fund return</a>
+        </p>
+    {%- endif -%}
+{% endblock %}

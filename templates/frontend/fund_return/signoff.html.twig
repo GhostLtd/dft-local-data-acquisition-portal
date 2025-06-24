@@ -5,7 +5,7 @@
 
 {% block content %}
     {% from 'frontend/fund_return/view.html.twig' import overallProgressContent %}
-    {% from '@GhostGovUkFrontend/components/macros.html.twig' import summaryCard %}
+    {% from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner, summaryCard, summaryList, table %}
 
     {{- summaryCard({
         title: {text: 'frontend.pages.fund_return.titles.overall_progress' | trans},
@@ -15,6 +15,4 @@
     <p class="govuk-body">This will sign off the return and submit it to DfT. Once signed off, you will no longer be able to edit it. Are you sure you wish to proceed?</p>
 
     {{- form(form) -}}
-
 {% endblock %}
-

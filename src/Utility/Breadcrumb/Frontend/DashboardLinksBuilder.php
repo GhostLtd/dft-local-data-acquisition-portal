@@ -46,7 +46,17 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
             'app_fund_return_signoff',
             routeParameters: ['fundReturnId' => $fundReturn->getId()],
             translationKey: 'frontend.pages.fund_return_signoff.title',
-            translationParameters: $this->getFundReturnTranslationKeys($fundReturn),
+        );
+    }
+
+    public function setAtViewIssuesPreventingSignoff(FundReturn $fundReturn): void
+    {
+        $this->setAtFundReturn($fundReturn);
+        $this->addBreadcrumb(
+            'fund_return_signoff_issues',
+            'app_fund_return_signoff_issues',
+            routeParameters: ['fundReturnId' => $fundReturn->getId()],
+            translationKey: 'frontend.pages.signoff_issues.breadcrumb',
         );
     }
 

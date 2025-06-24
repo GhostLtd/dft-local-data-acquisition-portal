@@ -62,6 +62,9 @@ crsts_scheme_return:
     not_null: Enter the expected business case approval date
     end_of_quarter: Enter a date no later than the end of the quarter
 
+expenses:
+  forecast_required: Forecast values must be entered
+
 milestone:
   date:
     not_null: >-

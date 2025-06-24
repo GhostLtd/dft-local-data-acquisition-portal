@@ -5,6 +5,8 @@
 {%- set current_menu = 'authority' -%}
 
 {%- block content -%}
-    {% set schemeViewRoute = 'admin_scheme_return' %}
-    {{- block ('viewFundReturn', 'frontend/fund_return/view.html.twig') -}}
+    {%- set schemeViewRoute = 'admin_scheme_return' -%}
+    {%- set signoffIssuesRoute = 'admin_fund_return_signoff_issues' -%}
+
+    {{- block ('content', 'base/fund_return/view.html.twig') -}}
 {%- endblock -%}

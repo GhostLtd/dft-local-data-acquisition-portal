@@ -26,12 +26,28 @@ class DivisionConfiguration
         return $this->key;
     }
 
+    public function deriveYearFromKey(): int
+    {
+        return intval($this->key);
+    }
+
     /**
      * @return array<int, ColumnConfiguration>
      */
     public function getColumnConfigurations(): array
     {
         return $this->columnConfigurations;
+    }
+
+    public function getColumnConfigurationByKey(string $key): ?ColumnConfiguration
+    {
+        foreach($this->columnConfigurations as $columnConfiguration) {
+            if ($columnConfiguration->getKey() === $key) {
+                return $columnConfiguration;
+            }
+        }
+
+        return null;
     }
 
     public function shouldHaveTotal(): bool

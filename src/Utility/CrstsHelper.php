@@ -15,7 +15,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 class CrstsHelper
 {
-    public static function getFundExpensesTable(int $returnYear, int $returnQuarter): TableConfiguration
+    public static function getFundExpensesTable(int $returnYear, int $returnQuarter, bool $hideForecastAndActual=false): TableConfiguration
     {
         $rowsConfiguration = [
             new CategoryConfiguration(
@@ -63,7 +63,7 @@ class CrstsHelper
 
         return new TableConfiguration(
             $rowsConfiguration,
-            self::getExpenseDivisionConfigurations($returnYear, $returnQuarter),
+            self::getExpenseDivisionConfigurations($returnYear, $returnQuarter, hideForecastAndActual: $hideForecastAndActual),
             self::getExtraTranslationParameters(),
         );
     }
@@ -146,7 +146,7 @@ class CrstsHelper
         // This is a forecast and only added in Q4
         $nextYear = substr(strval($endYear + 1), 2);
         $label = $hideForecastAndActual ?
-            new TranslatableMessage('forms.crsts.expenses.just_units') :
+            new TranslatableMessage('forms.crsts.expenses.forecast_only') :
             new TranslatableMessage('forms.crsts.expenses.forecast');
 
         $divisionConfiguration[] = new DivisionConfiguration(

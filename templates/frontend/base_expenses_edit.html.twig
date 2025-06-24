@@ -2,6 +2,38 @@
 
 {%- set page_heading_class = 'govuk-heading-m' -%}
 
+{#- Overriding the theme and error summary allow us to deduplicate the forecast_required errors -#}
+{%- form_theme form "frontend/expenses_theme.html.twig" -%}
+
+{%- block originalBeforeContent -%}
+    {%- from '@GhostGovUkFrontend/components/macros.html.twig' import errorSummary, flashNotificationBanners -%}
+
+    {{- flashNotificationBanners() -}}
+
+    {%- set erroringForms = _context | filter(item => not (item.vars.errors.form.getErrors(true) ?? []) is empty) -%}
+    {%- set expenseErrorText = 'expenses.forecast_required' | trans({}, 'validators') %}
+
+    {%- if erroringForms is not empty -%}
+        {%- set errorList = [] -%}
+        {%- set expenseRequiredErrorFound = false -%}
+        {%- for error in erroringForms | form_views_to_errors %}
+            {%- if error.text == expenseErrorText -%}
+                {%- if not expenseRequiredErrorFound -%}
+                    {%- set errorList = errorList | merge([error]) %}
+                {%- endif -%}
+                {%- set expenseRequiredErrorFound = true -%}
+            {%- else -%}
+                {%- set errorList = errorList | merge([error]) %}
+            {%- endif -%}
+        {%- endfor -%}
+        {{- errorSummary({
+            titleText: 'error-summary.problem' | trans,
+            errorList: errorList,
+            disableAutoFocus: true,
+        }) -}}
+    {%- endif -%}
+{%- endblock -%}
+
 {%- block content -%}
     {%- from "frontend/macros.html.twig" import renderTable -%}
     {% from "@GhostGovUkFrontend/components/macros.html.twig" import details %}

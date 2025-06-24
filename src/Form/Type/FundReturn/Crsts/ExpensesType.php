@@ -11,6 +11,7 @@ use Ghost\GovUkFrontendBundle\Form\Type\TextareaType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ExpensesType extends AbstractType
 {
@@ -41,11 +42,17 @@ class ExpensesType extends AbstractType
                 'data-total-sum-entire-row' => $cell->getAttribute('is_row_total') ? '1' : null,
             ], fn(mixed $value): bool => $value !== null);
 
+            $isForecast = $cell->getAttribute('is_forecast');
+            $isDisabled = $cellOptions['disabled'] ?? null;
+
             $builder->add($cellOptions['key'], InputType::class, [
                 'label' => $cellOptions['text'],
-                'disabled' => $cellOptions['disabled'] ?? null,
+                'disabled' => $isDisabled,
                 'label_attr' => ['class' => 'govuk-visually-hidden'],
                 'attr' => $attributes,
+                'constraints' => ($isForecast && !$isDisabled) ? [
+                    new NotBlank(message: 'expenses.forecast_required', groups: ['expenses'])
+                ] : [],
             ]);
         }
 

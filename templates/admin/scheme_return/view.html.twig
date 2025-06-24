@@ -5,7 +5,9 @@
 {%- set current_menu = 'authority' -%}
 
 {%- block content -%}
-    {{- block ('viewSchemeReturn', 'frontend/scheme_return/view.html.twig') -}}
+    {%- set signoffIssuesRoute = 'admin_fund_return_signoff_issues' -%}
+
+    {{- block ('content', 'base/scheme_return/view.html.twig') -}}
 
     <p class="govuk-body">
         <a href="{{ path('admin_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">

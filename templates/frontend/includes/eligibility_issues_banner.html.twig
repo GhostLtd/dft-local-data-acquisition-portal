@@ -1,0 +1,12 @@
+{%- from "@GhostGovUkFrontend/components/macros.html.twig" import notificationBanner -%}
+
+{%- if fundReturn.state == 'open' and not is_granted('CAN_RETURN_BE_SIGNED_OFF', fundReturn) -%}
+    {%- set content -%}
+        There are currently issues that will prevent sign-off of this return. <a class="govuk-link" href="{{ path(signoffIssuesRoute, {fundReturnId: fundReturn.id}) }}">View the issues</a>.
+    {%- endset -%}
+    {{ notificationBanner({
+        title: 'eligibility.notification.title',
+        content: content,
+        options: {html_content: true},
+    }) }}
+{%- endif -%}

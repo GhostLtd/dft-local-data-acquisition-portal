@@ -16,7 +16,8 @@ class Role
 
     // Return specific
     const string CAN_EDIT_BASELINES = 'CAN_EDIT_BASELINES';
-    const string CAN_SIGN_OFF_RETURN = 'CAN_SIGN_OFF_RETURN';
+    const string CAN_SIGN_OFF_RETURN = 'CAN_SIGN_OFF_RETURN'; // Is the user hypothetically allowed to perform this action?
+    const string CAN_RETURN_BE_SIGNED_OFF = 'CAN_RETURN_BE_SIGNED_OFF'; // Is the return valid for sign-off?
     const string CAN_REOPEN_RETURN = 'CAN_REOPEN_RETURN';
 
     // Scheme specific

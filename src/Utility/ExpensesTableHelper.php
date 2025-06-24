@@ -271,6 +271,14 @@ class ExpensesTableHelper
     }
 
     /**
+     * @return array<ExpenseType>
+     */
+    public function getNonBaselineExpenseTypes(): array
+    {
+        return array_filter($this->getExpenseTypes(), fn(ExpenseType $e) => !$e->isBaseline());
+    }
+
+    /**
      * @return array<int, ExpenseType>
      */
     public function getExpenseTypes(): array

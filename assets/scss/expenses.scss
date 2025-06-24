@@ -1,4 +1,17 @@
+.section-tabs .govuk-tabs__panel {
+  scroll-margin-top: 70px;
+}
+
 table.expenses {
+  input {
+    scroll-margin-top: 70px;
+  }
+
+  .govuk-form-group--error {
+    border-left: none;
+    padding-left: 0;
+  }
+
   .actual-or-forecast {
     display: block;
     font-weight: normal;

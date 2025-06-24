@@ -34,6 +34,17 @@ common:
   title:
     information: Information
 
+eligibility:
+  problem_types:
+    missing_forecast: Missing forecast value(s)
+    on_track_rating_empty: On-track rating must be filled out
+  fund_return:
+    missing_forecast: "{division}"
+  scheme_return:
+    name: "{schemeName}"
+  notification:
+    title: Information
+
 enum:
   active_travel_element:
     no_active_travel_elements: No active travel elements
@@ -62,6 +73,9 @@ enum:
   crsts_phase:
     crsts1: CRSTS1
     crsts2: CRSTS2
+  eligibility_problem_type:
+    missing_forecast: Missing forecast values in fund-level expenses
+    on_track_rating_empty: Missing on-track ratings at scheme level
   expense_category:
     baselines: Baselines
     fund_capital: "{fund} Capital"
@@ -251,7 +265,7 @@ forms:
       forecast: |-
         Forecast
         (£)
-      just_units: (£)
+      forecast_only: Forecast
       quarter:
         Q1: |-
           Q1 {actual_or_forecast} 
@@ -476,8 +490,11 @@ frontend:
       overall_confidence: Confidence rating
       overall_delivery_confidence: Delivery confidence
       overall_progress_summary: Progress summary
+      reopen_return: Re-open return
       resource_funding: *fr_resource_funding
       sign_off: Sign off
+      sign_off_and_submit: Signoff and submit return
+      sign_off_issues: View issues preventing sign-off
     fund_return_reopen:
       title: Re-open fund return
       warning: This will re-open the return and allow it to again be editable by the MCA. Are you sure you wish to proceed?
@@ -554,6 +571,9 @@ frontend:
       breadcrumb: Mark as not ready for signoff
     scheme_mark_as_ready_for_signoff:
       breadcrumb: Mark as ready for signoff
+    signoff_issues:
+      breadcrumb: &signoff_issues Issues preventing sign-off
+      title: *signoff_issues
     user:
       add_user: Add user
       back_to_users: Back to users

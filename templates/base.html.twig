@@ -72,7 +72,8 @@
 {%- endblock -%}
 
 {%- block beforeContent -%}
-    {{- parent() -}}
+    {%- set blockOverride = block('originalBeforeContent') ?? null -%}
+    {{- blockOverride ? (blockOverride | raw) : parent() -}}
 
     {%- from '@GhostGovUkFrontend/components/macros.html.twig' import notificationBanner -%}
     {%- if maintenanceWarningBanner ?? null -%}

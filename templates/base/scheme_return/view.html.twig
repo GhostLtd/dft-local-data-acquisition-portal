@@ -1,0 +1,135 @@
+{%- extends 'frontend/base.html.twig' -%}
+
+{%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') -%}
+{%- set page_heading_class = 'govuk-heading-l' -%}
+
+{%- block content -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import notificationBanner, summaryList, summaryCard -%}
+    {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue, moneyValue, bcrValue, onTrackRatingValue, dateValue, enumTextValue, displayCardForReturn, displaySectionsAsTabs, expenseDivisionComments -%}
+
+    {#- DETAILS --------------------------------------------------------------------------------------------------- -#}
+
+    {# @var schemeReturn \App\Entity\SchemeReturn\CrstsSchemeReturn #}
+
+    <div class="govuk-!-margin-bottom-9">
+        {%- if schemeReturn.fundReturn.state == 'open' and nonEditablePoint -%}
+            {%- set nonEditableFundReturn = nonEditablePoint.fundReturn -%}
+            {{ notificationBanner({
+                content: 'frontend.pages.scheme_return.non_editable'
+                | trans({
+                    year: nonEditableFundReturn.year,
+                    nextYear: (nonEditableFundReturn.year + 1) | slice(-2),
+                    quarter: nonEditableFundReturn.quarter,
+                }) | replace({'%tag%': onTrackRatingValue(nonEditablePoint.onTrackRating)}),
+                title: 'common.title.information',
+                options: {html_content: true}
+            }) }}
+        {%- endif -%}
+
+        {%- include 'frontend/includes/eligibility_issues_banner.html.twig' -%}
+
+        {# @var \App\Entity\Scheme scheme #}
+        {%- set scheme = schemeReturn.scheme -%}
+        {% from 'frontend/scheme/view.html.twig' import schemeDetailsSummaryList %}
+        {{- summaryCard({
+            title: {text: 'frontend.pages.scheme_return.titles.scheme_details' | trans},
+            attributes: {id: 'scheme_details'},
+        },
+            schemeDetailsSummaryList(scheme, {showFundList: false, schemeReturn})
+        ) -}}
+
+
+        {{- displayCardForReturn(
+            schemeReturn,
+            'frontend.pages.scheme_return.titles.overall_funding' | trans,
+            'overall_funding',
+            summaryList({rows: {
+                ('frontend.pages.scheme_return.total_cost' | trans): moneyValue(schemeReturn.totalCost),
+                ('frontend.pages.scheme_return.agreed_funding' | trans): moneyValue(schemeReturn.agreedFunding),
+                ('frontend.pages.scheme_return.benefit_cost_ratio' | trans): bcrValue(schemeReturn.benefitCostRatio),
+            }})
+        ) -}}
+
+        {#- MILESTONES ------------------------------------------------------------------------------------------------ -#}
+
+        {%- set configs = [] -%}
+
+        <div class="govuk-!-margin-bottom-9">
+            <h2 class="govuk-heading-m">{{ 'frontend.pages.scheme_return.titles.milestones' | trans }}</h2>
+
+            {{- displayCardForReturn(
+                schemeReturn,
+                'frontend.pages.scheme_return.titles.milestone_progress' | trans,
+                'milestone_progress',
+                summaryList({rows: {
+                    ('frontend.pages.scheme_return.on_track_rating' | trans): onTrackRatingValue(schemeReturn.onTrackRating),
+                    ('frontend.pages.scheme_return.progress_update' | trans): textValue(schemeReturn.progressUpdate),
+                    ('frontend.pages.scheme_return.risks' | trans): textValue(schemeReturn.risks),
+                }})
+            ) -}}
+
+            {{- displayCardForReturn(
+                schemeReturn,
+                'frontend.pages.scheme_return.titles.milestone_dates' | trans,
+                'milestone_dates',
+                summaryList({rows:
+                    schemeReturn.milestones | map((v,k) => {
+                        key: {text: "enum.milestone_type.#{v.type.value}" | trans},
+                        value: {text: dateValue(v.date, {dateFormat: 'format.date.year-and-month'})},
+                    })
+                })
+            ) -}}
+
+            {{- displayCardForReturn(
+                schemeReturn,
+                'frontend.pages.scheme_return.titles.milestone_business_case' | trans,
+                'milestone_business_case',
+                summaryList({rows: {
+                    ('frontend.pages.scheme_return.current_business_case' | trans): enumTextValue('enum.business_case', schemeReturn.businessCase),
+                    ((schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable')
+                    ? ('frontend.pages.scheme_return.expected_business_case_approval' | trans) : ''
+                    ): dateValue(schemeReturn.expectedBusinessCaseApproval, {dateFormat: 'format.date.year-and-month'}),
+                } | filter((v,k) => k is not empty)
+                })) -}}
+        </div>
+
+        {#- EXPENSES -------------------------------------------------------------------------------------------------- -#}
+
+        {%- set sections = [] -%}
+
+        {%- set expensesTitle = 'frontend.pages.scheme_return.titles.expenses' | trans -%}
+        {%- if is_granted('CAN_VIEW_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
+            {%- from "frontend/macros.html.twig" import renderTable -%}
+            {% set selectedTabIndex = 0 %}
+            {%- for division in expensesTableHelper.divisionConfigurations -%}
+                {%- do expensesTableHelper.setDivisionKey(division.key) -%}
+                {%- set contents -%}
+                    {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), schemeReturn) -%}
+                    {%- if is_granted('CAN_EDIT_SCHEME_RETURN_EXPENSES', schemeReturn) -%}
+                        {%- set url = section_edit_path(schemeReturn, division.key, true) -%}
+                        <div class="expenses-links">
+                            <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
+                        </div>
+                    {%- endif -%}
+                    {%- if not scheme.crstsData.isExpenseDataRequiredFor(fundReturn.quarter) -%}
+                        <div class="expenses-links">
+                            <p>{{ 'frontend.pages.scheme_return.expenses_not_required' | trans }}</p>
+                        </div>
+                    {%- endif -%}
+                    {{- renderTable(table) -}}
+                    {{- expenseDivisionComments(schemeReturn, division) -}}
+                {%- endset -%}
+                {%- set sections = sections|merge([{
+                    label: division.label | trans,
+                    id: 'expenses-' ~ division.key,
+                    panel: {html: contents},
+                }]) -%}
+                {% if division.key == returnYearDivisionKey %}
+                    {% set selectedTabIndex = loop.index0 %}
+                {% endif %}
+            {%- endfor -%}
+
+            {{- displaySectionsAsTabs(sections, expensesTitle, selectedTabIndex) -}}
+        {%- endif -%}
+    </div>
+{%- endblock -%}

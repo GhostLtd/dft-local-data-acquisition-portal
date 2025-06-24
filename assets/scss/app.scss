@@ -65,3 +65,15 @@ li.govuk-service-navigation__margin-left-auto {
     color: white;
   }
 }
+
+.signoff-eligibility-status-problems {
+  margin-bottom: 0;
+  tr:last-child {
+    td {
+      border-bottom: none;
+    }
+  }
+  .links {
+    text-align: right;
+  }
+}
