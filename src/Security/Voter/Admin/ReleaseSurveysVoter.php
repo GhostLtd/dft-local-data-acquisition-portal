@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\Security\Voter\Admin;
 
 use App\Entity\Enum\Fund;
-use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\Roles;
-use App\Entity\SchemeReturn\SchemeReturn;
+use App\Entity\UserTypeRoles;
 use App\Repository\FundReturn\FundReturnRepository;
 use App\Utility\FundReturnCreator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -30,7 +28,7 @@ class ReleaseSurveysVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if (!$this->authorizationChecker->isGranted(Roles::ROLE_ADMIN)) {
+        if (!$this->authorizationChecker->isGranted(UserTypeRoles::ROLE_IAP_ADMIN)) {
             return false;
         }
 

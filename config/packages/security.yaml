@@ -59,8 +59,8 @@ security:
         - { host: '^%frontend_hostname%$', path: '^/$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
         - { host: '^%frontend_hostname%$', path: '^/accessibility-statement', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
         - { host: '^%frontend_hostname%$', path: '^/login', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
-        - { host: '^%frontend_hostname%$', roles: ROLE_USER, requires_channel: '%env(SECURE_SCHEME)%' }
-        - { host: '^%admin_hostname%$', roles: ROLE_ADMIN, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%frontend_hostname%$', roles: !php/const App\Entity\UserTypeRoles::ROLE_USER, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%admin_hostname%$', roles: !php/const App\Entity\UserTypeRoles::ROLE_IAP_ADMIN, requires_channel: '%env(SECURE_SCHEME)%' }
 
 when@test:
     security:

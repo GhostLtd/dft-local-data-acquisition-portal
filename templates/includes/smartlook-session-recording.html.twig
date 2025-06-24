@@ -8,6 +8,6 @@
     })(document);
     smartlook('init', '{{ api_key }}', { region: 'eu' });
     smartlook('record', { forms: true, emails: true, ips: true, numbers: true, api: true });
-    {% if is_granted('ROLE_USER') %}smartlook('identify', '{{ is_granted('IS_IMPERSONATOR') ? app.token.originalToken.user.userIdentifier : app.user.userIdentifier }}');{% endif %}
+    {% if is_granted(constant('App\\Entity\\UserTypeRoles::ROLE_USER')) %}smartlook('identify', '{{ is_granted('IS_IMPERSONATOR') ? app.token.originalToken.user.userIdentifier : app.user.userIdentifier }}');{% endif %}
 </script>
 {% endif %}

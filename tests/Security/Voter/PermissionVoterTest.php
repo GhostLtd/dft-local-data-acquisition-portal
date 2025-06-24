@@ -2,6 +2,7 @@
 
 namespace App\Tests\Security\Voter;
 
+use App\Entity\Authority;
 use App\Entity\Enum\Fund;
 use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Permission;
@@ -10,8 +11,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
-use App\Entity\Authority;
-use App\Security\Voter\PermissionVoter;
+use App\Security\Voter\Internal\PermissionVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class PermissionVoterTest extends AbstractPermissionVoterTest

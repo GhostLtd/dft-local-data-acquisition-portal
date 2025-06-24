@@ -132,7 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Propert
 
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        return [UserTypeRoles::ROLE_USER];
     }
 
     public function eraseCredentials(): void

@@ -4,7 +4,7 @@
 {%- set page_title_suffix = '' -%}
 
 {%- block content -%}
-    {%- if is_granted('ROLE_USER') -%}
+    {%- if is_granted(constant('App\\Entity\\UserTypeRoles::ROLE_USER')) -%}
         <a href="{{ path('app_dashboard') }}" class="govuk-link">Dashboard</a>
     {% else %}
         <a href="{{ path('app_login') }}" class="govuk-link">Login</a>

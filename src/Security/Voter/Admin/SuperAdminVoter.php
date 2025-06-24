@@ -4,6 +4,7 @@ namespace App\Security\Voter\Admin;
 
 use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Role;
+use App\Entity\UserTypeRoles;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -21,7 +22,7 @@ class SuperAdminVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if (!$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+        if (!$this->authorizationChecker->isGranted(UserTypeRoles::ROLE_IAP_ADMIN)) {
             return false;
         }
 

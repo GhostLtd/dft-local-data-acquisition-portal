@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\Security\Voter\External;
 
 use App\Entity\Authority;
 use App\Entity\Enum\Role;

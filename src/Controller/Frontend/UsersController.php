@@ -140,7 +140,7 @@ class UsersController extends AbstractController
                 }
 
                 $this->entityManager->flush();
-                $url = $this->generateUrl('app_user_view', ['authorityId' => $authority->getId(), 'userId' => $user->getId()]);
+                $url = $this->generateUrl('app_user_list', ['authorityId' => $authority->getId()]);
                 return new RedirectResponse($url);
             }
         }

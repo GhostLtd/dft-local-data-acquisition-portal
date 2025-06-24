@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\Security\Voter\Internal;
 
 use App\Entity\Enum\InternalRole;
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\Roles;
+use App\Entity\UserTypeRoles;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Security\SubjectResolver;
 use Psr\Log\LoggerInterface;
@@ -54,7 +54,7 @@ class DenyActionsReturnVoter extends Voter
                 return true;
             }
 
-            if ($this->authorizationChecker->isGranted(Roles::ROLE_ADMIN)) {
+            if ($this->authorizationChecker->isGranted(UserTypeRoles::ROLE_IAP_ADMIN)) {
                 // ... except for admins
                 return true;
             }

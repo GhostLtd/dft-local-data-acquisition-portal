@@ -6,7 +6,7 @@
 {%- endblock -%}
 
 {%- block navigation -%}
-    {%- if is_granted('ROLE_USER') -%}
+    {%- if is_granted(constant('App\\Entity\\UserTypeRoles::ROLE_USER')) -%}
         {%- from "@GhostGovUkFrontend/components/macros.html.twig" import serviceNavigation -%}
 
         {%- set rightLinks -%}

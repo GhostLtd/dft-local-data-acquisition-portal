@@ -2,14 +2,13 @@
 
 namespace App\Tests\Security\Voter;
 
+use App\Entity\Authority;
 use App\Entity\Enum\InternalRole;
-use App\Entity\Enum\Role;
 use App\Entity\FundAward;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Entity\Authority;
-use App\Security\Voter\ViewPermissionVoter;
+use App\Security\Voter\Internal\ViewPermissionVoter;
 use App\Tests\AbstractFunctionalTest;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use ReflectionClass;

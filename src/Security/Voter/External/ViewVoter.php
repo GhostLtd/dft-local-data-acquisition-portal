@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\Security\Voter\External;
 
+use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Role;
-use App\Entity\FundReturn\FundReturn;
-use App\Entity\Roles;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class ReOpenReturnVoter extends Voter
+class ViewVoter extends Voter
 {
     public function __construct(
         protected AuthorizationCheckerInterface $authorizationChecker,
@@ -17,18 +16,15 @@ class ReOpenReturnVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $attribute === Role::CAN_REOPEN_RETURN &&
-            $subject instanceof FundReturn;
+        return $attribute === Role::CAN_VIEW;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        $user = $token->getUser();
+        if ($this->authorizationChecker->isGranted(InternalRole::HAS_VALID_VIEW_PERMISSION, $subject)) {
+            return true;
+        }
 
-        return
-            $user &&
-            $subject instanceof FundReturn &&
-            $subject->isSignedOff() &&
-            $this->authorizationChecker->isGranted(Roles::ROLE_ADMIN, $user);
+        return false;
     }
 }

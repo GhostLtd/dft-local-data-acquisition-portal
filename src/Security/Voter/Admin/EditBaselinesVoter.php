@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\Security\Voter\Admin;
 
-use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Role;
+use App\Entity\FundReturn\FundReturn;
+use App\Entity\UserTypeRoles;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class ViewVoter extends Voter
+class EditBaselinesVoter extends Voter
 {
     public function __construct(
         protected AuthorizationCheckerInterface $authorizationChecker,
@@ -16,15 +17,15 @@ class ViewVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $attribute === Role::CAN_VIEW;
+        return $attribute === Role::CAN_EDIT_BASELINES &&
+            $subject instanceof FundReturn;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if ($this->authorizationChecker->isGranted(InternalRole::HAS_VALID_VIEW_PERMISSION, $subject)) {
-            return true;
-        }
-
-        return false;
+        return
+            $this->authorizationChecker->isGranted(UserTypeRoles::ROLE_IAP_ADMIN) &&
+            $subject instanceof FundReturn &&
+            $subject->getState() === FundReturn::STATE_INITIAL;
     }
 }
