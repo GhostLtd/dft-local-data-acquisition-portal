@@ -26,6 +26,10 @@ class PermissionVoterSupportsTest extends AbstractFunctionalTest
 
     public function dataSupports(): array {
         $testCases = [
+            [InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION, new CrstsFundReturn(), false],
+            [InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION, new CrstsSchemeReturn(), false],
+            [InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION, new Authority(), true],
+
             [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new CrstsFundReturn(), true],
             [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new CrstsSchemeReturn(), false], // Can only submit fund returns
             [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, new Authority(), false],

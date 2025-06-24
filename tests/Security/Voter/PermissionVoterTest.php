@@ -21,9 +21,11 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
     const array ALL_BUT_MARK_AS_READY = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, InternalRole::HAS_VALID_EDIT_PERMISSION];
     const array ALL_BUT_EDIT = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION, InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION];
     const array SIGN_OFF_ONLY = [InternalRole::HAS_VALID_SIGN_OFF_PERMISSION];
+    const array MANAGE_SCHEMES_ONLY = [InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION];
     const array MARK_AS_READY_ONLY = [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION];
     const array EDIT_ONLY = [InternalRole::HAS_VALID_EDIT_PERMISSION];
-    const array ALL_PERMISSIONS = [Permission::SIGN_OFF, Permission::MARK_AS_READY, Permission::EDITOR, Permission::EDITOR];
+    const array SCHEME_EDIT_ONLY = [InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION];
+    const array ALL_PERMISSIONS = [Permission::SCHEME_MANAGER, Permission::SIGN_OFF, Permission::MARK_AS_READY, Permission::EDITOR, Permission::EDITOR];
 
     protected VoterInterface $permissionVoter;
 
@@ -59,6 +61,10 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
             [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
             [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
             [self::SIGN_OFF_ONLY, false, 'admin:1', CrstsSchemeReturn::class, 'authority:3/return:1/project:1'],
+
+            [self::MANAGE_SCHEMES_ONLY, true, 'admin:1', Authority::class, 'authority:1'],
+            [self::MANAGE_SCHEMES_ONLY, true, 'admin:1', Authority::class, 'authority:2'],
+            [self::MANAGE_SCHEMES_ONLY, false, 'admin:1', Authority::class, 'authority:3'],
         ];
 
         foreach($testCases as $testCase) {
@@ -95,6 +101,8 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                     [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
                     [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
                     [self::ALL_ROLES, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'],
+
+                    [self::MANAGE_SCHEMES_ONLY, false, Authority::class, 'authority:1'],
                 ]
             ],
 
@@ -124,9 +132,9 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                     [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject - can't mark_as_ready a fund_return
                     [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
                     [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
-                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
-                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
-                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
                     [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
                 ]
             ],
@@ -135,12 +143,12 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                 [[Permission::SIGN_OFF], Authority::class, Authority::class, 'authority:1'],
                 [
                     [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
-                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
-                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
                 ]
             ],
@@ -168,9 +176,9 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                     [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Invalid subject - can't mark_as_ready a fund_return
                     [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
                     [self::MARK_AS_READY_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
-                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
                     [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return 1
-                    [self::MARK_AS_READY_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
                     [self::MARK_AS_READY_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
                 ]
             ],
@@ -179,12 +187,12 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                 [[Permission::SIGN_OFF], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
                     [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
-                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'], // Not return 1
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority 1
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return 1
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority 1
                 ]
             ],
@@ -228,12 +236,12 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                 [[Permission::MARK_AS_READY], Authority::class, Authority::class, 'authority:1'],
                 [
                     [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject
-                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
-                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority:1
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
@@ -272,12 +280,12 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                 [[Permission::MARK_AS_READY], CrstsFundReturn::class, FundReturn::class, 'authority:1/return:1'],
                 [
                     [self::EDIT_ONLY, false, Authority::class, 'authority:1'], // Invalid subject - can't edit an authority
-                    [self::EDIT_ONLY, true, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'], // Not return:1
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'], // Not authority:1
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
             ],
@@ -319,7 +327,7 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Permission targeted at scheme, doesn't allow editing at fund level
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'], // Not return:1
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
@@ -363,8 +371,8 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'], // Permission targeted at scheme, doesn't allow editing at fund level
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
                     [self::EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
-                    [self::EDIT_ONLY, true, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
                     [self::EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
                 ]
@@ -495,10 +503,31 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
         ];
     }
 
+    // These extra tests run only on testPermissionsForView (and not testPermissionsWithFundsForView)
+    public function getPermissionsAndTestsForViewOnly(): array
+    {
+        return array_merge($this->getPermissionsAndTests(), [
+            //  permission on Scheme, HAS_VALID_EDIT_PERMISSION role
+            [
+                [[Permission::SCHEME_MANAGER], Authority::class, Authority::class, 'authority:1'],
+                [
+                    [self::SCHEME_EDIT_ONLY, true, Authority::class, 'authority:1'],
+                    [self::SCHEME_EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:1'],
+                    [self::SCHEME_EDIT_ONLY, false, CrstsFundReturn::class, 'authority:1/return:2'],
+                    [self::SCHEME_EDIT_ONLY, false, CrstsFundReturn::class, 'authority:2/return:1'],
+                    [self::SCHEME_EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:1'],
+                    [self::SCHEME_EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:2/project:1'],
+                    [self::SCHEME_EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:1/return:1/project:2'], // Not project:1
+                    [self::SCHEME_EDIT_ONLY, false, CrstsSchemeReturn::class, 'authority:2/return:1/project:1'], // Not authority:1
+                ]
+            ]
+        ]);
+    }
+
     public function dataPermissions(): \Generator
     {
         $userRef = 'user';
-        foreach($this->getPermissionsAndTests() as [$permissionSet, $tests]) {
+        foreach($this->getPermissionsAndTestsForViewOnly() as [$permissionSet, $tests]) {
             foreach($tests as $test) {
                 [$attributes, $expectedResult, $subjectClass, $subjectRef] = $test;
 
@@ -593,21 +622,27 @@ class PermissionVoterTest extends AbstractPermissionVoterTest
      * @dataProvider dataPermissionsWithFunds
      */
     public function testPermissionsWithFundsForView(
-        string         $attribute,
+        string      $attribute,
 
-        ?Permission    $permission,
-        ?string        $permissionEntityReferenceClass,
-        ?string        $permissionEntityClass,
-        ?string        $permissionEntityId,
-        ?array         $permissionFundTypes,
+        ?Permission $permission,
+        ?string     $permissionEntityReferenceClass,
+        ?string     $permissionEntityClass,
+        ?string     $permissionEntityId,
+        ?array      $permissionFundTypes,
 
-        bool           $expectedResult,
-        string         $userRef,
+        bool        $expectedResult,
+        string      $userRef,
 
-        string         $subjectClass,
-        string         $subjectRef,
+        string      $subjectClass,
+        string      $subjectRef,
     ): void
     {
+        // The dataProvider for this test generates two permissions per entry in getPermissionsAndTests()
+        //
+        // One with fundType: CRSTS1, and one with fundType: BSIP
+        //
+        // The former is expected to pass/fail as expected by the test (as all fixtures are CRSTS1-based),
+        // and the latter is always expected to fail
         $this->createPermissionAndPerformTestOnSpecificVoter($this->permissionVoter, ...func_get_args());
     }
 }

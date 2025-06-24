@@ -82,6 +82,7 @@ class SubjectResolver
 
         if (!isset($this->memoizationCacheParseSubject[$cacheKey])) {
             if (!in_array($role, [
+                InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION,
                 InternalRole::HAS_VALID_SIGN_OFF_PERMISSION,
                 InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION,
                 InternalRole::HAS_VALID_EDIT_PERMISSION,
@@ -129,7 +130,10 @@ class SubjectResolver
             $validBaseClasses[] = SchemeReturn::class;
         }
 
-        if ($role === InternalRole::HAS_VALID_VIEW_PERMISSION) {
+        if (in_array($role, [
+            InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION,
+            InternalRole::HAS_VALID_VIEW_PERMISSION,
+        ])) {
             $validBaseClasses[] = Authority::class;
         }
 

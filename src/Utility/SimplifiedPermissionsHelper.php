@@ -19,29 +19,21 @@ class SimplifiedPermissionsHelper
         protected PermissionsViewRepository $permissionsViewRepository
     ) {}
 
-    public function getSimplifiedPermissionAsString(User $user, Authority $authority): ?string
+    public function getSimplifiedPermissionStrings(User $user, Authority $authority): ?array
     {
         if ($authority->getAdmin() === $user) {
-            return 'admin';
+            return ['admin'];
         }
 
-        $bestPermissionsView = $this->getBestPermissionView($user, $authority);
+        $permissionsViews = $this->getPermissionViews($user, $authority);
 
-        if ($bestPermissionsView) {
-            return strtolower($bestPermissionsView->getPermission()->value);
-        }
-
-        return null;
+        return array_map(fn(PermissionsView $p) => strtolower($p->getPermission()->value), $permissionsViews);
     }
 
-    /**
-     * Look at the userPermissions that the user has which are applied to a matching
-     * Authority, and return the one that has the most powerful permission, if any.
-     */
-    public function getBestPermissionView(User $user, Authority $authority): ?PermissionsView
+    public function getPermissionViews(User $user, Authority $authority): array
     {
         /** @var array<PermissionsView> $permissions */
-        $permissions = $this->permissionsViewRepository->createQueryBuilder('pv')
+        return $this->permissionsViewRepository->createQueryBuilder('pv')
             ->where('pv.userId = :user_id')
             ->andWhere('pv.authorityId = :authority_id')
             ->andWhere('pv.entityClass = :entity_class')
@@ -50,27 +42,5 @@ class SimplifiedPermissionsHelper
             ->setParameter('entity_class', Authority::class)
             ->getQuery()
             ->getResult();
-
-        $permissionOrdering = [
-            Permission::VIEWER->value => 1,
-            Permission::EDITOR->value => 2,
-            Permission::MARK_AS_READY->value => 3,
-            Permission::SIGN_OFF->value => 4,
-        ];
-
-        $bestPermissionView = null;
-        $bestPermissionScore = 0;
-
-        foreach($permissions as $permissionView) {
-            $permission = $permissionView->getPermission();
-            $score = $permissionOrdering[$permission->value] ?? 0;
-
-            if ($score > $bestPermissionScore) {
-                $bestPermissionView = $permissionView;
-                $bestPermissionScore = $score;
-            }
-        }
-
-        return $bestPermissionView;
     }
 }

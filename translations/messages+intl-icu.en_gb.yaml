@@ -126,9 +126,10 @@ enum:
     scheme_merged: Merged
     scheme_split: Split
   permission:
-    SIGN_OFF: &perm_sign_off Sign-off/Edit/View all returns + mark schemes as ready for sign-off
-    MARK_AS_READY: &perm_mark_as_ready Edit/View all returns + mark schemes as ready for sign-off
-    EDITOR: &perm_editor Edit/View all returns
+    SCHEME_MANAGER: &perm_scheme_manager Manage schemes
+    SIGN_OFF: &perm_sign_off Sign-off all returns
+    MARK_AS_READY: &perm_mark_as_ready Mark schemes as ready for sign-off
+    EDITOR: &perm_editor Edit all returns
     VIEWER: &perm_viewer View all returns
   rating:
     green: Green
@@ -585,9 +586,10 @@ frontend:
       position: Position
       edit_user: Edit user
       delete_user: Delete user
-      permission: Permission
+      permission: Permissions
       permissions:
         admin: Admin
+        scheme_manager: *perm_scheme_manager
         sign_off: *perm_sign_off
         mark_as_ready: *perm_mark_as_ready
         editor: *perm_editor

@@ -13,7 +13,7 @@
             'email': user.email,
             'position': user.position,
             'phone': user.phone,
-            'permission': simplifiedPermission ? ("frontend.pages.user.permissions.#{simplifiedPermission}" | trans) : '-',
+            'permission': simplifiedPermissions | map(p => ("frontend.pages.user.permissions.#{p}" | trans)) | join('\n'),
         } | map((v,k) => {
             key: {text: "frontend.pages.user.#{k}" | trans},
             value: {text: textValue(v)},

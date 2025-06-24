@@ -116,7 +116,7 @@ class UsersController extends AbstractController
 
         return $this->render('frontend/users/view.html.twig', [
             'authority' => $authority,
-            'simplifiedPermission' => $userPermissionHelper->getSimplifiedPermissionAsString($user, $authority),
+            'simplifiedPermissions' => $userPermissionHelper->getSimplifiedPermissionStrings($user, $authority),
             'linksBuilder' => $this->linksBuilder,
             'user' => $user,
         ]);

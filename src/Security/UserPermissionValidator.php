@@ -33,6 +33,10 @@ class UserPermissionValidator
             if ($fundTypes !== null && !in_array($entityClass, [Authority::class, Scheme::class])) {
                 return false;
             }
+        } else if ($permission === Permission::SCHEME_MANAGER) {
+            if ($fundTypes !== null || $entityClass !== Authority::class) {
+                return false;
+            }
         } else {
             // Unsupported permission
             return false;

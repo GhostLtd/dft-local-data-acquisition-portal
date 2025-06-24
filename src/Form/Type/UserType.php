@@ -35,14 +35,21 @@ class UserType extends BaseUserType
                 $isAdmin = $user === $authority->getAdmin();
 
                 if (!$isAdmin) {
-                    $form->add('permission', ChoiceType::class, [
+                    $form->add('permissions', ChoiceType::class, [
                         'label' => "forms.user.permission.label",
                         'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
                         'help' => "forms.user.permission.help",
-                        'choices' => Permission::cases(),
+                        'choices' => array_combine(array_map(fn(Permission $p) => $p->name, Permission::cases()), Permission::cases()),
+                        'choice_options' => [
+                            Permission::VIEWER->name => [
+                                'disabled' => true,
+                                'data' => true,
+                            ],
+                        ],
                         'choice_label' => fn(Permission $choice) => "enum.permission.{$choice->value}",
                         'choice_value' => fn(?Permission $choice) => $choice?->value,
-                        'expanded' => false,
+                        'expanded' => true,
+                        'multiple' => true,
                         'placeholder' => 'forms.generic.placeholder',
                         'constraints' => [
                             new NotNull(message: 'user.permission.not_null', groups: ['user.edit']),

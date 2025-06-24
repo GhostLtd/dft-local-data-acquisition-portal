@@ -24,6 +24,7 @@ class PermissionVoter extends Voter
     protected function supports(string $attribute, mixed $subject): bool
     {
         if (!in_array($attribute, [
+            InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION,
             InternalRole::HAS_VALID_SIGN_OFF_PERMISSION,
             InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION,
             InternalRole::HAS_VALID_EDIT_PERMISSION,
@@ -50,9 +51,10 @@ class PermissionVoter extends Voter
 
         // If you can sign_off, then you can also mark_as_ready. If you can mark_as_ready then you can also edit.
         $permissionsWhichConferTheDesiredAttribute = match ($attribute) {
+            InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION => [Permission::SCHEME_MANAGER],
             InternalRole::HAS_VALID_SIGN_OFF_PERMISSION => [Permission::SIGN_OFF],
-            InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION => [Permission::SIGN_OFF, Permission::MARK_AS_READY],
-            InternalRole::HAS_VALID_EDIT_PERMISSION => [Permission::SIGN_OFF, Permission::MARK_AS_READY, Permission::EDITOR],
+            InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION => [Permission::MARK_AS_READY],
+            InternalRole::HAS_VALID_EDIT_PERMISSION => [Permission::EDITOR],
             default => [],
         };
 
