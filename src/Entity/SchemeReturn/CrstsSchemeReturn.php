@@ -279,9 +279,10 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
             ->setAgreedFunding($this->getAgreedFunding())
         ;
 
-        if ($this->getOnTrackRating()->shouldBePropagatedToFutureReturns()) {
+        $onTrackRating = $this->getOnTrackRating();
+        if ($onTrackRating && $onTrackRating->shouldBePropagatedToFutureReturns()) {
             // Only copy ratings like cancelled/completed/merged/split
-            $nextSchemeReturn->setOnTrackRating($this->getOnTrackRating());
+            $nextSchemeReturn->setOnTrackRating($onTrackRating);
 
             // Normally we wouldn't want to copy the textual progress update, but if the
             // scheme won't receive further updates, then we should
