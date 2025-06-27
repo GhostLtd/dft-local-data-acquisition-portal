@@ -22,7 +22,7 @@ class UserPermissionValidator
                 return false;
             }
 
-            if ($fundTypes !== null && $entityClass !== Authority::class) {
+            if (!empty($fundTypes) && $entityClass !== Authority::class) {
                 return false;
             }
         } else if (in_array($permission, [Permission::MARK_AS_READY, Permission::EDITOR, Permission::VIEWER])) {
@@ -30,11 +30,11 @@ class UserPermissionValidator
                 return false;
             }
 
-            if ($fundTypes !== null && !in_array($entityClass, [Authority::class, Scheme::class])) {
+            if (!empty($fundTypes) && !in_array($entityClass, [Authority::class, Scheme::class])) {
                 return false;
             }
         } else if ($permission === Permission::SCHEME_MANAGER) {
-            if ($fundTypes !== null || $entityClass !== Authority::class) {
+            if (!empty($fundTypes) || $entityClass !== Authority::class) {
                 return false;
             }
         } else {
