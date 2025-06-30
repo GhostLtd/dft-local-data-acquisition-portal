@@ -91,4 +91,21 @@ class FundReturnRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function isMostRecentReturnForAward(FundReturn $fundReturn): bool
+    {
+        $award = $fundReturn->getFundAward();
+
+        $latestReturn = $this->createQueryBuilder('fundReturn')
+            ->join('fundReturn.fundAward', 'fundAward')
+            ->where('fundAward.id = :award_id')
+            ->orderBy('fundReturn.year', 'DESC')
+            ->addOrderBy('fundReturn.quarter', 'DESC')
+            ->setParameter('award_id', $award->getId(), UlidType::NAME)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $latestReturn === $fundReturn;
+    }
 }
