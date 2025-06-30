@@ -1,14 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block pageTitle %}
-    {{ (prefix ~ 'title')|trans }}
-{% endblock %}
+{%- set page_title_key = prefix ~ 'heading' -%}
 
 {% block sessionWarning %}{% endblock %}
 
 {% block content %}
-    <h1 class="govuk-heading govuk-heading-xl">{{ (prefix ~ 'heading') | trans | nl2br }}</h1>
-
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <p class="govuk-body">{{ (prefix ~ 'copy')|trans|nl2br }}</p>
