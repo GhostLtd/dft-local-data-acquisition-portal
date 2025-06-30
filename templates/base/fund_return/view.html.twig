@@ -184,7 +184,7 @@
             <a class="govuk-link" href="{{ url }}">{{ 'common.actions.edit' | trans }} <span class="govuk-visually-hidden">{{ division.label | trans }}</span></a>
         </div>
     {%- endif -%}
-    {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(division.key), fundReturn) -%}
+    {%- set table = expensesTableCalculator.calculate(expensesTableHelper.getTable(), fundReturn) -%}
     {{- renderTable(table) -}}
     {{- expenseDivisionComments(fundReturn, division) -}}
 {% endblock %}

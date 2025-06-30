@@ -30,7 +30,6 @@ class ExpensesTableHelper
     protected array $cache = [];
     protected TableConfiguration $configuration;
     protected string $divisionKey;
-
     protected bool $editableBaselines = false;
 
     public function setConfiguration(TableConfiguration $configuration): static
@@ -58,7 +57,7 @@ class ExpensesTableHelper
 
     public function getTable(): ?Table
     {
-        $cacheKey = spl_object_id($this->configuration) . '-' . $this->divisionKey;
+        $cacheKey = spl_object_id($this->configuration) . '-' . $this->divisionKey.($this->editableBaselines ? '-editable_baselines':'');
 
         if (isset($this->cache[$cacheKey])) {
             return $this->cache[$cacheKey];
@@ -271,32 +270,13 @@ class ExpensesTableHelper
     }
 
     /**
-     * @return array<ExpenseType>
-     */
-    public function getNonBaselineExpenseTypes(): array
-    {
-        return array_filter($this->getExpenseTypes(), fn(ExpenseType $e) => !$e->isBaseline());
-    }
-
-    /**
-     * @return array<int, ExpenseType>
-     */
-    public function getExpenseTypes(): array
-    {
-        return array_merge(...array_map(
-            fn(CategoryConfiguration $category) => $category->getExpenseTypes(),
-            array_filter($this->configuration->getRowGroupConfigurations(), fn(RowGroupInterface $r) => $r instanceof CategoryConfiguration)
-        ));
-    }
-
-    /**
      * @return array<int, Cell>
      */
     public function getAllCells(): array
     {
         return array_merge(...array_map(
             fn(Row $row) => array_filter($row->getCells(), fn($cell) => $cell instanceof Cell),
-            $this->getTable($this->divisionKey)->getRows()
+            $this->getTable()->getRows()
         ));
     }
 

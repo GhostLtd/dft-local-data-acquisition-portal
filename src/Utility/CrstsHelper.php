@@ -146,7 +146,7 @@ class CrstsHelper
         // This is a forecast and only added in Q4
         $nextYear = substr(strval($endYear + 1), 2);
         $label = $hideForecastAndActual ?
-            new TranslatableMessage('forms.crsts.expenses.forecast_only') :
+            new TranslatableMessage('forms.crsts.expenses.total') :
             new TranslatableMessage('forms.crsts.expenses.forecast');
 
         $divisionConfiguration[] = new DivisionConfiguration(

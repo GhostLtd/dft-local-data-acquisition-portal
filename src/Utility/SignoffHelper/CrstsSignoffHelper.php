@@ -2,21 +2,24 @@
 
 namespace App\Utility\SignoffHelper;
 
+use App\Config\ExpenseDivision\TableConfiguration;
+use App\Config\ExpenseRow\CategoryConfiguration;
+use App\Config\ExpenseRow\RowGroupInterface;
+use App\Entity\Enum\ExpenseType;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
 use App\Repository\SchemeReturn\SchemeReturnRepository;
 use App\Utility\CrstsHelper;
-use App\Utility\ExpensesTableHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CrstsSignoffHelper implements SignoffHelperInterface
 {
     protected bool $useAdminLinks;
+    protected TableConfiguration $tableConfiguration;
 
     public function __construct(
-        protected ExpensesTableHelper    $tableHelper,
         protected SchemeReturnRepository $schemeReturnRepository,
         protected UrlGeneratorInterface  $urlGenerator,
     ) {
@@ -57,7 +60,7 @@ class CrstsSignoffHelper implements SignoffHelperInterface
 
     protected function initialiseTableHelper(CrstsFundReturn $return): void
     {
-        $this->tableHelper->setConfiguration(CrstsHelper::getFundExpensesTable($return->getYear(), $return->getQuarter(), hideForecastAndActual: true));
+        $this->tableConfiguration = CrstsHelper::getFundExpensesTable($return->getYear(), $return->getQuarter(), hideForecastAndActual: true);
     }
 
     /**
@@ -67,11 +70,11 @@ class CrstsSignoffHelper implements SignoffHelperInterface
     {
         // Look for missing forecast, non-baseline, expense figures
         // (These are identified by matching ExpenseEntries being missing from the database)
-        $expenseTypes = $this->tableHelper->getNonBaselineExpenseTypes();
+        $expenseTypes = $this->getNonBaselineExpenseTypes();
 
         $fundReturnRoute = $this->useAdminLinks ? 'admin_fund_return' : 'app_fund_return';
 
-        foreach($this->tableHelper->getDivisionConfigurations() as $divisionConfiguration) {
+        foreach($this->tableConfiguration->getDivisionConfigurations() as $divisionConfiguration) {
             foreach($divisionConfiguration->getColumnConfigurations() as $columnConfiguration) {
                 if ($columnConfiguration->isForecast()) {
                     foreach($expenseTypes as $expenseType) {
@@ -137,6 +140,19 @@ class CrstsSignoffHelper implements SignoffHelperInterface
                 ]).'#milestone_progress',
             );
         }
+    }
+
+    /**
+     * @return array<ExpenseType>
+     */
+    protected function getNonBaselineExpenseTypes(): array
+    {
+        $expenseTypes = array_merge(...array_map(
+            fn(CategoryConfiguration $category) => $category->getExpenseTypes(),
+            array_filter($this->tableConfiguration->getRowGroupConfigurations(), fn(RowGroupInterface $r) => $r instanceof CategoryConfiguration)
+        ));
+
+        return array_filter($expenseTypes, fn(ExpenseType $e) => !$e->isBaseline());
     }
 
     public function supports(SchemeReturn|FundReturn $return): bool

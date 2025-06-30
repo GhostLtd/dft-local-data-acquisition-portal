@@ -263,10 +263,10 @@ forms:
         label: 'Comments'
         help: 'Use this box only if any of the values above require additional explanation.'
       division_post_title: Post-{startYear}/{endYear}
+      division_year_title: "{startYear}/{endYear}"
       forecast: |-
         Forecast
         (£)
-      forecast_only: Forecast
       quarter:
         Q1: |-
           Q1 {actual_or_forecast} 
@@ -281,10 +281,18 @@ forms:
           Q4 {actual_or_forecast} 
           (£)
       quarter_only:
-        Q1: Q1
-        Q2: Q2
-        Q3: Q3
-        Q4: Q4
+        Q1: |-
+          Q1
+          (£)
+        Q2: |-
+          Q2
+          (£)
+        Q3: |-
+          Q3
+          (£)
+        Q4: |-
+          Q4
+          (£)
       sub_total: Sub-total
       total: |-
         Total
@@ -292,7 +300,6 @@ forms:
       total_row: |-
         Total 
         (excluding baselines and over-programming)
-      division_year_title: "{startYear}/{endYear}"
       yearly_forecast: |-
         Yearly forecast
         (£)
