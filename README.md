@@ -2,13 +2,14 @@
 
 ## Requirements
 - PHP 8.3
-- Postgresql 17+
+- MySQL 8+
 - Composer 2
 - Node 22
-- Yarn 4.50
+- Yarn 4
 - Gov.uk Notify API key
 
 ## Related documents / config
+- [ChangeLog](./docs/ChangeLog.md)
 - [Installation](./docs/Installation.md)
 - [Environment variables `Features` config](docs/Features.md)
 - [Twig](docs/Twig.md)
