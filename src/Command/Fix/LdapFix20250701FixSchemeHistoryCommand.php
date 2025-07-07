@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Fix;
 
 use App\Entity\Enum\Fund;
 use App\Entity\PropertyChangeLog;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: 'ldap:fix:20250701-fix-scheme-history',
     description: 'Adds missing scheme history into the property change log, assuming no changes',
 )]
-class LdapFix20250701FixSchemeHistoryCommand extends Command
+class LdapFix20250701FixSchemeHistoryCommand extends AbstractSheetBasedCommand
 {
     protected array $currentDataValues = [];
 
@@ -100,48 +100,6 @@ class LdapFix20250701FixSchemeHistoryCommand extends Command
     }
 
 
-    protected function getSourcesByYear(SymfonyStyle $io, string $importPath): array
-    {
-
-        $sourcesByYear = [];
-
-        foreach(new \DirectoryIterator($importPath) as $fileInfo) {
-            if (
-                $fileInfo->isDot()
-                || $fileInfo->isDir()
-                || $fileInfo->getExtension() !== 'xlsx'
-            ) {
-                continue;
-            }
-
-            if (!preg_match('/(?P<year>\d\d)(?P<nextYear>\d\d)Q(?P<quarter>\d)/i', $fileInfo->getFilename(), $matches)) {
-                $io->warning('Skipping non-import file: ' . $fileInfo->getFilename());
-                continue;
-            }
-
-            ['year' => $year, 'nextYear' => $nextYear, 'quarter' => $quarter] = $matches;
-
-            $year = 2000 + intval($year);
-            $nextYear = 2000 + intval($nextYear);
-            $quarter = intval($quarter);
-
-            if ($year + 1 !== $nextYear) {
-                $io->error('Invalid import file: ' . $fileInfo->getFilename());
-                continue;
-            }
-
-            $sourcesByYear[$year] ??= [];
-            $sourcesByYear[$year][$quarter] = $fileInfo->getRealpath();
-        }
-
-        ksort($sourcesByYear);
-        foreach($sourcesByYear as $year => $item) {
-            ksort($sourcesByYear[$year]);
-        }
-
-        return $sourcesByYear;
-    }
-
     protected function import(SymfonyStyle $io, string $year, string $quarter, string $importPath): void
     {
         $reader = IOFactory::createReaderForFile($importPath)
@@ -176,11 +134,7 @@ class LdapFix20250701FixSchemeHistoryCommand extends Command
                 continue;
             }
 
-            $authName = str_replace([
-                'MCA', 'CA', 'The West', 'North East Joint Transport Committee / Transport North East',
-            ], [
-                'Mayoral Combined Authority', 'Combined Authority', 'West', 'North East Combined Authority',
-            ], $authName);
+            $authName = $this->convertAuthorityName($authName);
 
             $scheme = $this->schemeRepository->createQueryBuilder('s')
                 ->join('s.authority', 'a')
