@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Fix;
 
 use App\Entity\ExpenseEntry;
 use App\Entity\FundReturn\CrstsFundReturn;
