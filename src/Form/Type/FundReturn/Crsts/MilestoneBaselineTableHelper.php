@@ -8,6 +8,7 @@ use App\Config\Table\Row;
 use App\Config\Table\Table;
 use App\Config\Table\TableBody;
 use App\Config\Table\TableHead;
+use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
@@ -52,6 +53,8 @@ class MilestoneBaselineTableHelper
 
         foreach($schemeReturns as $schemeReturn) {
             $schemeReturnId = $schemeReturn->getId()->toRfc4122();
+            $mostlyFundedAs = $schemeReturn->getScheme()->getCrstsData()->getFundedMostlyAs();
+
             $cells = [
                 new Header([
                     'text' => $schemeReturn->getScheme()->getName(),
@@ -59,12 +62,20 @@ class MilestoneBaselineTableHelper
             ];
 
             foreach($baselineTypes as $type) {
+                if ($mostlyFundedAs === FundedMostlyAs::RDEL) {
+                    $type = match($type) {
+                        MilestoneType::BASELINE_START_CONSTRUCTION => MilestoneType::BASELINE_START_DELIVERY,
+                        MilestoneType::BASELINE_END_CONSTRUCTION => MilestoneType::BASELINE_END_DELIVERY,
+                        default => $type,
+                    };
+                }
+
                 $milestone = $schemeReturn->getMilestoneByType($type);
-                $date = $milestone ? $milestone->getDate()->format('d/m/Y') : '-';
+                $date = $milestone?->getDate();
 
                 $cells[] = new Cell([
                     'key' => "milestone__{$schemeReturnId}__{$type->value}",
-                    'text' => $date,
+                    'text' => $date ? $date->format('d/m/Y') : '-',
                 ]);
             }
 

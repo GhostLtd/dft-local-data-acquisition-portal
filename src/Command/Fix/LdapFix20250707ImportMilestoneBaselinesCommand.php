@@ -4,13 +4,12 @@ namespace App\Command\Fix;
 
 use App\Entity\Enum\MilestoneType;
 use App\Entity\FundReturn\CrstsFundReturn;
-use App\Entity\FundReturn\FundReturn;
 use App\Entity\Milestone;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -44,12 +43,22 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
 
         $hasErrors = false;
 
-        // Set description history from source files
+        $latestYear = null;
+        $latestQuarter = null;
+
+        // Set milestone baseline history from source files
         $sourcesByYear = $this->getSourcesByYear($io, $importPath);
         foreach(array_keys($sourcesByYear) as $year) {
+            $latestYear = $year;
             foreach($sourcesByYear[$year] as $quarter => $path) {
+                $latestQuarter = $quarter;
                 $hasErrors |= $this->import($io, $year, $quarter, $path);
             }
+        }
+
+        if (!$hasErrors && $latestYear && $latestQuarter) {
+            $io->writeln('<info>Propagating those milestones to later returns</info>');
+            $this->propagateMilestonesToLaterReturns($latestYear, $latestQuarter);
         }
 
         if ($hasErrors) {
@@ -76,6 +85,7 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
         $io->writeln("- Q{$quarter} {$year}");
 
         $byMcaAndScheme = [];
+        $hasErrors = false;
 
         foreach($sheet->getRowIterator(2) as $row) {
             $rowIndex = $row->getRowIndex();
@@ -123,7 +133,6 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                 ->setDate($date);
         }
 
-        $hasErrors = false;
         foreach($byMcaAndScheme as $authorityName => $schemes) {
             /** @var CrstsSchemeReturn[] $schemeReturns */
             $schemeReturns = $this->entityManager
@@ -160,7 +169,7 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                         continue;
                     }
 
-                    $schemeMilestone = $this->getMilestoneByType($schemeReturn->getMilestones(), $milestoneType);
+                    $schemeMilestone = $schemeReturn->getMilestoneByType($milestoneType);
                     if (!$schemeMilestone) {
                         $io->error("Cannot find milestone matching: {$milestoneType->value}");
                         $hasErrors = true;
@@ -180,7 +189,7 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                         continue;
                     }
 
-                    $schemeMilestone = $this->getMilestoneByType($schemeReturn->getMilestones(), $milestone->getType());
+                    $schemeMilestone = $schemeReturn->getMilestoneByType($milestone->getType());
                     if ($schemeMilestone) {
                         $io->error("Baseline milestone already exists: {$schemeName}, {$milestoneType->value}");
                         $hasErrors = true;
@@ -195,15 +204,74 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
         return $hasErrors;
     }
 
-    protected function getMilestoneByType(iterable $milestones, MilestoneType $milestoneType): ?Milestone
+    protected function propagateMilestonesToLaterReturns(int $sourceYear, int $sourceQuarter): void
     {
-        foreach($milestones as $milestone) {
-            if ($milestone->getType() === $milestoneType) {
-                return $milestone;
+        /** @var CrstsFundReturn[] $sourceFundReturns */
+        $sourceFundReturns = $this->entityManager
+            ->getRepository(CrstsFundReturn::class)
+            ->createQueryBuilder('cfr')
+            ->select('cfr, fa, a')
+            ->join('cfr.fundAward', 'fa')
+            ->join('fa.authority', 'a')
+            ->where('cfr.year = :year')
+            ->andWhere('cfr.quarter = :quarter')
+            ->getQuery()
+            ->setParameter('year', $sourceYear)
+            ->setParameter('quarter', $sourceQuarter)
+            ->getResult();
+
+        foreach($sourceFundReturns as $sourceFundReturn) {
+            $fundAwardId = $sourceFundReturn->getFundAward()->getId();
+
+            $sourceSchemeReturns = $this->entityManager
+                ->getRepository(CrstsSchemeReturn::class)
+                ->createQueryBuilder('csr')
+                ->select('csr, s')
+                ->join('csr.fundReturn', 'fr')
+                ->join('csr.scheme', 's')
+                ->where('fr.id = :fundReturnId')
+                ->getQuery()
+                ->setParameter('fundReturnId', $sourceFundReturn->getId(), UlidType::NAME)
+                ->getResult();
+
+            /** @var CrstsSchemeReturn[] $targetSchemeReturns */
+            $targetSchemeReturns = $this->entityManager
+                ->getRepository(CrstsSchemeReturn::class)
+                ->createQueryBuilder('csr')
+                ->select('csr, fr, fa')
+                ->join('csr.fundReturn', 'fr')
+                ->join('fr.fundAward', 'fa')
+                ->where('fa.id = :fundAwardId')
+                ->andWhere('(fr.year > :year OR (fr.year = :year AND fr.quarter > :quarter))')
+                ->getQuery()
+                ->setParameter('fundAwardId', $fundAwardId, UlidType::NAME)
+                ->setParameter('year', $sourceYear)
+                ->setParameter('quarter', $sourceQuarter)
+                ->getResult();
+
+            foreach($sourceSchemeReturns as $sourceSchemeReturn) {
+                foreach($this->getMatchingTargetSchemeReturns($targetSchemeReturns, $sourceSchemeReturn) as $targetSchemeReturn) {
+                    foreach($sourceSchemeReturn->getMilestones() as $sourceMilestone) {
+                        $milestoneType = $sourceMilestone->getType();
+                        if (!$milestoneType->isBaseline()) {
+                            continue;
+                        }
+
+                        $targetMilestone = $targetSchemeReturn->getMilestoneByType($milestoneType);
+
+                        if ($targetMilestone) {
+                            $targetMilestone->setDate($sourceMilestone->getDate());
+                        } else {
+                            $targetMilestone = (new Milestone())
+                                ->setDate($sourceMilestone->getDate())
+                                ->setType($milestoneType);
+
+                            $targetSchemeReturn->addMilestone($targetMilestone);
+                        }
+                    }
+                }
             }
         }
-
-        return null;
     }
 
     protected function getSchemeReturnBySchemeName(array $schemeReturns, string $schemeName): ?CrstsSchemeReturn
@@ -215,5 +283,26 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
         }
 
         return null;
+    }
+
+    /**
+     * @param \Generator<CrstsSchemeReturn> $targetSchemeReturns
+     */
+    protected function getMatchingTargetSchemeReturns(array $targetSchemeReturns, CrstsSchemeReturn $sourceSchemeReturn): \Generator
+    {
+        $sourceScheme = $sourceSchemeReturn->getScheme();
+        $found = false;
+
+        foreach($targetSchemeReturns as $targetSchemeReturn) {
+            $targetScheme = $targetSchemeReturn->getScheme();
+            if ($targetScheme === $sourceScheme) {
+                yield $targetSchemeReturn;
+                $found = true;
+            }
+        }
+
+        if (!$found) {
+            throw new \RuntimeException("No matching schemeReturns for scheme: " . $sourceScheme->getName());
+        }
     }
 }
