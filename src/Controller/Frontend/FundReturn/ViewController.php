@@ -7,6 +7,7 @@ use App\Entity\Enum\FundLevelSection;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
+use App\Form\Type\FundReturn\Crsts\MilestoneBaselineTableHelper;
 use App\ListPage\SchemeListPage;
 use App\Repository\SchemeRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
@@ -24,18 +25,21 @@ class ViewController extends AbstractController
 {
     public function __construct(
         protected SchemeRepository $schemeRepository,
-    ) {}
+    )
+    {
+    }
 
     #[Route('/fund-return/{fundReturnId}', name: 'app_fund_return')]
     #[IsGranted(Role::CAN_VIEW, 'fundReturn')]
     public function view(
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn              $fundReturn,
-        ExpensesTableHelper     $expensesTableHelper,
-        ExpensesTableCalculator $expensesTableCalculator,
-        Request                 $request,
-        SchemeListPage          $schemeListPage,
-        DashboardLinksBuilder   $linksBuilder,
+        FundReturn                   $fundReturn,
+        ExpensesTableHelper          $expensesTableHelper,
+        ExpensesTableCalculator      $expensesTableCalculator,
+        DashboardLinksBuilder        $linksBuilder,
+        MilestoneBaselineTableHelper $milestoneBaselineTableHelper,
+        Request                      $request,
+        SchemeListPage               $schemeListPage,
     ): Response
     {
         $linksBuilder->setAtFundReturn($fundReturn);
@@ -54,8 +58,10 @@ class ViewController extends AbstractController
 
         if ($isInitialState) {
             $expensesTableHelper->setConfiguration(CrstsHelper::getFundBaselinesTable($fundReturn->getYear(), $fundReturn->getQuarter()));
+            $milestonesTable = $milestoneBaselineTableHelper->setFundReturn($fundReturn)->getTable();
         } else {
             $expensesTableHelper->setConfiguration(CrstsHelper::getFundExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter()));
+            $milestonesTable = null;
         }
 
         return $this->render($request->attributes->get('template', 'frontend/fund_return/view.html.twig'), [
@@ -64,6 +70,7 @@ class ViewController extends AbstractController
             'expensesTableHelper' => $expensesTableHelper,
             'fundLevelSections' => FundLevelSection::filterForFund($fund),
             'fundReturn' => $fundReturn,
+            'milestonesTable' => $milestonesTable,
             'returnYearDivisionKey' => CrstsHelper::getDivisionConfigurationKey($fundReturn->getYear()),
             'schemeFunds' => $schemeFunds,
             'schemeListPage' => $schemeListPage,
