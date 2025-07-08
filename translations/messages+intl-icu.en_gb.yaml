@@ -109,6 +109,13 @@ enum:
     start_delivery: Start delivery
     end_delivery: End delivery
     final_delivery: Final delivery
+    baseline_start_development: Baseline, Start development
+    baseline_end_development: Baseline, End development
+    baseline_start_construction: Baseline, Start construction
+    baseline_end_construction: Baseline, End construction
+    baseline_start_delivery: Baseline, Start delivery
+    baseline_end_delivery: Baseline, End delivery
+    baseline_final_delivery: Baseline, Final delivery
   on_track_rating:
     green: Green
     amber: Amber

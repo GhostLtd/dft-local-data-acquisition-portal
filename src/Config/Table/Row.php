@@ -2,8 +2,6 @@
 
 namespace App\Config\Table;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 class Row extends AbstractElementWithClasses
 {
     public function __construct(
