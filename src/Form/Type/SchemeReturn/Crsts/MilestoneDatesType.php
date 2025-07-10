@@ -122,20 +122,21 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
         $viewData->setDevelopmentOnly($isDevelopmentOnly);
         $isCDEL = $this->isCDEL($viewData);
 
+        // For all non-baseline milestones (i.e. do not touch baseline milestones data)
         foreach(MilestoneType::getNonBaselineCases() as $milestoneType) {
             $milestone = $viewData->getMilestoneByType($milestoneType);
 
             $shouldBeRemoved =
+                // If CDEL, remove non-CDEL milestones
+                // If RDEL, remove non-RDEL milestones
                 !($isCDEL ? $milestoneType->isCDEL() : $milestoneType->isRDEL())
+                // If development_only ticked, remove non-development milestones
                 || ($isDevelopmentOnly && !$milestoneType->isDevelopmentMilestone());
 
             if ($shouldBeRemoved) {
                 if ($milestone) {
                     $viewData->removeMilestone($milestone);
                 }
-            }
-
-            if ($shouldBeRemoved || $milestoneType->isBaselineMilestone()) {
                 continue;
             }
 
