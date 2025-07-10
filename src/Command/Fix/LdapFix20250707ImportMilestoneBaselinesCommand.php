@@ -99,16 +99,17 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
             }
 
             $isBaseline = $sheet->getCell([2, $rowIndex])->getValue();
+            $milestoneType = $sheet->getCell([3, $rowIndex])->getValue();
 
             if ($isBaseline === 'N') {
-                $milestoneType = match ($sheet->getCell([3, $rowIndex])->getValue()) {
+                $milestoneType = match($milestoneType) {
                     'Start construction' => MilestoneType::START_CONSTRUCTION,
                     'End construction' => MilestoneType::END_CONSTRUCTION,
                     'Start development' => MilestoneType::START_DEVELOPMENT,
                     'End development' => MilestoneType::END_DEVELOPMENT,
                 };
             } else if ($isBaseline === 'Y') {
-                $milestoneType = match ($sheet->getCell([3, $rowIndex])->getValue()) {
+                $milestoneType = match($milestoneType) {
                     'Start construction' => MilestoneType::BASELINE_START_CONSTRUCTION,
                     'End construction' => MilestoneType::BASELINE_END_CONSTRUCTION,
                     'Start development' => MilestoneType::BASELINE_START_DEVELOPMENT,
@@ -165,7 +166,7 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                 /** @var Milestone $milestone */
                 foreach($milestones as $milestone) {
                     $milestoneType = $milestone->getType();
-                    if ($milestoneType->isBaseline()) {
+                    if ($milestoneType->isBaselineMilestone()) {
                         continue;
                     }
 
@@ -185,7 +186,7 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                 /** @var Milestone $milestone */
                 foreach($milestones as $milestone) {
                     $milestoneType = $milestone->getType();
-                    if (!$milestoneType->isBaseline()) {
+                    if (!$milestoneType->isBaselineMilestone()) {
                         continue;
                     }
 

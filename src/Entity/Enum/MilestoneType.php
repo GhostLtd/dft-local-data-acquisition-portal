@@ -26,48 +26,12 @@ enum MilestoneType: string
     {
         return match ($this) {
             self::START_DEVELOPMENT,
-            self::END_DEVELOPMENT,
-            self::BASELINE_START_DEVELOPMENT,
-            self::BASELINE_END_DEVELOPMENT => true,
+            self::END_DEVELOPMENT => true,
             default => false,
         };
     }
 
-    public function isCDEL(): bool
-    {
-        return in_array($this, [
-            self::START_DEVELOPMENT,
-            self::END_DEVELOPMENT,
-            self::START_CONSTRUCTION,
-            self::END_CONSTRUCTION,
-            self::FINAL_DELIVERY,
-        ]);
-    }
-
-    public function isRDEL(): bool
-    {
-        return in_array($this, [
-            self::START_DEVELOPMENT,
-            self::END_DEVELOPMENT,
-            self::START_DELIVERY,
-            self::END_DELIVERY,
-        ]);
-    }
-
-    /** @return array<MilestoneType> */
-    public static function getNonBaselineCases(?bool $isCDEL=null): array
-    {
-        return array_values(array_filter(
-            self::cases(),
-            fn(MilestoneType $e) =>
-                (
-                    $isCDEL === null
-                    || ($isCDEL ? $e->isCDEL() : $e->isRDEL())
-                )
-        ));
-    }
-
-    public function isBaseline(): bool
+    public function isBaselineMilestone(): bool
     {
         return str_starts_with($this->name, "BASELINE_");
     }
@@ -80,5 +44,59 @@ enum MilestoneType: string
     public function getNonBaselineCounterpart(): self
     {
         return self::from(str_replace('baseline_', '', $this->value));
+    }
+
+    public function isCDEL(): bool
+    {
+        return in_array($this, [
+            self::START_DEVELOPMENT,
+            self::END_DEVELOPMENT,
+            self::START_CONSTRUCTION,
+            self::END_CONSTRUCTION,
+            self::FINAL_DELIVERY,
+
+            self::BASELINE_START_DEVELOPMENT,
+            self::BASELINE_END_DEVELOPMENT,
+            self::BASELINE_START_CONSTRUCTION,
+            self::BASELINE_END_CONSTRUCTION,
+            self::BASELINE_FINAL_DELIVERY,
+        ]);
+    }
+
+    public function isRDEL(): bool
+    {
+        return in_array($this, [
+            self::START_DEVELOPMENT,
+            self::END_DEVELOPMENT,
+            self::START_DELIVERY,
+            self::END_DELIVERY,
+
+            self::BASELINE_START_DEVELOPMENT,
+            self::BASELINE_END_DEVELOPMENT,
+            self::BASELINE_START_DELIVERY,
+            self::BASELINE_END_DELIVERY,
+        ]);
+    }
+
+    /** @return array<MilestoneType> */
+    public static function getBaselineCases(bool $isCDEL): array
+    {
+        return array_values(array_filter(
+            self::cases(),
+            fn(MilestoneType $e) =>
+                $e->isBaselineMilestone()
+                && ($isCDEL ? $e->isCDEL() : $e->isRDEL())
+        ));
+    }
+
+    /** @return array<MilestoneType> */
+    public static function getNonBaselineCases(bool $isCDEL): array
+    {
+        return array_values(array_filter(
+            self::cases(),
+            fn(MilestoneType $e) =>
+                !$e->isBaselineMilestone()
+                && ($isCDEL ? $e->isCDEL() : $e->isRDEL())
+        ));
     }
 }

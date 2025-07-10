@@ -192,15 +192,4 @@ class DashboardLinksBuilder extends AbstractFrontendLinksBuilder
             text: $division->getLabel(),
         );
     }
-
-    public function setAtFundReturnBaselinesEdit(FundReturn $fundReturn, DivisionConfiguration $division): void
-    {
-        $this->setAtFundReturn($fundReturn);
-        $this->addBreadcrumb(
-            'fund_return_baselines_edit',
-            'admin_fund_return_baselines_edit',
-            routeParameters: ['fundReturnId' => $fundReturn->getId(), 'divisionKey' => $division->getKey()],
-            text: $division->getLabel(),
-        );
-    }
 }

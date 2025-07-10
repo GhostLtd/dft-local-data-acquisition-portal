@@ -27,6 +27,8 @@ pages:
   authority_admin_edit:
     title: "Edit {mca} admin user"
     breadcrumb: "Edit admin user"
+  baselines_edit:
+    breadcrumb: "Baselines: {divisionLabel}"
   data_export:
     title: Data export
   data_export_queue:
@@ -50,6 +52,9 @@ pages:
       Once you release these returns:
       * Baselines will no longer be editable
       * The returns will be visible to MCAs
+  scheme_milestone_baselines_edit:
+      title: &milestone_baselines_title "Milestone baselines: {schemeName}"
+      breadcrumb: *milestone_baselines_title
 
 authority:
   list:
