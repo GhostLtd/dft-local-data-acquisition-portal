@@ -117,35 +117,42 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
 
-        $milestoneEnums = $this->getRelevantMilestoneEnums($viewData);
         $isDevelopmentOnly = $forms['developmentOnly']->getData();
 
         $viewData->setDevelopmentOnly($isDevelopmentOnly);
+        $isCDEL = $this->isCDEL($viewData);
 
-        foreach($milestoneEnums as $milestoneEnum) {
-            $value = $forms[$milestoneEnum->value]->getData();
+        foreach(MilestoneType::getNonBaselineCases() as $milestoneType) {
+            $milestone = $viewData->getMilestoneByType($milestoneType);
 
-            $milestone = $viewData->getMilestoneByType($milestoneEnum);
-            $shouldBeRemoved = $isDevelopmentOnly && !$milestoneEnum->isDevelopmentMilestone();
+            $shouldBeRemoved =
+                !($isCDEL ? $milestoneType->isCDEL() : $milestoneType->isRDEL())
+                || ($isDevelopmentOnly && !$milestoneType->isDevelopmentMilestone());
 
             if ($shouldBeRemoved) {
                 if ($milestone) {
                     $viewData->removeMilestone($milestone);
                 }
-            } else {
-                if (!$milestone) {
-                    $milestone = (new Milestone())->setType($milestoneEnum);
-                    $viewData->addMilestone($milestone);
-                }
-
-                $milestone->setDate($value);
             }
+
+            if ($shouldBeRemoved || $milestoneType->isBaselineMilestone()) {
+                continue;
+            }
+
+            $value = $forms[$milestoneType->value]->getData();
+
+            if (!$milestone) {
+                $milestone = (new Milestone())->setType($milestoneType);
+                $viewData->addMilestone($milestone);
+            }
+
+            $milestone->setDate($value);
         }
     }
 
     protected function getRelevantMilestoneEnums(CrstsSchemeReturn $schemeReturn): array
     {
-        return MilestoneType::getNonBaselineCases($this->isCDEL($schemeReturn));;
+        return MilestoneType::getNonBaselineCases($this->isCDEL($schemeReturn));
     }
 
     protected function isCDEL(CrstsSchemeReturn $schemeReturn): bool
