@@ -55,7 +55,7 @@ class EditBaselinesController extends AbstractReturnController
             return $response;
         }
 
-        return $this->render('frontend/fund_return/baselines_edit.html.twig', [
+        return $this->render('admin/fund_return/baselines_edit.html.twig', [
             'linksBuilder' => $linksBuilder,
             'expensesTable' => $tableHelper->getTable(),
             'form' => $form,

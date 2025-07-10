@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
-class MilestoneDatesType extends AbstractType implements DataMapperInterface
+class MilestoneBaselinesType extends AbstractType implements DataMapperInterface
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -95,16 +95,9 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
 
-        $milestoneEnums = $this->getRelevantMilestoneEnums($viewData);
-        $isDevelopmentOnly = $viewData->getDevelopmentOnly();
-        $forms['developmentOnly']->setData($isDevelopmentOnly);
-
-        foreach($milestoneEnums as $milestoneEnum) {
+        foreach($this->getRelevantMilestoneEnums($viewData) as $milestoneEnum) {
             $data = $viewData->getMilestoneByType($milestoneEnum)?->getDate();
-
-            if (!$isDevelopmentOnly || $milestoneEnum->isDevelopmentMilestone()) {
-                $forms[$milestoneEnum->value]->setData($data);
-            }
+            $forms[$milestoneEnum->value]->setData($data);
         }
     }
 
@@ -118,9 +111,6 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
         /** @var FormInterface[] $forms */
 
         $milestoneEnums = $this->getRelevantMilestoneEnums($viewData);
-        $isDevelopmentOnly = $forms['developmentOnly']->getData();
-
-        $viewData->setDevelopmentOnly($isDevelopmentOnly);
 
         foreach($milestoneEnums as $milestoneEnum) {
             $value = $forms[$milestoneEnum->value]->getData();
@@ -145,11 +135,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
 
     protected function getRelevantMilestoneEnums(CrstsSchemeReturn $schemeReturn): array
     {
-        return MilestoneType::getNonBaselineCases($this->isCDEL($schemeReturn));;
-    }
-
-    protected function isCDEL(CrstsSchemeReturn $schemeReturn): bool
-    {
-        return $schemeReturn->getScheme()->getCrstsData()->getFundedMostlyAs() === FundedMostlyAs::CDEL;
+        $isCDEL = $schemeReturn->getScheme()->getCrstsData()->getFundedMostlyAs() === FundedMostlyAs::CDEL;
+        return MilestoneType::getBaselineCases($isCDEL);
     }
 }
