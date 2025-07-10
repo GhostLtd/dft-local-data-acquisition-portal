@@ -79,24 +79,30 @@ enum MilestoneType: string
     }
 
     /** @return array<MilestoneType> */
-    public static function getBaselineCases(bool $isCDEL): array
+    public static function getBaselineCases(?bool $isCDEL=null): array
     {
         return array_values(array_filter(
             self::cases(),
             fn(MilestoneType $e) =>
                 $e->isBaselineMilestone()
-                && ($isCDEL ? $e->isCDEL() : $e->isRDEL())
+                && (
+                    $isCDEL === null
+                    || ($isCDEL ? $e->isCDEL() : $e->isRDEL())
+                )
         ));
     }
 
     /** @return array<MilestoneType> */
-    public static function getNonBaselineCases(bool $isCDEL): array
+    public static function getNonBaselineCases(?bool $isCDEL=null): array
     {
         return array_values(array_filter(
             self::cases(),
             fn(MilestoneType $e) =>
                 !$e->isBaselineMilestone()
-                && ($isCDEL ? $e->isCDEL() : $e->isRDEL())
+                && (
+                    $isCDEL === null
+                    || ($isCDEL ? $e->isCDEL() : $e->isRDEL())
+                )
         ));
     }
 }
