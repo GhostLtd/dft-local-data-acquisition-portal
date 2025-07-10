@@ -12,11 +12,15 @@ use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatableMessage;
 
 class MilestoneBaselineTableHelper
 {
     protected CrstsFundReturn $fundReturn;
+
+    public function __construct(protected UrlGeneratorInterface $urlGenerator)
+    {}
 
     public function setFundReturn(CrstsFundReturn $fundReturn): static {
         $this->fundReturn = $fundReturn;
@@ -79,9 +83,16 @@ class MilestoneBaselineTableHelper
                 ]);
             }
 
+            $link = htmlspecialchars(
+                $this->urlGenerator->generate('admin_scheme_return_milestone_baselines_edit', [
+                    'schemeId' => $schemeReturn->getScheme()->getId(),
+                    'fundReturnId' => $schemeReturn->getFundReturn()->getId(),
+                ]), \ENT_QUOTES | \ENT_SUBSTITUTE
+            );
+
             $cells[] = new Cell([
                 'key' => "milestone__{$schemeReturnId}__links",
-                'html' => '<a class="govuk-link" href="#">edit</a>',
+                'html' => '<a class="govuk-link" href="'.$link.'">edit</a>',
             ]);
 
             $bodyRows[] = new Row($cells, ['classes' => 'ungrouped']);
