@@ -9,75 +9,24 @@ use App\Entity\Scheme;
 use App\Entity\SchemeData\CrstsData;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Form\Type\SchemeReturn\Crsts\MilestoneDatesType;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
 
 class MilestoneDatesTypeTest extends AbstractTypeTest
 {
     public function dataForm(): array
     {
-        $initialMilestones = '{"baseline_start_construction":"2025-04-01","start_development":"2025-05-01"}';
-        $fundedMostlyAs = FundedMostlyAs::CDEL;
-
         $validDate = ['year' => '2025', 'month' => '3', 'day' => '3'];
-        $formData = [
-            'developmentOnly' => 'true',
-            'start_development' => $validDate,
-            'end_development' => $validDate,
-        ];
-
-        $allBaselines = '"baseline_end_construction":"2025-04-01","baseline_end_delivery":"2025-04-01","baseline_end_development":"2025-04-01","baseline_final_delivery":"2025-04-01","baseline_start_construction":"2025-04-01","baseline_start_delivery":"2025-04-01","baseline_start_development":"2025-04-01"';
-        $allMilestones = '{'.$allBaselines.',"end_construction":"2025-04-01","end_delivery":"2025-04-01","end_development":"2025-04-01","final_delivery":"2025-04-01","start_construction":"2025-04-01","start_delivery":"2025-04-01","start_development":"2025-04-01"}';
 
         return array_merge(
-            $this->getCDELValidationTests($validDate),
-            $this->getRDELValidationTests($validDate),
-            [
-                'CDEL: development-only (baselines, start/end development remain)' => [
-                    $allMilestones,
-                    FundedMostlyAs::CDEL,
-                    [
-                        'developmentOnly' => 'true',
-                        'start_development' => ['year' => '2025', 'month' => '3', 'day' => '3'],
-                        'end_development' => ['year' => '2025', 'month' => '5', 'day' => '1'],
-                    ],
-                    true,
-                    '{'.$allBaselines.',"end_development":"2025-05-01","start_development":"2025-03-01"}',
-                ],
-            ],
-            [
-                'RDEL: development-only (baselines, start/end construction remain)' => [
-                    $allMilestones,
-                    FundedMostlyAs::CDEL,
-                    [
-                        'developmentOnly' => 'true',
-                        'start_development' => ['year' => '2025', 'month' => '3', 'day' => '3'],
-                        'end_development' => ['year' => '2025', 'month' => '5', 'day' => '1'],
-                    ],
-                    true,
-                    '{'.$allBaselines.',"end_construction":"2025-05-01","start_construction":"2025-03-01"}',
-                ],
-            ],
+            $this->getCDELValidationTestCases($validDate),
+            $this->getRDELValidationTestCases($validDate),
+            $this->getDataTransformTestCases(),
         );
-
-
-//            [
-//                '{"baseline_start_construction":"2025-04-01","start_development":"2025-05-01"}',
-//                FundedMostlyAs::CDEL,
-//                [
-//                    'developmentOnly' => 'true',
-//                    'start_development' => $validDate,
-//                    'end_development' => $validDate,
-//                ],
-//                true,
-//                '{"baseline_start_construction":"2025-04-01","end_development":"2025-03-03","start_development":"2025-03-03"}',
-//            ]
     }
 
-    protected function getCDELValidationTests(array $validDate): array
+    protected function getCDELValidationTestCases(array $validDate): array
     {
         return [
-            'CDEL: Missing start_development + end_development' => [
+            'CDEL: Validation - Missing start_development + end_development' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -85,7 +34,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing end_development' => [
+            'CDEL: Validation - Missing end_development' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -94,7 +43,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing start_development' => [
+            'CDEL: Validation - Missing start_development' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -103,7 +52,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Valid development only' => [
+            'CDEL: Validation - Valid development only' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -113,7 +62,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 true,
             ],
-            'CDEL: Missing start_construction, end_construction, final_delivery' => [
+            'CDEL: Validation - Missing start_construction, end_construction, final_delivery' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -123,7 +72,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing end_construction, final_delivery' => [
+            'CDEL: Validation - Missing end_construction, final_delivery' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -136,7 +85,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing start_construction, final_delivery' => [
+            'CDEL: Validation - Missing start_construction, final_delivery' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -149,7 +98,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing start_construction, end_construction' => [
+            'CDEL: Validation - Missing start_construction, end_construction' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -162,7 +111,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing end_construction' => [
+            'CDEL: Validation - Missing end_construction' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -176,7 +125,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing start_construction' => [
+            'CDEL: Validation - Missing start_construction' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -190,7 +139,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Missing final_delivery' => [
+            'CDEL: Validation - Missing final_delivery' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -204,7 +153,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'CDEL: Valid non-development' => [
+            'CDEL: Validation - Valid non-development' => [
                 '{}',
                 FundedMostlyAs::CDEL,
                 [
@@ -222,10 +171,10 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
         ];
     }
 
-    protected function getRDELValidationTests(array $validDate): array
+    protected function getRDELValidationTestCases(array $validDate): array
     {
         return [
-            'RDEL: Missing start_development + end_development' => [
+            'RDEL: Validation - Missing start_development + end_development' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -233,7 +182,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'RDEL: Missing end_development' => [
+            'RDEL: Validation - Missing end_development' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -242,7 +191,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'RDEL: Missing start_development' => [
+            'RDEL: Validation - Missing start_development' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -251,7 +200,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'RDEL: Valid development only' => [
+            'RDEL: Validation - Valid development only' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -261,7 +210,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 true,
             ],
-            'RDEL: Missing start_delivery, end_delivery' => [
+            'RDEL: Validation - Missing start_delivery, end_delivery' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -271,7 +220,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'RDEL: Missing end_delivery' => [
+            'RDEL: Validation - Missing end_delivery' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -284,7 +233,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'RDEL: Missing start_delivery' => [
+            'RDEL: Validation - Missing start_delivery' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -297,7 +246,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                 ],
                 false,
             ],
-            'RDEL: Valid non-development' => [
+            'RDEL: Validation - Valid non-development' => [
                 '{}',
                 FundedMostlyAs::RDEL,
                 [
@@ -310,6 +259,68 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
                     ],
                 ],
                 true,
+            ],
+        ];
+    }
+
+    protected function getDataTransformTestCases(): array
+    {
+        $allBaselines = '"baseline_end_construction":"2025-04-01","baseline_end_delivery":"2025-04-01","baseline_end_development":"2025-04-01","baseline_final_delivery":"2025-04-01","baseline_start_construction":"2025-04-01","baseline_start_delivery":"2025-04-01","baseline_start_development":"2025-04-01"';
+        $allMilestones = '{' . $allBaselines . ',"end_construction":"2025-04-01","end_delivery":"2025-04-01","end_development":"2025-04-01","final_delivery":"2025-04-01","start_construction":"2025-04-01","start_delivery":"2025-04-01","start_development":"2025-04-01"}';
+
+        return [
+            'CDEL: Data transforms - development-only (baselines, start/end development remain)' => [
+                $allMilestones,
+                FundedMostlyAs::CDEL,
+                [
+                    'developmentOnly' => 'true',
+                    'start_development' => ['year' => '2025', 'month' => '3', 'day' => '3'],
+                    'end_development' => ['year' => '2025', 'month' => '5', 'day' => '1'],
+                ],
+                true,
+                '{' . $allBaselines . ',"end_development":"2025-05-01","start_development":"2025-03-03"}',
+            ],
+            'CDEL: Data transforms - not development-only (baselines, start/end development, start/end construction, final delivery remain)' => [
+                $allMilestones,
+                FundedMostlyAs::CDEL,
+                [
+                    'developmentOnly' => 'false',
+                    'start_development' => ['year' => '2025', 'month' => '3', 'day' => '3'],
+                    'end_development' => ['year' => '2025', 'month' => '5', 'day' => '1'],
+                    'nonDevelopmentalMilestones' => [
+                        'start_construction' => ['year' => '2025', 'month' => '6', 'day' => '6'],
+                        'end_construction' => ['year' => '2025', 'month' => '7', 'day' => '7'],
+                        'final_delivery' => ['year' => '2025', 'month' => '8', 'day' => '8'],
+                    ],
+                ],
+                true,
+                '{' . $allBaselines . ',"end_construction":"2025-07-07","end_development":"2025-05-01","final_delivery":"2025-08-08","start_construction":"2025-06-06","start_development":"2025-03-03"}',
+            ],
+            'RDEL: Data transforms - development-only (baselines, start/end development remain)' => [
+                $allMilestones,
+                FundedMostlyAs::CDEL,
+                [
+                    'developmentOnly' => 'true',
+                    'start_development' => ['year' => '2025', 'month' => '3', 'day' => '3'],
+                    'end_development' => ['year' => '2025', 'month' => '5', 'day' => '1'],
+                ],
+                true,
+                '{' . $allBaselines . ',"end_development":"2025-05-01","start_development":"2025-03-03"}',
+            ],
+            'RDEL: Data transforms - not development-only (baselines, start/end development, start/end delivery remain)' => [
+                $allMilestones,
+                FundedMostlyAs::RDEL,
+                [
+                    'developmentOnly' => 'false',
+                    'start_development' => ['year' => '2025', 'month' => '3', 'day' => '3'],
+                    'end_development' => ['year' => '2025', 'month' => '5', 'day' => '1'],
+                    'nonDevelopmentalMilestones' => [
+                        'start_delivery' => ['year' => '2025', 'month' => '6', 'day' => '6'],
+                        'end_delivery' => ['year' => '2025', 'month' => '7', 'day' => '7'],
+                    ],
+                ],
+                true,
+                '{' . $allBaselines . ',"end_delivery":"2025-07-07","end_development":"2025-05-01","start_delivery":"2025-06-06","start_development":"2025-03-03"}',
             ],
         ];
     }
@@ -317,7 +328,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
     /**
      * @dataProvider dataForm
      */
-    public function testForm(string $initialMilestones, FundedMostlyAs $fundedMostlyAs, array $formData, bool $expectedToBeValid, ?string $expectedOutputMilestones=null): void
+    public function testForm(string $initialMilestones, FundedMostlyAs $fundedMostlyAs, array $formData, bool $expectedToBeValid, ?string $expectedOutputMilestones = null): void
     {
         $crstsData = (new CrstsData())
             ->setFundedMostlyAs($fundedMostlyAs);
