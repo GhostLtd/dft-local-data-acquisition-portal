@@ -152,7 +152,14 @@
             {% endif %}
         {%- endfor -%}
 
-        {{- displaySectionsAsTabs(sections, 'frontend.pages.fund_return.titles.baselines' | trans, selectedTabIndex, containerClass: '') -}}
+        {{- displaySectionsAsTabs(sections, 'frontend.pages.fund_return.titles.baselines' | trans, selectedTabIndex) -}}
+
+        {%- from "frontend/macros.html.twig" import renderTable -%}
+
+        <div>
+            <h2 class="govuk-heading-m">Milestone baselines</h2>
+            {{- renderTable(milestonesTable) -}}
+        </div>
     {%- endif -%}
 
     {%- set buttonsAndLinks -%}

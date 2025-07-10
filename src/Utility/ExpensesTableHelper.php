@@ -5,7 +5,6 @@ namespace App\Utility;
 use App\Config\ExpenseDivision\DivisionConfiguration;
 use App\Config\ExpenseDivision\TableConfiguration;
 use App\Config\ExpenseRow\CategoryConfiguration;
-use App\Config\ExpenseRow\RowGroupInterface;
 use App\Config\ExpenseRow\TotalConfiguration;
 use App\Config\ExpenseRow\UngroupedConfiguration;
 use App\Config\Table\Cell;
