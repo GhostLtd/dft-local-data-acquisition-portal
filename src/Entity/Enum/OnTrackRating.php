@@ -14,7 +14,12 @@ enum OnTrackRating: string
 
     public function getTagClass(): string
     {
-        return 'govuk-tag--' . match ($this) {
+        return "govuk-tag--{$this->getTagColour()}";
+    }
+
+    public function getTagColour(): string
+    {
+        return match ($this) {
             self::RED => 'red',
             self::AMBER => 'orange',
             self::GREEN => 'green',
@@ -25,6 +30,7 @@ enum OnTrackRating: string
             self::SCHEME_SPLIT => 'blue',
         };
     }
+
 
     public function shouldBePropagatedToFutureReturns(): bool
     {

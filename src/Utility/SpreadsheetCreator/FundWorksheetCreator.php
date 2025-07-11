@@ -53,8 +53,8 @@ class FundWorksheetCreator extends AbstractWorksheetCreator
             ->setCellValue($this->relXY(1, 2), 'Year')
             ->setCellValue($this->relXY(1, 3), 'Quarter');
 
-        $this->setBold($this->relX(1), $this->relY(2));
-        $this->setBold($this->relX(1), $this->relY(3));
+        $this->setBold(...$this->relXY(1, 2));
+        $this->setBold(...$this->relXY(1, 3));
 
         $firstColumn = Coordinate::stringFromColumnIndex($this->relX(1));
 
