@@ -128,10 +128,4 @@ class Location
         $this->getAlignment()->setHorizontal($alignment);
         return $this;
     }
-
-    public function mergeCells(int $x1, int $y1, int $x2, int $y2): static
-    {
-        $this->worksheet->mergeCells([$x1 + $this->x, $y1 + $this->y, $x2 + $this->x, $y2 + $this->y]);
-        return $this;
-    }
 }

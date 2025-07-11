@@ -28,6 +28,8 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
     public function addWorksheet(Worksheet $worksheet, CrstsFundReturn $fundReturn): void
     {
         $this->worksheet = $worksheet->setTitle('Scheme milestones');
+        $this->worksheet->freezePane($this->relXY(3, 3));
+
         $this->helper = new WorksheetHelper($this->worksheet);
 
         $this->writeRowHeaders();
@@ -199,5 +201,7 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
         $this->helper->at(15, 2)
             ->setValue('BCR')
             ->apply($styles);
+
+        $this->helper->mergeCells(1, 1, 15, 1);
     }
 }
