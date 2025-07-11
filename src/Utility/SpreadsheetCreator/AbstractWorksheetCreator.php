@@ -11,8 +11,8 @@ abstract class AbstractWorksheetCreator
 
     protected Worksheet $worksheet;
 
-    protected int $originX = 0;
-    protected int $originY = 0;
+    protected int $offsetX = 0;
+    protected int $offsetY = 0;
 
     protected Color $cellShadeEven;
     protected
@@ -48,12 +48,12 @@ abstract class AbstractWorksheetCreator
 
     protected function relX(int $x): int
     {
-        return $x + $this->originX;
+        return $x + $this->offsetX;
     }
 
     protected function relY(int $y): int
     {
-        return $y + $this->originY;
+        return $y + $this->offsetY;
     }
 
     protected function relXY(int $x, int $y): array
