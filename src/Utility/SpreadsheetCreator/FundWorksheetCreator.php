@@ -122,30 +122,32 @@ class FundWorksheetCreator extends AbstractWorksheetCreator
         $oddRow = false;
 
         foreach($this->expensesTableHelper->getRowGroupConfigurations() as $rowGroup) {
-            $currentY = $this->relY(3 + $currentRow);
+            $currentY = 3 + $currentRow;
 
-            $this->worksheet->setCellValue([$this->relX(0), $currentY], $rowGroup->getLabel(['fund' => $fundStr])->trans($this->translator));
-            $this->setBold($this->originX, $currentY);
+            $this->worksheet->setCellValue($this->relXY(0, $currentY), $rowGroup->getLabel(['fund' => $fundStr])->trans($this->translator));
+            $this->setBold(...$this->relXY(0, $currentY));
 
             if ($rowGroup instanceof CategoryConfiguration) {
                 foreach($rowGroup->getRowConfigurations() as $rowIdx => $type) {
                     $label = $type->getLabel(['fund' => $fundStr])->trans($this->translator);
-                    $this->worksheet->setCellValue([$this->relX(1), $currentY + $rowIdx], $label);
+
+                    $cellCoords = $this->relXY(1, $currentY + $rowIdx);
+                    $this->worksheet->setCellValue($cellCoords, $label);
 
                     $isBaseline = $type instanceof ExpenseType && $type->isBaseline();
                     if ($isBaseline) {
-                        $this->setItalic($this->relX(1), $currentY + $rowIdx);
+                        $this->setItalic(...$cellCoords);
                     } else {
-                        $this->setBold($this->relX(1), $currentY + $rowIdx);
+                        $this->setBold(...$cellCoords);
                     }
 
                     if ($label === '') {
-                        $this->worksheet->mergeCells([$this->originX, $currentY, $this->originX + 1, $currentY]);
+                        $this->worksheet->mergeCells($this->relXYXY(0, $currentY, 1, $currentY));
 
-                        $style = $this->worksheet->getStyle([$this->relX(2), $currentY + $rowIdx, $this->relX($columnCount - 2), $currentY + $rowIdx]);
+                        $style = $this->worksheet->getStyle($this->relXYXY(2, $currentY + $rowIdx, $columnCount - 2, $currentY + $rowIdx));
                         $style->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($oddRow ? $this->cellShadeOdd : $this->cellShadeEven);
                     } else {
-                        $style = $this->worksheet->getStyle([$this->relX(1), $currentY + $rowIdx, $this->relX(1 + $columnCount - 2), $currentY + $rowIdx]);
+                        $style = $this->worksheet->getStyle($this->relXYXY(1, $currentY + $rowIdx, 1 + $columnCount - 2, $currentY + $rowIdx));
                         $borders = $style->getBorders();
                         $borders->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor($this->darkGray);
                         $borders->getLeft()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
@@ -157,21 +159,20 @@ class FundWorksheetCreator extends AbstractWorksheetCreator
                     $oddRow = !$oddRow;
                 }
 
-                $borders = $this->worksheet->getStyle([$this->relX(0), $currentY, $this->relX($columnCount - 1), $currentY + $rowGroup->rowCount() - 1])->getBorders();
+                $borders = $this->worksheet->getStyle($this->relXYXY(0, $currentY, $columnCount - 1, $currentY + $rowGroup->rowCount() - 1))->getBorders();
                 $borders->getTop()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
                 $borders->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
             } else {
-                $this->worksheet->mergeCells([$this->relX(0), $currentY, $this->relX(1), $currentY]);
-
-                $style = $this->worksheet->getStyle([$this->relX(0), $currentY]);
+                $this->worksheet->mergeCells($this->relXYXY(0, $currentY, 1, $currentY));
+                $style = $this->worksheet->getStyle($this->relXY(0, $currentY));
                 $borders = $style->getBorders();
                 $borders->getTop()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
                 $borders->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
 
-                $style = $this->worksheet->getStyle([$this->relX(2), $currentY, $this->relX(2) + $columnCount - 3, $currentY]);
+                $style = $this->worksheet->getStyle($this->relXYXY(2, $currentY, 2 + $columnCount - 3, $currentY));
                 $style->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($oddRow ? $this->cellShadeOdd : $this->cellShadeEven);
 
-                $this->setBold($this->relX(0), $currentY);
+                $this->setBold(...$this->relXY(0, $currentY));
 
                 $currentRow++;
                 $oddRow = !$oddRow;
@@ -233,11 +234,11 @@ class FundWorksheetCreator extends AbstractWorksheetCreator
                     $sumParts = [];
                     foreach($totalRow->getKeysOfRowsToSum() as $srcKey) {
                         $srcRowIdx = $this->expensesTableHelper->getAbsoluteRowIndexForKey($srcKey->value);
-                        $sumParts[] = Coordinate::stringFromColumnIndex($this->originX + 2 + $columnIdx) . ($this->originY + 3 + $srcRowIdx);
+                        $sumParts[] = Coordinate::stringFromColumnIndex($this->relX(2 + $columnIdx)).($this->relY(3 + $srcRowIdx));
                     }
 
                     $targetRowIdx = $this->expensesTableHelper->getAbsoluteRowIndexForKey($totalRow->getKey());
-                    $cell = $this->worksheet->getCell([$this->originX + 2 + $columnIdx, $this->originY + 3 + $targetRowIdx]);
+                    $cell = $this->worksheet->getCell($this->relXY(2 + $columnIdx, 3 + $targetRowIdx));
                     $cell->setValue('=' . join('+', $sumParts));
                     $cell->getStyle()->getNumberFormat()->setFormatCode(self::NUMERIC_FORMAT_CODE);
                 }
@@ -255,7 +256,7 @@ class FundWorksheetCreator extends AbstractWorksheetCreator
             default => new Color('ffccccee'),
         };
 
-        $columnIdx = $this->originX + 2;
+        $columnIdx = $this->relX(2);
         $rowCount = $this->expensesTableHelper->getRowCount();
 
         foreach($divisionConfigurations as $divisionConfiguration) {
@@ -264,7 +265,7 @@ class FundWorksheetCreator extends AbstractWorksheetCreator
             for($i = 0; $i < $rowCount; $i++) {
                 $startColumn = Coordinate::stringFromColumnIndex($columnIdx);
                 $endColumn = Coordinate::stringFromColumnIndex($columnIdx + $columnCount - 1);
-                $row = $this->originY + 3 + $i;
+                $row = $this->relY(3 + $i);
 
                 if ($columnCount > 1) {
                     $cell = $this->worksheet->getCell([$columnIdx + $columnCount, $row]);
@@ -272,7 +273,7 @@ class FundWorksheetCreator extends AbstractWorksheetCreator
                     $cell->getStyle()->getNumberFormat()->setFormatCode(self::NUMERIC_FORMAT_CODE);
                 } else {
                     $sumCells = [];
-                    $currentX = $this->originX + 2 - 1;
+                    $currentX = $this->relX(1);
                     foreach($divisionConfigurations as $innerDivisionConfiguration) {
                         $innerColumnCount = $innerDivisionConfiguration->getColumnCount();
                         if ($innerColumnCount > 1) {
