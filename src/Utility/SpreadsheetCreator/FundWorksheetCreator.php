@@ -3,7 +3,6 @@
 namespace App\Utility\SpreadsheetCreator;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
-use App\Config\ExpenseDivision\TableConfiguration;
 use App\Config\ExpenseRow\CategoryConfiguration;
 use App\Config\ExpenseRow\TotalConfiguration;
 use App\Entity\Enum\ExpenseType;
@@ -20,48 +19,19 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FundWorksheetCreator
+class FundWorksheetCreator extends AbstractWorksheetCreator
 {
-    const string NUMERIC_FORMAT_CODE = '#,##0.00;[Red]-#,##0.00';
-
-    protected Worksheet $worksheet;
-    protected int $originX = 2;
-    protected int $originY = 2;
-
-    protected Color $cellShadeEven;
-    protected Color $cellShadeOdd;
-
-    protected Color $black;
-    protected Color $blue;
-    protected Color $darkGray;
-    protected Color $lightGray;
-    protected Color $white;
-
     public function __construct(
         protected ExpensesTableHelper $expensesTableHelper,
         protected TranslatorInterface $translator,
     ) {
-        $this->blue = new Color('ff2f5597');
-        $this->black = new Color(Color::COLOR_BLACK);
-        $this->darkGray = new Color('ff888888');
-        $this->white = new Color(Color::COLOR_WHITE);
-        $this->lightGray = new Color('ffcccccc');
+        parent::__construct();
 
-        $this->cellShadeEven = new Color('ffeeeeee');
-        $this->cellShadeOdd = new Color('ffdddddd');
+        $this->originX = 2;
+        $this->originY = 2;
     }
 
-    public function setBold(int $x, int $y): void
-    {
-        $this->worksheet->getStyle([$x, $y])->getFont()->setBold(true);
-    }
-
-    public function setItalic(int $x, int $y): void
-    {
-        $this->worksheet->getStyle([$x, $y])->getFont()->setItalic(true);
-    }
-
-    public function addFundWorksheet(Worksheet $worksheet, CrstsFundReturn $fundReturn): void
+    public function addWorksheet(Worksheet $worksheet, CrstsFundReturn $fundReturn): void
     {
         $configuration = CrstsHelper::getFundExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter());
         $divisionConfigurations = $configuration->getDivisionConfigurations();
@@ -71,7 +41,7 @@ class FundWorksheetCreator
         $columnCount = array_sum(array_map(fn(DivisionConfiguration $d) => count($d->getColumnConfigurations()) + 1, $divisionConfigurations)) + 2;
         $rowCount = $this->expensesTableHelper->getRowCount();
 
-        $lastColumn = Coordinate::stringFromColumnIndex($this->originX + $columnCount - 1);
+        $lastColumn = Coordinate::stringFromColumnIndex($this->relX($columnCount - 1));
 
         $this->worksheet = $worksheet;
         $this->worksheet->setTitle('Fund expenditure');
@@ -79,21 +49,21 @@ class FundWorksheetCreator
         $fundStr = $this->translator->trans("enum.fund.{$fundReturn->getFund()->value}");
 
         $this->worksheet
-            ->setCellValue([$this->originX, $this->originY], 'Fund expenditure')
-            ->setCellValue([$this->originX, $this->originY + 1], 'Year')
-            ->setCellValue([$this->originX, $this->originY + 2], 'Quarter');
+            ->setCellValue($this->relXY(0, 0), 'Fund expenditure')
+            ->setCellValue($this->relXY(0, 1), 'Year')
+            ->setCellValue($this->relXY(0, 2), 'Quarter');
 
-        $this->setBold($this->originX, $this->originY + 1);
-        $this->setBold($this->originX, $this->originY + 2);
+        $this->setBold($this->relX(0), $this->relY(1));
+        $this->setBold($this->relX(0), $this->relY(2));
 
-        $firstColumn = Coordinate::stringFromColumnIndex($this->originX);
+        $firstColumn = Coordinate::stringFromColumnIndex($this->relX(0));
 
         $this->worksheet
             ->getColumnDimension($firstColumn)
             ->setWidth(30);
 
         $this->worksheet
-            ->getColumnDimension(Coordinate::stringFromColumnIndex($this->originX + 1))
+            ->getColumnDimension(Coordinate::stringFromColumnIndex($this->relX(1)))
             ->setWidth(50);
 
         // Make the first column bold
@@ -108,7 +78,8 @@ class FundWorksheetCreator
         // Fill out the values
         foreach($fundReturn->getExpenses() as $expense) {
             $columnIdx = $this->expensesTableHelper->getAbsoluteColumnIndexFor($divisionConfigurations, $expense->getDivision(), $expense->getColumn(), accountForTotalColumns: true);
-            $cell = $this->worksheet->getCell([$this->originX + 2 + $columnIdx, $this->originY + 3 + $this->expensesTableHelper->getAbsoluteRowIndexFor($expense->getType())]);
+            $rowIdx = $this->expensesTableHelper->getAbsoluteRowIndexFor($expense->getType());
+            $cell = $this->worksheet->getCell($this->relXY(2 + $columnIdx, 3 + $rowIdx));
             $cell->setValueExplicit($expense->getValue(), DataType::TYPE_NUMERIC);
             $cell->getStyle()->getNumberFormat()->setFormatCode(self::NUMERIC_FORMAT_CODE);
         }
@@ -120,26 +91,26 @@ class FundWorksheetCreator
         // Styles
 
         // Top bar
-        $this->worksheet->mergeCells("{$firstColumn}{$this->originY}:{$lastColumn}{$this->originY}");
-        $style = $this->worksheet->getStyle("{$firstColumn}{$this->originY}");
+        $this->worksheet->mergeCells("{$firstColumn}{$this->relY(0)}:{$lastColumn}{$this->relY(0)}");
+        $style = $this->worksheet->getStyle("{$firstColumn}{$this->relY(0)}");
         $style->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
         $style->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($this->blue);
         $style->getFont()->setColor($this->white);
         $style->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Headers
-        $style = $this->worksheet->getStyle([$this->originX, $this->originY + 1, $this->originX + $columnCount - 1, $this->originY + 2]);
+        $style = $this->worksheet->getStyle($this->relXYXY(0, 1, $columnCount - 1, 2));
         $style->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($this->lightGray);
 
-        $style = $this->worksheet->getStyle([$this->originX, $this->originY + 2, $this->originX + $columnCount - 1, $this->originY + 2]);
+        $style = $this->worksheet->getStyle($this->relXYXY(0, 2, $columnCount - 1, 2));
         $style->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THICK)->setColor($this->black);
 
         // Footer
-        $style = $this->worksheet->getStyle([$this->originX, $this->originY + 2 + $rowCount, $this->originX + $columnCount - 1, $this->originY + 2 + $rowCount]);
+        $style = $this->worksheet->getStyle($this->relXYXY(0, 2 + $rowCount, $columnCount - 1, 2 + $rowCount));
         $style->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
 
         // Outer box
-        $style = $this->worksheet->getStyle([$this->originX, $this->originY, $this->originX + $columnCount - 1, $this->originY + 2 + $rowCount]);
+        $style = $this->worksheet->getStyle($this->relXYXY(0, 0, $columnCount - 1, 2 + $rowCount));
         $borders = $style->getBorders();
         $borders->getLeft()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
         $borders->getRight()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
@@ -151,30 +122,30 @@ class FundWorksheetCreator
         $oddRow = false;
 
         foreach($this->expensesTableHelper->getRowGroupConfigurations() as $rowGroup) {
-            $currentY = $this->originY + 3 + $currentRow;
+            $currentY = $this->relY(3 + $currentRow);
 
-            $this->worksheet->setCellValue([$this->originX, $currentY], $rowGroup->getLabel(['fund' => $fundStr])->trans($this->translator));
+            $this->worksheet->setCellValue([$this->relX(0), $currentY], $rowGroup->getLabel(['fund' => $fundStr])->trans($this->translator));
             $this->setBold($this->originX, $currentY);
 
             if ($rowGroup instanceof CategoryConfiguration) {
                 foreach($rowGroup->getRowConfigurations() as $rowIdx => $type) {
                     $label = $type->getLabel(['fund' => $fundStr])->trans($this->translator);
-                    $this->worksheet->setCellValue([$this->originX + 1, $currentY + $rowIdx], $label);
+                    $this->worksheet->setCellValue([$this->relX(1), $currentY + $rowIdx], $label);
 
                     $isBaseline = $type instanceof ExpenseType && $type->isBaseline();
                     if ($isBaseline) {
-                        $this->setItalic($this->originX + 1, $currentY + $rowIdx);
+                        $this->setItalic($this->relX(1), $currentY + $rowIdx);
                     } else {
-                        $this->setBold($this->originX + 1, $currentY + $rowIdx);
+                        $this->setBold($this->relX(1), $currentY + $rowIdx);
                     }
 
                     if ($label === '') {
                         $this->worksheet->mergeCells([$this->originX, $currentY, $this->originX + 1, $currentY]);
 
-                        $style = $this->worksheet->getStyle([$this->originX + 2, $currentY + $rowIdx, $this->originX + $columnCount - 2, $currentY + $rowIdx]);
+                        $style = $this->worksheet->getStyle([$this->relX(2), $currentY + $rowIdx, $this->relX($columnCount - 2), $currentY + $rowIdx]);
                         $style->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($oddRow ? $this->cellShadeOdd : $this->cellShadeEven);
                     } else {
-                        $style = $this->worksheet->getStyle([$this->originX + 1, $currentY + $rowIdx, $this->originX + 1 + $columnCount - 2, $currentY + $rowIdx]);
+                        $style = $this->worksheet->getStyle([$this->relX(1), $currentY + $rowIdx, $this->relX(1 + $columnCount - 2), $currentY + $rowIdx]);
                         $borders = $style->getBorders();
                         $borders->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor($this->darkGray);
                         $borders->getLeft()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
@@ -186,21 +157,21 @@ class FundWorksheetCreator
                     $oddRow = !$oddRow;
                 }
 
-                $borders = $this->worksheet->getStyle([$this->originX, $currentY, $this->originX + $columnCount - 1, $currentY + $rowGroup->rowCount() - 1])->getBorders();
+                $borders = $this->worksheet->getStyle([$this->relX(0), $currentY, $this->relX($columnCount - 1), $currentY + $rowGroup->rowCount() - 1])->getBorders();
                 $borders->getTop()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
                 $borders->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
             } else {
-                $this->worksheet->mergeCells([$this->originX, $currentY, $this->originX + 1, $currentY]);
+                $this->worksheet->mergeCells([$this->relX(0), $currentY, $this->relX(1), $currentY]);
 
-                $style = $this->worksheet->getStyle([$this->originX, $currentY]);
+                $style = $this->worksheet->getStyle([$this->relX(0), $currentY]);
                 $borders = $style->getBorders();
                 $borders->getTop()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
                 $borders->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor($this->black);
 
-                $style = $this->worksheet->getStyle([$this->originX + 2, $currentY, $this->originX + 2 + $columnCount - 3, $currentY]);
+                $style = $this->worksheet->getStyle([$this->relX(2), $currentY, $this->relX(2) + $columnCount - 3, $currentY]);
                 $style->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($oddRow ? $this->cellShadeOdd : $this->cellShadeEven);
 
-                $this->setBold($this->originX, $currentY);
+                $this->setBold($this->relX(0), $currentY);
 
                 $currentRow++;
                 $oddRow = !$oddRow;
@@ -210,40 +181,41 @@ class FundWorksheetCreator
 
     public function writeColumnHeaders(array $divisionConfigurations, int $rowCount): void
     {
-        $currentX = $this->originX + 2;
+        $currentX = 2;
         foreach($divisionConfigurations as $divisionConfiguration) {
             $columnConfigurations = $divisionConfiguration->getColumnConfigurations();
             $columnCount = count($columnConfigurations);
 
             if ($columnCount > 1) {
-                $this->worksheet->mergeCells([$currentX, $this->originY + 1, $currentX + $columnCount - 1, $this->originY + 1]);
+                $this->worksheet->mergeCells($this->relXYXY($currentX, 1, $currentX + $columnCount - 1, 1));
             }
 
-            $this->worksheet->setCellValue([$currentX, $this->originY + 1], $divisionConfiguration->getLabel()->trans($this->translator));
-            $style = $this->worksheet->getStyle([$currentX, $this->originY + 1]);
+            $this->worksheet->setCellValue($this->relXY($currentX, 1), $divisionConfiguration->getLabel()->trans($this->translator));
+            $style = $this->worksheet->getStyle($this->relXY($currentX, 1));
             $style->getFont()->setBold(true);
             $style->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-            $style = $this->worksheet->getStyle([$currentX, $this->originY + 1, $currentX + $columnCount - 1, $this->originY + 1 + 1 + $rowCount]);
+            $style = $this->worksheet->getStyle($this->relXYXY($currentX, 1, $currentX + $columnCount - 1, 1 + 1 + $rowCount));
             $borders = $style->getBorders();
             $borders->getLeft()->setBorderStyle(Border::BORDER_THIN);
             $borders->getRight()->setBorderStyle(Border::BORDER_THIN);
 
             foreach($columnConfigurations as $columnConfiguration) {
-                $this->worksheet->setCellValue([$currentX, $this->originY + 2], $columnConfiguration->getLabel()->trans($this->translator));
-                $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($currentX))->setWidth(16);
+                $this->worksheet->setCellValue($this->relXY($currentX, 2), $columnConfiguration->getLabel()->trans($this->translator));
+                $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($this->relX($currentX)))->setWidth(16);
                 $currentX++;
             }
 
-            $this->worksheet->setCellValue([$currentX, $this->originY + 2], (function () use ($columnCount) {
+            $this->worksheet->setCellValue($this->relXY($currentX, 2), (function () use ($columnCount) {
                 $text = new RichText();
                 $run = $text->createTextRun($columnCount > 1 ? 'Total' : 'TOTAL');
                 $run->getFont()->setBold(true);
                 $text->createTextRun("\n(£)");
                 return $text;
             })());
-            $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($currentX))->setWidth(18);
-            $style = $this->worksheet->getStyle([$currentX, $this->originY + 2]);
+
+            $this->worksheet->getColumnDimension(Coordinate::stringFromColumnIndex($this->relX($currentX)))->setWidth(18);
+            $style = $this->worksheet->getStyle($this->relXY($currentX, 2));
             $style->getFont()->setBold(true);
             $style->getAlignment()->setWrapText(true);
             $currentX++;

@@ -14,16 +14,22 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 class SpreadsheetCreator
 {
     public function __construct(
-        protected FundWorksheetCreator $fundWorksheetCreator,
+        protected FundWorksheetCreator   $fundWorksheetCreator,
+        protected SchemeWorksheetCreator $schemeWorksheetCreator,
     ) {}
 
-    public function getSpreadsheetForFundReturn(FundReturn $fundReturn): Xlsx {
+    public function getSpreadsheetForFundReturn(FundReturn $fundReturn): Xlsx
+    {
         if (!$fundReturn instanceof CrstsFundReturn) {
             throw new AccessDeniedException('Only CRSTS returns are currently supported');
         }
 
         $spreadsheet = new Spreadsheet();
-        $this->fundWorksheetCreator->addFundWorksheet($spreadsheet->getActiveSheet(), $fundReturn);
+        $sheet = $spreadsheet->getActiveSheet();
+        $this->fundWorksheetCreator->addWorksheet($sheet, $fundReturn);
+
+        $sheet = $spreadsheet->createSheet();
+        $this->schemeWorksheetCreator->addWorksheet($sheet, $fundReturn);
 
         return new Xlsx($spreadsheet);
     }
