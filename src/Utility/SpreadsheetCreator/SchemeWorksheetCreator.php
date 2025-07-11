@@ -2,15 +2,14 @@
 
 namespace App\Utility\SpreadsheetCreator;
 
+use App\Entity\Enum\BenefitCostRatioType;
 use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\FundReturn\CrstsFundReturn;
-use App\Entity\Milestone;
 use App\Utility\ExpensesTableHelper;
 use App\Utility\SpreadsheetCreator\Helper\WorksheetHelper;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -38,24 +37,46 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
 
             $isCDEL = $scheme->getCrstsData()->getFundedMostlyAs() === FundedMostlyAs::CDEL;
             $milestoneTypes = MilestoneType::getNonBaselineCases($isCDEL);
+
+            if ($schemeReturn->getDevelopmentOnly()) {
+                $milestoneTypes = array_filter($milestoneTypes, fn(MilestoneType $t) => $t->isDevelopmentMilestone());
+            }
+
             $milestonesCount = count($milestoneTypes);
 
+            // General text column options
+            $transportMode = $scheme->getTransportMode()?->getForDisplay();
+            $activeTravelElement = $scheme->getActiveTravelElement()?->getForDisplay();
+            $businessCase = $schemeReturn->getBusinessCase()?->value;
+
             $textColumns = [
-                1 => $scheme->getName(),
-                2 => $scheme->getDescription(),
-                5 => $this->translator->trans("enum.on_track_rating.{$schemeReturn->getOnTrackRating()->value}"),
+                1 => $scheme->getSchemeIdentifier(),
+                2 => $scheme->getName(),
+                3 => $scheme->getDescription(),
+                4 => $this->translator->trans("enum.on_track_rating.{$schemeReturn->getOnTrackRating()->value}"),
+                5 => match($schemeReturn->getDevelopmentOnly()) {
+                    true => 'Y',
+                    false => 'N',
+                    null => '-',
+                },
+                8 => $schemeReturn->getProgressUpdate(),
+                9 => match($scheme->getCrstsData()->isPreviouslyTcf()) {
+                    true => 'Y',
+                    false => 'N',
+                    null => '-',
+                },
+                10 => $schemeReturn->getRisks(),
+                11 => $transportMode ? $transportMode->trans($this->translator) : '-',
+                12 => $activeTravelElement ? $activeTravelElement->trans($this->translator) : '-',
+                13 => $businessCase ? $this->translator->trans("enum.business_case.{$businessCase}") : '-',
+                14 => $schemeReturn->getExpectedBusinessCaseApproval()?->format('M-y') ?? '-',
+                15 => match($schemeReturn->getBenefitCostRatio()?->getType()) {
+                    BenefitCostRatioType::NA => 'N/A',
+                    BenefitCostRatioType::TBC => 'TBC',
+                    BenefitCostRatioType::VALUE => $schemeReturn->getBenefitCostRatio()->getValue(),
+                    null => '-',
+                },
             ];
-
-            $onTrackColours = match($schemeReturn->getOnTrackRating()->getTagColour()) {
-                "red" => [new Color('ff2a0b06'), new Color('fff4cdc6')],
-                "green" => [new Color("ff005a30"), new Color('ffcce2d8')],
-                "orange" => [new Color('ff6e3619'), new Color('fffcd6c3')],
-                "blue" => [new Color('ff00c2d4a'), new Color('ffbbd4ea')],
-            };
-
-            $this->helper->at(5, $currentY)
-                ->setColor($onTrackColours[0])
-                ->setFill($onTrackColours[1]);
 
             foreach($textColumns as $x => $text) {
                 $this->helper->at($x, $currentY)
@@ -66,11 +87,30 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
                 $this->helper->mergeCells($x, $currentY, $x, $currentY + $milestonesCount - 1);
             }
 
+            // On-track rating
+            $onTrackColours = match($schemeReturn->getOnTrackRating()->getTagColour()) {
+                "red" => [new Color('ff2a0b06'), new Color('fff4cdc6')],
+                "green" => [new Color("ff005a30"), new Color('ffcce2d8')],
+                "orange" => [new Color('ff6e3619'), new Color('fffcd6c3')],
+                "blue" => [new Color('ff00c2d4a'), new Color('ffbbd4ea')],
+            };
+
+            $this->helper->at(4, $currentY)
+                ->setColor($onTrackColours[0])
+                ->setFill($onTrackColours[1])
+                ->setVerticalAlignment(Alignment::VERTICAL_CENTER)
+                ->setHorizontalAlignment(Alignment::HORIZONTAL_CENTER);
+
+            // BCR
+            $this->helper->at(15, $currentY)
+                ->setHorizontalAlignment(Alignment::HORIZONTAL_LEFT);
+
+            // Milestone types
             foreach($milestoneTypes as $milestoneType) {
                 $milestone = $schemeReturn->getMilestoneByType($milestoneType);
 
-                $this->helper->at(3, $currentY)->setValue($this->translator->trans("enum.milestone_type.{$milestoneType->value}"));
-                $this->helper->at(4, $currentY)->setValue($milestone?->getDate()?->format('M-y') ?? '-');
+                $this->helper->at(6, $currentY)->setValue($this->translator->trans("enum.milestone_type.{$milestoneType->value}"));
+                $this->helper->at(7, $currentY)->setValue($milestone?->getDate()?->format('M-y') ?? '-');
                 $currentY++;
             }
         }
@@ -85,36 +125,97 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             ->setFill($this->blue);
 
         $this->helper->at(1, 2)
+            ->setValue('Identifier')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(20);
+
+        $this->helper->at(2, 2)
             ->setValue('Scheme')
             ->setBold(true)
             ->setFill($this->lightGray)
             ->setWidth(50);
 
-        $this->helper->at(2, 2)
+        $this->helper->at(3, 2)
             ->setValue('Description')
             ->setBold(true)
             ->setFill($this->lightGray)
             ->setWidth(60);
 
-        $this->helper->at(3, 2)
-            ->setValue('Milestone')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20);
-
         $this->helper->at(4, 2)
-            ->setValue('Current forecast / delivered date')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20)
-            ->setTextWrap(true);
-
-        $this->helper->at(5, 2)
             ->setValue('On-track rating')
             ->setBold(true)
             ->setFill($this->lightGray)
             ->setWidth(20)
             ->setTextWrap(true);
 
+        $this->helper->at(5, 2)
+            ->setValue('Development only?')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(20);
+
+        $this->helper->at(6, 2)
+            ->setValue('Milestone')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(20);
+
+        $this->helper->at(7, 2)
+            ->setValue('Current forecast / delivered date')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(20)
+            ->setTextWrap(true);
+
+        $this->helper->at(8, 2)
+            ->setValue('Progress update')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(60);
+
+        $this->helper->at(9, 2)
+            ->setValue('Transforming Cities Fund?')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(20)
+            ->setTextWrap(true);
+
+        $this->helper->at(10, 2)
+            ->setValue('Scheme risks')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(60);
+
+        $this->helper->at(11, 2)
+            ->setValue('Transport mode')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(35);
+
+        $this->helper->at(12, 2)
+            ->setValue('Active travel element')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(30);
+
+        $this->helper->at(13, 2)
+            ->setValue('Current business case')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(25);
+
+        $this->helper->at(14, 2)
+            ->setValue('Expected date of next approval gateway')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(20)
+            ->setTextWrap(true);
+
+        $this->helper->at(15, 2)
+            ->setValue('BCR')
+            ->setBold(true)
+            ->setFill($this->lightGray)
+            ->setWidth(20);
     }
 }
