@@ -7,7 +7,8 @@ use App\Entity\Enum\FundedMostlyAs;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Utility\ExpensesTableHelper;
-use App\Utility\SpreadsheetCreator\Helper\WorksheetHelper;
+use App\Utility\SpreadsheetCreator\WorksheetHelper\ActionSet;
+use App\Utility\SpreadsheetCreator\WorksheetHelper\WorksheetHelper;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -124,98 +125,79 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             ->setColor($this->white)
             ->setFill($this->blue);
 
-        $this->helper->at(1, 2)
-            ->setValue('Identifier')
+        $styles = (new ActionSet())
             ->setBold(true)
             ->setFill($this->lightGray)
             ->setWidth(20);
 
+        $this->helper->at(1, 2)
+            ->setValue('Identifier')
+            ->apply($styles);
+
         $this->helper->at(2, 2)
             ->setValue('Scheme')
-            ->setBold(true)
-            ->setFill($this->lightGray)
+            ->apply($styles)
             ->setWidth(50);
 
         $this->helper->at(3, 2)
             ->setValue('Description')
-            ->setBold(true)
-            ->setFill($this->lightGray)
+            ->apply($styles)
             ->setWidth(60);
 
         $this->helper->at(4, 2)
             ->setValue('On-track rating')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20)
+            ->apply($styles)
             ->setTextWrap(true);
 
         $this->helper->at(5, 2)
             ->setValue('Development only?')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20);
+            ->apply($styles);
 
         $this->helper->at(6, 2)
             ->setValue('Milestone')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20);
+            ->apply($styles);
 
         $this->helper->at(7, 2)
             ->setValue('Current forecast / delivered date')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20)
+            ->apply($styles)
             ->setTextWrap(true);
 
         $this->helper->at(8, 2)
             ->setValue('Progress update')
-            ->setBold(true)
-            ->setFill($this->lightGray)
+            ->apply($styles)
             ->setWidth(60);
 
         $this->helper->at(9, 2)
             ->setValue('Transforming Cities Fund?')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20)
+            ->apply($styles)
             ->setTextWrap(true);
 
         $this->helper->at(10, 2)
-            ->setValue('Scheme risks')
-            ->setBold(true)
-            ->setFill($this->lightGray)
+            ->apply($styles)
             ->setWidth(60);
 
         $this->helper->at(11, 2)
             ->setValue('Transport mode')
-            ->setBold(true)
-            ->setFill($this->lightGray)
+            ->apply($styles)
             ->setWidth(35);
 
         $this->helper->at(12, 2)
             ->setValue('Active travel element')
-            ->setBold(true)
-            ->setFill($this->lightGray)
+            ->apply($styles)
             ->setWidth(30);
 
         $this->helper->at(13, 2)
             ->setValue('Current business case')
-            ->setBold(true)
-            ->setFill($this->lightGray)
+            ->apply($styles)
             ->setWidth(25);
 
         $this->helper->at(14, 2)
             ->setValue('Expected date of next approval gateway')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20)
+            ->apply($styles)
             ->setTextWrap(true);
 
         $this->helper->at(15, 2)
             ->setValue('BCR')
-            ->setBold(true)
-            ->setFill($this->lightGray)
-            ->setWidth(20);
+            ->apply($styles);
     }
 }

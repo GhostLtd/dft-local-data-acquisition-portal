@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utility\SpreadsheetCreator\Helper;
+namespace App\Utility\SpreadsheetCreator\WorksheetHelper;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\Style;
 use PhpOffice\PhpSpreadsheet\Worksheet\ColumnDimension;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class WorksheetHelper
+class Location
 {
     public function __construct(
         protected Worksheet $worksheet,
@@ -23,6 +23,12 @@ class WorksheetHelper
     public function at(int $x, int $y): static
     {
         return new self($this->worksheet, $x + $this->x, $y + $this->y);
+    }
+
+    public function apply(ActionSet $actionSet): static
+    {
+        $actionSet->apply($this);
+        return $this;
     }
 
     public function getCell(): Cell
