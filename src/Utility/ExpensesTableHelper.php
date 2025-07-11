@@ -275,13 +275,13 @@ class ExpensesTableHelper
      */
     public function getRowGroupConfigurations(): array
     {
-        return $this->rowGroupConfigurations;
+        return $this->configuration->getRowGroupConfigurations();
     }
 
     public function getRowCount(): int
     {
         $count = 0;
-        foreach($this->rowGroupConfigurations as $groupConfiguration) {
+        foreach($this->getRowGroupConfigurations() as $groupConfiguration) {
             $count += $groupConfiguration instanceof CategoryConfiguration ? $groupConfiguration->rowCount() : 1;
         }
         return $count;
@@ -292,7 +292,7 @@ class ExpensesTableHelper
      */
     public function walkRowConfigurations(): \Generator
     {
-        foreach($this->rowGroupConfigurations as $rowGroupConfiguration) {
+        foreach($this->getRowGroupConfigurations() as $rowGroupConfiguration) {
             if ($rowGroupConfiguration instanceof CategoryConfiguration) {
                 foreach($rowGroupConfiguration->getRowConfigurations() as $rowConfiguration) {
                     yield $rowConfiguration;
@@ -378,16 +378,6 @@ class ExpensesTableHelper
         return null;
     }
 
-    public function getDivisionConfiguration(): DivisionConfiguration
-    {
-        return $this->divisionConfiguration;
-    }
-
-    public function getFund(): Fund
-    {
-        return $this->fund;
-    }
-
     /**
      * @return array<int, ExpenseType>
      */
@@ -395,7 +385,7 @@ class ExpensesTableHelper
     {
         return array_merge(...array_map(
             fn(CategoryConfiguration $category) => $category->getExpenseTypes(),
-            array_filter($this->rowGroupConfigurations, fn(RowGroupInterface $r) => $r instanceof CategoryConfiguration)
+            array_filter($this->getRowGroupConfigurations(), fn(RowGroupInterface $r) => $r instanceof CategoryConfiguration)
         ));
     }
 

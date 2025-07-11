@@ -3,6 +3,7 @@
 namespace App\Utility\SpreadsheetCreator;
 
 use App\Config\ExpenseDivision\DivisionConfiguration;
+use App\Config\ExpenseDivision\TableConfiguration;
 use App\Config\ExpenseRow\CategoryConfiguration;
 use App\Config\ExpenseRow\TotalConfiguration;
 use App\Entity\Enum\ExpenseType;
@@ -62,11 +63,10 @@ class FundWorksheetCreator
 
     public function addFundWorksheet(Worksheet $worksheet, CrstsFundReturn $fundReturn): void
     {
-        $this->expensesTableHelper
-            ->setRowGroupConfigurations(CrstsHelper::getFundExpenseRowsConfiguration())
-            ->setFund($fundReturn->getFund());
+        $configuration = CrstsHelper::getFundExpensesTable($fundReturn->getYear(), $fundReturn->getQuarter());
+        $divisionConfigurations = $configuration->getDivisionConfigurations();
 
-        $divisionConfigurations = CrstsHelper::getExpenseDivisionConfigurations($fundReturn->getYear(), $fundReturn->getQuarter());
+        $this->expensesTableHelper->setConfiguration($configuration);
 
         $columnCount = array_sum(array_map(fn(DivisionConfiguration $d) => count($d->getColumnConfigurations()) + 1, $divisionConfigurations)) + 2;
         $rowCount = $this->expensesTableHelper->getRowCount();
@@ -96,7 +96,7 @@ class FundWorksheetCreator
             ->getColumnDimension(Coordinate::stringFromColumnIndex($this->originX + 1))
             ->setWidth(50);
 
-        // Set first column as bold
+        // Make the first column bold
         $this->worksheet
             ->getStyle("{$firstColumn}:{$firstColumn}")
             ->getFont()
@@ -170,6 +170,9 @@ class FundWorksheetCreator
 
                     if ($label === '') {
                         $this->worksheet->mergeCells([$this->originX, $currentY, $this->originX + 1, $currentY]);
+
+                        $style = $this->worksheet->getStyle([$this->originX + 2, $currentY + $rowIdx, $this->originX + $columnCount - 2, $currentY + $rowIdx]);
+                        $style->getFill()->setFillType(Fill::FILL_SOLID)->setStartColor($oddRow ? $this->cellShadeOdd : $this->cellShadeEven);
                     } else {
                         $style = $this->worksheet->getStyle([$this->originX + 1, $currentY + $rowIdx, $this->originX + 1 + $columnCount - 2, $currentY + $rowIdx]);
                         $borders = $style->getBorders();
@@ -209,8 +212,6 @@ class FundWorksheetCreator
     {
         $currentX = $this->originX + 2;
         foreach($divisionConfigurations as $divisionConfiguration) {
-            $this->expensesTableHelper->setDivisionConfiguration($divisionConfiguration);
-
             $columnConfigurations = $divisionConfiguration->getColumnConfigurations();
             $columnCount = count($columnConfigurations);
 
