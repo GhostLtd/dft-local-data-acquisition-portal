@@ -42,7 +42,7 @@ class ExportSpreadsheetController extends AbstractController
 
     #[Route('/fund-return/{fundReturnId}/export-spreadsheet', name: 'app_fund_return_export_spreadsheet')]
     #[IsGranted(Role::CAN_EXPORT_SPREADSHEET, 'fundReturn')]
-    public function view(
+    public function exportSpreadsheet(
         #[MapEntity(expr: 'repository.findForSpreadsheetExport(fundReturnId)')]
         FundReturn          $fundReturn,
         SpreadsheetCreator  $spreadsheetCreator,
@@ -53,13 +53,6 @@ class ExportSpreadsheetController extends AbstractController
         }
 
         $xlsx = $spreadsheetCreator->getSpreadsheetForFundReturn($fundReturn);
-
-        $debug = false;
-        if ($debug) {
-            return $this->render('base.html.twig', [
-                'page_title_key' => 'Hello',
-            ]);
-        }
 
         return new StreamedResponse(function () use ($xlsx) {
             $xlsx->save('php://output');
