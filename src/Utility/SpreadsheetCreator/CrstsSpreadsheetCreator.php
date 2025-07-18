@@ -8,7 +8,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
-class SpreadsheetCreator
+class CrstsSpreadsheetCreator
 {
     public function __construct(
         protected FundDetailsWorksheetCreator  $fundDetailsWorksheetCreator,
@@ -16,12 +16,8 @@ class SpreadsheetCreator
         protected SchemeWorksheetCreator       $schemeWorksheetCreator,
     ) {}
 
-    public function getSpreadsheetForFundReturn(FundReturn $fundReturn): Xlsx
+    public function getSpreadsheetForFundReturn(CrstsFundReturn $fundReturn): Xlsx
     {
-        if (!$fundReturn instanceof CrstsFundReturn) {
-            throw new AccessDeniedException('Only CRSTS returns are currently supported');
-        }
-
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $this->fundDetailsWorksheetCreator->addWorksheet($sheet, $fundReturn);

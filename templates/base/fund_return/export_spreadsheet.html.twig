@@ -1,0 +1,25 @@
+{% extends 'frontend/base.html.twig' %}
+
+{%- set page_title_key = 'frontend.pages.export_spreadsheet.title' -%}
+
+{% block head %}
+    {{ parent() }}
+    <meta http-equiv="refresh" content="1;" />
+{% endblock %}
+
+{% block content %}
+    <p class="govuk-body">
+        Please wait - exporting spreadsheet.<br>
+
+        {% if (jobStatus ?? null) is null %}
+            Job not found.<br>
+        {% else %}
+            Job status: {{ jobStatus.state.value }}<br>
+        {% endif %}
+
+        {%- if downloadLink -%}
+            Download link: {{ downloadLink }}<br>
+        {%- endif -%}
+    </p>
+{% endblock %}
+

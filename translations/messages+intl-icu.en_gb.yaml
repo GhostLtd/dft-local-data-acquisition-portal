@@ -481,6 +481,8 @@ frontend:
       schemes: Schemes
       users: Users
       no_authorities: No authorities are accessible to you
+    export_spreadsheet:
+      title: Exporting spreadsheet
     fund_return:
       title: "{type} return for {year}/{nextYear} Q{quarter}"
       titles:
