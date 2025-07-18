@@ -4,35 +4,47 @@
 
 {% block head %}
     {{ parent() }}
-    <meta http-equiv="refresh" content="5;" />
+    <meta http-equiv="refresh" content="3;" />
 {% endblock %}
 
 {% block content %}
-    <p class="govuk-body">
-        Please wait - exporting spreadsheet.<br>
+    {%- from "frontend/macros.html.twig" import loadingSpinner -%}
 
-        {% if (jobStatus ?? null) is null %}
-            Job not found.<br>
-        {% else %}
-            Job status: {{ jobStatus.state.value }}<br>
-        {% endif %}
-    </p>
+    {%- set jobStatus = jobStatus ?? null -%}
+    {%- if jobStatus and jobStatus.state.value == 'failed' %}
+        <h1 class="govuk-heading-m">Spreadsheet generation failed</h1>
+    {%- else -%}
+        {%- set statusContents -%}
+            {%- if jobStatus is null -%}
+                <h1 class="govuk-heading-m">Initialising...</h1>
+            {%- elseif jobStatus.state.value == 'running' -%}
+                <h1 class="govuk-heading-m">Generating spreadsheet...</h1>
+            {%- elseif jobStatus.state.value == 'completed' -%}
+                <h1 class="govuk-heading-m">Downloading spreadsheet</h1>
+            {%- endif -%}
+        {%- endset -%}
 
-    {%- if downloadUrl -%}
-        <script nonce="{{ csp_nonce('script') }}">
-            const iframe = document.createElement('iframe')
-            iframe.style.display = 'none'
-            iframe.src = '{{ downloadUrl }}'
-            document.body.appendChild(iframe)
+        {{- loadingSpinner({
+            content: {html: statusContents}
+        }) -}}
 
-            setTimeout(() => {
-                window.location.href = '{{ redirectUrl }}'
-            }, 1500)
-        </script>
+        {%- if downloadUrl -%}
+            <script nonce="{{ csp_nonce('script') }}">
+                const iframe = document.createElement('iframe')
+                iframe.style.display = 'none'
+                iframe.src = '{{ downloadUrl }}'
+                document.body.appendChild(iframe)
 
-        <p class="govuk-body">
-            Your spreadsheet is ready and your download will start automatically. If it does not, please <a href="{{ downloadUrl }}" target="_blank">click here</a> to download.
-        </p>
+                setTimeout(() => {
+                    window.location.href = '{{ redirectUrl }}'
+                }, 1500)
+                {# N.B. timeout here must be less than the page refresh #}
+            </script>
+
+            <p class="govuk-body">
+                Your spreadsheet is ready and your download will start automatically. If it does not, please <a href="{{ downloadUrl }}" target="_blank">click here</a> to download.
+            </p>
+        {%- endif -%}
     {%- endif -%}
 {% endblock %}
 

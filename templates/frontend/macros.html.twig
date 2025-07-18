@@ -136,3 +136,13 @@
         }) }}
     {%- endif -%}
 {% endmacro %}
+
+{% macro loadingSpinner(params) %}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import htmlOrText -%}
+    <div class="hods-loading-spinner" role="status">
+        <div class="hods-loading-spinner__spinner"></div>
+        {%- if params.content is defined -%}
+            <div class="hods-loading-spinner__content">{{ htmlOrText(params.content) }}</div>
+        {%- endif -%}
+    </div>
+{% endmacro %}
