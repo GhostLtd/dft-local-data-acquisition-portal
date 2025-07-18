@@ -152,14 +152,20 @@ class FundDetailsWorksheetCreator extends AbstractWorksheetCreator
                 ->setValue($fundReturn->getDeliveryConfidence())
                 ->setHeight(180);
 
-            $colour = $this->getTagColours($fundReturn->getOverallConfidence()->getTagColour());
-            $this->helper->cell($x + 2, $y + 1)
-                ->setValue($this->translator->trans("enum.rating.{$fundReturn->getOverallConfidence()->value}"))
-                ->setAllBorders($this->black)
-                ->setColor($colour[0])
-                ->setFill($colour[1])
-                ->setVerticalAlignment(Alignment::VERTICAL_CENTER)
-                ->setHorizontalAlignment(Alignment::HORIZONTAL_CENTER);
+            $tagColour = $fundReturn->getOverallConfidence()?->getTagColour();
+            $cell = $this->helper->cell($x + 2, $y + 1);
+
+            if ($tagColour) {
+                $colour = $this->getTagColours($tagColour);
+                $cell
+                    ->setValue($this->translator->trans("enum.rating.{$fundReturn->getOverallConfidence()->value}"))
+                    ->setColor($colour[0])
+                    ->setFill($colour[1])
+                    ->setVerticalAlignment(Alignment::VERTICAL_CENTER)
+                    ->setHorizontalAlignment(Alignment::HORIZONTAL_CENTER);
+            }
+
+            $cell->setAllBorders($this->black);
         })(6, 5 + $signoffYAdjustment);
     }
 }

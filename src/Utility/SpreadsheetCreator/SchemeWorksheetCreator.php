@@ -72,6 +72,7 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             $activeTravelElement = $scheme->getActiveTravelElement()?->getForDisplay();
             $businessCase = $schemeReturn->getBusinessCase()?->value;
             $expectedBusinessCaseApproval = $schemeReturn->getExpectedBusinessCaseApproval();
+            $onTrackRatingValue = $schemeReturn->getOnTrackRating()?->value;
 
             $textColumns = [
                 1 => $scheme->getSchemeIdentifier(),
@@ -82,7 +83,7 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
                     null => '',
                 },
                 $offsetX + 4 => $scheme->getDescription(),
-                $offsetX + 5 => $this->translator->trans("enum.on_track_rating.{$schemeReturn->getOnTrackRating()->value}"),
+                $offsetX + 5 => $onTrackRatingValue ? $this->translator->trans("enum.on_track_rating.{$onTrackRatingValue}") : '',
                 $offsetX + 6 => match ($schemeReturn->getDevelopmentOnly()) {
                     true => 'Y',
                     false => 'N',
@@ -118,11 +119,14 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             }
 
             // On-track rating
-            $onTrackColours = $this->getTagColours($schemeReturn->getOnTrackRating()->getTagColour());
+            $tagColour = $schemeReturn->getOnTrackRating()?->getTagColour();
 
-            $this->helper->cell($offsetX + 5, $currentY)
-                ->setColor($onTrackColours[0])
-                ->setFill($onTrackColours[1]);
+            if ($tagColour) {
+                $onTrackColours = $this->getTagColours($tagColour);
+                $this->helper->cell($offsetX + 5, $currentY)
+                    ->setColor($onTrackColours[0])
+                    ->setFill($onTrackColours[1]);
+            }
 
             // Milestone types
             foreach($milestoneTypes as $idx => $milestoneType) {

@@ -31,6 +31,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSpreadsheetController extends AbstractController
@@ -46,6 +48,7 @@ class ExportSpreadsheetController extends AbstractController
         #[MapEntity(expr: 'repository.findForSpreadsheetExport(fundReturnId)')]
         FundReturn          $fundReturn,
         SpreadsheetCreator  $spreadsheetCreator,
+        SluggerInterface    $slugger,
     ): Response
     {
         if (!$fundReturn instanceof CrstsFundReturn) {
@@ -54,10 +57,16 @@ class ExportSpreadsheetController extends AbstractController
 
         $xlsx = $spreadsheetCreator->getSpreadsheetForFundReturn($fundReturn);
 
+        $authorityName = $slugger->slug($fundReturn->getFundAward()->getAuthority()->getName())->lower();
+        $datePeriod = "{$fundReturn->getYear()}-{$fundReturn->getNextYearAsTwoDigits()}-Q{$fundReturn->getQuarter()}";
+        $now = (new \DateTime())->format('Ymd_Hisv');
+        $filename = "{$datePeriod}_{$authorityName}_CRSTS_{$now}.xls";
+
         return new StreamedResponse(function () use ($xlsx) {
             $xlsx->save('php://output');
         }, 200, [
             'content-type' => 'application/vnd.ms-excel',
+            'content-disposition' => "attachment; filename={$filename}",
         ]);
     }
 
