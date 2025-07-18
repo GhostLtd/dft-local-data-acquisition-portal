@@ -29,9 +29,7 @@ class ExportSpreadsheetController extends AbstractController
         #[Autowire(service: 'cache.spreadsheet_jobs')]
         protected CacheItemPoolInterface        $cache,
         protected MessageBusInterface           $messageBus, private readonly FundReturnRepository $fundReturnRepository,
-    )
-    {
-    }
+    ) {}
 
     #[Route('/fund-return/{fundReturnId}/export-spreadsheet', name: 'app_fund_return_export_spreadsheet')]
     #[IsGranted(Role::CAN_EXPORT_SPREADSHEET, 'fundReturn')]
@@ -56,20 +54,25 @@ class ExportSpreadsheetController extends AbstractController
     {
         $jobStatus = $this->getJobStatus($jobId);
 
-        $downloadLink = null;
+        $downloadUrl = null;
+        $redirectUrl = null;
         if ($jobStatus && $jobStatus->getState() === JobState::COMPLETED) {
             $downloadRoute = $request->attributes->get('download_route') ?? 'app_fund_return_export_spreadsheet_download';
-            $downloadLink = $this->generateUrl($downloadRoute, ['jobId' => $jobId]);
+            $downloadUrl = $this->generateUrl($downloadRoute, ['jobId' => $jobId]);
+
+            $redirectRoute = $request->attributes->get('redirect_route') ?? 'app_fund_return';
+            $redirectUrl = $this->generateUrl($redirectRoute, ['fundReturnId' => $jobStatus->getContext()['fundReturnId']]);
         }
 
         return $this->render('frontend/fund_return/export_spreadsheet.html.twig', [
             'jobStatus' => $jobStatus,
-            'downloadLink' => $downloadLink,
+            'downloadUrl' => $downloadUrl, // URL to hit for the download...
+            'redirectUrl' => $redirectUrl, // Where to redirect afterwards...
         ]);
     }
 
     #[Route('/export-spreadsheet/{jobId}/download', name: 'app_fund_return_export_spreadsheet_download')]
-    public function downloadSpreadsheet(string $jobId): Response
+    public function download(string $jobId): Response
     {
         $jobStatus = $this->getJobStatus($jobId);
 
@@ -77,7 +80,7 @@ class ExportSpreadsheetController extends AbstractController
             throw new NotFoundHttpException('Job not completed');
         }
 
-        $fundReturn = $this->fundReturnRepository->find($jobStatus->getContext()['fundReturnId'] ?? '');
+        $fundReturn = $this->fundReturnRepository->find($jobStatus->getContext()['fundReturnId']);
         if (!$fundReturn || !$this->authorizationChecker->isGranted(Role::CAN_EXPORT_SPREADSHEET, $fundReturn)) {
             throw new AccessDeniedHttpException();
         }

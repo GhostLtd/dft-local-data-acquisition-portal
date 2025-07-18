@@ -37,5 +37,6 @@ class ExportSpreadsheetController extends AbstractController
     {
         $request->attributes->set('queue_route', 'admin_fund_return_export_spreadsheet_queue');
         $request->attributes->set('download_route', 'admin_fund_return_export_spreadsheet_download');
+        $request->attributes->set('redirect_route', 'admin_fund_return');
     }
 }
