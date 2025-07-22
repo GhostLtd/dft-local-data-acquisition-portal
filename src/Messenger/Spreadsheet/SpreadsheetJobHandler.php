@@ -68,7 +68,7 @@ class SpreadsheetJobHandler
         $authorityName = $this->slugger->slug($fundReturn->getFundAward()->getAuthority()->getName())->lower();
         $datePeriod = "{$fundReturn->getYear()}-{$fundReturn->getNextYearAsTwoDigits()}-Q{$fundReturn->getQuarter()}";
         $now = (new \DateTime())->format('Ymd_Hisv');
-        return "{$datePeriod}_{$authorityName}_CRSTS_{$now}.xls";
+        return "{$datePeriod}_{$authorityName}_CRSTS_{$now}.xlsx";
     }
 
     public function getSpreadsheetData(CrstsFundReturn $fundReturn): ?string
