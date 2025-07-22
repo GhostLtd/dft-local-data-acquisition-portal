@@ -65,5 +65,7 @@
     {% from 'frontend/authority_macros.html.twig' import returnTaskList %}
     {%- for fundAward in fundAwards -%}
         {{- returnTaskList(fundAward, 'admin_fund_return') -}}
+    {%- else -%}
+        No returns yet
     {%- endfor -%}
 {% endmacro %}

@@ -2,16 +2,12 @@
 
 namespace App\Controller\Admin;
 
-use App\DataFixtures\FixtureHelper;
-use App\DataFixtures\RandomFixtureGenerator;
 use App\Entity\Authority;
-use App\Entity\FundReturn\CrstsFundReturn;
 use App\Form\Type\Admin\AuthorityType;
 use App\Form\Type\UserType;
 use App\ListPage\AuthorityListPage;
 use App\Repository\UserRepository;
 use App\Utility\Breadcrumb\Admin\DashboardLinksBuilder;
-use App\Utility\SampleReturnGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkFrontendBundle\Model\NotificationBanner;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,10 +24,7 @@ class AuthorityController extends AbstractController
 {
     public function __construct(
         protected EntityManagerInterface $entityManager,
-        protected SampleReturnGenerator  $sampleReturnGenerator,
-    )
-    {
-    }
+    ) {}
 
     #[Route(path: '', name: '')]
     public function list(
@@ -99,7 +92,6 @@ class AuthorityController extends AbstractController
             $authority = $form->getData();
             if (!$form->getData()->getId()) {
                 $this->entityManager->persist($authority);
-                $this->sampleReturnGenerator->createAssetsForNewAuthority($authority);
                 $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority added', 'The new authority has been added', ['style' => NotificationBanner::STYLE_SUCCESS]));
             } else {
                 $session->getFlashBag()->add(NotificationBanner::FLASH_BAG_TYPE, new NotificationBanner('Success', 'Authority updated', 'The authority has been updated', ['style' => NotificationBanner::STYLE_SUCCESS]));
