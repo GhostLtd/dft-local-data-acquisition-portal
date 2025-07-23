@@ -27,11 +27,11 @@ class CsvExporter
 
     public function exportZip(?int $returnYear=null, ?int $returnQuarter=null): StreamedResponse
     {
-        $filenamePrefix = 'crsts_';
+        $filenamePrefix = 'crsts';
 
         if ($returnYear !== null && $returnQuarter !== null) {
             $nextYear = substr(strval($returnYear + 1), - 2);
-            $filenamePrefix .= "{$returnYear}_{$nextYear}_Q{$returnQuarter}";
+            $filenamePrefix .= "_{$returnYear}_{$nextYear}_Q{$returnQuarter}";
         }
 
         return new StreamedResponse(function() use ($filenamePrefix, $returnYear, $returnQuarter) {
