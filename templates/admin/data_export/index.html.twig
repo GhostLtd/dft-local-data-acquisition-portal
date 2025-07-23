@@ -1,0 +1,9 @@
+{%- extends 'admin/base.html.twig' -%}
+
+{%- trans_default_domain 'admin' -%}
+{%- set page_title_key = 'pages.data_export.title' -%}
+{%- set current_menu = 'data_export' -%}
+
+{%- block content -%}
+    {{- form(form) -}}
+{%- endblock -%}

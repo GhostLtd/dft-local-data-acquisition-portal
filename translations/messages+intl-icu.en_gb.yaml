@@ -233,11 +233,6 @@ forms:
     transition_re_open: Mark as in progress
     save: Save
     submit: Submit
-  generic:
-    placeholder: Please select an option
-
-  rag_guidance_help:
-    details: View guidance
 
   crsts:
     benefit_cost_ratio:
@@ -322,6 +317,20 @@ forms:
         label: Overall delivery confidence
       overall_confidence:
         label: Overall confidence rating
+
+  data_export:
+    confirm:
+      label: Export data
+    year_and_quarter:
+      label: Which data to export?
+      help: ''
+      placeholder: All data
+
+  generic:
+    placeholder: Please select an option
+
+  rag_guidance_help:
+    details: View guidance
 
   scheme:
     mark_as_ready_for_signoff:

@@ -27,6 +27,8 @@ pages:
   authority_admin_edit:
     title: "Edit {mca} admin user"
     breadcrumb: "Edit admin user"
+  data_export:
+    title: Data export
   maintenance:
     title: Maintenance warnings
   maintenance_add:

@@ -24,6 +24,13 @@ abstract class AbstractAdminLinksBuilder extends FrontendDashboardLinksBuilder
         );
 
         $this->addNavLink(
+            'data_export',
+            'admin_data_export',
+            translationKey: 'pages.data_export.title',
+            translationDomain: 'admin',
+        );
+
+        $this->addNavLink(
             'maintenance',
             'admin_maintenance',
             translationKey: 'pages.maintenance.title',
