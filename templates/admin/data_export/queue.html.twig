@@ -1,6 +1,7 @@
-{% extends 'frontend/base.html.twig' %}
+{%- extends 'admin/base.html.twig' -%}
 
-{%- set page_title_key = 'frontend.pages.export_spreadsheet.title' -%}
+{%- set page_title_key = 'pages.data_export_queue.title' -%}
+{%- set current_menu = 'data_export' -%}
 
 {%- set jobStatus = jobStatus ?? null -%}
 {%- set isFailed = jobStatus and jobStatus.state.value == 'failed' -%}
@@ -15,21 +16,22 @@
 {% block content %}
     {%- from "/macros.html.twig" import jobStatusSpinner, autoDownloadScript, fallbackDownloadLink -%}
 
-
     {%- if isFailed %}
-        <p class="govuk-body">Spreadsheet generation failed</p>
+        <p class="govuk-body">Data export failed</p>
+        <p class="govuk-body">
+            <a href="{{ path('admin_data_export') }}" class="govuk-button">Try again</a>
+        </p>
     {%- else -%}
         {{- jobStatusSpinner(
             jobStatus,
             'Initialising...',
-            'Generating spreadsheet...',
-            'Downloading spreadsheet...'
+            'Generating data export...',
+            'Downloading data export...'
         ) -}}
 
         {%- if downloadUrl -%}
             {{ autoDownloadScript(downloadUrl, redirectUrl) }}
-            {{ fallbackDownloadLink(downloadUrl, 'If your download does not automatically, please') }}
+            {{ fallbackDownloadLink(downloadUrl) }}
         {%- endif -%}
     {%- endif -%}
 {% endblock %}
-

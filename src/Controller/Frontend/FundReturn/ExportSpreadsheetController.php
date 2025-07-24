@@ -2,35 +2,35 @@
 
 namespace App\Controller\Frontend\FundReturn;
 
+use App\Controller\AbstractJobController;
 use App\Entity\Enum\JobState;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
-use App\Messenger\JobStatus;
 use App\Messenger\Spreadsheet\SpreadsheetJob;
 use App\Repository\FundReturn\FundReturnRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-class ExportSpreadsheetController extends AbstractController
+class ExportSpreadsheetController extends AbstractJobController
 {
     public function __construct(
         protected AuthorizationCheckerInterface $authorizationChecker,
-        #[Autowire(service: 'cache.spreadsheet_jobs')]
-        protected CacheItemPoolInterface        $cache,
-        protected MessageBusInterface           $messageBus,
+        #[Autowire(service: 'cache.job_cache')]
+        CacheItemPoolInterface                  $cache,
+        MessageBusInterface                     $messageBus,
         protected FundReturnRepository          $fundReturnRepository,
-    ) {}
+    ) {
+        parent::__construct($cache, $messageBus);
+    }
 
     #[Route('/fund-return/{fundReturnId}/export-spreadsheet', name: 'app_fund_return_export_spreadsheet')]
     #[IsGranted(Role::CAN_EXPORT_SPREADSHEET, 'fundReturn')]
@@ -86,13 +86,9 @@ class ExportSpreadsheetController extends AbstractController
         string     $jobId
     ): Response
     {
+        $spreadsheet = $this->getCompletedJobData($jobId);
         $jobStatus = $this->getJobStatus($jobId);
 
-        if (!$jobStatus || $jobStatus->getState() !== JobState::COMPLETED) {
-            throw new NotFoundHttpException('Job not completed');
-        }
-
-        $spreadsheet = $this->getSpreadsheet($jobId);
         $headers = [
             'content-type' => 'application/vnd.ms-excel',
             'content-length' => strlen($spreadsheet),
@@ -106,30 +102,4 @@ class ExportSpreadsheetController extends AbstractController
         return new Response($spreadsheet, 200, $headers);
     }
 
-    protected function getJobStatus(string $jobId): ?JobStatus
-    {
-        if (!preg_match('/^[A-Z0-9]{26}$/', $jobId)) {
-            throw new NotFoundHttpException('Invalid job ID');
-        }
-
-        $jobStatus = null;
-        $item = $this->cache->getItem("status-{$jobId}");
-
-        if ($item->isHit()) {
-            $jobStatus = $item->get();
-        }
-
-        return $jobStatus instanceof JobStatus ? $jobStatus : null;
-    }
-
-    protected function getSpreadsheet(string $jobId): ?string
-    {
-        $item = $this->cache->getItem("data-{$jobId}");
-
-        if (!$item->isHit()) {
-            return null;
-        }
-
-        return $item->get();
-    }
 }

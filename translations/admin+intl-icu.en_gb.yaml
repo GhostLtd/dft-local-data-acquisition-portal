@@ -29,6 +29,8 @@ pages:
     breadcrumb: "Edit admin user"
   data_export:
     title: Data export
+  data_export_queue:
+      title: Data export
   maintenance:
     title: Maintenance warnings
   maintenance_add:

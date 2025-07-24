@@ -1,0 +1,8 @@
+{# Import and re-export macros from frontend/macros.html.twig #}
+
+{% from 'frontend/macros.html.twig' import loadingSpinner as frontendLoadingSpinner %}
+
+{# Re-export the loadingSpinner macro #}
+{% macro loadingSpinner(params) %}
+    {{ frontendLoadingSpinner(params) }}
+{% endmacro %}

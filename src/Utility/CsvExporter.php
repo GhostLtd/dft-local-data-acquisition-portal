@@ -24,6 +24,55 @@ class CsvExporter
         ];
         $this->ulidColumns = array_combine($ulidColumns, $ulidColumns);
     }
+    
+    /**
+     * Generate zip file data and return it as a string
+     */
+    public function getZipData(?int $returnYear=null, ?int $returnQuarter=null): string
+    {
+        ob_start();
+        
+        $filenamePrefix = 'crsts';
+
+        if ($returnYear !== null && $returnQuarter !== null) {
+            $nextYear = substr(strval($returnYear + 1), - 2);
+            $filenamePrefix .= "_{$returnYear}_{$nextYear}_Q{$returnQuarter}";
+        }
+
+        $views = [
+            'export_fund_return_data' => "export_fund_return_data.csv",
+            'export_fund_return_expense_data' => "export_fund_return_expense_data.csv",
+            'export_scheme_return_data' => "export_scheme_return_data.csv",
+            'export_scheme_return_expense_data' => "export_scheme_return_expense_data.csv",
+        ];
+
+        $filenameSuffix = (new \DateTime())->format('Ymd_Hisv');
+        
+        // Use memory stream to capture zip data
+        $stream = fopen('php://memory', 'w+b');
+        
+        $zip = new ZipStream(
+            sendHttpHeaders: false,
+            outputName: "{$filenamePrefix}_{$filenameSuffix}.zip",
+            outputStream: $stream
+        );
+
+        foreach($views as $view => $filename) {
+            $generator = $this->viewToCsvLines($view, $returnYear, $returnQuarter);
+            $csvStream = StreamWrapper::getResource(Utils::streamFor($generator));
+            $zip->addFileFromStream($filename, $csvStream);
+        }
+
+        $zip->finish();
+        
+        ob_end_clean();
+        
+        rewind($stream);
+        $data = stream_get_contents($stream);
+        fclose($stream);
+        
+        return $data;
+    }
 
     public function exportZip(?int $returnYear=null, ?int $returnQuarter=null): StreamedResponse
     {

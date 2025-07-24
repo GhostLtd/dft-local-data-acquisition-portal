@@ -41,8 +41,8 @@ services:
         parent: 'cache.adapter.doctrine_dbal'
         tags: [{ name: 'cache.pool', namespace: 'rate-limiter' }]
 
-    cache.spreadsheet_jobs:
+    cache.job_cache:
         parent: 'cache.adapter.doctrine_dbal'
-        tags: [ { name: 'cache.pool', namespace: 'rate-limiter' } ]
+        tags: [ { name: 'cache.pool', namespace: 'job-cache' } ]
         arguments:
             $defaultLifetime: 3600 # 1 hour

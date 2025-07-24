@@ -9,6 +9,7 @@ use App\Messenger\JobStatus;
 use App\Repository\FundReturn\FundReturnRepository;
 use App\Utility\SpreadsheetCreator\CrstsSpreadsheetCreator;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
@@ -19,45 +20,84 @@ use Symfony\Component\Uid\Ulid;
 class SpreadsheetJobHandler
 {
     public function __construct(
-        #[Autowire(service: 'cache.spreadsheet_jobs')]
+        #[Autowire(service: 'cache.job_cache')]
         protected CacheItemPoolInterface  $cache,
         protected FundReturnRepository    $fundReturnRepository,
         protected CrstsSpreadsheetCreator $spreadsheetCreator,
         protected SluggerInterface        $slugger,
+        protected LoggerInterface         $logger,
     ) {}
 
     public function __invoke(SpreadsheetJob $job): void
     {
         $jobId = $job->getId();
-        $fundReturn = $this->fundReturnRepository->findForSpreadsheetExport(Ulid::fromString($job->getFundReturnId()));
+        
+        try {
+            $fundReturn = $this->fundReturnRepository->findForSpreadsheetExport(Ulid::fromString($job->getFundReturnId()));
 
-        if (!$fundReturn) {
-            throw new UnrecoverableMessageHandlingException("No such fund return: {$job->getFundReturnId()}");
-        }
+            if (!$fundReturn) {
+                $errorMessage = "No such fund return: {$job->getFundReturnId()}";
+                $this->logger->error($errorMessage);
+                throw new UnrecoverableMessageHandlingException($errorMessage);
+            }
 
-        if (!$fundReturn instanceof CrstsFundReturn) {
-            throw new UnrecoverableMessageHandlingException("Unsupported fund return type: ".$fundReturn::class);
-        }
+            if (!$fundReturn instanceof CrstsFundReturn) {
+                $errorMessage = "Unsupported fund return type: ".$fundReturn::class;
+                $this->logger->error($errorMessage);
+                throw new UnrecoverableMessageHandlingException($errorMessage);
+            }
 
-        $statusKey = "status-{$jobId}";
+            $statusKey = "status-{$jobId}";
 
-        $jobStatus = $this->cache->getItem($statusKey);
-        $jobStatus->set(new JobStatus(JobState::RUNNING));
-        $this->cache->save($jobStatus);
+            $jobStatus = $this->cache->getItem($statusKey);
+            $jobStatus->set(new JobStatus(JobState::RUNNING));
+            $this->cache->save($jobStatus);
 
-        $spreadsheetData = $this->getSpreadsheetData($fundReturn);
+            $spreadsheetData = $this->getSpreadsheetData($fundReturn);
 
-        if ($spreadsheetData) {
-            $jobData = $this->cache->getItem("data-{$jobId}");
-            $jobData->set($spreadsheetData);
-            $this->cache->save($jobData);
+            if ($spreadsheetData) {
+                $jobData = $this->cache->getItem("data-{$jobId}");
+                $jobData->set($spreadsheetData);
+                $this->cache->save($jobData);
 
-            $jobStatus->set(new JobStatus(JobState::COMPLETED, context: [
-                'filename' => $this->getFilename($fundReturn),
-                'fundReturnId' => strval($fundReturn->getId()),
-            ]));
-        } else {
-            $jobStatus->set(new JobStatus(JobState::FAILED));
+                $filename = $this->getFilename($fundReturn);
+                
+                $jobStatus->set(new JobStatus(JobState::COMPLETED, context: [
+                    'filename' => $filename,
+                    'fundReturnId' => strval($fundReturn->getId()),
+                ]));
+                
+                // Log successful job completion
+                $this->logger->info('Spreadsheet job completed successfully', [
+                    'filename' => $filename,
+                    'fundReturnId' => strval($fundReturn->getId()),
+                    'authority' => $fundReturn->getFundAward()->getAuthority()->getName(),
+                    'year' => $fundReturn->getYear(),
+                    'quarter' => $fundReturn->getQuarter()
+                ]);
+            } else {
+                $errorMessage = 'Failed to generate spreadsheet data';
+                $jobStatus->set(new JobStatus(JobState::FAILED, $errorMessage));
+                
+                // Log failure
+                $this->logger->error($errorMessage, [
+                    'jobId' => $jobId,
+                    'fundReturnId' => strval($fundReturn->getId()),
+                    'authority' => $fundReturn->getFundAward()->getAuthority()->getName(),
+                    'year' => $fundReturn->getYear(),
+                    'quarter' => $fundReturn->getQuarter(),
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Spreadsheet job failed with exception', [
+                'jobId' => $jobId,
+                'error' => $e->getMessage(),
+                'stackTrace' => $e->getTraceAsString(),
+                'fundReturnId' => $job->getFundReturnId(),
+            ]);
+            
+            $jobStatus = $this->cache->getItem("status-{$jobId}");
+            $jobStatus->set(new JobStatus(JobState::FAILED, $e->getMessage()));
         }
 
         $this->cache->save($jobStatus);
