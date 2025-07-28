@@ -24,7 +24,7 @@
         "deploy-build": "encore production",
         "build-env-subs": "printenv | grep -E '^APP_' > .env.local"
     },
-    "packageManager": "yarn@4.9.1",
+    "packageManager": "yarn@4.9.2",
     "dependencies": {
         "js-big-decimal": "^2.2.0"
     }

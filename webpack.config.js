@@ -61,7 +61,11 @@ Encore
 
     .copyFiles({
         from: './node_modules/govuk-frontend/dist/govuk/assets/images',
-        to: 'images/[name].[hash:8].[ext]',
+        to: 'images/[path][name].[hash:8].[ext]',
+    })
+    .copyFiles({
+        from: './node_modules/govuk-frontend/dist/govuk/assets/rebrand',
+        to: 'rebrand/[path][name].[hash:8].[ext]',
     })
 
     // uncomment if you use TypeScript
