@@ -6,14 +6,14 @@ framework:
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             async: 'doctrine://default'
-            async_notify:
-                dsn: 'doctrine://default?queue_name=govuk-notify'
+            async_ldap:
+                dsn: 'doctrine://default?queue_name=ldap-queue'
                 retry_strategy:
                     delay: 1800000     # 30 min delay first time
                     multiplier: 2      # double the delay for each retry
                     max_delay: 7200000 # max delay 2 hours
-            async_notify_high_prio:
-                dsn: 'doctrine://default?queue_name=govuk-notify-high-prio'
+            async_notify:
+                dsn: 'doctrine://default?queue_name=govuk-notify'
                 retry_strategy:
                     delay: 1800000     # 30 min delay first time
                     multiplier: 2      # double the delay for each retry
@@ -22,8 +22,8 @@ framework:
             sync: 'sync://'
 
         routing:
-            'App\Messenger\AlphagovNotify\AbstractMessage': async_notify
-            'App\Messenger\AlphagovNotify\AbstractHighPrioMessage': async_notify_high_prio
+            'App\Messenger\AlphagovNotify\AbstractMessage': async_ldap
+            'App\Messenger\AlphagovNotify\AbstractHighPrioMessage': async_notify
 
 # when@test:
 #    framework:
