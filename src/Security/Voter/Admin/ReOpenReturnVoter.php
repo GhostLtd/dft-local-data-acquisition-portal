@@ -7,14 +7,14 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\UserTypeRoles;
 use App\Repository\FundReturn\FundReturnRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ReOpenReturnVoter extends Voter
 {
     public function __construct(
-        protected AuthorizationCheckerInterface $authorizationChecker,
-        protected FundReturnRepository          $fundReturnRepository,
+        protected AccessDecisionManagerInterface $accessDecisionManager,
+        protected FundReturnRepository           $fundReturnRepository,
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -31,7 +31,7 @@ class ReOpenReturnVoter extends Voter
             $user &&
             $subject instanceof FundReturn &&
             $subject->isSignedOff() &&
-            $this->authorizationChecker->isGranted(UserTypeRoles::ROLE_IAP_ADMIN, $user) &&
+            $this->accessDecisionManager->decide($token, [UserTypeRoles::ROLE_IAP_ADMIN]) &&
             $this->fundReturnRepository->isMostRecentReturnForAward($subject);
     }
 }

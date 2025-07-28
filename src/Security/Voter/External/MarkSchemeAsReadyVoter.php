@@ -7,14 +7,14 @@ use App\Entity\Enum\Role;
 use App\Entity\SchemeReturn\SchemeReturn;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class MarkSchemeAsReadyVoter extends Voter
 {
     public function __construct(
-        protected AuthorizationCheckerInterface $authorizationChecker,
-        protected LoggerInterface               $logger
+        protected AccessDecisionManagerInterface $accessDecisionManager,
+        protected LoggerInterface                $logger
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -28,7 +28,7 @@ class MarkSchemeAsReadyVoter extends Voter
      */
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if (!$this->authorizationChecker->isGranted(InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION, $subject)) {
+        if (!$this->accessDecisionManager->decide($token, [InternalRole::HAS_VALID_MARK_AS_READY_PERMISSION], $subject)) {
             return false;
         }
 

@@ -7,14 +7,14 @@ use App\Entity\Enum\Role;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class SchemeReturnExpensesVoter extends Voter
 {
     public function __construct(
-        protected AuthorizationCheckerInterface $authorizationChecker,
-        protected LoggerInterface               $logger,
+        protected AccessDecisionManagerInterface $accessDecisionManager,
+        protected LoggerInterface                $logger,
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -33,7 +33,7 @@ class SchemeReturnExpensesVoter extends Voter
             Role::CAN_VIEW_SCHEME_RETURN_EXPENSES => InternalRole::HAS_VALID_VIEW_PERMISSION,
         };
 
-        if (!$this->authorizationChecker->isGranted($internalRole, $subject)) {
+        if (!$this->accessDecisionManager->decide($token, [$internalRole], $subject)) {
             return false;
         }
 

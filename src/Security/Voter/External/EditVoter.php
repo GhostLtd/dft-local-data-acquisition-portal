@@ -6,13 +6,13 @@ use App\Entity\Enum\InternalRole;
 use App\Entity\Enum\Role;
 use App\Entity\SchemeReturn\SchemeReturn;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class EditVoter extends Voter
 {
     public function __construct(
-        protected AuthorizationCheckerInterface $authorizationChecker,
+        protected AccessDecisionManagerInterface $accessDecisionManager,
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -22,7 +22,7 @@ class EditVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if (!$this->authorizationChecker->isGranted(InternalRole::HAS_VALID_EDIT_PERMISSION, $subject)) {
+        if (!$this->accessDecisionManager->decide($token, [InternalRole::HAS_VALID_EDIT_PERMISSION], $subject)) {
             return false;
         }
 

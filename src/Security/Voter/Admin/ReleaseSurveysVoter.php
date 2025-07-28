@@ -9,15 +9,15 @@ use App\Entity\UserTypeRoles;
 use App\Repository\FundReturn\FundReturnRepository;
 use App\Utility\FundReturnCreator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ReleaseSurveysVoter extends Voter
 {
     public function __construct(
-        protected AuthorizationCheckerInterface $authorizationChecker,
-        protected FundReturnCreator             $fundReturnCreator,
-        protected FundReturnRepository          $fundReturnRepository,
+        protected AccessDecisionManagerInterface $accessDecisionManager,
+        protected FundReturnCreator              $fundReturnCreator,
+        protected FundReturnRepository           $fundReturnRepository,
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -28,7 +28,7 @@ class ReleaseSurveysVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        if (!$this->authorizationChecker->isGranted(UserTypeRoles::ROLE_IAP_ADMIN)) {
+        if (!$this->accessDecisionManager->decide($token, [UserTypeRoles::ROLE_IAP_ADMIN])) {
             return false;
         }
 
