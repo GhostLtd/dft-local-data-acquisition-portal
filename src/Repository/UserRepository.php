@@ -35,15 +35,20 @@ class UserRepository extends ServiceEntityRepository
             ->createQueryBuilder('user', 'user.id')
             ->where(new Expr\Orx([
                 $em->getExpressionBuilder()->in('user.id', $userIdsQuery),
-                $em->getExpressionBuilder()->eq('user.id', ':userId')
+                $em->getExpressionBuilder()->eq('user.id', ':adminUserId')
             ]))
-            ->setParameter('userId', $authority->getAdmin()->getId(), UlidType::NAME)
+            ->setParameter('adminUserId', $authority->getAdmin()->getId(), UlidType::NAME)
             ->setParameter('authorityId', $authority->getId(), UlidType::NAME)
         ;
     }
 
     public function findAllForAuthority(Authority $authority): array
     {
-        return $this->getAllForAuthorityQueryBuilder($authority)->getQuery()->getResult();
+        return $this->getAllForAuthorityQueryBuilder($authority)
+            // Admin first, but otherwise in name order...
+            ->orderBy('CASE WHEN user.id = :adminUserId THEN 1 ELSE 0 END', 'DESC')
+            ->addOrderBy('user.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }
