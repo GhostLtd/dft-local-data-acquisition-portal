@@ -79,7 +79,7 @@ class SchemeReturnRepositoryTest extends KernelTestCase
             '1c: not editable - previous return closed' => ['sr_1_2023_3', 'sr_1_2023_2'],
             '1d: not editable - return -2 closed' => ['sr_1_2023_4', 'sr_1_2023_2'],
             '1e: not editable - return -3 closed' => ['sr_1_2023_4', 'sr_1_2023_2'],
-            '1f: not editable - return -4 closed ' => ['sr_1_2024_1', 'sr_1_2024_2'],
+            '1f: not editable - return -4 closed ' => ['sr_1_2024_1', 'sr_1_2023_2'],
             '1g: editable - previous return open' => ['sr_1_2024_2', null],
             '1h: not editable - previous return closed' => ['sr_1_2024_3', 'sr_1_2024_2'],
 

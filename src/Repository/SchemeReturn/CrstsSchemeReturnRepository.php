@@ -26,63 +26,73 @@ class CrstsSchemeReturnRepository extends ServiceEntityRepository
 
     public function findPointWhereReturnBecameNonEditable(CrstsSchemeReturn $currentSchemeReturn): ?CrstsSchemeReturn
     {
-        if (
-            $currentSchemeReturn->getOnTrackRating() === null ||
-            $currentSchemeReturn->getOnTrackRating()->shouldSchemeBeEditableInTheFuture()
-        ) {
-            // Well, it's currently editable (i.e. not split/merged/completed), so it never became non-editable
-            return null;
-        }
-
         $entityManager = $this->getEntityManager();
         $conn = $entityManager->getConnection();
 
         $sql = <<<SQL
-WITH base_data AS (
-  SELECT 
-    sr.id AS scheme_return_id,
-    sr.scheme_id,
-    fr.year,
-    fr.quarter,
-    csr.on_track_rating,
-    CASE
-      WHEN csr.on_track_rating IN ('scheme_completed', 'scheme_merged', 'scheme_split') THEN true
-      ELSE false
-    END AS is_closed
-  FROM crsts_scheme_return csr
-  JOIN scheme_return sr ON csr.id = sr.id
-  JOIN fund_return fr ON sr.fund_return_id = fr.id
+WITH
+current_return AS (
+    SELECT
+        sr.scheme_id,
+        fr.year,
+        fr.quarter
+    FROM scheme_return sr
+    JOIN fund_return fr ON sr.fund_return_id = fr.id
+    WHERE sr.id = :current_scheme_return_id
 ),
-
-target_return AS (
-  SELECT 
-    sr.scheme_id AS target_scheme_id,
-    fr.year AS target_year,
-    fr.quarter AS target_quarter
-  FROM scheme_return sr
-  JOIN fund_return fr ON sr.fund_return_id = fr.id
-  WHERE sr.id = :target_scheme_return_id
+base_data AS (
+    SELECT
+        sr.id AS scheme_return_id,
+        sr.scheme_id,
+        fr.year,
+        fr.quarter,
+        csr.on_track_rating,
+        CASE
+            WHEN csr.on_track_rating IN ('scheme_completed', 'scheme_merged', 'scheme_split') THEN true
+            ELSE false
+        END AS is_closed
+    FROM crsts_scheme_return csr
+    JOIN scheme_return sr ON csr.id = sr.id
+    JOIN current_return cr ON cr.scheme_id = sr.scheme_id
+    JOIN fund_return fr ON sr.fund_return_id = fr.id
 ),
-
-prior_return AS (
-  SELECT bd.*
-  FROM base_data bd
-  JOIN target_return tr ON bd.scheme_id = tr.target_scheme_id
-  WHERE (
-    bd.year < tr.target_year OR
-    (bd.year = tr.target_year AND bd.quarter < tr.target_quarter)
-  )
-  ORDER BY bd.year DESC, bd.quarter DESC
-  LIMIT 1
+previous_returns AS (
+    SELECT
+        bd.scheme_return_id,
+        bd.year,
+        bd.quarter,
+        bd.is_closed
+    FROM base_data bd
+    JOIN current_return cr ON bd.scheme_id = cr.scheme_id
+    WHERE (bd.year < cr.year) OR (bd.year = cr.year AND bd.quarter < cr.quarter)
+    ORDER BY bd.year ASC, bd.quarter ASC
+),
+most_recent_open AS (
+    SELECT p.scheme_return_id, p.year, p.quarter
+    FROM previous_returns p
+    WHERE p.is_closed = 0
+    ORDER BY p.year DESC, p.quarter DESC
+    LIMIT 1
+),
+relevant_returns AS (
+    SELECT
+        pr.scheme_return_id,
+        pr.year,
+        pr.quarter,
+        pr.is_closed
+    FROM previous_returns pr
+    LEFT JOIN most_recent_open mo ON 1=1
+    WHERE (pr.year > mo.year) OR (pr.year = mo.year AND pr.quarter > mo.quarter)
+    ORDER BY pr.year ASC, pr.quarter ASC
 )
-
-SELECT *
-FROM prior_return
-WHERE is_closed = true;
+SELECT scheme_return_id
+FROM relevant_returns
+ORDER BY year, quarter
+LIMIT 1
 SQL;
 
         $stmt = $conn->prepare($sql);
-        $stmt->bindValue('target_scheme_return_id', $currentSchemeReturn->getId(), UlidType::NAME);
+        $stmt->bindValue('current_scheme_return_id', $currentSchemeReturn->getId(), UlidType::NAME);
         $result = $stmt->executeQuery();
         $row = $result->fetchAssociative();
         return $row
