@@ -33,42 +33,6 @@ class SchemeReturnRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-
-    public function cachedFindPointWhereReturnBecameNonEditable(CrstsSchemeReturn $currentSchemeReturn): ?CrstsSchemeReturn
-    {
-        static $cache = [];
-        $key = strval($currentSchemeReturn->getId());
-        return $cache[$key] ?? ($cache[$key] = $this->findPointWhereReturnBecameNonEditable($currentSchemeReturn));
-    }
-
-    public function findPointWhereReturnBecameNonEditable(CrstsSchemeReturn $currentSchemeReturn): ?CrstsSchemeReturn
-    {
-        if (
-            $currentSchemeReturn->getOnTrackRating() === null ||
-            $currentSchemeReturn->getOnTrackRating()->shouldSchemeBeEditableInTheFuture()
-        ) {
-            // Well, it's currently editable (i.e. not split/merged/completed), so it never became non-editable
-            return null;
-        }
-
-        return $this->getEntityManager()
-                ->createQueryBuilder()
-                ->select('schemeReturn, fundReturn')
-                ->from(CrstsSchemeReturn::class, 'schemeReturn')
-                ->join('schemeReturn.fundReturn', 'fundReturn')
-                ->where('IDENTITY(schemeReturn.scheme) = :schemeId')
-                ->andWhere('schemeReturn.onTrackRating IN (:ratings)')
-                ->andWhere('schemeReturn.id != :currentSchemeReturnId')
-                ->setParameter('schemeId', $currentSchemeReturn->getScheme()->getId(), UlidType::NAME)
-                ->setParameter('ratings', OnTrackRating::getFutureNonEditableStates())
-                ->setParameter('currentSchemeReturnId', $currentSchemeReturn->getId(), UlidType::NAME)
-                ->orderBy('fundReturn.year')
-                ->addOrderBy('fundReturn.quarter')
-                ->getQuery()
-                ->setMaxResults(1)
-                ->getOneOrNullResult();
-    }
-
     public function findForSpreadsheetExport(CrstsFundReturn $fundReturn): array
     {
         return $this->getEntityManager()
