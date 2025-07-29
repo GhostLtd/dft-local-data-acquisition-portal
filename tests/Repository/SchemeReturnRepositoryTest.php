@@ -9,7 +9,6 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
-use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class SchemeReturnRepositoryTest extends KernelTestCase
@@ -44,21 +43,6 @@ class SchemeReturnRepositoryTest extends KernelTestCase
         /** @var CrstsSchemeReturn $target */
         $target = $this->referenceRepository->getReference($targetRef, CrstsSchemeReturn::class);
         $expected = $expectedClosedRef ? $this->referenceRepository->getReference($expectedClosedRef, CrstsSchemeReturn::class) : null;
-
-//        $x = $this->entityManager->getConnection()
-//            ->executeQuery(<<<SQL
-//SELECT fr.year, fr.quarter, csr.on_track_rating
-//FROM crsts_scheme_return csr
-//JOIN scheme_return sr ON csr.id = sr.id
-//JOIN fund_return fr ON sr.fund_return_id = fr.id
-//WHERE sr.scheme_id = :schemeId
-//SQL, [
-//    'schemeId' => $target->getScheme()->getId()
-//], [
-//    'schemeId' => UlidType::NAME
-//])
-//            ->fetchAllAssociative();
-//        dump($x);
 
         $result = $this->repository->findPointWhereReturnBecameNonEditable($target);
 
