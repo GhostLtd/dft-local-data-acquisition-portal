@@ -10,7 +10,7 @@ use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
-use App\Repository\SchemeReturn\SchemeReturnRepository;
+use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
 use App\Utility\CrstsHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -20,9 +20,10 @@ class CrstsSignoffHelper implements SignoffHelperInterface
     protected TableConfiguration $tableConfiguration;
 
     public function __construct(
-        protected SchemeReturnRepository $schemeReturnRepository,
-        protected UrlGeneratorInterface  $urlGenerator,
-    ) {
+        protected CrstsSchemeReturnRepository $schemeReturnRepository,
+        protected UrlGeneratorInterface       $urlGenerator,
+    )
+    {
         $this->useAdminLinks = false;
     }
 
@@ -32,7 +33,7 @@ class CrstsSignoffHelper implements SignoffHelperInterface
         return $this;
     }
 
-    public function getSignoffEligibilityStatus(FundReturn|SchemeReturn $return, bool $useAdminLinks=false): SignoffEligibilityStatus
+    public function getSignoffEligibilityStatus(FundReturn|SchemeReturn $return, bool $useAdminLinks = false): SignoffEligibilityStatus
     {
         $generator = $this->getGenerator($return);
         $problems = iterator_to_array($generator, false);
@@ -96,7 +97,7 @@ class CrstsSignoffHelper implements SignoffHelperInterface
                                 messageParameters: [
                                     'division' => $divisionConfiguration->getLabel(),
                                 ],
-                                url: $this->urlGenerator->generate($fundReturnRoute, ['fundReturnId' => $return->getId()]).'#expenses-'.$divisionConfiguration->getKey(),
+                                url: $this->urlGenerator->generate($fundReturnRoute, ['fundReturnId' => $return->getId()]) . '#expenses-' . $divisionConfiguration->getKey(),
                             );
                             break 2;
                         }
@@ -137,7 +138,7 @@ class CrstsSignoffHelper implements SignoffHelperInterface
                 url: $this->urlGenerator->generate($schemeReturnRoute, [
                     'fundReturnId' => $return->getFundReturn()->getId(),
                     'schemeId' => $scheme->getId(),
-                ]).'#milestone_progress',
+                ]) . '#milestone_progress',
             );
         }
     }

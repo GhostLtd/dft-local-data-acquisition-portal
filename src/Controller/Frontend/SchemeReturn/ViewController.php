@@ -7,7 +7,7 @@ use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
-use App\Repository\SchemeReturn\SchemeReturnRepository;
+use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
 use App\Utility\ExpensesTableHelper;
@@ -21,15 +21,15 @@ class ViewController extends AbstractController
 {
     #[Route('/fund-return/{fundReturnId}/scheme/{schemeId}', name: 'app_scheme_return')]
     public function view(
-        Request $request,
+        Request                     $request,
         #[MapEntity(expr: 'repository.findForDashboard(fundReturnId)')]
-        FundReturn              $fundReturn,
+        FundReturn                  $fundReturn,
         #[MapEntity(expr: 'repository.findForDashboard(schemeId)')]
-        Scheme                  $scheme,
-        DashboardLinksBuilder   $linksBuilder,
-        ExpensesTableHelper     $expensesTableHelper,
-        ExpensesTableCalculator $expensesTableCalculator,
-        SchemeReturnRepository  $schemeReturnRepository,
+        Scheme                      $scheme,
+        DashboardLinksBuilder       $linksBuilder,
+        ExpensesTableHelper         $expensesTableHelper,
+        ExpensesTableCalculator     $expensesTableCalculator,
+        CrstsSchemeReturnRepository $schemeReturnRepository,
     ): Response
     {
         $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);

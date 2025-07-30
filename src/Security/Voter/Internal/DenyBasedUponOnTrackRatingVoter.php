@@ -4,7 +4,7 @@ namespace App\Security\Voter\Internal;
 
 use App\Entity\Enum\InternalRole;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Repository\SchemeReturn\SchemeReturnRepository;
+use App\Repository\SchemeReturn\CrstsSchemeReturnRepository;
 use App\Security\SubjectResolver;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -13,10 +13,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class DenyBasedUponOnTrackRatingVoter extends Voter
 {
     public function __construct(
-        protected LoggerInterface               $logger,
-        protected SubjectResolver               $subjectResolver,
-        protected SchemeReturnRepository        $schemeReturnRepository,
-    ) {}
+        protected LoggerInterface             $logger,
+        protected SubjectResolver             $subjectResolver,
+        protected CrstsSchemeReturnRepository $schemeReturnRepository,
+    )
+    {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {

@@ -28,14 +28,16 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
     protected WorksheetHelper $helper;
 
     public function __construct(
-        protected ExpensesTableHelper $expensesTableHelper,
-        protected SchemeRepository    $schemeRepository,
-        protected TranslatorInterface $translator, private readonly SchemeReturnRepository $schemeReturnRepository,
-    ) {
+        protected ExpensesTableHelper    $expensesTableHelper,
+        protected SchemeRepository       $schemeRepository,
+        protected TranslatorInterface    $translator,
+        protected SchemeReturnRepository $schemeReturnRepository,
+    )
+    {
         parent::__construct();
     }
 
-    public function addWorksheet(Worksheet $worksheet, CrstsFundReturn $fundReturn, bool $moveExpensesHeaderToColumnC=false): void
+    public function addWorksheet(Worksheet $worksheet, CrstsFundReturn $fundReturn, bool $moveExpensesHeaderToColumnC = false): void
     {
         $this->worksheet = $worksheet->setTitle('Schemes');
         $this->helper = new WorksheetHelper($this->worksheet);
@@ -77,7 +79,7 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             $textColumns = [
                 1 => $scheme->getSchemeIdentifier(),
                 2 => $scheme->getName(),
-                3 => match($scheme->getCrstsData()->isRetained()) {
+                3 => match ($scheme->getCrstsData()->isRetained()) {
                     true => 'Y',
                     false => 'N',
                     null => '',
@@ -347,7 +349,7 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             ->setRightBorder($this->darkGray, Border::BORDER_THICK);
     }
 
-    protected function sumExpensesRow(int $y1, int $y2, ExpensesTableHelper $expensesTableHelper, Color $bottomBorderColor=null): void
+    protected function sumExpensesRow(int $y1, int $y2, ExpensesTableHelper $expensesTableHelper, Color $bottomBorderColor = null): void
     {
         $currentX = 20;
         $sumCells = [];
@@ -361,12 +363,12 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             }
 
             $sumCells[] = $this->helper->cell($currentX, $y1)->getCoordinate();
-            $currentX+=2; // One to skip the comments column, one to skip the totals column
+            $currentX += 2; // One to skip the comments column, one to skip the totals column
         }
 
         $cell = $this->helper->range($currentX, $y1, $currentX, $y2)
             ->mergeCells()
-            ->setValue("=SUM(".join(',',$sumCells).")");
+            ->setValue("=SUM(" . join(',', $sumCells) . ")");
 
         if ($bottomBorderColor) {
             $cell->setBottomBorder($bottomBorderColor);
@@ -464,7 +466,7 @@ class SchemeWorksheetCreator extends AbstractWorksheetCreator
             ->setBold(true);
 
         $expenditureX = $this->moveExpensesHeaderToColumnC ? 4 : 19;
-        $this->helper->range($expenditureX,1, $expenditureX, 2)
+        $this->helper->range($expenditureX, 1, $expenditureX, 2)
             ->mergeCells()
             ->setValue('Expenditure')
             ->setBold(true)
