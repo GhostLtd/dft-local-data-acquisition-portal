@@ -14,13 +14,10 @@ use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
 
 class MilestoneDatesType extends AbstractType implements DataMapperInterface
 {
@@ -28,13 +25,14 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
     {
         $builder
             ->setDataMapper($this)
-            ->addEventListener(FormEvents::PRE_SET_DATA, $this->buildMilestoneFormElements(...));
+            ->addEventListener(FormEvents::PRE_SET_DATA, fn(PreSetDataEvent $event) => $this->buildMilestoneFormElements($event, $options));
     }
 
-    public function buildMilestoneFormElements(PreSetDataEvent $event): void
+    public function buildMilestoneFormElements(PreSetDataEvent $event, array $options): void
     {
         $data = $event->getData();
         $form = $event->getForm();
+        $milestonesEnabled = $options['milestones_enabled'];
 
         if (!$data instanceof CrstsSchemeReturn) {
             throw new UnexpectedTypeException($data, CrstsSchemeReturn::class);
@@ -59,20 +57,34 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             ]);
 
         foreach($relevantMilestoneEnums as $milestoneType) {
-            $fieldKey = $milestoneType->value;
+            $milestoneValue = $milestoneType->value;
 
             $parent = $milestoneType->isDevelopmentMilestone() ? $form : $form->get('nonDevelopmentalMilestones');
 
-            $groupName = "group_{$milestoneType->value}";
-            $parent->add($groupName, MilestoneGroupType::class);
+            $groupName = "group_{$milestoneValue}";
+            $parent->add($groupName, MilestoneGroupType::class, [
+                'priority' => 10,
+            ]);
             $group = $parent->get($groupName);
 
-            $group->add($milestoneType->value, DateType::class, [
-                'label' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.label",
+            $group->add($milestoneValue, DateType::class, [
+                'label' => "forms.scheme.milestone_dates.milestones.{$milestoneValue}.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
-                'help' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.help",
+                'help' => "forms.scheme.milestone_dates.milestones.{$milestoneValue}.help",
                 'priority' => 1,
             ]);
+
+            if ($milestonesEnabled) {
+                $milestoneValue = $milestoneType->getBaselineCounterpart()->value;
+                $group->add($milestoneValue, DateType::class, [
+                    'label' => "forms.scheme.milestone_dates.milestones.{$milestoneValue}.label",
+                    'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
+                    'help' => "forms.scheme.milestone_dates.milestones.{$milestoneValue}.help",
+                    'priority' => 1,
+                    'disabled' => true,
+                    'row_attr' => ['class' => 'baseline'],
+                ]);
+            }
         }
     }
 
@@ -102,6 +114,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
         /** @var FormInterface[] $forms */
 
         $milestoneEnums = $this->getRelevantMilestoneEnums($viewData);
+
         $isDevelopmentOnly = $viewData->getDevelopmentOnly();
         $forms['developmentOnly']->setData($isDevelopmentOnly);
 
@@ -109,8 +122,17 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             $data = $viewData->getMilestoneByType($milestoneEnum)?->getDate();
 
             if (!$isDevelopmentOnly || $milestoneEnum->isDevelopmentMilestone()) {
+                $data = [
+                    $milestoneEnum->value => $data,
+                ];
+
                 $groupName = "group_{$milestoneEnum->value}";
-                $forms[$groupName][$milestoneEnum->value]->setData($data);
+                $baselineEnum = $milestoneEnum->getBaselineCounterpart();
+                if ($forms[$groupName]->has($baselineEnum->value)) {
+                    $data[$baselineEnum->value] = $viewData->getMilestoneByType($baselineEnum)?->getDate();
+                }
+
+                $forms[$groupName]->setData($data);
             }
         }
     }
@@ -159,6 +181,9 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
         }
     }
 
+    /**
+     * @return array<int, MilestoneType>
+     */
     protected function getRelevantMilestoneEnums(CrstsSchemeReturn $schemeReturn): array
     {
         return MilestoneType::getNonBaselineCases($this->isCDEL($schemeReturn));
