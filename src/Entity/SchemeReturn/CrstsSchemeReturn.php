@@ -293,6 +293,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         $this->createExpensesForNextQuarter($sourceExpenses, $sourceFundReturn->getFinancialQuarter())
             ->map(fn($e) => $nextSchemeReturn->expenses->add($e));
 
+        $nextSchemeReturn->setDevelopmentOnly($this->getDevelopmentOnly());
         $this->milestones->map(fn($m) => $nextSchemeReturn->addMilestone((new Milestone())
             ->setType($m->getType())
             ->setDate($m->getDate())
