@@ -107,20 +107,22 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[Callback(groups: ['milestone_dates'])]
     public function validateMilestoneDates(ExecutionContextInterface $context): void
     {
-        $root = $context->getRoot()->getData();
+        $isDevOnly = $this->getDevelopmentOnly();
 
-        $fundedMostlyAs = null;
-        if ($root instanceof CrstsSchemeReturn) {
-            $fundedMostlyAs = $root->getScheme()->getCrstsData()->getFundedMostlyAs();
-        }
+        foreach($this->milestones as $milestone) {
+            $isDevMilestone = $milestone->getType()->isDevelopmentMilestone();
 
-        foreach($this->milestones as $i => $milestone) {
+            if ($isDevOnly !== false && !$isDevMilestone) {
+                continue;
+            }
+
             if ($milestone->getDate() === null) {
+                $value = $milestone->getType()->value;
                 $context
                     ->buildViolation('milestone.date.not_null', [
-                        'milestone_type' => $milestone->getType()->value,
+                        'milestone_type' => $value,
                     ])
-                    ->atPath($milestone->getType()->value)
+                    ->atPath("group_{$value}[{$value}]")
                     ->addViolation();
             }
         }

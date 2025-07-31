@@ -63,7 +63,11 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
 
             $parent = $milestoneType->isDevelopmentMilestone() ? $form : $form->get('nonDevelopmentalMilestones');
 
-            $parent->add($milestoneType->value, DateType::class, [
+            $groupName = "group_{$milestoneType->value}";
+            $parent->add($groupName, MilestoneGroupType::class);
+            $group = $parent->get($groupName);
+
+            $group->add($milestoneType->value, DateType::class, [
                 'label' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.label",
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
                 'help' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.help",
@@ -103,7 +107,8 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             $data = $viewData->getMilestoneByType($milestoneEnum)?->getDate();
 
             if (!$isDevelopmentOnly || $milestoneEnum->isDevelopmentMilestone()) {
-                $forms[$milestoneEnum->value]->setData($data);
+                $groupName = "group_{$milestoneEnum->value}";
+                $forms[$groupName][$milestoneEnum->value]->setData($data);
             }
         }
     }
@@ -140,7 +145,8 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
                 continue;
             }
 
-            $value = $forms[$milestoneType->value]->getData();
+            $groupName = "group_{$milestoneType->value}";
+            $value = $forms[$groupName][$milestoneType->value]->getData();
 
             if (!$milestone) {
                 $milestone = (new Milestone())->setType($milestoneType);
