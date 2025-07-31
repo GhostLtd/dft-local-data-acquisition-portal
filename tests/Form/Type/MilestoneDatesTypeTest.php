@@ -12,15 +12,22 @@ use App\Form\Type\SchemeReturn\Crsts\MilestoneDatesType;
 
 class MilestoneDatesTypeTest extends AbstractTypeTest
 {
-    public function dataForm(): array
+    public function dataForm(): \Generator
     {
         $validDate = ['year' => '2025', 'month' => '3', 'day' => '3'];
 
-        return array_merge(
+        $cases = array_merge(
             $this->getCDELValidationTestCases($validDate),
             $this->getRDELValidationTestCases($validDate),
             $this->getDataTransformTestCases(),
         );
+
+        // All test cases... once with milestones disabled, and then once with milestones enabled
+        foreach([false, true] as $milestonesEnabled) {
+            foreach($cases as $case) {
+                yield [$milestonesEnabled, ...$case];
+            }
+        }
     }
 
     protected function getCDELValidationTestCases(array $validDate): array
@@ -328,7 +335,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
     /**
      * @dataProvider dataForm
      */
-    public function testForm(string $initialMilestones, FundedMostlyAs $fundedMostlyAs, array $formData, bool $expectedToBeValid, ?string $expectedOutputMilestones = null): void
+    public function testForm(bool $milestonesEnabled, string $initialMilestones, FundedMostlyAs $fundedMostlyAs, array $formData, bool $expectedToBeValid, ?string $expectedOutputMilestones = null): void
     {
         $crstsData = (new CrstsData())
             ->setFundedMostlyAs($fundedMostlyAs);
@@ -346,6 +353,7 @@ class MilestoneDatesTypeTest extends AbstractTypeTest
         $form = $this->factory->create(MilestoneDatesType::class, $schemeReturn, [
             'cancel_url' => '#',
             'allow_extra_fields' => false,
+            'milestones_enabled' => $milestonesEnabled,
         ]);
 
 //        $this->debugShowFormStructure($form);
