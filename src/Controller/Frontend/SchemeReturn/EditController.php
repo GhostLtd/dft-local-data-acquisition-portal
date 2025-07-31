@@ -50,9 +50,13 @@ class EditController extends AbstractReturnController
             'cancel_url' => $cancelUrl,
         ]);
 
+        dump($form->get('group_start_development')->get('start_development'));
+        dump($form->get('group_start_development')->get('start_development')->getViewData());
+
         if ($response = $this->processForm($form, $request, $cancelUrl)) {
             return $response;
         }
+
 
         return $this->render('frontend/scheme_return/edit.html.twig', [
             'linksBuilder' => $linksBuilder,

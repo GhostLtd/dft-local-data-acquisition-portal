@@ -382,6 +382,28 @@ forms:
         final_delivery:
           label: Final delivery
           help: ''
+
+        baseline_start_development:
+          label: "Baseline: Start development"
+          help: ''
+        baseline_end_development:
+          label: "Baseline: End development"
+          help: ''
+        baseline_start_construction:
+          label: "Baseline: Start construction"
+          help: ''
+        baseline_end_construction:
+          label: "Baseline: End construction"
+          help: ''
+        baseline_start_delivery:
+          label: "Baseline: Start delivery"
+          help: ''
+        baseline_end_delivery:
+          label: "Baseline: End delivery"
+          help: ''
+        baseline_final_delivery:
+          label: "Baseline: Final delivery"
+          help: ''
     milestone_business_case:
       business_case:
         label: &sr_current_business_case Current business case

@@ -224,6 +224,7 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
         foreach($sourceFundReturns as $sourceFundReturn) {
             $fundAwardId = $sourceFundReturn->getFundAward()->getId();
 
+            /** @var CrstsSchemeReturn[] $sourceSchemeReturns */
             $sourceSchemeReturns = $this->entityManager
                 ->getRepository(CrstsSchemeReturn::class)
                 ->createQueryBuilder('csr')
@@ -254,7 +255,7 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                 foreach($this->getMatchingTargetSchemeReturns($targetSchemeReturns, $sourceSchemeReturn) as $targetSchemeReturn) {
                     foreach($sourceSchemeReturn->getMilestones() as $sourceMilestone) {
                         $milestoneType = $sourceMilestone->getType();
-                        if (!$milestoneType->isBaseline()) {
+                        if (!$milestoneType->isBaselineMilestone()) {
                             continue;
                         }
 

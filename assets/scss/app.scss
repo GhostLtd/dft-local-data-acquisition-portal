@@ -78,3 +78,24 @@ li.govuk-service-navigation__margin-left-auto {
     text-align: right;
   }
 }
+
+.ldap-milestone-group
+{
+  display: flex;
+
+  .baseline {
+    legend, label {
+      color: #1967D2;
+    }
+
+    input[disabled] {
+      opacity: 100%;
+      color: #1967D2;
+      border-color: #1967D2;
+    }
+  }
+
+  & > div {
+    flex-basis: 35%;
+  }
+}
