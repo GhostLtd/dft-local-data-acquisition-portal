@@ -100,24 +100,39 @@ li.govuk-service-navigation__margin-left-auto {
     // Style variation #2
     // ------------------
 
-    border: 2px solid rgba(govuk-colour('blue'), 0.4);
-    padding-left: 20px;
+    //border: 2px solid rgba(govuk-colour('blue'), 0.4);
+    //padding-left: 20px;
+    //margin-top: -10px;
+    //padding-top: 10px;
+    //
+    //background: repeating-linear-gradient(
+    //  45deg,
+    //  govuk-colour('white'),
+    //  govuk-colour('white') 8px,
+    //  rgba(govuk-colour('blue'), 0.2) 10px
+    //);
+    //
+    //input[disabled] {
+    //  background: govuk-colour('white');
+    //}
+
+    // Style variation #3
+    // ------------------
+
+    border: 1px dashed govuk-colour('dark-grey');
+    border-left: 4px solid govuk-colour('blue');
+
+    margin-left: 20px;
     margin-top: -10px;
     padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 10px ! important;
 
-    background: repeating-linear-gradient(
-      45deg,
-      govuk-colour('white'),
-      govuk-colour('white') 8px,
-      rgba(govuk-colour('blue'), 0.2) 10px
-    );
-
-    input[disabled] {
-      background: govuk-colour('white');
-    }
+    background: govuk-colour('light-grey');
   }
 
   & > div {
-    flex-basis: 35%;
+    //flex-basis: 35%;
   }
 }
