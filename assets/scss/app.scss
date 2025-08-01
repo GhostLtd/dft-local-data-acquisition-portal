@@ -84,14 +84,36 @@ li.govuk-service-navigation__margin-left-auto {
   display: flex;
 
   .baseline {
-    legend, label {
-      color: #1967D2;
-    }
+    // Style variation #1
+    // ------------------
+
+    //legend, label {
+    //  color: #1967D2;
+    //}
+    //
+    //input[disabled] {
+    //  opacity: 100%;
+    //  color: #1967D2;
+    //  border-color: #1967D2;
+    //}
+
+    // Style variation #2
+    // ------------------
+
+    border: 2px solid rgba(govuk-colour('blue'), 0.4);
+    padding-left: 20px;
+    margin-top: -10px;
+    padding-top: 10px;
+
+    background: repeating-linear-gradient(
+      45deg,
+      govuk-colour('white'),
+      govuk-colour('white') 8px,
+      rgba(govuk-colour('blue'), 0.2) 10px
+    );
 
     input[disabled] {
-      opacity: 100%;
-      color: #1967D2;
-      border-color: #1967D2;
+      background: govuk-colour('white');
     }
   }
 
