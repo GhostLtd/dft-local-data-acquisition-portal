@@ -11,17 +11,27 @@ use ZipStream\ZipStream;
 
 class CsvExporter
 {
+    protected array $boolColumns;
     protected array $ulidColumns;
 
     public function __construct(
         protected Connection $connection,
     ) {
+        $boolColumns = [
+            'is_development_only',
+            'is_new_scheme',
+            'is_retained',
+            'was_previously_tcf',
+        ];
+
         $ulidColumns = [
             'authority_id',
             'fund_return_id',
             'scheme_id',
             'scheme_return_id',
         ];
+
+        $this->boolColumns = array_combine($boolColumns, $boolColumns);
         $this->ulidColumns = array_combine($ulidColumns, $ulidColumns);
     }
     
@@ -138,6 +148,12 @@ class CsvExporter
             foreach($row as $idx => $value) {
                 if (isset($this->ulidColumns[$idx])) {
                     $row[$idx] = Ulid::fromBinary($value)->toRfc4122();
+                }
+
+                if (isset($this->boolColumns[$idx])) {
+                    if ($value !== null) {
+                        $row[$idx] = $value ? 1 : 0;
+                    }
                 }
             }
 
