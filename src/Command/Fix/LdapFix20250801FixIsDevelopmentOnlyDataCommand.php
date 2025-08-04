@@ -51,10 +51,13 @@ class LdapFix20250801FixIsDevelopmentOnlyDataCommand extends Command
             ->join('csr.milestones', 'm')
             ->where('fr.year = :startYear and fr.quarter >= :startQuarter')
             ->orWhere('fr.year > :startYear')
+            ->andWhere('csr.developmentOnly IS NULL')
             ->setParameter('startYear', $startYear)
             ->setParameter('startQuarter', $startQuarter)
             ->getQuery()
             ->execute();
+
+        $changedRecords = 0;
 
         foreach($schemeReturns as $schemeReturn) {
             $milestones = $schemeReturn->getMilestones()->toArray();
@@ -82,11 +85,16 @@ class LdapFix20250801FixIsDevelopmentOnlyDataCommand extends Command
                 $isDevelopmentOnly = null;
             }
 
+            $changedRecords++;
             $schemeReturn->setDevelopmentOnly($isDevelopmentOnly);
         }
 
-        $io->success("Saving...");
-        $this->entityManager->flush();
+        if ($changedRecords === 0) {
+            $io->success("No records to update");
+        } else {
+            $io->success("Updated {$changedRecords} scheme returns; Saving...");
+            $this->entityManager->flush();
+        }
 
         return Command::SUCCESS;
     }
