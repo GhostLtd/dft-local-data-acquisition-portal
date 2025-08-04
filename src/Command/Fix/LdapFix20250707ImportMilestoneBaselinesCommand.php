@@ -5,7 +5,9 @@ namespace App\Command\Fix;
 use App\Entity\Enum\MilestoneType;
 use App\Entity\FundReturn\CrstsFundReturn;
 use App\Entity\Milestone;
+use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
+use App\Entity\SchemeReturn\SchemeReturn;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -16,6 +18,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 #[AsCommand(
     name: 'ldap:fix:20250707-import-milestone-baselines',
@@ -136,6 +140,25 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                 ->setDate($date);
         }
 
+        $schemeNameMapQuery = <<<SQL
+WITH name_changes AS (
+    SELECT 
+        p.entity_id AS id, 
+        LOWER(JSON_UNQUOTE(p.property_value)) AS name,
+        a.name AS authority_name,
+        ROW_NUMBER() over (PARTITION BY p.entity_id ORDER BY p.timestamp) AS recency_num
+    FROM property_change_log p
+    JOIN scheme s ON s.id = p.entity_id
+    JOIN authority a ON a.id = s.authority_id
+    WHERE 
+        p.entity_class = :schemeClass AND p.property_name = 'name'
+        AND a.name = :authorityName
+)
+SELECT n.name AS earliest_name, n.id
+FROM name_changes n
+WHERE n.recency_num = 1
+SQL;
+
         foreach($byMcaAndScheme as $authorityName => $schemes) {
             /** @var CrstsSchemeReturn[] $schemeReturns */
             $schemeReturns = $this->entityManager
@@ -156,11 +179,32 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
                 ->getQuery()
                 ->getResult();
 
+            $schemeNameMap = $this->entityManager
+                ->getConnection()
+                ->executeQuery($schemeNameMapQuery, [
+                    'schemeClass' => Scheme::class,
+                    'authorityName' => $authorityName
+                ])
+                ->fetchAllAssociative();
+
             foreach($schemes as $schemeName => $milestones) {
-                $schemeReturn = $this->getSchemeReturnBySchemeName($schemeReturns, $schemeName);
+                $schemeId = null;
+                foreach($schemeNameMap as $map) {
+                    if ($map['earliest_name'] === mb_strtolower($schemeName)) {
+                        $schemeId = Ulid::fromBinary($map['id']);
+                        break;
+                    }
+                }
+
+                if (!$schemeId) {
+                    $io->error("Cannot find mapping for scheme with name: {$schemeName}");
+                    continue;
+                }
+
+                $schemeReturn = $this->getSchemeReturnById($schemeReturns, $schemeId);
 
                 if (!$schemeReturn) {
-                    $io->error("Cannot find scheme with name: {$schemeName}");
+                    $io->error("Cannot find scheme with id: {$schemeId} ({$schemeName})");
                     continue;
                 }
 
@@ -278,10 +322,13 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
         }
     }
 
-    protected function getSchemeReturnBySchemeName(array $schemeReturns, string $schemeName): ?CrstsSchemeReturn
+    /**
+     * @param array<int, CrstsSchemeReturn> $schemeReturns
+     */
+    protected function getSchemeReturnById(array $schemeReturns, Ulid $schemeId): ?CrstsSchemeReturn
     {
         foreach($schemeReturns as $schemeReturn) {
-            if (mb_strtolower($schemeReturn->getScheme()->getName()) === mb_strtolower($schemeName)) {
+            if ($schemeReturn->getScheme()->getId()->equals($schemeId)) {
                 return $schemeReturn;
             }
         }
