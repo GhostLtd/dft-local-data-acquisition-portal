@@ -8,6 +8,7 @@ use App\Entity\FundReturn\FundReturn;
 use App\Entity\Milestone;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
+use App\EventSubscriber\PropertyChangeLogEventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -24,7 +25,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class LdapFix20250801FixIsDevelopmentOnlyDataCommand extends Command
 {
     public function __construct(
-        protected EntityManagerInterface $entityManager,
+        protected EntityManagerInterface           $entityManager,
+        protected PropertyChangeLogEventSubscriber $changeLogEventSubscriber,
     )
     {
         parent::__construct();
@@ -93,7 +95,10 @@ class LdapFix20250801FixIsDevelopmentOnlyDataCommand extends Command
             $io->success("No records to update");
         } else {
             $io->success("Updated {$changedRecords} scheme returns; Saving...");
+            $this->changeLogEventSubscriber->setDefaultSource('fix:2025-08-08:fix-is-development-only-data');
             $this->entityManager->flush();
+            $this->changeLogEventSubscriber->setDefaultSource(null);
+
         }
 
         return Command::SUCCESS;
