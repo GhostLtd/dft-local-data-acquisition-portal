@@ -92,10 +92,12 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
 
             $date = $sheet->getCell([1, $rowIndex])->getValue();
 
-            if ($date > 2000 && $date < 2050) {
+            if ($date === null) {
+                continue;
+            } elseif ($date > 2000 && $date < 2050) {
                 $date = new \DateTime("{$date}-01-01");
             } else {
-                $date = $date === null ? null : Date::excelToDateTimeObject($date);
+                $date = Date::excelToDateTimeObject($date);
             }
 
             $isBaseline = $sheet->getCell([2, $rowIndex])->getValue();
