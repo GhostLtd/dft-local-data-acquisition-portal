@@ -8,6 +8,7 @@ use App\Entity\Milestone;
 use App\Entity\Scheme;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Entity\SchemeReturn\SchemeReturn;
+use App\EventSubscriber\PropertyChangeLogEventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -27,7 +28,10 @@ use Symfony\Component\Uid\Uuid;
 )]
 class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedCommand
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
+    public function __construct(
+        protected EntityManagerInterface           $entityManager,
+        protected PropertyChangeLogEventSubscriber $changeLogEventSubscriber,
+    )
     {
         parent::__construct();
     }
@@ -70,7 +74,9 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
             return Command::FAILURE;
         } else {
             $io->success("Saving...");
+            $this->changeLogEventSubscriber->setDefaultSource('fix:2025-07-07:import-milestone-baselines');
             $this->entityManager->flush();
+            $this->changeLogEventSubscriber->setDefaultSource(null);
             return Command::SUCCESS;
         }
     }
@@ -108,14 +114,14 @@ class LdapFix20250707ImportMilestoneBaselinesCommand extends AbstractSheetBasedC
             $milestoneType = $sheet->getCell([3, $rowIndex])->getValue();
 
             if ($isBaseline === 'N') {
-                $milestoneType = match($milestoneType) {
+                $milestoneType = match ($milestoneType) {
                     'Start construction' => MilestoneType::START_CONSTRUCTION,
                     'End construction' => MilestoneType::END_CONSTRUCTION,
                     'Start development' => MilestoneType::START_DEVELOPMENT,
                     'End development' => MilestoneType::END_DEVELOPMENT,
                 };
             } else if ($isBaseline === 'Y') {
-                $milestoneType = match($milestoneType) {
+                $milestoneType = match ($milestoneType) {
                     'Start construction' => MilestoneType::BASELINE_START_CONSTRUCTION,
                     'End construction' => MilestoneType::BASELINE_END_CONSTRUCTION,
                     'Start development' => MilestoneType::BASELINE_START_DEVELOPMENT,
