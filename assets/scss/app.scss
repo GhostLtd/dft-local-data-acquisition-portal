@@ -136,3 +136,25 @@ li.govuk-service-navigation__margin-left-auto {
     //flex-basis: 35%;
   }
 }
+
+table.milestone-dates {
+  table-layout: fixed;
+
+  td {
+    white-space: pre;
+  }
+
+  th.type {
+    width: 30%;
+  }
+
+  th.value {
+    width: 15%;
+  }
+
+  span.date {
+    display: inline-block;
+    width: 6em;
+    text-align: right;
+  }
+}

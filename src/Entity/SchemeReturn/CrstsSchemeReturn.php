@@ -20,6 +20,7 @@ use Doctrine\Common\Collections\ReadableCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
@@ -233,6 +234,39 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     public function getMilestones(): Collection
     {
         return $this->milestones;
+    }
+
+    public function getMilestonesForTableOutput(): array
+    {
+        $pairs = [];
+
+        foreach($this->milestones as $milestone) {
+            $type = $milestone->getType();
+            $isBaseline = $type->isBaselineMilestone();
+
+            $nonBaselineValue = ($isBaseline ? $type->getNonBaselineCounterpart() : $type)->value;
+            $pairs[$nonBaselineValue] ??= [];
+
+            $key = $isBaseline ? 'baseline' : 'current';
+            $pairs[$nonBaselineValue][$key] = $milestone;
+            $pairs[$nonBaselineValue]['label'] ??= new TranslatableMessage("enum.milestone_type.{$nonBaselineValue}");
+        }
+
+        uasort($pairs, function(array $x, array $y) {
+            $cases = MilestoneType::cases();
+            $keyX = $x['current']->getType();
+            $keyY = $y['current']->getType();
+
+            return ($keyX ? array_search($keyX, $cases) : null) <=> ($keyY ? array_search($keyY, $cases) : null);
+        });
+
+        return array_map(function(array $pair) {
+            $label = $pair['label'];
+            $current = ($pair['current'] ?? null) ? $pair['current']->getDate() : null;
+            $baseline = ($pair['baseline'] ?? null) ? $pair['baseline']->getDate() : null;
+
+            return ['label' => $label, 'current' => $current, 'baseline' => $baseline];
+        }, $pairs);
     }
 
     public function getMilestoneByType(MilestoneType $type): ?Milestone

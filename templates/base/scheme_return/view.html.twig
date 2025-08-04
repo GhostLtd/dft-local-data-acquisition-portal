@@ -68,16 +68,38 @@
                 }})
             ) -}}
 
+            {%- set milestoneDatesContent -%}
+                {%- from "@GhostGovUkFrontend/components/macros.html.twig" import table -%}
+                {%- set rows = [] -%}
+                {%- for tuple in schemeReturn.milestonesForTableOutput -%}
+                    {%- set row = [] -%}
+                    {%- for key,value in tuple -%}
+                        {%- set dict = (key == 'label')
+                            ? {text: value | trans}
+                            : {html: '<span class="date">' ~ (value ? (value | date('d/m/Y')) : '-') ~ '</span>'}
+                        -%}
+                        {%- set row = row | merge([dict]) -%}
+                    {%- endfor -%}
+                    {%- set rows = rows | merge([[...row, {text: ''}]]) -%}
+                {%- endfor -%}
+                {{- table({
+                    classes: 'milestone-dates',
+                    firstCellIsHeader: true,
+                    head: [
+                        {text: 'Type', classes: 'type'},
+                        {html: '<span class="date">Current</span>', classes: 'value'},
+                        {html: '<span class="date">Baseline</span>', classes: 'value'},
+                        {text: '', classes: 'spacer'}
+                    ],
+                    rows: rows
+                }) -}}
+            {%- endset -%}
+
             {{- displayCardForReturn(
                 schemeReturn,
                 'frontend.pages.scheme_return.titles.milestone_dates' | trans,
                 'milestone_dates',
-                summaryList({rows:
-                    schemeReturn.milestones | map((v,k) => {
-                        key: {text: "enum.milestone_type.#{v.type.value}" | trans},
-                        value: {text: dateValue(v.date, {dateFormat: 'format.date.year-and-month'})},
-                    })
-                })
+                milestoneDatesContent
             ) -}}
 
             {{- displayCardForReturn(
