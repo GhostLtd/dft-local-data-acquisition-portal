@@ -238,7 +238,7 @@ abstract class AbstractSheetImporter
         if (!$authority) {
             throw new \RuntimeException('authority not found: ' . $authorityName);
         }
-        return $this->entityManager->getRepository(FundReturn::class)->findOneBy([
+        return $this->entityManager->getRepository(CrstsFundReturn::class)->findOneBy([
             'fundAward' => $authority->getFundAwards()->filter(fn(FundAward $fa) => $fa->getType() === Fund::CRSTS1)->first(),
             'year' => $this->year,
             'quarter' => $this->quarter

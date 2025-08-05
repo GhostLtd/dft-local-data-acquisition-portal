@@ -24,7 +24,7 @@ class FinancialQuarter
         return [$this->initialYear, $this->quarter];
     }
 
-    public static function createFromDate(\DateTime $date): static
+    public static function createFromDate(\DateTime $date): self
     {
         // we need to take the first of the given month, because if it's something like Dec-31, it becomes Oct-01
         // subtract 3 months, because FY starts in April
@@ -32,7 +32,7 @@ class FinancialQuarter
         return new self($date->format('Y'), ceil($date->format('m') / 3));
     }
 
-    public static function createFromDivisionAndColumn(string $division, string $column): static
+    public static function createFromDivisionAndColumn(string $division, string $column): self
     {
         if (!preg_match('/^(?<year>\d{4})-\d{2}$/', $division, $divisionMatches)) {
             throw new \RuntimeException('unexpected division format: ' . $division);
@@ -43,7 +43,7 @@ class FinancialQuarter
         return new self(intval($divisionMatches['year']), intval($columnMatches['quarter']));
     }
 
-    public function getNextQuarter(): static
+    public function getNextQuarter(): self
     {
         return match($this->quarter) {
             4 => new self($this->initialYear + 1, 1),
@@ -51,7 +51,7 @@ class FinancialQuarter
         };
     }
 
-    public function getPreviousQuarter(): static
+    public function getPreviousQuarter(): self
     {
         return match($this->quarter) {
             1 => new self($this->initialYear - 1, 4),
