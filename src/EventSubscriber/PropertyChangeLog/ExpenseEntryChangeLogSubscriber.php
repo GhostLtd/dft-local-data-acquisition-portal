@@ -10,6 +10,7 @@ use App\Entity\SchemeReturn\SchemeReturn;
 use App\Utility\PropertyChangeLog\Events\ChangeLogEntityCreatedEvent;
 use App\Utility\PropertyChangeLog\Events\ChangeSetRetrievedEvent;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ExpenseEntryChangeLogSubscriber implements EventSubscriberInterface
@@ -77,6 +78,10 @@ class ExpenseEntryChangeLogSubscriber implements EventSubscriberInterface
                 $entityId = $return->getId();
                 $entityClass = $return::class;
                 break;
+            }
+
+            if (!$expenses instanceof PersistentCollection) {
+                throw new \RuntimeException('Unexpected collection type');
             }
 
             foreach($expenses->getSnapshot() as $snapshotEntry) {

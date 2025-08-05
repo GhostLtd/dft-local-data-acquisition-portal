@@ -76,7 +76,7 @@ class LdapFix20250405PatchBaselinesCommand extends Command
 
             foreach($previousExpenses as $previousExpense) {
                 if ($previousExpense->getType()->isBaseline()) {
-                    $existingExpense = $fundReturn->getExpenseWithSameDivisionTypeAndColumnAs($previousExpense, true);
+                    $existingExpense = $fundReturn->getExpenseWithSameDivisionTypeAndColumnAs($previousExpense);
                     if ($existingExpense) {
                         if ($existingExpense->getValue() !== null) {
                             $io->writeln("<info>EXISTS</info> {$getInfoString($fundReturn, $previousExpense)}");

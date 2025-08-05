@@ -6,6 +6,7 @@ use App\Entity\Enum\ExpenseType;
 use App\Entity\ExpenseEntry;
 use App\Entity\ExpensesContainerInterface;
 use App\Entity\FundReturn\CrstsFundReturn;
+use App\Entity\SchemeReturn\CrstsSchemeReturn;
 use App\Utility\FinancialQuarter;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
@@ -62,7 +63,7 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
         }
 
 
-        /** @var ExpensesContainerInterface $parentEntity */
+        /** @var CrstsFundReturn|CrstsSchemeReturn $parentEntity */
         $parentEntity = $isSchemeExpense
             ? $this->findCrstsSchemeReturnByName(...$this->getSchemeAndAuthorityNames($expenseIdentifier))
             : $this->findCrstsFundReturnByAuthorityName($expenseIdentifier);
@@ -105,13 +106,27 @@ class ExpenseEntrySheetImporter extends AbstractSheetImporter
     {
         $ignoredValues = ['total', 'comments', 'current date vs date from previous report'];
         $value = strtolower($value);
-        return match(true) {
-            $value === 'post-26/27' => 'post-2026-27',
-            $value === 'total' => ($this->logger->info("ignored expense division", [$value]) ?? null),
-            1 === preg_match('/^\d{4}\/\d{2}$/', $value) => str_replace(['/'], ['-'], $value),
-            in_array(strtolower($value), $ignoredValues) => ($this->logger->info("ignored expense division", [$value]) ?? null),
-            default => ($this->logger->error("invalid expense division", [$value]) ?? null),
-        };
+
+        if ($value === 'post-26/27') {
+            return 'post-2026-27';
+        }
+
+        if ($value === 'total') {
+            $this->logger->info("ignored expense division", [$value]);
+            return null;
+        }
+
+        if (preg_match('/^\d{4}\/\d{2}$/', $value)) {
+            return str_replace(['/'], ['-'], $value);
+        }
+
+        if (in_array(strtolower($value), $ignoredValues)) {
+            $this->logger->info("ignored expense division", [$value]);
+            return null;
+        }
+
+        $this->logger->error("invalid expense division", [$value]);
+        return null;
     }
 
     protected function attemptToFormatAsExpenseType(?string $value): ?ExpenseType

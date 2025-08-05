@@ -126,7 +126,7 @@ class ScreenshotsCommand extends Command
 
         try {
             $process->disableOutput();
-            $process->mustRun(function($type, $buffer) use ($cursor, $input, $io): void {
+            $process->mustRun(function($type, $buffer) use ($input, $io): void {
                 $this->subprocessRequestHelper->process($buffer, $input, function($line) use ($io) {
                     $io->writeln("\r<comment>screenshots</comment> $line");
                 });

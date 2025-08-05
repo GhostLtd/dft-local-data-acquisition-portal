@@ -51,7 +51,7 @@ class RandomFixtureGenerator
 
     /**
      * @template T
-     * @class-string $class<T>
+     * @param class-string<T> $class
      * @return array<T>
      */
     protected function repeat(string $class, int $min, int $max, \Closure $callback): array
@@ -87,6 +87,7 @@ class RandomFixtureGenerator
 
         for($i=0; $i<$numberOfFixtures; $i++) {
             do {
+                /** @phpstan-ignore-next-line */
                 $name = $this->faker->council_name();
             } while(array_key_exists($name, $authorities));
 
@@ -212,6 +213,7 @@ class RandomFixtureGenerator
 
         return new SchemeDefinition(
             $crstsData,
+            /** @phpstan-ignore-next-line */
             $this->faker->scheme_name(),
             $this->faker->text(),
             $this->faker->randomElement(TransportMode::cases()),

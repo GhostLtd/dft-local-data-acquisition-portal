@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkFrontendBundle\Model\NotificationBanner;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -80,7 +81,6 @@ class AuthorityController extends AbstractController
             $linksBuilder->setAtAuthorityAdd();
         }
 
-        /** @var Form $form */
         $form = $this->createForm(AuthorityType::class, $authority, [
             'cancel_url' => $type === 'edit'
                 ? $this->generateUrl('admin_authority_view', ['id' => $authority->getId()])

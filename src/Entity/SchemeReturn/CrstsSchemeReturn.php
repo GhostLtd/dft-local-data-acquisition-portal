@@ -233,22 +233,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         return $this->milestones;
     }
 
-    /**
-     * @return ReadableCollection<int, Milestone>
-     *
-     * Fetches the milestones, but sorted in the order that their types appear in the MilestoneType enum
-     */
-    public function getMilestonesSorted(): ReadableCollection
-    {
-        $iterator = $this->milestones->getIterator();
-        $iterator->uasort(function(Milestone $a, Milestone $b) {
-            $cases = MilestoneType::cases();
-            return array_search($a->getType(), $cases) <=> array_search($b->getType(), $cases);
-        });
-
-        return new ArrayCollection(iterator_to_array($iterator));
-    }
-
     public function getMilestoneByType(MilestoneType $type): ?Milestone
     {
         foreach($this->milestones as $milestone) {
@@ -279,7 +263,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     {
         $scheme = $this->getScheme();
 
-        $nextSchemeReturn = new static();
+        $nextSchemeReturn = new self();
         $nextSchemeReturn
             ->setScheme($scheme)
             ->setBenefitCostRatio($this->getBenefitCostRatio())
@@ -317,7 +301,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
     public static function createInitialSchemeReturnFor(Scheme $scheme): static
     {
-        $schemeReturn = new static();
+        $schemeReturn = new self();
         $schemeReturn->setScheme($scheme);
 
         return $schemeReturn;

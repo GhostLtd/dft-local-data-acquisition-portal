@@ -30,9 +30,11 @@ class SimplifiedPermissionsHelper
         return array_map(fn(PermissionsView $p) => strtolower($p->getPermission()->value), $permissionsViews);
     }
 
+    /**
+     * @return array<PermissionsView>
+     */
     public function getPermissionViews(User $user, Authority $authority): array
     {
-        /** @var array<PermissionsView> $permissions */
         return $this->permissionsViewRepository->createQueryBuilder('pv')
             ->where('pv.userId = :user_id')
             ->andWhere('pv.authorityId = :authority_id')

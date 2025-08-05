@@ -160,7 +160,7 @@ class CrstsHelper
         return $divisionConfiguration;
     }
 
-    protected static function getNextYear(int $year): int
+    protected static function getNextYear(int $year): string
     {
         return substr(strval($year + 1), 2);
     }

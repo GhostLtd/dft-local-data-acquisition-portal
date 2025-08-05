@@ -78,8 +78,8 @@ class MilestoneSheetImporter extends AbstractSheetImporter
             '',
         ];
         $value = strtoupper(str_replace([' / delivery', ' '], ['', '_'], $value));
-        /** @var MilestoneType $enum */
         try {
+            /** @var MilestoneType $enum */
             $enum = (new \ReflectionEnumBackedCase(MilestoneType::class, $value))->getValue();
         } catch (\Throwable $e) {
             return null;

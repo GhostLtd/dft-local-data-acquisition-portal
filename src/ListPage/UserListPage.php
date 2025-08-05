@@ -45,9 +45,9 @@ class UserListPage extends AbstractListPage
     #[\Override]
     protected function getQueryBuilder(): QueryBuilder
     {
-        return $this->entityManager
-            ->getRepository(User::class)
-            ->getAllForAuthorityQueryBuilder($this->authority);
+        /** @var UserRepository $repo */
+        $repo = $this->entityManager->getRepository(User::class);
+        return $repo->getAllForAuthorityQueryBuilder($this->authority);
     }
 
     #[\Override]

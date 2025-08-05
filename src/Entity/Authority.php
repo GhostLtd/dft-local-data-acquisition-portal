@@ -112,7 +112,7 @@ class Authority implements PropertyChangeLoggableInterface
     }
 
     /**
-     * @return Collection<string, FundAward>
+     * @return Collection<int, FundAward>
      */
     public function getFundAwards(): Collection
     {

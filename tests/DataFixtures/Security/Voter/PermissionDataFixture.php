@@ -127,8 +127,8 @@ class PermissionDataFixture extends Fixture
     }
 
     /**
-     * @template T
-     * @param object<T> $object
+     * @template T of object
+     * @param T $object
      * @return T
      */
     protected function persistAndAddReference(object $object, string $referenceName): object

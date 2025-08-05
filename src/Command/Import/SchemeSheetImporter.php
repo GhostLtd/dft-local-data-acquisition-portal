@@ -57,6 +57,12 @@ class SchemeSheetImporter extends AbstractSheetImporter
             'multi-modal (inc. at or bus)' => TransportMode::MM_OTHER,
 
         ];
-        return $map[strtolower($value)] ?? ($this->logger->warning('Unhandled transport mode', [$value]) ?? null);
+
+        $mode = $map[strtolower($value)] ?? null;
+        if ($mode === null) {
+            $this->logger->warning('Unhandled transport mode', [$value]);
+        }
+
+        return $mode;
     }
 }
