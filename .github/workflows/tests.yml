@@ -10,13 +10,13 @@ jobs:
   phpunit:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-php-env
+      - uses: .github/actions/setup-php-env
       - name: Run PHPUnit tests
         run: bin/phpunit --testdox
 
   phpstan:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-php-env
+      - uses: .github/actions/setup-php-env
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
