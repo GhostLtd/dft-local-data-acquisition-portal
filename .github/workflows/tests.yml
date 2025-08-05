@@ -6,21 +6,32 @@ on:
     branches: [ main ]
   pull_request:
 
+# Reusable step groups
+x-common-php-setup: &common-php-setup
+  - name: Checkout code
+    uses: actions/checkout@v4
+
+  - name: Setup PHP
+    uses: shivammathur/setup-php@v2
+    with:
+      php-version: 8.3
+      extensions: mbstring, intl, sqlite3
+      coverage: none
+
+x-common-env: &common-env
+  - name: Set placeholder environment variables
+    run: |
+      cat > .env.local <<'EOF'
+      APP_DATABASE_URL=sqlite://$(pwd)/var/placeholder.sqlite
+      APP_ADMIN_HOSTNAME=admin.ldap.example.com
+      APP_FRONTEND_HOSTNAME=ldap.example.com
+      EOF
+
 jobs:
   build-deps:
     runs-on: ubuntu-latest
-    outputs:
-      cache-key: ${{ steps.composer-cache.outputs.cache-key }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          extensions: mbstring, intl, sqlite3
-          coverage: none
+      - <<: *common-php-setup
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -33,49 +44,47 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Set placeholder environment variables
-        run: |
-          cat > .env.local <<'EOF'
-          APP_DATABASE_URL=sqlite://$(pwd)/var/placeholder.sqlite
-          APP_ADMIN_HOSTNAME=admin.ldap.example.com
-          APP_FRONTEND_HOSTNAME=ldap.example.com
-          EOF
+      - <<: *common-env
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Upload vendor folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor
+          path: vendor
 
   phpunit:
     needs: build-deps
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - <<: *common-php-setup
 
-      - uses: shivammathur/setup-php@v2
+      - name: Download vendor folder
+        uses: actions/download-artifact@v4
         with:
-          php-version: 8.3
-          extensions: mbstring, intl, sqlite3
-
-      - uses: actions/cache@v4
-        with:
+          name: vendor
           path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
-      - run: bin/phpunit --testdox
+      - <<: *common-env
+
+      - name: Run PHPUnit tests
+        run: bin/phpunit --testdox
 
   phpstan:
     needs: build-deps
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - <<: *common-php-setup
 
-      - uses: shivammathur/setup-php@v2
+      - name: Download vendor folder
+        uses: actions/download-artifact@v4
         with:
-          php-version: 8.3
-          extensions: mbstring, intl, sqlite3
-
-      - uses: actions/cache@v4
-        with:
+          name: vendor
           path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
 
-      - run: vendor/bin/phpstan analyse
+      - <<: *common-env
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
