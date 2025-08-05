@@ -45,4 +45,4 @@ jobs:
         run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit --testdox
+        run: bin/phpunit --testdox
