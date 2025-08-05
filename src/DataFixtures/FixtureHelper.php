@@ -34,7 +34,7 @@ class FixtureHelper
     }
 
     /**
-     * @param array<mixed> $object
+     * @param array<mixed> $objects
      */
     protected function persist(array $objects): void
     {

@@ -136,7 +136,7 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 
     public function createFundReturnForNextQuarter(): static
     {
-        $nextReturn = new static();
+        $nextReturn = new self();
         $this->getFundAward()->addReturn($nextReturn);
 
         $nextQuarter = (new FinancialQuarter($this->getYear(), $this->getQuarter()))
@@ -160,7 +160,7 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 
     public static function createInitialFundReturnStartingAt(FinancialQuarter $financialQuarter, FundAward $fundAward): static
     {
-        $return = new static();
+        $return = new self();
         $fundAward->addReturn($return);
 
         $return

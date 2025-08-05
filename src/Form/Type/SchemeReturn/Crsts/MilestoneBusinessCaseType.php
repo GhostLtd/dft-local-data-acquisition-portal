@@ -3,9 +3,7 @@
 namespace App\Form\Type\SchemeReturn\Crsts;
 
 use App\Entity\Enum\BusinessCase;
-use App\Entity\Enum\TransportModeCategory;
 use App\Entity\SchemeReturn\CrstsSchemeReturn;
-use App\Entity\SchemeReturn\SchemeReturn;
 use App\Form\Type\BaseButtonsFormType;
 use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Ghost\GovUkFrontendBundle\Form\Type\DateType;
@@ -61,7 +59,7 @@ class MilestoneBusinessCaseType extends AbstractType implements DataMapperInterf
 
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
-        if (!$viewData instanceof SchemeReturn) {
+        if (!$viewData instanceof CrstsSchemeReturn) {
             throw new UnexpectedTypeException($viewData, CrstsSchemeReturn::class);
         }
 

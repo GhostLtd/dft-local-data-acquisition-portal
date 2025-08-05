@@ -8,6 +8,7 @@ use App\Entity\SchemeReturn\SchemeReturn;
 use App\Utility\PropertyChangeLog\Events\ChangeLogEntityCreatedEvent;
 use App\Utility\PropertyChangeLog\Events\ChangeSetRetrievedEvent;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MilestoneChangeLogSubscriber implements EventSubscriberInterface
@@ -66,6 +67,10 @@ class MilestoneChangeLogSubscriber implements EventSubscriberInterface
                 $entityId = $return->getId();
                 $entityClass = $return::class;
                 break;
+            }
+
+            if (!$milestones instanceof PersistentCollection) {
+                throw new \RuntimeException('Unexpected collection type');
             }
 
             // Naughty, but how else can I figure this out?
