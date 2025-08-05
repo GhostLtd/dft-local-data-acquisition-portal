@@ -10,15 +10,19 @@ jobs:
   phpunit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-php-env
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup PHP environment
+        uses: ./.github/actions/setup-php-env
       - name: Run PHPUnit tests
         run: bin/phpunit --testdox
 
   phpstan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-php-env
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup PHP environment
+        uses: ./.github/actions/setup-php-env
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
