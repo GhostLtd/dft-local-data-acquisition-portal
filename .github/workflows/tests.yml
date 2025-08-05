@@ -7,9 +7,10 @@ on:
   pull_request:
 
 jobs:
-  build:
+  build-deps:
     runs-on: ubuntu-latest
-
+    outputs:
+      cache-key: ${{ steps.composer-cache.outputs.cache-key }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,5 +44,38 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Run PHPUnit tests
-        run: bin/phpunit --testdox
+  phpunit:
+    needs: build-deps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          extensions: mbstring, intl, sqlite3
+
+      - uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+
+      - run: bin/phpunit --testdox
+
+  phpstan:
+    needs: build-deps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          extensions: mbstring, intl, sqlite3
+
+      - uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+
+      - run: vendor/bin/phpstan analyse
