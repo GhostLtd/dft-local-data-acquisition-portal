@@ -33,6 +33,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
+      - name: Set placeholder DB URL
+        run: echo "APP_DATABASE_URL=sqlite://$(pwd)/var/placeholder.sqlite" > .env.local
+
       - name: Install Composer dependencies
         run: composer install --no-interaction --no-progress --prefer-dist
 
