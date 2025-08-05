@@ -10,6 +10,3 @@ parameters:
         - vendor/autoload.php
     scanDirectories:
         - var/cache/dev/Symfony/Config
-
-includes:
-    - vendor/phpstan/phpstan-phpunit/extension.neon
