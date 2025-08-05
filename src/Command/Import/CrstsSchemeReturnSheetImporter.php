@@ -65,8 +65,13 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
             'Post FBC' => BusinessCase::POST_FBC,
         ];
 
-        return $map[$value] ?? ($this->logger->warning('Unhandled business case', [$value]) ?? null);
+        $case = $map[$value] ?? null;
 
+        if ($case === null) {
+            $this->logger->warning('Unhandled business case', [$value]);
+        }
+
+        return $case;
     }
 
     protected function attemptToFormatAsBcr(?string $value): ?BenefitCostRatio
@@ -76,22 +81,32 @@ class CrstsSchemeReturnSheetImporter extends AbstractSheetImporter
         }
 
         $value = strtolower($value);
-        return match(true) {
-            1 === preg_match('/^tbc/', $value),
-            1 === preg_match('/^to be confirmed/', $value),
-            1 === preg_match('/^(bcr will|to) be determined/', $value),
-                => (new BenefitCostRatio())->setType(BenefitCostRatioType::TBC),
-            'na' === $value,
-            'n/a' === $value,
-                => (new BenefitCostRatio())->setType(BenefitCostRatioType::NA),
-            is_numeric($value) => (new BenefitCostRatio())
+
+        if (in_array($value, ['na', 'n/a'])) {
+            return (new BenefitCostRatio())->setType(BenefitCostRatioType::NA);
+        }
+
+        if (
+            str_starts_with($value, 'tbc')
+            || str_starts_with($value, 'to be confirmed')
+            || preg_match('/^(bcr will|to) be determined/', $value)
+        ) {
+            return (new BenefitCostRatio())->setType(BenefitCostRatioType::TBC);
+        }
+
+        if (is_numeric($value)) {
+            return (new BenefitCostRatio())
                 ->setType(BenefitCostRatioType::VALUE)
-                ->setValue($this->attemptToFormatAsDecimal($value)),
-            1 === preg_match('/^>?(?<val>\d+(\.\d+)?)/', $value, $matches)
-                => (new BenefitCostRatio())
-                    ->setType(BenefitCostRatioType::VALUE)
-                    ->setValue($matches['val']),
-            default => ($this->logger->warning('unhandled BCR', [$value]) ?? null),
-        };
+                ->setValue($this->attemptToFormatAsDecimal($value));
+        }
+
+        if (preg_match('/^>?(?<val>\d+(\.\d+)?)/', $value, $matches)) {
+            return (new BenefitCostRatio())
+                ->setType(BenefitCostRatioType::VALUE)
+                ->setValue($matches['val']);
+        }
+
+        $this->logger->warning('unhandled BCR', [$value]);
+        return null;
     }
 }

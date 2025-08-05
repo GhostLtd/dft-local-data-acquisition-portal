@@ -1,12 +1,10 @@
 parameters:
-    level: 1
+    level: 2
     paths:
         - bin/
         - config/
         - public/
         - src/
         - tests/
-    bootstrapFiles:
-        - vendor/autoload.php
     scanDirectories:
         - var/cache/dev/Symfony/Config

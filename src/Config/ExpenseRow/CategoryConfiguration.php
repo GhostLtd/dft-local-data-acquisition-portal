@@ -2,8 +2,6 @@
 
 namespace App\Config\ExpenseRow;
 
-use App\Config\ExpenseRow\AbstractRowContainer;
-use App\Config\ExpenseRow\TotalConfiguration;
 use App\Config\LabelProviderInterface;
 use App\Entity\Enum\ExpenseCategory;
 use App\Entity\Enum\ExpenseType;
@@ -12,7 +10,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 class CategoryConfiguration extends AbstractRowContainer implements LabelProviderInterface
 {
     /**
-     * @param TotalConfiguration $rowConfigurations
+     * @param array<int, ExpenseType|TotalConfiguration> $rowConfigurations
      */
     public function __construct(
         protected ExpenseCategory $category,

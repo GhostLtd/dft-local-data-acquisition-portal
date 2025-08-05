@@ -68,7 +68,7 @@ class ExpenseEntrySheetImporter extends BaseExpenseEntrySheetImporter
         }
 
 
-        /** @var ExpensesContainerInterface $parentEntity */
+        /** @var CrstsFundReturn|CrstsSchemeReturn $parentEntity */
         $parentEntity = $isSchemeExpense
             ? $this->findCrstsSchemeReturnByName(...$this->getSchemeAndAuthorityNames($expenseIdentifier))
             : $this->findCrstsFundReturnByAuthorityName($expenseIdentifier);

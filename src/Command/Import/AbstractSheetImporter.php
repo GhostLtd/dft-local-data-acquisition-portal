@@ -110,20 +110,39 @@ abstract class AbstractSheetImporter
     protected function attemptToFormatAsDate(?string $value): ?\DateTimeInterface
     {
         $ignoreValues = ['-', 'tbc', 'n/a', 'post fbc', 'development only', 'various', 'development progressing but dates tbc'];
-        return match(true) {
-            in_array(strtolower($value), $ignoreValues) => ($this->logger->info("Ignored date", [$value]) ?? null),
-            1 === preg_match('/^[345]\d{4}$/', $value) => Date::excelToDateTimeObject($value),
-            1 === preg_match('/^(?<day>[012]\d|3[01])\.(?<month>0\d|1[012])\.(?<year>20\d{2})$/', $value, $matches)
-                => new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day']),
-            1 === preg_match('/^(?<day>[012]\d|3[01])\/(?<month>0\d|1[012])\/(?<year>20\d{2})/', $value, $matches)
-                => ($this->logger->info("partial date match", [$value])
-                    ?? new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day'])),
-            1 === preg_match('/^(?<year>20\d{2})$/', $value, $matches)
-                => new \DateTime($matches['year'] . '-01-01'),
-            $value === null => null,
-            default => (function($v) {try{return new \DateTime($v);}catch(Throwable $e){return null;}})($value)
-                ?? ($this->logger->error("Invalid date format", [$value]) ?? null)
-        };
+
+        if (in_array(strtolower($value), $ignoreValues)) {
+            $this->logger->info("Ignored date", [$value]);
+            return null;
+        }
+
+        if ($value === null) {
+            return null;
+        }
+
+        if (preg_match('/^[345]\d{4}$/', $value)) {
+            return Date::excelToDateTimeObject($value);
+        }
+
+        if (preg_match('/^(?<day>[012]\d|3[01])\.(?<month>0\d|1[012])\.(?<year>20\d{2})$/', $value, $matches)) {
+            return new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day']);
+        }
+
+        if (preg_match('/^(?<day>[012]\d|3[01])\/(?<month>0\d|1[012])\/(?<year>20\d{2})/', $value, $matches)) {
+            $this->logger->info("partial date match", [$value]);
+            return new \DateTime($matches['year'] . '-' . $matches['month'] . '-' . $matches['day']);
+        }
+
+        if (preg_match('/^(?<year>20\d{2})$/', $value, $matches)) {
+            return new \DateTime($matches['year'] . '-01-01');
+        }
+
+        try{
+            return new \DateTime($value);
+        } catch(Throwable){
+            $this->logger->error("Invalid date format", [$value]);
+            return null;
+        }
     }
 
     protected function attemptToFormatAsFinancial(?string $value, $autoMultiply = false, array $additionalLoggingContext = []): ?string
@@ -150,15 +169,26 @@ abstract class AbstractSheetImporter
     protected function attemptToFormatAsDecimal(?string $value): ?float
     {
         $ignoreValues = ['tbc', 'n/a'];
-        return match(true) {
-            1 === preg_match('/^£?(?<val>\d+(\.\d+)?)m?$/iu', $value, $matches)
-                => floatval($matches['val']),
-            1 === preg_match('/^[+\-]?(?=.)(?:0|[1-9]\d*)?(?:\.\d*)?(?:\d[eE][+\-]?\d+)?$/', $value)
-                => floatval($value),
-            in_array(strtolower($value), $ignoreValues) => ($this->logger->info("ignore decimal value", [$value]) ?? null),
-            null === $value => null,
-            default => ($this->logger->error("unable to transform decimal", [$value]) ?? null)
-        };
+
+        if ($value === null) {
+            return null;
+        }
+
+        if (in_array(strtolower($value), $ignoreValues)) {
+            $this->logger->info("ignore decimal value", [$value]);
+            return null;
+        }
+
+        if (preg_match('/^£?(?<val>\d+(\.\d+)?)m?$/iu', $value, $matches)) {
+            return floatval($matches['val']);
+        }
+
+        if (preg_match('/^[+\-]?(?=.)(?:0|[1-9]\d*)?(?:\.\d*)?(?:\d[eE][+\-]?\d+)?$/', $value)) {
+            return floatval($value);
+        }
+
+        $this->logger->error("unable to transform decimal", [$value]);
+        return null;
     }
 
     protected function attemptToFormatAsEnum(string $enumClass, ?string $value): ?BackedEnum

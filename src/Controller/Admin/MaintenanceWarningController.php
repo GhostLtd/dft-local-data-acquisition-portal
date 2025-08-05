@@ -60,14 +60,16 @@ class MaintenanceWarningController extends AbstractController
             $linksBuilder->setAtAdd();
         }
 
-        /** @var Form $form */
         $form = $this->createForm(MaintenanceWarningType::class, $maintenanceWarning, [
             'cancel_url' => $this->generateUrl('admin_maintenance'),
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            if ($form->getClickedButton()->getName() === 'cancel') {
+            if (
+                $form instanceof Form
+                && $form->getClickedButton()->getName() === 'cancel'
+            ) {
                 return $this->redirectToRoute('admin_maintenance');
             }
 
