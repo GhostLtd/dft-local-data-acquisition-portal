@@ -47,6 +47,7 @@
         "liip/test-fixtures-bundle": "^3.2",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
         "symfony/debug-bundle": "6.4.*",
         "symfony/maker-bundle": "^1.61",
