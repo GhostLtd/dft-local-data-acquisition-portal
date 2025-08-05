@@ -86,8 +86,8 @@ abstract class AbstractSheetImporter
                 $k = array_keys(static::COLUMNS),
                 $v = array_map(fn(Cell $c) => $this->getCellValue($c), iterator_to_array($row->getCellIterator()))
             );
-        } catch (\Throwable $e) {
-            dump($k, $v ?? null); exit;
+        } catch (\Throwable) {
+            dump($k ?? null, $v ?? null); exit;
         }
     }
 

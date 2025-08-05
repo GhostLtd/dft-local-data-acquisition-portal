@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\DataFixtures\Definition\SchemeFund\CrstsSchemeFundDefinition;
 use App\DataFixtures\Definition\AuthorityDefinition;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -72,6 +71,10 @@ class FixtureDefinitionToJsonCommand extends Command
             }
 
             $types = $this->propertyInfoExtractor->getTypes($definitionClass, $property);
+
+            if ($types === null) {
+                continue;
+            }
 
             /** @var Type $type */
             foreach($types as $type) {
@@ -214,7 +217,7 @@ class FixtureDefinitionToJsonCommand extends Command
         // get_declared_classes() is used in getSubclasses(), but only returns classes that have been loaded.
         // As such, we'll need to force some important classes to load...
         foreach([
-            CrstsSchemeFundDefinition::class,
+            // SomeClass::class,
         ] as $class) {
             class_exists($class);
         }

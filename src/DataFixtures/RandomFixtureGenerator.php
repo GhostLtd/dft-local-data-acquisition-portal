@@ -51,7 +51,7 @@ class RandomFixtureGenerator
 
     /**
      * @template T
-     * @class-string $class<T>
+     * @param class-string<T> $class
      * @return array<T>
      */
     protected function repeat(string $class, int $min, int $max, \Closure $callback): array
