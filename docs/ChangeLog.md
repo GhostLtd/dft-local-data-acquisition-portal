@@ -2,7 +2,7 @@
 
 # Changelog
 
-## Upcoming
+## 5th August 2025
 
 - **Feature**: Ability to export a return as an excel file
 - **Update**: Don't add sample fixtures when adding a new MCA
