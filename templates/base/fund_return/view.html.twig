@@ -169,14 +169,12 @@
             <a href="{{ path('admin_dashboard') ~ '#latest-' ~ fundReturn.fund.value }}">{{ 'frontend.pages.fund_return.back_to_latest_returns' | trans }}</a>
         {%- endif -%}
         {%- if is_granted('CAN_EXPORT_SPREADSHEET', fundReturn) -%}
-            <p class="govuk-body">
-                <a class="govuk-button" href="{{ path(exportSpreadsheetRoute, {fundReturnId: fundReturn.id}) }}">Export spreadsheet</a>
-            </p>
+            <a class="govuk-button" href="{{ path(exportSpreadsheetRoute, {fundReturnId: fundReturn.id}) }}">Export spreadsheet</a>
         {%- endif -%}
     {%- endset -%}
 
     {%- if buttonsAndLinks is not empty -%}
-        <p class="govuk-body">{{ buttonsAndLinks }}</p>
+        <div class="govuk-button-group">{{ buttonsAndLinks }}</div>
     {%- endif -%}
 {%- endblock -%}
 
