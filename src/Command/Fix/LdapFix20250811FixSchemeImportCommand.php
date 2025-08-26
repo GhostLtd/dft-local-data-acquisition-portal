@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 #[AsCommand(
     name: 'ldap:fix:20250811-fix-scheme-import',
@@ -232,9 +233,31 @@ class LdapFix20250811FixSchemeImportCommand extends Command
         $this->connection->beginTransaction();
 
         foreach($this->getProblematicRenamesThatNeedToBeUndone() as $propertyChangeLogId) {
-            $this->connection->executeStatement('DELETE FROM property_change_log WHERE id = UUID_TO_BIN(:id)', [
-                'id' => $propertyChangeLogId,
-            ]);
+            $params = ['id' => $propertyChangeLogId];
+
+            // Get the entity ID from the property change log entry
+            $entityId = Uuid::fromBinary(
+                $this->connection
+                    ->executeQuery('SELECT entity_id FROM property_change_log WHERE id = UUID_TO_BIN(:id)', $params)
+                    ->fetchOne()
+            )->toRfc4122();
+
+            // Delete the offending property change log entry
+            $this->connection->executeStatement('DELETE FROM property_change_log WHERE id = UUID_TO_BIN(:id)', $params);
+
+            // Set the scheme name to the latest value from the property change log series
+            $this->connection->executeStatement(<<<SQL
+WITH latest_value AS (
+    SELECT
+        ROW_NUMBER() OVER (PARTITION BY entity_id, property_name ORDER BY timestamp DESC) AS number,
+        property_value
+    FROM property_change_log
+    WHERE entity_id = UUID_TO_BIN(:entityId)
+    AND property_name = 'name'
+)
+UPDATE scheme SET name = (SELECT JSON_UNQUOTE(property_value) FROM latest_value WHERE number = 1)
+WHERE id = UUID_TO_BIN(:entityId); 
+SQL, ['entityId' => $entityId]);
         }
 
         // A manually collated list of schemes that should be merged - see commentary on the method
