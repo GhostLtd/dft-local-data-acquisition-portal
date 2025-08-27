@@ -4,17 +4,22 @@ namespace App\Form\Type\Admin;
 
 use App\Entity\Authority;
 use App\Entity\User;
-use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use App\Form\Type\FilteringDataMapper;
 use Symfony\Component\Form\FormInterface;
 
-class AuthorityDataMapper extends DataMapper
+class AuthorityDataMapper extends FilteringDataMapper
 {
+    public function __construct(protected FundAwardDataMapper $fundAwardDataMapper)
+    {
+        parent::__construct();
+    }
+
     /**
      * @param Authority $data
      */
     public function mapDataToForms(mixed $data, \Traversable $forms): void
     {
-        parent::mapDataToForms($data, $forms);
+        parent::mapDataToForms($data, $this->filterForms($forms, exclude: ['funds']));
 
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */
@@ -31,7 +36,11 @@ class AuthorityDataMapper extends DataMapper
      */
     public function mapFormsToData(\Traversable $forms, mixed &$data): void
     {
-        parent::mapFormsToData($forms, $data);
+        parent::mapFormsToData($this->filterForms($forms, exclude: ['funds']), $data);
+
+        if (!$data->getId()) {
+            $this->fundAwardDataMapper->mapFormsToData($forms, $data);
+        }
 
         $forms = iterator_to_array($forms);
         /** @var FormInterface[] $forms */

@@ -2,6 +2,11 @@
 
 # Changelog
 
+## Upcoming
+
+- **Feature**: Add the ability to add fund awards to an authority
+- **Update**: Enable the cron job for the creation of new returns
+
 ## 5th August 2025
 
 - **Feature**: Ability to export a return as an excel file

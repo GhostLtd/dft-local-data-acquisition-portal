@@ -3,30 +3,35 @@
 namespace App\Form\Type\Admin;
 
 use App\Entity\Authority;
+use App\Entity\Enum\Fund;
 use App\Entity\User;
 use App\Form\Type\BaseButtonsFormType;
 use App\Form\Type\BaseUserType;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityRepository;
 use Ghost\GovUkFrontendBundle\Form\Type as Gds;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Ghost\GovUkFrontendBundle\Form\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class AuthorityType extends AbstractType
 {
+
     public const string ADMIN_CHOICE_EXISTING = 'existing';
     public const string ADMIN_CHOICE_NEW = 'new';
+
+    public function __construct(protected AuthorityDataMapper $authorityDataMapper)
+    {}
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->setDataMapper(new AuthorityDataMapper())
+            ->setDataMapper($this->authorityDataMapper)
 
             ->add('name', Gds\InputType::class, [
                 'label' => 'authority.form.name',
@@ -65,6 +70,7 @@ class AuthorityType extends AbstractType
                             'choice_label' => 'name',
                             'label' => 'authority.form.admin',
                             'label_attr' => ['class' => 'govuk-visually-hidden'],
+                            'expanded' => false,
                         ])
                         ->add('admin', BaseUserType::class, [
                             'label' => 'authority.form.admin',
@@ -72,12 +78,20 @@ class AuthorityType extends AbstractType
                         ])
                     ;
                 } else {
-                    $form->add('admin', BaseUserType::class, [
-                        'label' => 'authority.form.admin',
-                        'label_attr' => ['class' => 'govuk-label--m'],
-                    ]);
-                }
+                    $funds = array_map(fn(Fund $f) => $f->value, Fund::enabledCases());
 
+                    $form
+                        ->add('admin', BaseUserType::class, [
+                            'label' => 'authority.form.admin',
+                            'label_attr' => ['class' => 'govuk-label--m'],
+                        ])
+                        ->add('funds', ChoiceType::class, [
+                            'choices' => array_combine($funds, $funds),
+                            'choice_label' => fn(string $choice) => new TranslatableMessage("enum.fund.{$choice}", [], 'messages'),
+                            'multiple' => true,
+                            'label_attr' => ['class' => 'govuk-fieldset__legend--m'],
+                        ]);
+                }
             })
             ;
     }

@@ -12,6 +12,7 @@
     {{- tabs({
         items: [
             {id: 'mca-details', label: 'Details', panel: {html: _self.detailsContent(authority)}},
+            {id: 'mca-funds', label: 'Fund awards', panel: {html: _self.fundAwards(authority)}},
             {id: 'mca-users', label: 'Users', panel: {html: _self.usersContent(users)}},
             {id: 'mca-returns', label: 'Returns', panel: {html: _self.returnsContent(authority.fundAwards)}},
         ]
@@ -43,6 +44,25 @@
     </div>
 {%- endmacro -%}
 
+{%- macro fundAwards(authority) -%}
+    {%- from "@GhostGovUkFrontend/components/macros.html.twig" import summaryList -%}
+    {%- from "frontend/macros.html.twig" import textValue -%}
+
+    {%- set funds = (authority.fundAwards | map (fa => "enum.fund.#{fa.type.value}" | trans({}, 'messages')) | join(', ')) -%}
+    {{- summaryList({
+        rows: {
+            'fund_awards': funds == '' ? '-' : funds,
+        } | map ((v,k) => {
+            key: {text: "pages.authority_view.details.#{k}" | trans},
+            value: v is iterable ? v : {text: textValue(v)}
+        })
+    }) -}}
+
+    <div class="govuk-button-group">
+        <a href="{{ path('admin_authority_edit_fund_awards', {id: authority.id}) }}" class="govuk-button" data-module="govuk-button">{{ 'authority.list.edit_fund_awards' | trans }}</a>
+    </div>
+{%- endmacro -%}
+
 {%- macro usersContent(users) -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import table -%}
     {# @var u \App\Entity\User #}
@@ -63,9 +83,15 @@
 
 {% macro returnsContent(fundAwards) %}
     {% from 'frontend/authority_macros.html.twig' import returnTaskList %}
+    {%- set allEmpty = true -%}
     {%- for fundAward in fundAwards -%}
+        {%- if not fundAward.returns.isEmpty() -%}
+            {%- set allEmpty = false -%}
+        {%- endif -%}
         {{- returnTaskList(fundAward, 'admin_fund_return') -}}
-    {%- else -%}
-        No returns yet
     {%- endfor -%}
+
+    {%- if allEmpty -%}
+        {{ 'pages.authority_view.details.no_returns' | trans }}
+    {%- endif -%}
 {% endmacro %}

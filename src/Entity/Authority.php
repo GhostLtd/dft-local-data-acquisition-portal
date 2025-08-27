@@ -35,7 +35,7 @@ class Authority implements PropertyChangeLoggableInterface
     /**
      * @var Collection<int, FundAward>
      */
-    #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'authority', orphanRemoval: true, indexBy: 'type')]
+    #[ORM\OneToMany(targetEntity: FundAward::class, mappedBy: 'authority', cascade: ['persist', 'remove'], orphanRemoval: true, indexBy: 'type')]
     private Collection $fundAwards;
 
     public function __construct()

@@ -15,6 +15,9 @@ class Role
     const string CAN_RELEASE_RETURNS = 'CAN_RELEASE_RETURNS';
     const string CAN_VIEW = 'CAN_VIEW';
 
+    // Fund-award specific
+    const string CAN_REMOVE_FUND_AWARD = 'CAN_REMOVE_FUND_AWARD';
+
     // Return specific
     const string CAN_EDIT_BASELINES = 'CAN_EDIT_BASELINES';
     const string CAN_SIGN_OFF_RETURN = 'CAN_SIGN_OFF_RETURN'; // Is the user hypothetically allowed to perform this action?

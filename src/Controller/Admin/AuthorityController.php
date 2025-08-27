@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Authority;
 use App\Form\Type\Admin\AuthorityType;
+use App\Form\Type\Admin\FundAwardType;
 use App\Form\Type\UserType;
 use App\ListPage\AuthorityListPage;
 use App\Repository\UserRepository;
@@ -109,6 +110,34 @@ class AuthorityController extends AbstractController
             'linksBuilder' => $linksBuilder,
             'form' => $form,
             'type' => $type,
+        ]);
+    }
+
+    #[Route(path: '/{id}/edit-fund-awards', name: '_edit_fund_awards')]
+    public function editFundAwards(
+        Authority             $authority,
+        DashboardLinksBuilder $linksBuilder,
+        Request               $request,
+    ): Response
+    {
+        $linksBuilder->setAtFundAwardEdit();
+
+        $viewUrl = $this->generateUrl('admin_authority_view', ['id' => $authority->getId()]).'#mca-funds';
+
+        $form = $this->createForm(FundAwardType::class, $authority, [
+            'cancel_url' => $viewUrl
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->entityManager->flush();
+            return $this->redirect($viewUrl);
+        }
+
+        return $this->render('admin/authority/edit_fund_awards.html.twig', [
+            'authority' => $form->getData(),
+            'linksBuilder' => $linksBuilder,
+            'form' => $form,
         ]);
     }
 

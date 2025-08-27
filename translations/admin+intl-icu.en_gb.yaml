@@ -15,10 +15,15 @@ pages:
     title: Add MCA
   authority_edit:
     title: Edit MCA
+  authority_edit_fund_awards:
+    title: Edit MCA fund awards
+    help: Funds will not be removable if a return has been generated for the fund.
   authority_view:
     title: "MCA details: {name}"
     details:
+      fund_awards: Fund awards
       name: Name
+      no_returns: No returns yet
       admin:
         name: Admin name
         email: Admin email
@@ -57,6 +62,7 @@ authority:
     delete: Delete
     edit: Edit
     edit_admin_user: Edit admin user
+    edit_fund_awards: Edit fund awards
     view: View
     no_results: No results
   form:

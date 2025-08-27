@@ -37,6 +37,7 @@ class UserRepository extends ServiceEntityRepository
                 $em->getExpressionBuilder()->in('user.id', $userIdsQuery),
                 $em->getExpressionBuilder()->eq('user.id', ':adminUserId')
             ]))
+            ->orderBy('user.name', 'ASC')
             ->setParameter('adminUserId', $authority->getAdmin()->getId(), UlidType::NAME)
             ->setParameter('authorityId', $authority->getId(), UlidType::NAME)
         ;

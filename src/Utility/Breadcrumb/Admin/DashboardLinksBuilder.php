@@ -37,6 +37,11 @@ class DashboardLinksBuilder extends AbstractAdminLinksBuilder
         $this->setNavLinks(null);
     }
 
+    public function setAtFundAwardEdit(): void
+    {
+        $this->setNavLinks(null);
+    }
+
     public function setAtAuthorityAdd(): void
     {
         $this->setNavLinks(null);
