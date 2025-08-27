@@ -33,8 +33,14 @@ class FundReturnCreator
     public function createFundReturnsForFinancialQuarter(FinancialQuarter $financialQuarter): void
     {
         $awards = $this->getFundAwardsWithNoFundReturnForFinancialQuarter($financialQuarter);
-        $previousQuarter = $financialQuarter->getPreviousQuarter();
 
+        if (empty($awards)) {
+            $nextYear = substr($financialQuarter->initialYear + 1, 2);
+            $this->logger->info("No new returns required for {$financialQuarter->initialYear}/{$nextYear} Q{$financialQuarter->quarter}");
+            return;
+        }
+
+        $previousQuarter = $financialQuarter->getPreviousQuarter();
         $fundReturnRepository = $this->entityManager
             ->getRepository(FundReturn::class);
 
