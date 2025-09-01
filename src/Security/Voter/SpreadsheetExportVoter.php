@@ -26,7 +26,6 @@ class SpreadsheetExportVoter extends Voter
             return false;
         }
 
-        return $subject->isSignedOff()
-            && $this->accessDecisionManager->decide($token, [Role::CAN_VIEW], $subject);
+        return $this->accessDecisionManager->decide($token, [Role::CAN_VIEW], $subject);
     }
 }
