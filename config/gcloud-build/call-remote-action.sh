@@ -36,8 +36,8 @@ if [ "xyz" == "xyz$ACTION" ]; then
   prepare_abnormal_exit
 fi
 
-if [ "xyz" == "xyz$DOMAIN_NAME" ]; then
-  echo "Error: DOMAIN_NAME env var is not defined"
+if [ "xyz" == "xyz$APP_FRONTEND_HOSTNAME" ]; then
+  echo "Error: APP_FRONTEND_HOSTNAME env var is not defined"
   prepare_abnormal_exit
 fi
 
@@ -57,7 +57,7 @@ echo "" > remote-action-response-${ACTION}.txt
 TIMESTAMP=`date +%s`
 HASH=`echo  -n "$ACTION:$TIMESTAMP" | openssl sha256 -hmac "$APP_SECRET"`
 HASH=${HASH#*= }
-URL=https://${DOMAIN_NAME}/_util/${ACTION}
+URL=https://${APP_FRONTEND_HOSTNAME}/_util/${ACTION}
 echo $URL
 
 # If testing from dev environment with self-signed certs, add the "-k" option to curl

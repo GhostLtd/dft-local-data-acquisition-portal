@@ -15,18 +15,18 @@ options:
 
 steps:
     # Start by running some pre-install actions
-#    - name: node:22
-#      id: 'pre-install-script'
-#      entrypoint: sh
-#      args: ['-c', 'config/gcloud-build/call-remote-action.sh -a pre-install']
-#      waitFor: ['-']
+    - name: node:22
+      id: 'pre-install-script'
+      entrypoint: sh
+      args: ['-c', 'config/gcloud-build/call-remote-action.sh -a pre-install']
+      waitFor: ['-']
 
     # Copy deployment config files in to root directory (alpine required for gsutil)
     - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
       id: 'copy-deploy-files'
       entrypoint: sh
       args: ['-c', 'gsutil rsync config/gcloud-build/all/ . && gsutil rsync config/gcloud-build/$PROJECT_ID/ .']
-#      waitFor: ['pre-install-script']
+      waitFor: ['pre-install-script']
 
     # We need vendor/ghost/govuk-frontend-bundle since the CSS/JS references resources from it
     - name: composer:2.3
@@ -63,10 +63,10 @@ steps:
       waitFor: ['deploy-default-service', 'deploy-admin-service']
 
     # Finish up by calling the post-install-script
-#    - name: node:22
-#      id: 'post-install-script'
-#      entrypoint: sh
-#      args: ['-c', 'config/gcloud-build/call-remote-action.sh -a post-install']
-#      waitFor: ['deploy-default-service', 'deploy-admin-service', 'deploy-cron']
+    - name: node:22
+      id: 'post-install-script'
+      entrypoint: sh
+      args: ['-c', 'config/gcloud-build/call-remote-action.sh -a post-install']
+      waitFor: ['deploy-default-service', 'deploy-admin-service', 'deploy-cron']
 
 timeout: "1800s"
