@@ -24,7 +24,7 @@ class MaintenanceModeHelper
     protected ?array $whitelistedIps = null;
 
     public function __construct(
-        #[Autowire('@cache.app')]
+        #[Autowire('@cache.maintenance_mode')]
         protected CacheInterface            $cache,
         protected EntityManagerInterface    $entityManager,
         protected MaintenanceLockRepository $maintenanceLockRepository,
@@ -95,6 +95,10 @@ class MaintenanceModeHelper
 
             $this->isActive = true;
             $this->whitelistedIps = $whitelistIps;
+
+            try {
+                $this->cache->delete(self::MAINTENANCE_INFO_CACHE_KEY);
+            } catch (InvalidArgumentException) {}
         }
         catch(\Exception $e) {
             $this->entityManager->rollback();

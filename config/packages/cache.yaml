@@ -27,7 +27,6 @@ framework:
 ## This caused issues with maintenance mode. Result was cached in FS and DB. was able to manually
 ## invalidate DB cache, but not FS cache on AppEngine instance.
 #        app: cache.chained.fs_dbal1
-
         app: cache.adapter.doctrine_dbal
 
 
@@ -46,3 +45,9 @@ services:
         tags: [ { name: 'cache.pool', namespace: 'job-cache' } ]
         arguments:
             $defaultLifetime: 3600 # 1 hour
+
+    cache.maintenance_mode:
+        parent: 'cache.adapter.doctrine_dbal'
+        tags: [ { name: 'cache.pool', namespace: 'maintenance-mode' } ]
+        arguments:
+          $defaultLifetime: 360 # 5 minutes
