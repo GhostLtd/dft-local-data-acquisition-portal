@@ -26,15 +26,6 @@
     {%- endblock -%}
 {% endblock %}
 
-{% block headIcons %}
-    <link rel="icon" sizes="48x48" href="{{ asset('build/images/favicon.ico') }}">
-    <link rel="icon" sizes="any" href="{{ asset('build/images/favicon.svg') }}" type="image/svg+xml">
-    <link rel="mask-icon" href="{{ asset('build/images/govuk-icon-mask.svg') }}" color="{{ themeColor ?? "#0b0c0c" }}"> {#- Hardcoded value of $govuk-black #}
-    <link rel="apple-touch-icon" href="{{ asset('build/images/govuk-icon-180.png') }}">
-    {# N.B. This is not a valid PWA manifest, but rather a webpack manifest #}
-    {#    <link rel="manifest" href="{{ asset('build/manifest.json') }}">#}
-{% endblock %}
-
 {%- block headerStart -%}
     {%- if env_label_frontend ?? false -%}
         <style nonce="{{ csp_nonce('style') }}">
@@ -53,6 +44,7 @@
 {%- block headerBar -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import header -%}
     {{- header({
+        rebrand: _rebrand,
         classes: 'govuk-header--full-width-border'
     }) -}}
 {%- endblock -%}
