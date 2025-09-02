@@ -524,6 +524,8 @@ frontend:
         content: "The {fund} return for {year}/{nextYear} Q{quarter} has been signed-off and submitted"
     home:
       title: Local data acquisition portal
+    privacy_notice:
+      page_title: Privacy notice
     schemes:
       title: &schemes_title "Schemes for {authorityName}"
       add_scheme: Add scheme

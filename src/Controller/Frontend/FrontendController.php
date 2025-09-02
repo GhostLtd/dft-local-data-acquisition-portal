@@ -14,4 +14,11 @@ class FrontendController extends AbstractController
     {
         return [];
     }
+
+    #[Route(path: '/privacy-notice', name: 'app_pages_privacy')]
+    #[Template('frontend/privacy_notice.html.twig')]
+    public function privacyNotice(): array
+    {
+        return [];
+    }
 }

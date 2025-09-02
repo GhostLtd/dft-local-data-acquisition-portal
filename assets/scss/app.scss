@@ -78,3 +78,9 @@ li.govuk-service-navigation__margin-left-auto {
     text-align: right;
   }
 }
+
+.privacy-notice {
+  ul {
+    margin-left: govuk-spacing(5);
+  }
+}
