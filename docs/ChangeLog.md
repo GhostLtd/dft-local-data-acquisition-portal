@@ -5,7 +5,13 @@
 ## Upcoming
 
 - **Feature**: Add the ability to add fund awards to an authority
+- **Feature**: Add privacy statement
+- **Update**: Allow spreadsheet export prior to submission
 - **Update**: Enable the cron job for the creation of new returns
+- **Update**: Pre + post install scripts enabled in cloudbuild.yaml pipeline
+- **Fix**: Fix some GovUK rebrand styles not showing up 
+- **Fix**: Remove legacy database env bind bindings
+- **Fix**: Maintenance mode not immediately enabling/disabling due to cache problem
 
 ## 5th August 2025
 
