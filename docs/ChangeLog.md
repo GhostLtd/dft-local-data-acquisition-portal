@@ -9,6 +9,7 @@
 - **Update**: Allow spreadsheet export prior to submission
 - **Update**: Enable the cron job for the creation of new returns
 - **Update**: Pre + post install scripts enabled in cloudbuild.yaml pipeline
+- **Update**: Add help text for the Final Delivery milestone date
 - **Fix**: Fix some GovUK rebrand styles not showing up 
 - **Fix**: Remove legacy database env bind bindings
 - **Fix**: Maintenance mode not immediately enabling/disabling due to cache problem

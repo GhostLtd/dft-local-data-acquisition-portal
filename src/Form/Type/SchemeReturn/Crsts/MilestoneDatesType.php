@@ -40,7 +40,6 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
             throw new UnexpectedTypeException($data, CrstsSchemeReturn::class);
         }
 
-        $fundedMostlyAs = $data->getScheme()->getCrstsData()->getFundedMostlyAs();
         $relevantMilestoneEnums = $this->getRelevantMilestoneEnums($data);
 
         $form
@@ -59,6 +58,8 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
                 'inherit_data' => true,
             ]);
 
+        $fundedMostlyAs = $data->getScheme()->getCrstsData()->getFundedMostlyAs()->value;
+
         foreach($relevantMilestoneEnums as $milestoneType) {
             $fieldKey = $milestoneType->value;
 
@@ -69,6 +70,7 @@ class MilestoneDatesType extends AbstractType implements DataMapperInterface
                 'label_attr' => ['class' => 'govuk-fieldset__legend--s'],
                 'help' => "forms.scheme.milestone_dates.milestones.{$fieldKey}.help",
                 'priority' => 1,
+                'help_translation_parameters' => ['funded_mostly_as' => $fundedMostlyAs],
             ]);
         }
     }

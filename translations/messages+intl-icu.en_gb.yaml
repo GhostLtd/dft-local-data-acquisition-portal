@@ -374,7 +374,12 @@ forms:
           help: ''
         final_delivery:
           label: Final delivery
-          help: ''
+          help: >
+            This is often, but not always, the same as the end
+            {funded_mostly_as, select,
+              CDEL  {construction}
+              other {delivery}
+            } date
     milestone_business_case:
       business_case:
         label: &sr_current_business_case Current business case
