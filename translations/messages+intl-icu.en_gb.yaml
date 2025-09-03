@@ -383,7 +383,10 @@ forms:
     milestone_business_case:
       business_case:
         label: &sr_current_business_case Current business case
-        help: Information entered should reflect knowledge as per the end of the quarter
+        help: |
+          Information entered should reflect knowledge as per the end of the quarter.
+
+          This means that if this scheme is now post-FBC, but that completion happened after the end of the quarter, then you should enter this as "Working towards FBC" here.
       expected_business_case_approval:
         label: &sr_expected_business_case_approval Expected or actual date of approval for current business case
         help: ''

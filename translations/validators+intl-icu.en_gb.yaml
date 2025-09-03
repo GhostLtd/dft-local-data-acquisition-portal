@@ -58,9 +58,9 @@ crsts_scheme_return:
   business_case:
     not_null: Choose the current business case
   expected_business_case_approval:
-    future: Enter a date after the end of the quarter
+    future: Enter a date after the start of the next quarter ({start_of_next_quarter, date, short} or later)
     not_null: Enter the expected business case approval date
-    end_of_quarter: Enter a date no later than the end of the quarter
+    end_of_quarter: Enter a date earlier than the start of the next quarter ({start_of_next_quarter, date, short})
 
 expenses:
   forecast_required: Forecast values must be entered

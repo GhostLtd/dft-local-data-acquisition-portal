@@ -16,14 +16,12 @@ use App\Validator\ExpensesValidator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
-use Doctrine\Common\Collections\ReadableCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ghost\GovUkCoreBundle\Validator\Constraint\Decimal;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -54,9 +52,10 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     private ?BusinessCase $businessCase = null; // 4proj_milestones: Current business case
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null', groups: ["milestone_business_case_date"])]
-    #[GreaterThanOrEqual(propertyPath: 'startOfNextQuarter', message: 'crsts_scheme_return.expected_business_case_approval.future', groups: ["milestone_business_case_date_future"])]
-    #[LessThan(propertyPath: 'startOfNextQuarter', message: 'crsts_scheme_return.expected_business_case_approval.end_of_quarter', groups: ["milestone_business_case_date_past"])]
+    #[Assert\Sequentially([
+        new Assert\NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null'),
+        new Assert\Callback(callback: [self::class, 'validateExpectedBusinessCaseApproval']),
+    ], groups: ["milestone_business_case"])]
     private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, length: AbstractMySQLPlatform::LENGTH_LIMIT_TEXT, nullable: true)]
@@ -83,25 +82,42 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
         return $this->getFundReturn()->getFinancialQuarter()->getNextQuarter()->getStartDate();
     }
 
-    #[Callback(groups: ['milestone_business_case'])]
-    public function validateExpectedBusinessCaseApproval(ExecutionContextInterface $context): void
-    {
-        if ($this->businessCase === BusinessCase::NOT_APPLICABLE) {
+    public static function validateExpectedBusinessCaseApproval(
+        \DateTimeInterface $value,
+        ExecutionContextInterface $context
+    ): void {
+        /** @var CrstsSchemeReturn $schemeReturn */
+        $schemeReturn = $context->getObject();
+        $businessCase = $schemeReturn->getBusinessCase();
+
+        if ($businessCase === BusinessCase::NOT_APPLICABLE) {
             return;
         }
 
-        $groups = ['milestone_business_case_date'];
-        $groups[] = $this->businessCase === BusinessCase::POST_FBC ?
-            'milestone_business_case_date_past' :
-            'milestone_business_case_date_future';
+        $startOfNextQuarter = $schemeReturn->startOfNextQuarter();
 
-        $violations = $context->getValidator()->validateProperty($this, 'expectedBusinessCaseApproval', $groups);
-        foreach($violations as $violation) {
-            $context
-                ->buildViolation($violation->getMessage(), $violation->getParameters())
-                ->atPath($violation->getPropertyPath())
-                ->addViolation();
+        $params = [
+            'start_of_next_quarter' => $startOfNextQuarter,
+        ];
+
+        if ($businessCase === BusinessCase::POST_FBC) {
+            if ($value < $startOfNextQuarter) {
+                return;
+            }
+
+            $message = 'crsts_scheme_return.expected_business_case_approval.end_of_quarter';
+        } else {
+            if ($value >= $startOfNextQuarter) {
+                return;
+            }
+
+            $message = 'crsts_scheme_return.expected_business_case_approval.future';
         }
+
+        $context
+            ->buildViolation($message, $params)
+            ->atPath($context->getPropertyPath())
+            ->addViolation();
     }
 
     #[Callback(groups: ['milestone_dates'])]
