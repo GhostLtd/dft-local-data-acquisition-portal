@@ -77,11 +77,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[ORM\ManyToMany(targetEntity: Milestone::class, cascade: ['persist'])]
     private Collection $milestones;
 
-    public function startOfNextQuarter(): \DateTime
-    {
-        return $this->getFundReturn()->getFinancialQuarter()->getNextQuarter()->getStartDate();
-    }
-
     public static function validateExpectedBusinessCaseApproval(
         \DateTimeInterface $value,
         ExecutionContextInterface $context
@@ -94,7 +89,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
             return;
         }
 
-        $startOfNextQuarter = $schemeReturn->startOfNextQuarter();
+        $startOfNextQuarter = $schemeReturn->getFundReturn()->getFinancialQuarter()->getNextQuarter()->getStartDate();
 
         $params = [
             'start_of_next_quarter' => $startOfNextQuarter,
@@ -123,13 +118,6 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     #[Callback(groups: ['milestone_dates'])]
     public function validateMilestoneDates(ExecutionContextInterface $context): void
     {
-        $root = $context->getRoot()->getData();
-
-        $fundedMostlyAs = null;
-        if ($root instanceof CrstsSchemeReturn) {
-            $fundedMostlyAs = $root->getScheme()->getCrstsData()->getFundedMostlyAs();
-        }
-
         foreach($this->milestones as $i => $milestone) {
             if ($milestone->getDate() === null) {
                 $context
