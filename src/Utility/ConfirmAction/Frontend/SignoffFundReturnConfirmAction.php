@@ -3,14 +3,13 @@
 namespace App\Utility\ConfirmAction\Frontend;
 
 use App\Entity\FundReturn\FundReturn;
-use App\Entity\User;
+use App\Form\Type\FundReturn\Crsts\SignOffConfirmationType;
 use Doctrine\ORM\EntityManagerInterface;
 use Ghost\GovUkCoreBundle\Utility\ConfirmAction\AbstractConfirmAction;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Workflow\WorkflowInterface;
-
 
 class SignoffFundReturnConfirmAction extends AbstractConfirmAction
 {
@@ -25,6 +24,11 @@ class SignoffFundReturnConfirmAction extends AbstractConfirmAction
         protected WorkflowInterface      $returnStateStateMachine,
     ) {
         parent::__construct($formFactory, $requestStack);
+    }
+
+    public function getFormClass(): string
+    {
+        return SignOffConfirmationType::class;
     }
 
     #[\Override]

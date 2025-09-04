@@ -65,6 +65,10 @@ crsts_scheme_return:
 expenses:
   forecast_required: Forecast values must be entered
 
+fund_return_signoff:
+  confirm_fco_approved.not_blank: You must confirm that the FCO has reviewed and approved this return
+  confirm_cannot_be_undone.not_blank: You must confirm that you understand that this action cannot be undone
+
 milestone:
   date:
     not_null: >-

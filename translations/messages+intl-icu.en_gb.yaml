@@ -530,6 +530,10 @@ frontend:
       confirmed-notification:
         heading: "{fund} return submitted"
         content: "The {fund} return for {year}/{nextYear} Q{quarter} has been signed-off and submitted"
+      confirm_fco_approved:
+        label: I confirm that the FCO has reviewed these figures and approved sign-off of this return
+      confirm_cannot_be_undone:
+        label: I understand that once signed-off, this return will no longer be editable
     home:
       title: Local data acquisition portal
     privacy_notice:
