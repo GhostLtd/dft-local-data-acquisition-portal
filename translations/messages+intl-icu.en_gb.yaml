@@ -584,7 +584,9 @@ frontend:
       agreed_funding: *sr_agreed_funding
       back_to_fund_return: "Back to {fundName} return"
       benefit_cost_ratio: Benefit-cost ratio
+      business_case_not_entered: Business case status not entered
       current_business_case: *sr_current_business_case
+      dates_not_entered: Milestone dates not entered
       description: Scheme description
       expected_business_case_approval: *sr_expected_business_case_approval
       expenses_not_required: >-

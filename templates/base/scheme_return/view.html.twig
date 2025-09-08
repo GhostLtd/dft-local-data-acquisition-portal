@@ -3,6 +3,10 @@
 {%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') -%}
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
+{%- macro placeholder(translationKey) -%}
+    <p class="govuk-body placeholder">{{ translationKey | trans }}</p>
+{%- endmacro -%}
+
 {%- block content -%}
     {%- from "@GhostGovUkFrontend/components/macros.html.twig" import notificationBanner, summaryList, summaryCard -%}
     {%- from "frontend/macros.html.twig" import textValue, yesOrNoValue, moneyValue, bcrValue, onTrackRatingValue, dateValue, enumTextValue, displayCardForReturn, displaySectionsAsTabs, expenseDivisionComments -%}
@@ -72,24 +76,28 @@
                 schemeReturn,
                 'frontend.pages.scheme_return.titles.milestone_dates' | trans,
                 'milestone_dates',
-                summaryList({rows:
-                    schemeReturn.milestones | map((v,k) => {
-                        key: {text: "enum.milestone_type.#{v.type.value}" | trans},
-                        value: {text: dateValue(v.date, {dateFormat: 'format.date.year-and-month'})},
+                schemeReturn.milestones.empty
+                  ? _self.placeholder('frontend.pages.scheme_return.dates_not_entered')
+                  : summaryList({rows:
+                        schemeReturn.milestones | map((v,k) => {
+                            key: {text: "enum.milestone_type.#{v.type.value}" | trans},
+                            value: {text: dateValue(v.date, {dateFormat: 'format.date.year-and-month'})},
+                        })
                     })
-                })
             ) -}}
 
             {{- displayCardForReturn(
                 schemeReturn,
                 'frontend.pages.scheme_return.titles.milestone_business_case' | trans,
                 'milestone_business_case',
-                summaryList({rows: {
-                    ('frontend.pages.scheme_return.current_business_case' | trans): enumTextValue('enum.business_case', schemeReturn.businessCase),
-                    ((schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable')
-                    ? ('frontend.pages.scheme_return.expected_business_case_approval' | trans) : ''
-                    ): dateValue(schemeReturn.expectedBusinessCaseApproval, {dateFormat: 'format.date.year-and-month'}),
-                } | filter((v,k) => k is not empty)
+                schemeReturn.businessCase is null
+                    ? _self.placeholder('frontend.pages.scheme_return.business_case_not_entered')
+                    : summaryList({rows: {
+                        ('frontend.pages.scheme_return.current_business_case' | trans): enumTextValue('enum.business_case', schemeReturn.businessCase),
+                        ((schemeReturn.businessCase and schemeReturn.businessCase.value != 'not_applicable')
+                        ? ('frontend.pages.scheme_return.expected_business_case_approval' | trans) : ''
+                        ): dateValue(schemeReturn.expectedBusinessCaseApproval, {dateFormat: 'format.date.year-and-month'}),
+                    } | filter((v,k) => k is not empty)
                 })) -}}
         </div>
 
