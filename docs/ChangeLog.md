@@ -6,6 +6,7 @@
 
 - **Feature**: Add the ability to add fund awards to an authority
 - **Feature**: Add privacy statement
+- **Feature**: Add previous / next buttons on scheme return pages
 - **Update**: Allow spreadsheet export prior to submission
 - **Update**: Enable the cron job for the creation of new returns
 - **Update**: Pre + post install scripts enabled in cloudbuild.yaml pipeline

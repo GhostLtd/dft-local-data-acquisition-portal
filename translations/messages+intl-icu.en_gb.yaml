@@ -558,6 +558,9 @@ frontend:
       scheme_identifier: Scheme ID
       transport_mode: *sr_transport_mode
       delete_scheme: Delete scheme
+      navigation:
+        next: Next scheme
+        previous: Previous scheme
     scheme_add:
       title: &scheme_add_title Add scheme
       breadcrumb: *scheme_add_title

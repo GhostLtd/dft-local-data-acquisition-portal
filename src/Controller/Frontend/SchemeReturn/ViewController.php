@@ -7,6 +7,7 @@ use App\Entity\Enum\SchemeLevelSection;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use App\Form\Type\FundReturn\Crsts\ExpensesTableCalculator;
+use App\Repository\SchemeRepository;
 use App\Repository\SchemeReturn\SchemeReturnRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
 use App\Utility\CrstsHelper;
@@ -30,6 +31,7 @@ class ViewController extends AbstractController
         ExpensesTableHelper     $expensesTableHelper,
         ExpensesTableCalculator $expensesTableCalculator,
         SchemeReturnRepository  $schemeReturnRepository,
+        SchemeRepository        $schemeRepository,
     ): Response
     {
         $schemeReturn = $fundReturn->getSchemeReturnForScheme($scheme);
@@ -49,6 +51,7 @@ class ViewController extends AbstractController
             'linksBuilder' => $linksBuilder,
             'nonEditablePoint' => $schemeReturnRepository->cachedFindPointWhereReturnBecameNonEditable($schemeReturn),
             'returnYearDivisionKey' => CrstsHelper::getDivisionConfigurationKey($fundReturn->getYear()),
+            'previousAndNextSchemes' => $schemeRepository->getPreviousAndNextSchemes($fundReturn, $scheme),
             'schemeReturn' => $schemeReturn,
             'schemeLevelSectionsConfiguration' => SchemeLevelSection::getConfigurationForFund($fund),
         ]);

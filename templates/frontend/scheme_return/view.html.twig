@@ -3,6 +3,32 @@
 {%- set page_title = linksBuilder.breadcrumbTitleFor('scheme_return') -%}
 {%- set page_heading_class = 'govuk-heading-l' -%}
 
+{%- set previousSchemeLink %}
+    {%- if previousAndNextSchemes['previous'] -%}
+        <a class="govuk-link" href="{{ path('app_scheme_return', {fundReturnId: fundReturn.id, schemeId: previousAndNextSchemes['previous']}) }}">
+            {{- "frontend.pages.scheme.navigation.previous" | trans -}}
+        </a>
+    {%- endif -%}
+{%- endset -%}
+
+{%- set nextSchemeLink -%}
+    {%- if previousAndNextSchemes['next'] -%}
+        <a class="govuk-link" href="{{ path('app_scheme_return', {fundReturnId: fundReturn.id, schemeId: previousAndNextSchemes['next']}) }}">
+            {{- "frontend.pages.scheme.navigation.next" | trans -}}
+        </a>
+    {%- endif -%}
+{%- endset -%}
+
+{%- block pageHeading -%}
+    <div class="header-with-links">
+        {{ parent() }}
+        <div class="govuk-button-group">
+            {{ previousSchemeLink }}
+            {{ nextSchemeLink }}
+        </div>
+    </div>
+{%- endblock -%}
+
 {%- block content -%}
     {%- set signoffIssuesRoute = 'app_fund_return_signoff_issues' -%}
 
@@ -30,9 +56,13 @@
     {%- endif -%}
 
 
-    <p class="govuk-body">
+    <div class="govuk-button-group">
+        {{ previousSchemeLink }}
+
         <a href="{{ path('app_fund_return', {fundReturnId: fundReturn.id}) }}#scheme-list" class="govuk-link">
             {{- 'frontend.pages.scheme_return.back_to_fund_return' | trans({fundName: "enum.fund.#{fundReturn.fundAward.type.name}" | trans}) -}}
         </a>
-    </p>
+
+        {{ nextSchemeLink }}
+    </div>
 {%- endblock -%}

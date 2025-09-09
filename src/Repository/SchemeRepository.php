@@ -6,6 +6,7 @@ use App\Entity\Authority;
 use App\Entity\FundReturn\FundReturn;
 use App\Entity\Scheme;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -54,6 +55,55 @@ class SchemeRepository extends ServiceEntityRepository
             ->where('fundReturn.id = :fund_return_id')
             ->orderBy('scheme.name', 'ASC')
             ->setParameter('fund_return_id', $fundReturn->getId(), UlidType::NAME);
+    }
+
+    /**
+     * @return array{previous: ?Ulid, next: ?Ulid}
+     */
+    public function getPreviousAndNextSchemes(FundReturn $fundReturn, Scheme $currentScheme): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = <<<SQL
+    SELECT prev_id, next_id
+    FROM (
+      SELECT
+          s.id AS scheme_id,
+          LAG(s.id)  OVER (ORDER BY s.name, s.id) AS prev_id,
+          LEAD(s.id) OVER (ORDER BY s.name, s.id) AS next_id
+      FROM scheme s
+      JOIN authority a      ON a.id = s.authority_id
+      JOIN fund_award fa    ON fa.authority_id = a.id
+      JOIN fund_return fr   ON fr.fund_award_id = fa.id
+      JOIN scheme_return sr ON sr.scheme_id = s.id AND sr.fund_return_id = fr.id
+      WHERE fr.id = :fund_return_id
+    ) AS scoped
+    WHERE scheme_id = :current_scheme_id
+    LIMIT 1
+SQL;
+
+        try {
+            $row = $conn->fetchAssociative(
+                $sql, [
+                'fund_return_id' => $fundReturn->getId(),
+                'current_scheme_id' => $currentScheme->getId(),
+            ], [
+                    'fund_return_id' => UlidType::NAME,
+                    'current_scheme_id' => UlidType::NAME,
+                ]
+            );
+        } catch (Exception) {
+            $row = null;
+        }
+
+        if (!$row) {
+            return ['previous' => null, 'next' => null];
+        }
+
+        return [
+            'previous' => $row['prev_id'] !== null ? Ulid::fromBinary($row['prev_id']) : null,
+            'next' => $row['next_id'] !== null ? Ulid::fromBinary($row['next_id']) : null,
+        ];
     }
 
     public function findForDashboard(string $id): ?Scheme

@@ -88,3 +88,15 @@ li.govuk-service-navigation__margin-left-auto {
     margin-left: govuk-spacing(5);
   }
 }
+
+.header-with-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .govuk-button-group {
+    .govuk-link {
+      margin-bottom: 0;
+    }
+  }
+}
