@@ -2,7 +2,7 @@
 {% macro jobStatusSpinner(jobStatus, initialText, runningText, completedText) %}
     {%- from 'frontend/macros.html.twig' import loadingSpinner -%}
     {%- set statusContents -%}
-        {%- if jobStatus is null -%}
+        {%- if jobStatus.state.value == 'new' -%}
             <h1 class="govuk-heading-m">{{ initialText | default('Initialising...') }}</h1>
         {%- elseif jobStatus.state.value == 'running' -%}
             <h1 class="govuk-heading-m">{{ runningText | default('Processing...') }}</h1>

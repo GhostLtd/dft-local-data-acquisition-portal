@@ -3,9 +3,10 @@
 namespace App\Messenger\DataExport;
 
 use App\Messenger\AlphagovNotify\AbstractMessage;
+use App\Messenger\JobInterface;
 use Symfony\Component\Uid\Ulid;
 
-class DataExportJob extends AbstractMessage
+class DataExportJob extends AbstractMessage implements JobInterface
 {
     protected string $id;
     protected ?int $year;
@@ -16,7 +17,7 @@ class DataExportJob extends AbstractMessage
         ?int $quarter = null
     )
     {
-        $this->id = strval(Ulid::generate());
+        $this->id = Ulid::generate();
         $this->year = $year;
         $this->quarter = $quarter;
     }

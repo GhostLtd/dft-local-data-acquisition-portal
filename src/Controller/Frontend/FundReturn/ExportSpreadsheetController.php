@@ -6,15 +6,15 @@ use App\Controller\AbstractJobController;
 use App\Entity\Enum\JobState;
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\FundReturn;
+use App\Messenger\JobCacheHelper;
 use App\Messenger\Spreadsheet\SpreadsheetJob;
 use App\Repository\FundReturn\FundReturnRepository;
 use App\Utility\Breadcrumb\Frontend\DashboardLinksBuilder;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -24,12 +24,11 @@ class ExportSpreadsheetController extends AbstractJobController
 {
     public function __construct(
         protected AuthorizationCheckerInterface $authorizationChecker,
-        #[Autowire(service: 'cache.job_cache')]
-        CacheItemPoolInterface                  $cache,
+        JobCacheHelper                          $jobCacheHelper,
         MessageBusInterface                     $messageBus,
         protected FundReturnRepository          $fundReturnRepository,
     ) {
-        parent::__construct($cache, $messageBus);
+        parent::__construct($jobCacheHelper, $messageBus);
     }
 
     #[Route('/fund-return/{fundReturnId}/export-spreadsheet', name: 'app_fund_return_export_spreadsheet')]
@@ -62,7 +61,12 @@ class ExportSpreadsheetController extends AbstractJobController
 
         $downloadUrl = null;
         $redirectUrl = null;
-        if ($jobStatus && $jobStatus->getState() === JobState::COMPLETED) {
+
+        if (!$jobStatus) {
+            throw new NotFoundHttpException();
+        }
+
+        if ($jobStatus->getState() === JobState::COMPLETED) {
             $downloadRoute = $request->attributes->get('download_route') ?? 'app_fund_return_export_spreadsheet_download';
             $downloadUrl = $this->generateUrl($downloadRoute, ['fundReturnId' => $fundReturn->getId(), 'jobId' => $jobId]);
 
@@ -101,5 +105,4 @@ class ExportSpreadsheetController extends AbstractJobController
 
         return new Response($spreadsheet, 200, $headers);
     }
-
 }

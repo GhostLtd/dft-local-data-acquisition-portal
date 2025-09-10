@@ -6,12 +6,12 @@ use App\Controller\AbstractJobController;
 use App\Entity\Enum\JobState;
 use App\Form\Type\Admin\DataExportType;
 use App\Messenger\DataExport\DataExportJob;
+use App\Messenger\JobCacheHelper;
 use App\Utility\Breadcrumb\Admin\DashboardLinksBuilder;
-use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -19,11 +19,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class DataExportController extends AbstractJobController
 {
     public function __construct(
-        #[Autowire(service: 'cache.job_cache')]
-        CacheItemPoolInterface $cache,
+        JobCacheHelper      $jobCacheHelper,
         MessageBusInterface $messageBus,
     ) {
-        parent::__construct($cache, $messageBus);
+        parent::__construct($jobCacheHelper, $messageBus);
     }
 
     #[Route(path: '', name: 'admin_data_export')]
@@ -71,7 +70,12 @@ class DataExportController extends AbstractJobController
 
         $downloadUrl = null;
         $redirectUrl = null;
-        if ($jobStatus && $jobStatus->getState() === JobState::COMPLETED) {
+
+        if (!$jobStatus) {
+            throw new NotFoundHttpException();
+        }
+
+        if ($jobStatus->getState() === JobState::COMPLETED) {
             $downloadUrl = $this->generateUrl('admin_data_export_download', ['jobId' => $jobId]);
             $redirectUrl = $this->generateUrl('admin_data_export');
         }

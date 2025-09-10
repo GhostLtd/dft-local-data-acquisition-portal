@@ -3,21 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Enum\JobState;
+use App\Messenger\JobCacheHelper;
 use App\Messenger\JobStatus;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 abstract class AbstractJobController extends AbstractController
 {
     public function __construct(
-        #[Autowire(service: 'cache.job_cache')]
-        protected CacheItemPoolInterface $cache,
-        protected MessageBusInterface $messageBus
+        protected JobCacheHelper      $jobCacheHelper,
+        protected MessageBusInterface $messageBus,
     ) {}
-    
 
     protected function getJobStatus(string $jobId): ?JobStatus
     {
@@ -26,10 +23,10 @@ abstract class AbstractJobController extends AbstractController
         }
 
         $jobStatus = null;
-        $item = $this->cache->getItem("status-{$jobId}");
+        $cacheItem = $this->jobCacheHelper->getJobCacheItem($jobId, 'status');
 
-        if ($item->isHit()) {
-            $jobStatus = $item->get();
+        if ($cacheItem->isHit()) {
+            $jobStatus = $cacheItem->get();
         }
 
         return $jobStatus instanceof JobStatus ? $jobStatus : null;
@@ -37,13 +34,13 @@ abstract class AbstractJobController extends AbstractController
 
     protected function getJobData(string $jobId): ?string
     {
-        $item = $this->cache->getItem("data-{$jobId}");
+        $cacheItem = $this->jobCacheHelper->getJobCacheItem($jobId, 'data');
 
-        if (!$item->isHit()) {
+        if (!$cacheItem->isHit()) {
             return null;
         }
 
-        return $item->get();
+        return $cacheItem->get();
     }
 
     protected function getCompletedJobData(string $jobId): string

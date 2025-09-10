@@ -3,20 +3,18 @@
 namespace App\Messenger\DataExport;
 
 use App\Entity\Enum\JobState;
+use App\Messenger\JobCacheHelper;
 use App\Messenger\JobStatus;
 use App\Utility\CsvExporter;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 class DataExportJobHandler
 {
     public function __construct(
-        #[Autowire(service: 'cache.job_cache')]
-        protected CacheItemPoolInterface $cache,
-        protected CsvExporter $csvExporter,
+        protected CsvExporter     $csvExporter,
+        protected JobCacheHelper  $jobCacheHelper,
         protected LoggerInterface $logger,
     ) {}
 
@@ -26,33 +24,28 @@ class DataExportJobHandler
         $year = $job->getYear();
         $quarter = $job->getQuarter();
 
-        $statusKey = "status-{$jobId}";
-
-        $jobStatus = $this->cache->getItem($statusKey);
-        $jobStatus->set(new JobStatus(JobState::RUNNING));
-        $this->cache->save($jobStatus);
+        $this->jobCacheHelper->setJobStatus($jobId, new JobStatus(JobState::RUNNING));
 
         try {
             $zipData = $this->csvExporter->getZipData($year, $quarter);
 
             if ($zipData) {
-                $jobData = $this->cache->getItem("data-{$jobId}");
-                $jobData->set($zipData);
-                $this->cache->save($jobData);
+                $this->jobCacheHelper->setJobCacheEntry($jobId, 'data', $zipData);
 
                 // Generate filename for the download
                 $filenamePrefix = 'crsts';
                 if ($year !== null && $quarter !== null) {
-                    $nextYear = substr(strval($year + 1), - 2);
+                    $nextYear = substr(strval($year + 1), -2);
                     $filenamePrefix .= "_{$year}_{$nextYear}_Q{$quarter}";
                 }
                 $filenameSuffix = (new \DateTime())->format('Ymd_Hisv');
                 $filename = "{$filenamePrefix}_{$filenameSuffix}.zip";
 
-                $jobStatus->set(new JobStatus(JobState::COMPLETED, context: [
-                    'filename' => $filename,
-                ]));
-                
+                $this->jobCacheHelper->setJobStatus(
+                    $jobId,
+                    new JobStatus(JobState::COMPLETED, context: ['filename' => $filename])
+                );
+
                 // Log successful job completion
                 $this->logger->info('Data export job completed successfully', [
                     'jobId' => $jobId,
@@ -62,8 +55,8 @@ class DataExportJobHandler
                 ]);
             } else {
                 $errorMessage = 'Failed to generate zip file';
-                $jobStatus->set(new JobStatus(JobState::FAILED, $errorMessage));
-                
+                $this->jobCacheHelper->setJobStatus($jobId, new JobStatus(JobState::FAILED, $errorMessage));
+
                 // Log failure
                 $this->logger->error($errorMessage, [
                     'jobId' => $jobId,
@@ -73,7 +66,8 @@ class DataExportJobHandler
                 ]);
             }
         } catch (\Exception $e) {
-            // Log exception with stack trace
+            $this->jobCacheHelper->setJobStatus($jobId, new JobStatus(JobState::FAILED, $e->getMessage()));
+
             $this->logger->error('Data export job failed with exception', [
                 'jobId' => $jobId,
                 'error' => $e->getMessage(),
@@ -81,10 +75,6 @@ class DataExportJobHandler
                 'year' => $year,
                 'quarter' => $quarter,
             ]);
-            
-            $jobStatus->set(new JobStatus(JobState::FAILED, $e->getMessage()));
         }
-
-        $this->cache->save($jobStatus);
     }
 }

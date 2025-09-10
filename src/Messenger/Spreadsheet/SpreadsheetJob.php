@@ -4,9 +4,10 @@ namespace App\Messenger\Spreadsheet;
 
 use App\Entity\FundReturn\FundReturn;
 use App\Messenger\AlphagovNotify\AbstractMessage;
+use App\Messenger\JobInterface;
 use Symfony\Component\Uid\Ulid;
 
-class SpreadsheetJob extends AbstractMessage
+class SpreadsheetJob extends AbstractMessage implements JobInterface
 {
     protected string $id;
     protected string $fundReturnId;
@@ -15,7 +16,7 @@ class SpreadsheetJob extends AbstractMessage
         FundReturn $fundReturn,
     )
     {
-        $this->id = strval(Ulid::generate());
+        $this->id = Ulid::generate();
         $this->fundReturnId = strval($fundReturn->getId());
     }
 
