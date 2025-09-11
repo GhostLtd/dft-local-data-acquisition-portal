@@ -12,4 +12,5 @@
 - [ChangeLog](./docs/ChangeLog.md)
 - [Installation](./docs/Installation.md)
 - [Environment variables `Features` config](docs/Features.md)
+- [TableHelper](docs/TableHelper.md)
 - [Twig](docs/Twig.md)

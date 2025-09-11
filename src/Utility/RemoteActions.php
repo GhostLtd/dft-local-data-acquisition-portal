@@ -87,7 +87,6 @@ class RemoteActions
         return $output;
     }
 
-    #[NoReturn]
     public static function handleException(Throwable $originalException): void
     {
         if ($originalException instanceof HttpException) {
