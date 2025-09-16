@@ -15,6 +15,7 @@
 - **Fix**: Fix some GovUK rebrand styles not showing up 
 - **Fix**: Remove legacy database env bind bindings
 - **Fix**: Maintenance mode not immediately enabling/disabling due to cache problem
+- **Fix**: X-CSP header now matches CSP header
 
 ## 5th August 2025
 

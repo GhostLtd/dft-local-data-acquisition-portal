@@ -78,9 +78,13 @@ class SecureHeadersSubscriber implements EventSubscriberInterface
             }
         }
 
-        $headers->set('Content-Security-Policy', join('; ', $cspRules));
-    }
+        $headerValue = join('; ', $cspRules);
+        $headers->set('Content-Security-Policy', $headerValue);
 
+        if ($headers->has('X-Content-Security-Policy')) {
+            $headers->set('X-Content-Security-Policy', $headerValue);
+        }
+    }
 
     public static function getSubscribedEvents(): array
     {
