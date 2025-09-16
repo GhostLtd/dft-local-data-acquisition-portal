@@ -52,10 +52,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     private ?BusinessCase $businessCase = null; // 4proj_milestones: Current business case
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Assert\Sequentially([
-        new Assert\NotNull(message: 'crsts_scheme_return.expected_business_case_approval.not_null'),
-        new Assert\Callback(callback: [self::class, 'validateExpectedBusinessCaseApproval']),
-    ], groups: ["milestone_business_case"])]
+    #[Assert\Callback(callback: [self::class, 'validateExpectedBusinessCaseApproval'], groups: ["milestone_business_case"])]
     private ?\DateTimeInterface $expectedBusinessCaseApproval = null; // 4proj_milestones: Expected date of approval for current business case
 
     #[ORM\Column(type: Types::TEXT, length: AbstractMySQLPlatform::LENGTH_LIMIT_TEXT, nullable: true)]
@@ -78,7 +75,7 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     private Collection $milestones;
 
     public static function validateExpectedBusinessCaseApproval(
-        \DateTimeInterface $value,
+        ?\DateTimeInterface $value,
         ExecutionContextInterface $context
     ): void {
         /** @var CrstsSchemeReturn $schemeReturn */
@@ -89,24 +86,29 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
             return;
         }
 
-        $startOfNextQuarter = $schemeReturn->getFundReturn()->getFinancialQuarter()->getNextQuarter()->getStartDate();
-
-        $params = [
-            'start_of_next_quarter' => $startOfNextQuarter,
-        ];
-
-        if ($businessCase === BusinessCase::POST_FBC) {
-            if ($value < $startOfNextQuarter) {
-                return;
-            }
-
-            $message = 'crsts_scheme_return.expected_business_case_approval.end_of_quarter';
+        if ($value === null) {
+            $message = 'crsts_scheme_return.expected_business_case_approval.not_null';
+            $params = [];
         } else {
-            if ($value >= $startOfNextQuarter) {
-                return;
-            }
+            $startOfNextQuarter = $schemeReturn->getFundReturn()->getFinancialQuarter()->getNextQuarter()->getStartDate();
 
-            $message = 'crsts_scheme_return.expected_business_case_approval.future';
+            $params = [
+                'start_of_next_quarter' => $startOfNextQuarter,
+            ];
+
+            if ($businessCase === BusinessCase::POST_FBC) {
+                if ($value < $startOfNextQuarter) {
+                    return;
+                }
+
+                $message = 'crsts_scheme_return.expected_business_case_approval.end_of_quarter';
+            } else {
+                if ($value >= $startOfNextQuarter) {
+                    return;
+                }
+
+                $message = 'crsts_scheme_return.expected_business_case_approval.future';
+            }
         }
 
         $context
