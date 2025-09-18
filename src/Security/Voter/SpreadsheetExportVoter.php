@@ -4,6 +4,7 @@ namespace App\Security\Voter;
 
 use App\Entity\Enum\Role;
 use App\Entity\FundReturn\CrstsFundReturn;
+use App\Entity\FundReturn\FundReturn;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -23,6 +24,10 @@ class SpreadsheetExportVoter extends Voter
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         if (!$subject instanceof CrstsFundReturn) {
+            return false;
+        }
+
+        if ($subject->getState() === FundReturn::STATE_INITIAL) {
             return false;
         }
 
