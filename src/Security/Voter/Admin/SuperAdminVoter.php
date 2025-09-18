@@ -2,8 +2,6 @@
 
 namespace App\Security\Voter\Admin;
 
-use App\Entity\Enum\InternalRole;
-use App\Entity\Enum\Role;
 use App\Entity\UserTypeRoles;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -26,10 +24,12 @@ class SuperAdminVoter extends Voter
             return false;
         }
 
-        if (preg_match('/@ghostlimited.com$/', $token->getUser()->getUserIdentifier())) {
-            return true;
-        }
+        // There was previously logic that checked the domain of $token->getUser()->getUserIdentifier()
+        // to grant Ghost this ability. Ultimately this just allowed the admin of an MCA to be changed.
+        //
+        // This is now just allowed to all admins, as it will sometimes be useful (e.g. if MCA admin is
+        // away)
 
-        return false;
+        return true;
     }
 }
