@@ -56,11 +56,11 @@ security:
         # N.B. Don't force https for either of these, as it means we'll get a redirect...
         - { path: ^/_ah }
         - { host: '^%frontend_hostname%$', path: ^/cron }
-        - { host: '^%frontend_hostname%$', path: '^/$', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
-        - { host: '^%frontend_hostname%$', path: '^/accessibility-statement', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
-        - { host: '^%frontend_hostname%$', path: '^/login', roles: PUBLIC_ACCESS, requires_channel: '%env(SECURE_SCHEME)%' }
-        - { host: '^%frontend_hostname%$', roles: !php/const App\Entity\UserTypeRoles::ROLE_USER, requires_channel: '%env(SECURE_SCHEME)%' }
-        - { host: '^%admin_hostname%$', roles: !php/const App\Entity\UserTypeRoles::ROLE_IAP_ADMIN, requires_channel: '%env(SECURE_SCHEME)%' }
+        - { host: '^%frontend_hostname%$', path: '^/$', roles: PUBLIC_ACCESS }
+        - { host: '^%frontend_hostname%$', path: '^/accessibility-statement', roles: PUBLIC_ACCESS }
+        - { host: '^%frontend_hostname%$', path: '^/login', roles: PUBLIC_ACCESS }
+        - { host: '^%frontend_hostname%$', roles: !php/const App\Entity\UserTypeRoles::ROLE_USER }
+        - { host: '^%admin_hostname%$', roles: !php/const App\Entity\UserTypeRoles::ROLE_IAP_ADMIN }
 
 when@test:
     security:

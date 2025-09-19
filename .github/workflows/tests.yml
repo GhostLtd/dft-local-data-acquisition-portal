@@ -14,8 +14,69 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup PHP environment
         uses: ./.github/actions/setup-php-env
+      - name: Enable Corepack
+        run: corepack enable
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "yarn"
+      - name: Install JS dependencies
+        run: yarn install --immutable
+      - name: Run build
+        run: yarn build
+      # PHP-WebDriver / Panther doesn't seem to play well with later Chrome versions
+      #     - lots of unexpected staleElementReference errors
+      - name: Setup Chrome 128 + matching ChromeDriver
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: '128'
+          install-chromedriver: true
+      - name: Show Chrome versions
+        run: |
+          "${{ steps.chrome.outputs.chrome-path }}" --version || true
+          "${{ steps.chrome.outputs.chromedriver-path }}" --version || true
       - name: Run PHPUnit tests
-        run: bin/phpunit --testdox
+        env:
+          PANTHER_CHROME_BINARY: "${{ steps.chrome.outputs.chrome-path }}"
+          PANTHER_CHROME_DRIVER_BINARY: "${{ steps.chrome.outputs.chromedriver-path }}"
+          PANTHER_CHROME_ARGUMENTS: >-
+            --headless=new
+            --no-sandbox
+            --disable-dev-shm-usage
+            --remote-debugging-port=0
+            --user-data-dir=/tmp/panther-profile
+            --window-size=1280,800
+            --v=1
+# --------------------------------------------------------------------------------
+#   Chrome makes some *big* logs, so these options are commented out,
+#   but if uncommented, logs will be generated and available as artifacts
+# --------------------------------------------------------------------------------
+#            --enable-logging
+#          CHROME_LOG_FILE: /tmp/chrome.log
+#          CHROMEDRIVER_VERBOSE: 1
+#          CHROMEDRIVER_LOG_PATH: /tmp/chromedriver.log
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/panther-profile
+          # tee ensures we still see output live; return code is preserved by `pipefail`
+          bin/phpunit --testdox 2>&1 | tee /tmp/phpunit.log
+
+#      - name: Upload logs (artifact)
+#        if: ${{ always() }}
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: panther-logs
+#          path: |
+#            /tmp/phpunit.log
+#            /tmp/chromedriver.log
+#            /tmp/chrome.log
+
+      # Re-fail the job if PHPUnit failed
+      - name: Fail if tests failed
+        if: ${{ failure() && steps.phpunit.outcome == 'failure' }}
+        run: exit 1
 
   phpstan:
     runs-on: ubuntu-latest
@@ -28,3 +89,17 @@ jobs:
         run: bin/phpunit --help > /dev/null
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
+
+  php-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup cache
+        uses: actions/cache@v4
+        id: cache-db
+        with:
+          path: ~/.symfony/cache
+          key: db
+      - name: Symfony security checker
+        uses: symfonycorp/security-checker-action@v5

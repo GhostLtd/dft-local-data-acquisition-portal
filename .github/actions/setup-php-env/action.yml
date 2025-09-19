@@ -4,9 +4,6 @@ description: "Checkout, setup PHP, restore Composer cache, create .env.local, an
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -30,9 +27,9 @@ runs:
       shell: bash
       run: |
         cat > .env.local <<'EOF'
-        APP_DATABASE_URL=sqlite://$(pwd)/var/placeholder.sqlite
-        APP_ADMIN_HOSTNAME=admin.ldap.example.com
-        APP_FRONTEND_HOSTNAME=ldap.example.com
+        APP_DATABASE_URL=sqlite:////dev/shm/test.sqlite
+        APP_ADMIN_HOSTNAME=ldap-admin.localhost
+        APP_FRONTEND_HOSTNAME=ldap-frontend.localhost
         EOF
 
     - name: Install Composer dependencies

@@ -2,7 +2,7 @@
   "name": "screenshots",
   "packageManager": "yarn@4.4.0",
   "dependencies": {
-    "puppeteer": "^24.6.0",
+    "puppeteer": "^24.22.0",
     "sharp": "^0.34.1",
     "yargs": "^17.7.2"
   }

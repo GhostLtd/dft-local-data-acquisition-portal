@@ -50,3 +50,9 @@ nelmio_security:
             - ^/cron/
         hsts_max_age: 2592000 # 30 days
         hsts_subdomains: true
+
+when@panther:
+  # Forced SSL means panther tests fail to connect to the symfony test server
+  nelmio_security:
+    forced-ssl:
+      enabled: false

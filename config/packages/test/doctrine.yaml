@@ -3,8 +3,4 @@ doctrine:
     # N.B. do not use the "sqlite3" driver as it can't deal with ULIDs which have zero-bytes
     #      in them. The "pdo_sqlite" driver however, is fine :)
     driver: 'pdo_sqlite'
-    path: '%env(APP_DATABASE_PATH)%'
-    dbname: ~
-    host: ~
-    user: ~
-    password: ~
+    url: '%env(APP_DATABASE_URL)%'

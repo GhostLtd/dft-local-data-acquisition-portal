@@ -23,7 +23,7 @@ class TypeHelper
      * @template T
      * @param class-string<T> $className
      * @param mixed $value
-     * @return T
+     * @return T|null
      */
     public static function checkMatchesClassOrNull(string $className, mixed $value)
     {
