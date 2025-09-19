@@ -2,7 +2,7 @@
 
 # Changelog
 
-## Upcoming
+## 19th September 2025
 
 - **Feature**: Add the ability to add fund awards to an authority
 - **Feature**: Add privacy statement
