@@ -4,7 +4,6 @@ namespace App\ListPage;
 
 use App\Entity\Authority;
 use App\Repository\AuthorityRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Ghost\GovUkCoreBundle\ListPage\AbstractListPage;
 use Ghost\GovUkCoreBundle\ListPage\Field\Simple;
@@ -14,12 +13,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 class AuthorityListPage extends AbstractListPage
 {
-    private AuthorityRepository $repository;
-
-    public function __construct(EntityManagerInterface $entityManager, FormFactoryInterface $formFactory, RouterInterface $router)
-    {
+    public function __construct(
+        private readonly AuthorityRepository $repository,
+        FormFactoryInterface $formFactory,
+        RouterInterface $router
+    ) {
         parent::__construct($formFactory, $router);
-        $this->repository = $entityManager->getRepository(Authority::class);
     }
 
     #[\Override]

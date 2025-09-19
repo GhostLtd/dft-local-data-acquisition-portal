@@ -136,7 +136,8 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 
     public function createFundReturnForNextQuarter(): static
     {
-        $nextReturn = new self();
+        /** @phpstan-ignore-next-line */
+        $nextReturn = new static();
         $this->getFundAward()->addReturn($nextReturn);
 
         $nextQuarter = (new FinancialQuarter($this->getYear(), $this->getQuarter()))
@@ -160,7 +161,8 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 
     public static function createInitialFundReturnStartingAt(FinancialQuarter $financialQuarter, FundAward $fundAward): static
     {
-        $return = new self();
+        /** @phpstan-ignore-next-line */
+        $return = new static();
         $fundAward->addReturn($return);
 
         $return
@@ -182,9 +184,13 @@ class CrstsFundReturn extends FundReturn implements ExpensesContainerInterface
 
     /**
      * @return Collection<int, CrstsSchemeReturn>
+     * @phpstan-ignore-next-line
      */
     public function getSchemeReturns(): Collection
     {
+        // PHPStan doesn't support covariant return types for generic collections,
+        // but we know this collection only contains CrstsSchemeReturn instances.
+        /** @var Collection<int, CrstsSchemeReturn> */
         return parent::getSchemeReturns();
     }
 

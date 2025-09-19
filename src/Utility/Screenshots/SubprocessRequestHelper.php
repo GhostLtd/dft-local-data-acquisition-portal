@@ -56,7 +56,7 @@ class SubprocessRequestHelper
     }
 
     /**
-     * @return \Generator<array, LoginEmail>
+     * @return \Generator<int, array{0: ?int, 1: LoginEmail}>
      */
     protected function messagesFor(string $email): \Generator
     {
@@ -74,12 +74,14 @@ class SubprocessRequestHelper
         }
 
         foreach($messages as $message) {
+            $messageId = $message['id'] ?? null;
+
             $serializer = new PhpSerializer();
             $envelope = $serializer->decode($messages[0]);
             $decoded = $envelope->getMessage();
 
-            if ($decoded instanceof LoginEmail || $decoded->getRecipient() === $email) {
-                yield [$message, $decoded];
+            if ($decoded instanceof LoginEmail && $decoded->getRecipient() === $email) {
+                yield [$messageId, $decoded];
             }
         }
     }
@@ -90,7 +92,7 @@ class SubprocessRequestHelper
 
         /** @var array<LoginEmail> $decodedMessages */
         $decodedMessages = [];
-        foreach($this->messagesFor($email) as [$message, $decoded]) {
+        foreach($this->messagesFor($email) as [$messageId, $decoded]) {
             $decodedMessages[] = $decoded;
         }
 
@@ -118,9 +120,9 @@ class SubprocessRequestHelper
     {
         $email = $matches[1];
 
-        foreach($this->messagesFor($email) as [$message, $decoded]) {
+        foreach($this->messagesFor($email) as [$messageId, $decoded]) {
             $this->entityManager->getConnection()
-                ->executeQuery('DELETE FROM messenger_messages WHERE id=:id', ['id' => $message['id']]);
+                ->executeQuery('DELETE FROM messenger_messages WHERE id=:id', ['id' => $messageId]);
         }
 
         $this->deleteExistingScreenshotsAuthority();

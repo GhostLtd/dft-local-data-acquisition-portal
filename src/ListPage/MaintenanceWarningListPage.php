@@ -4,7 +4,6 @@ namespace App\ListPage;
 
 use App\Entity\MaintenanceWarning;
 use App\Repository\MaintenanceWarningRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Ghost\GovUkCoreBundle\ListPage\AbstractListPage;
 use Ghost\GovUkCoreBundle\ListPage\Field\Simple;
@@ -13,12 +12,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 class MaintenanceWarningListPage extends AbstractListPage
 {
-    private MaintenanceWarningRepository $repository;
-
-    public function __construct(EntityManagerInterface $entityManager, FormFactoryInterface $formFactory, RouterInterface $router)
-    {
+    public function __construct(
+        private readonly MaintenanceWarningRepository $repository,
+        FormFactoryInterface $formFactory,
+        RouterInterface $router
+    ) {
         parent::__construct($formFactory, $router);
-        $this->repository = $entityManager->getRepository(MaintenanceWarning::class);
     }
 
     #[\Override]

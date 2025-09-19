@@ -269,7 +269,8 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
     {
         $scheme = $this->getScheme();
 
-        $nextSchemeReturn = new self();
+        /** @phpstan-ignore-next-line */
+        $nextSchemeReturn = new static();
         $nextSchemeReturn
             ->setScheme($scheme)
             ->setBenefitCostRatio($this->getBenefitCostRatio())
@@ -307,7 +308,8 @@ class CrstsSchemeReturn extends SchemeReturn implements ExpensesContainerInterfa
 
     public static function createInitialSchemeReturnFor(Scheme $scheme): static
     {
-        $schemeReturn = new self();
+        /** @phpstan-ignore-next-line */
+        $schemeReturn = new static();
         $schemeReturn->setScheme($scheme);
 
         return $schemeReturn;

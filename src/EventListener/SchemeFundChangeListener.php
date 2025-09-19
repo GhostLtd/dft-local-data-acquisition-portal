@@ -35,6 +35,9 @@ class SchemeFundChangeListener
                 $fundChanges = $changeSet['funds'] ?? null;
 
                 if ($fundChanges !== null) {
+                    if (!is_array($fundChanges) || count($fundChanges) !== 2) {
+                        continue;
+                    }
                     [$from, $to] = $fundChanges;
 
                     $valuesToFunds = fn(array $fundValues) => array_map(fn(string $fundValue) => Fund::from($fundValue), $fundValues);
