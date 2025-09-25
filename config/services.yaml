@@ -17,6 +17,7 @@ parameters:
     frontend_hostname: '%env(string:APP_FRONTEND_HOSTNAME)%'
 
     screenshots.path: '%env(resolve:SCREENSHOTS_PATH)%'
+    session.lock_mode: '%env(int:SESSION_LOCK_MODE)%'
 
 services:
     # default configuration for services in *this* file
@@ -63,7 +64,7 @@ services:
         arguments:
             - !service { class: PDO, factory: ['@database_connection', 'getNativeConnection'] }
             # If you get transaction issues (e.g. after login) uncomment the line below
-            - { lock_mode: !php/const Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler::LOCK_ADVISORY }
+            - { lock_mode: '%session.lock_mode%' }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

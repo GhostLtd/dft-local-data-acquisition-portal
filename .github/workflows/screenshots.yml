@@ -11,3 +11,49 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Setup PHP and JS environment
+        uses: ./.github/actions/setup-php-and-js-env
+        # Required for screenshots
+      - name: Set app in production mode
+        shell: bash
+        run: |
+          cat >> .env.local <<'EOF'
+          APP_ENV=prod
+          APP_SECRET=not-so-secret-abcdefghijk
+          SESSION_LOCK_MODE=0
+          EOF
+      - name: Clear Symfony cache and create database
+        run: |
+          bin/console doctrine:schema:create -n
+          bin/console cache:clear
+      - name: Install screenshots dependencies
+        working-directory: screenshots
+        run: yarn install --immutable
+      - name: Run Symfony server
+        run: |
+          curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.deb.sh' | sudo -E bash 
+          sudo apt install libnss3-tools symfony-cli
+          mkdir -p "$HOME/.pki/nssdb"
+          certutil -N -d "sql:$HOME/.pki/nssdb" --empty-password
+          symfony server:ca:install
+          symfony local:server:start --port=8080 -d
+      - name: Run screenshots
+        run: bin/console ldap:screenshots --override-hostname=ldap-frontend.localhost:8080
+      - name: Prepare artifact folder
+        run: |
+          mkdir -p artifact/screenshots
+          mkdir -p artifact/logs/app
+          mkdir -p artifact/logs/server
+          
+          cp -r screenshots/output/* artifact/screenshots/ || true
+          cp -r var/log/* artifact/logs/app/ || true
+          cp -r ~/.symfony5/log/* artifact/logs/server/ || true
+      - name: Upload screenshots (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: artifact
+          if-no-files-found: ignore
+      - name: Stop Symfony server
+        run: |
+          symfony local:server:stop

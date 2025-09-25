@@ -10,6 +10,7 @@ module.exports.setupBrowserAndPage = async () => {
         args: [
             '--single-process',
             '--ignore-certificate-errors',
+            '--no-sandbox', // Github actions screenshots job will crash without this...
         ],
         // ignoreHTTPSErrors: true,
         //headless: false,

@@ -39,6 +39,7 @@ class ScreenshotsCommand extends Command
     protected function configure(): void
     {
         $this
+            ->addOption('override-hostname', null, InputOption::VALUE_REQUIRED, 'Override the hostname')
             ->addOption('protocol', null, InputOption::VALUE_OPTIONAL, 'http or https', 'https')
             ->addOption('no-build', null, InputOption::VALUE_NONE, 'disable "yarn build" step')
         ;
@@ -93,6 +94,7 @@ class ScreenshotsCommand extends Command
                 });
             } catch (ProcessFailedException $exception) {
                 echo $exception->getMessage();
+                return Command::FAILURE;
             }
         }
 
@@ -110,10 +112,12 @@ class ScreenshotsCommand extends Command
         $outputDir = "{$outputBaseDir}/" . (new \DateTime())->format('Ymd-His');
 
         $protocol = $input->getOption('protocol');
+        $hostname = $input->getOption('override-hostname') ?? $this->frontendHostname;
+
         $processArgs = [
             $path,
             "frontend",
-            "{$protocol}://{$this->frontendHostname}/",
+            "{$protocol}://{$hostname}/",
             "{$outputDir}/",
         ];
 
@@ -133,6 +137,7 @@ class ScreenshotsCommand extends Command
             });
         } catch (ProcessFailedException $exception) {
             echo $exception->getMessage();
+            return Command::FAILURE;
         }
 
         return Command::SUCCESS;

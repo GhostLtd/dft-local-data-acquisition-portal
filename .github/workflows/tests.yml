@@ -12,19 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup PHP environment
-        uses: ./.github/actions/setup-php-env
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Setup Node.js 22.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22.x"
-          cache: "yarn"
-      - name: Install JS dependencies
-        run: yarn install --immutable
-      - name: Run build
-        run: yarn build
+      - name: Setup PHP and JS environment
+        uses: ./.github/actions/setup-php-and-js-env
       # PHP-WebDriver / Panther doesn't seem to play well with later Chrome versions
       #     - lots of unexpected staleElementReference errors
       - name: Setup Chrome 128 + matching ChromeDriver
