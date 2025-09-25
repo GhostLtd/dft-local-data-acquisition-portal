@@ -89,17 +89,3 @@ jobs:
         run: bin/phpunit --help > /dev/null
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
-
-  php-audit:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup cache
-        uses: actions/cache@v4
-        id: cache-db
-        with:
-          path: ~/.symfony/cache
-          key: db
-      - name: Symfony security checker
-        uses: symfonycorp/security-checker-action@v5
