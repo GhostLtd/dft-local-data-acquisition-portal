@@ -41,7 +41,6 @@ The configuration used to power the cloud build CD pipeline can be found in:
 ### Notes:
 
 * Maintenance mode is mandatory - the CI / cloud build script will fail if not enabled.
-* If there are no migrations, maintenance mode could technically be disabled after the CI check has passed.
 * When deploying to prod, it would be sensible to:
   - Copy the database from prod -> dev
   - Deploy against dev and check that everything works
