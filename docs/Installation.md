@@ -2,20 +2,53 @@
 
 # Installation
 
-### Set environment variables in .env
+## Set environment variables in .env / .env.local
 
-#### Required:
-* `DATABASE_PASSWORD`
-* `DATABASE_SERVER_VERSION`
+### Required:
 
-#### Optional:
-* `DATABASE_DRIVER` (defaults to `pdo_pgsql`)
-* `DATABASE_USER` (defaults to `ldap`)
-* `DATABASE_NAME` (defaults to `ldap`)
-* `DATABASE_HOST` (defaults to `127.0.0.1`)
+* `APP_DATABASE_URL`
+  - Specifies database connection details as per [symfony documentation](https://symfony.com/doc/current/doctrine.html#configuring-the-database)
+  - MySQL 8.x has been the database of choice, but others should also work (e.g. Sqlite 3.x is used in the test suite)
 
-#### Notes:
-* Separate configuration options are used here instead of a single combined url-style DSN, as:
-  * When using a unix_socket to connect with Postgresql, the socket needs to be passed in the "dbal.host" field.
-  * The url-style DSN does not support 'path' characters in the host part of the URL.
-  * See [related discussion](https://github.com/doctrine/dbal/issues/3624#issuecomment-558843253) on Github for more information.
+
+* `APP_ADMIN_HOSTNAME`
+* `APP_FRONTEND_HOSTNAME`
+  - Admin and frontend hostnames (without protocol) - e.g. `admin.dft-ldap.localhost`
+
+* `APP_NOTIFY_API_KEY` (Needed for production deployments)
+  - GOV UK Notify to allow app to send login link emails to users
+
+* `APP_SECRET`
+  - Symfony secret; used in various places throughout the app (e.g. rate limiter, remember me, login links) 
+
+### Optional
+
+* `APP_FEATURES`
+  - Set to `dev-auto-login` to enable auto-login when in the dev environment
+
+
+* `APP_ENV_LABEL_FRONTEND` 
+* `APP_ENV_LABEL_COLOUR`
+* `APP_ENV_LABEL_BACKGROUND`
+  - If set, these toggle a bar at the top of the site, so that it can be visibly flagged as a dev/test site, for example: 
+    ```dotenv
+    APP_ENV_LABEL_FRONTEND="Local DEV site"
+    APP_ENV_LABEL_COLOUR="#ffffff"
+    APP_ENV_LABEL_BACKGROUND="#ff0080"
+    ```
+* `APP_SMARTLOOK_API_KEY`
+  - Used to set the Smartlook API Key. If set, enables Smartlook session recording (used for user-testing purposes)
+
+## PHP setup
+
+* Set environment variables as above
+* Have PHP 8.3 installed
+* Have [composer 2.x](https://getcomposer.org/download/) installed
+* `composer install`
+* `bin/console cache:clear`
+
+## Javascript setup
+
+* Requires node: tested working with v22.x (recommend installing with nvm)
+* Requires yarn: tested working with v4.x  (if corepack enabled, this will get auto-installed as defined in package.json)
+* `yarn install` / `yarn build` (or `yarn watch` for dev-mode auto-compilation upon change)

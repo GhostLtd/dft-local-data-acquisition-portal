@@ -11,6 +11,8 @@
 ## Related documents / config
 - [ChangeLog](./docs/ChangeLog.md)
 - [Installation](./docs/Installation.md)
+- [Deployment](./docs/Deployment.md)
+- [Development](./docs/Development.md)
 - [Environment variables `Features` config](docs/Features.md)
 - [TableHelper](docs/TableHelper.md)
 - [Twig](docs/Twig.md)
