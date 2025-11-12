@@ -42,15 +42,20 @@ class SchemeType extends AbstractType implements DataMapperInterface
         $data = $options['data'];
         $this->authority = $options['authority'];
 
-        if ($data->getAuthority() === null) {
+        // Are we adding, or editing?
+        $isAdd = $data->getAuthority() === null;
+
+        if ($isAdd) {
             // This is needed for the voter to work...
             // It also sets the scheme identifier
             $this->authority->addScheme($data);
         }
 
-        $canEditCriticalSchemeFields = $this->authorizationChecker->isGranted(Role::CAN_EDIT_CRITICAL_SCHEME_FIELDS, $data);
         $canEditCriticalCrstsSchemeFields = $this->authorizationChecker->isGranted(Role::CAN_EDIT_CRITICAL_CRSTS_SCHEME_FIELDS, $data);
-        $canRemoveCrstsFundFromScheme = $this->authorizationChecker->isGranted(Role::CAN_REMOVE_CRSTS_FUND_FROM_SCHEME, $data);
+
+        $canToggleCrstsFund =
+            $isAdd ||
+            $this->authorizationChecker->isGranted(Role::CAN_REMOVE_CRSTS_FUND_FROM_SCHEME, $data);
 
         $transportModeCategories = TransportModeCategory::cases();
 
@@ -119,12 +124,12 @@ class SchemeType extends AbstractType implements DataMapperInterface
                 'choices' => Fund::enabledCases(),
                 'choice_label' => fn(Fund $choice) => "enum.fund.{$choice->value}",
                 'choice_value' => fn(?Fund $choice) => $choice?->value,
-                'choice_options' => function(?Fund $choice) use ($canRemoveCrstsFundFromScheme) {
+                'choice_options' => function(?Fund $choice) use ($canToggleCrstsFund) {
                     $options = [];
 
                     if ($choice === Fund::CRSTS1) {
                         $options['conditional_form_name'] = 'crstsData';
-                        $options['disabled'] = !$canRemoveCrstsFundFromScheme;
+                        $options['disabled'] = !$canToggleCrstsFund;
                     }
 
                     return $options;

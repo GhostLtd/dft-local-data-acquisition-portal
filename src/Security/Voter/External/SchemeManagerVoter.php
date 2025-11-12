@@ -41,6 +41,7 @@ class SchemeManagerVoter extends Voter
             return true;
         }
 
+        // Or the user is the admin for the authority that this subject belongs to...
         $user = $token->getUser();
         if ($subject instanceof Scheme) {
             $subject = $subject->getAuthority();

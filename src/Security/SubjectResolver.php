@@ -48,6 +48,11 @@ class SubjectResolver
 
             $originalSubject = $subject;
 
+            if ($subject instanceof Scheme) {
+                $idMap[Scheme::class] = $subject?->getId();
+                $subject = $subject->getAuthority();
+            }
+
             if ($subject instanceof SchemeReturn) {
                 $idMap[SchemeReturn::class] = $subject->getId();
                 $idMap[Scheme::class] = $subject?->getScheme()?->getId();
@@ -135,6 +140,12 @@ class SubjectResolver
             InternalRole::HAS_VALID_VIEW_PERMISSION,
         ])) {
             $validBaseClasses[] = Authority::class;
+        }
+
+        if (in_array($role, [
+            InternalRole::HAS_VALID_MANAGE_SCHEME_PERMISSION,
+        ])) {
+            $validBaseClasses[] = Scheme::class;
         }
 
         // No, you can't replace this loop with in_array, because ::class is not the same as instanceof (inheritance!)
