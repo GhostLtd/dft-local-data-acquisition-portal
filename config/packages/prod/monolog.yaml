@@ -10,6 +10,8 @@ monolog:
             type: rotating_file
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
+            max_files: 10
+            include_stacktraces: true
         console:
             type: console
             process_psr_3_messages: false

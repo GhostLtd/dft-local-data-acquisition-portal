@@ -1747,11 +1747,11 @@
         },
         {
             "name": "ghost/govuk-frontend-bundle",
-            "version": "4.0.0",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://git.tomarq.net/ghost/govuk-frontend-bundle.git",
-                "reference": "c7c00668ae1a5257e60648448d65093fc10d42f9"
+                "reference": "6b5ccc521bfaed66185f0d03fd681db0dd6811f0"
             },
             "require": {
                 "brick/math": "^0.12.1",
@@ -1807,7 +1807,7 @@
                 }
             ],
             "description": "Symfony integration bundle for govuk-frontend",
-            "time": "2025-07-21T11:36:41+00:00"
+            "time": "2025-11-12T11:47:37+00:00"
         },
         {
             "name": "google/auth",
